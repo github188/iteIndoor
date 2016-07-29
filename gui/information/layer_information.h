@@ -68,7 +68,7 @@ void setInformationContentTheme(char* themeStr);
 void setInformationContentSender(char* senderStr);
 void setInformationContentTime(char* timeStr);
 void setInformationContentDetail(char* detailStr);
-void setInformationContentImage(char* imageStr);
+bool setInformationContentImage(char* imageStr);
 void setInformationList();
 bool setInformationListIsVisible(uint8_t index, bool status);
 bool setInformationIsReaded(uint8_t index, INFORMATION_MSGICON_STATUS_e status);

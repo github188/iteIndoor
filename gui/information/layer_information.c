@@ -38,12 +38,15 @@ static ITUText*			informationMSGListSenderText;
 
 //MSGContent
 static ITUTextBox*		informationMSGContentDetailTextBox;
-static ITUBackground*	informationMSGContentImageBackground;
+static ITUBackground*	informationMSGContentImageIcon;
 static ITUText*			informationMSGContentSenderText;
 static ITUText*			informationMSGContentThemeText;
 static ITUText*			informationMSGContentTimeText;
 
 
+static uint8_t*	gInformationImageData;
+static int		gInformationImageSize;
+static char		gInformationImageFilePath[PATH_MAX];
 
 
 bool informationLayerOnEnter(ITUWidget* widget, char* param)
@@ -331,6 +334,24 @@ void setInformationContent(uint8_t index)
 
 	sprintf(tmpStr, "%s", "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
 	setInformationContentDetail(tmpStr);
+
+	if (index == 0)
+	{
+		strcpy(gInformationImageFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_05.jpg");
+	}
+	else if (index == 1)
+	{
+		strcpy(gInformationImageFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_02.jpg");
+	}
+	else if (index == 2)
+	{
+		strcpy(gInformationImageFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_04.jpg");
+	}
+	else if (index == 3)
+	{
+		strcpy(gInformationImageFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_03.jpg");
+	}
+	setInformationContentImage(gInformationImageFilePath);
 }
 
 void setInformationContentTheme(char* themeStr)
@@ -363,48 +384,49 @@ void setInformationContentTime(char* timeStr)
 	ituTextSetString(informationMSGContentTimeText, timeStr);
 }
 
-void setInformationContentImage(char* imageStr)
+bool setInformationContentImage(char* imageStr)
 {
 	FILE*	tmpFile;
 
-	if (!informationMSGContentImageBackground)
+	if (!informationMSGContentImageIcon)
 	{
-		informationMSGContentImageBackground = ituSceneFindWidget(&theScene, "informationMSGContentImageBackground");
-		assert(informationMSGContentImageBackground);
+		informationMSGContentImageIcon = ituSceneFindWidget(&theScene, "informationMSGContentImageIcon");
+		assert(informationMSGContentImageIcon);
 	}
 
-	//// try to load minipic jpeg file if exists
-	//tmpFile = fopen(iconAddr, "rb");
-	//if (tmpFile)
-	//{
-	//	struct stat sb;
-	//	if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
-	//	{
-	//		gPhotoMsgListIconSize = (int)sb.st_size;
-	//		gPhotoMsgListIconData = malloc(gPhotoMsgListIconSize);
-	//		if (gPhotoMsgListIconSize)
-	//		{
-	//			gPhotoMsgListIconSize = fread(gPhotoMsgListIconData, 1, gPhotoMsgListIconSize, tmpFile);
-	//		}
-	//	}
-	//	fclose(tmpFile);
-	//}
-	//else
-	//{
-	//	printf("open  minipic jepg icon icon failed!");
-	//	ituWidgetSetVisible(photoMsgListMiniPicIcon, FALSE);
-	//	return FALSE;
-	//}
-	//if (gPhotoMsgListIconData)
-	//{
-	//	ituIconLoadJpegData((ITUIcon*)photoMsgListMiniPicIcon, gPhotoMsgListIconData, gPhotoMsgListIconSize);
-	//}
-	//else
-	//{
-	//	printf("load minipic jepg icon failed!");
-	//	ituWidgetSetVisible(photoMsgListMiniPicIcon, FALSE);
-	//	return FALSE;
-	//}
+	// try to load minipic jpeg file if exists
+	tmpFile = fopen(imageStr, "rb");
+	if (tmpFile)
+	{
+		struct stat sb;
+		if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
+		{
+			gInformationImageSize = (int)sb.st_size;
+			gInformationImageData = malloc(gInformationImageSize);
+			if (gInformationImageSize)
+			{
+				gInformationImageSize = fread(gInformationImageData, 1, gInformationImageSize, tmpFile);
+			}
+		}
+		fclose(tmpFile);
+	}
+	else
+	{
+		printf("open  minipic jepg icon icon failed!");
+		ituWidgetSetVisible(informationMSGContentImageIcon, FALSE);
+		return FALSE;
+	}
+	if (gInformationImageData)
+	{
+		ituIconLoadJpegData((ITUIcon*)informationMSGContentImageIcon, gInformationImageData, gInformationImageSize);
+		return TRUE;
+	}
+	else
+	{
+		printf("load minipic jepg icon failed!");
+		ituWidgetSetVisible(informationMSGContentImageIcon, FALSE);
+		return FALSE;
+	}
 }
 
 void setInformationContentDetail(char* detailStr)

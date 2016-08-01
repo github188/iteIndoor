@@ -16,46 +16,38 @@ Modification:
 
 static ITUText*		mainDigitalClockWeekText;
 static ITUSprite*	mainIPSprite;
-
 static ITUIcon*		mainNetStatusOffIcon;
 static ITUSprite*	mainNetStatusOnSprite;
-
 static ITUText*		mainDeviceNoText;
-
 static ITUButton*	mainSOSOnButton;
 static ITUButton*	mainSOSOffButton;
-
 static ITUIcon*		page1NoDisturbOnIcon;
 static ITUText*		page1NoDisturbOnText;
 static ITUIcon*		page1NoDisturbOffIcon;
 static ITUText*		page1NoDisturbOffText;
-
 static ITUIcon*		page1RecorderNumIcon;
 static ITUText*		page1RecorderNumText;
-
 static ITUIcon*		page0SecurityNumIcon;
 static ITUText*		page0SecurityNumText;
 static ITUSprite*   page0SecuritySprite;
-
 static ITUIcon*		page0PhotoMsgNumIcon;
 static ITUText*		page0PhotoMsgNumText;
-
 static ITUIcon*		page0InformationNumIcon;
 static ITUText*		page0InformationNumText;
-
 static ITUIcon*		page0MissCallNumIcon;
 static ITUText*		page0MissCallNumText;
 
 
-static bool gDistrubStstus = FALSE;
+static bool		gDistrubStstus = FALSE;
+static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
 
 
 
-bool mainMenuLayerOnEnter(ITUWidget* widget, char* param)
+bool mainLayerOnEnter(ITUWidget* widget, char* param)
 {
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
+	mainLayerCornerNumReload();
 
-	//setDigtalClockWeek();				//设置时钟星期
 
 	setNetworkStatus(TRUE);				//设置网络状态
 	setDeviceNo((char*)"NO:010101011");	//设置设备编号
@@ -69,8 +61,47 @@ bool mainMenuLayerOnEnter(ITUWidget* widget, char* param)
 	setMissCallNum((uint8_t)11);		//设置未接来电数
 	setIpIconStatus(TRUE);				//设置IP模块启用与否
 
+	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
+
 	return TRUE;
 }
+
+
+bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
+{
+	char buf[10] = { 0 };
+
+	uint32_t duration;
+	uint32_t curtime = SDL_GetTicks();
+
+	if (curtime >= gMainLayerLastTimeTick)
+	{
+		duration = curtime - gMainLayerLastTimeTick;
+	}
+	else
+	{
+		duration = 0xFFFFFFFF - gMainLayerLastTimeTick + curtime;
+	}
+
+	if (duration >= MS_PER_SECOND)		//时间差是以毫秒为单位
+	{
+		gMainLayerLastTimeTick = curtime;
+		//TODO:读取存储和全局变量对比，不一样时候在设置各种状态值
+	}
+}
+
+
+void mainLayerCornerNumReload()
+{
+	//TODO:用户在界面Enter时候载入不需要实时去获取的数据！！！！！
+}
+
+
+bool getIpIconStatus()
+{
+	return (bool)get_ipmodule_bindstate();		//获取是否启用IP模块
+}
+
 
 void setIpIconStatus(bool status)
 {
@@ -83,57 +114,14 @@ void setIpIconStatus(bool status)
 }
 
 
-void setDigtalClockWeek()
+bool getNetworkStatus()
 {
-	char* week;
-	if (!mainDigitalClockWeekText)
-	{
-		mainDigitalClockWeekText = ituSceneFindWidget(&theScene, "mainDigitalClockWeekText");
-		assert(mainDigitalClockWeekText);
-	}
-	week = getWeekStringByDay(2016, 8, 9);	
-	ituTextSetString(mainDigitalClockWeekText, week);
-	free(week);
-}
-
-char* getWeekStringByDay(uint16_t year, uint16_t month, uint16_t day)
-{
-	char* weekStr = malloc(sizeof(char) * 10);
-	uint8_t week = 6; //TODO: getWeekByDay(2016, 10, 7);
-	switch (week)
-	{
-	case 0:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	case 1:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	case 2:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	case 3:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	case 4:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	case 5:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	case 6:
-		sprintf(weekStr, "%s", "星期一");
-		break;
-	default:
-		break;
-
-	}
-	return (char*)weekStr;
+	return (bool)NetworkIsReady();
 }
 
 
 void setNetworkStatus(bool status)
 {
-	
 	if (!mainNetStatusOffIcon)
 	{
 		mainNetStatusOffIcon = ituSceneFindWidget(&theScene, "mainNetStatusOffIcon");
@@ -155,6 +143,17 @@ void setNetworkStatus(bool status)
 		ituWidgetSetVisible(mainNetStatusOffIcon, TRUE);
 	}
 }
+
+
+char* getDeviceNo()
+{
+	char tmpStr[50] = { 0 };
+	PFULL_DEVICE_NO tmpDev = storage_get_devparam();
+	sprintf(tmpStr, "%s%s", "No:", tmpDev->DeviceNoStr);
+
+	return tmpStr;
+}
+
 
 void setDeviceNo(char* deviceno)
 {
@@ -190,6 +189,13 @@ void setSOSBtnType(bool status)
 		ituWidgetSetVisible(mainSOSOffButton, TRUE);
 	}
 }
+
+
+bool getDisturbStatus()
+{
+	return (bool)storage_get_noface();	//存储获取是否启用免打扰
+}
+
 
 void setDisturbStatus(bool status)
 {
@@ -246,6 +252,13 @@ bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 	return TRUE;
 }
 
+
+uint8_t	getRecorderNum()
+{
+	return 0;
+}
+
+
 void setRecorderNum(uint8_t num)
 {
 	char numstr[4] = { 0 };
@@ -282,6 +295,13 @@ void setRecorderNum(uint8_t num)
 		ituWidgetSetVisible(page1RecorderNumText, FALSE);
 	}
 }
+
+
+uint8_t getPhotoMsgNum()
+{
+	return 0;
+}
+
 
 void setPhotoMsgNum(uint8_t num)
 {
@@ -320,6 +340,12 @@ void setPhotoMsgNum(uint8_t num)
 	}
 }
 
+
+uint8_t setInformationNum()
+{
+	return 0;
+}
+
 void setInformationNum(uint8_t num)
 {
 	char numstr[4] = { 0 };
@@ -355,6 +381,12 @@ void setInformationNum(uint8_t num)
 		ituWidgetSetVisible(page0InformationNumIcon, FALSE);
 		ituWidgetSetVisible(page0InformationNumText, FALSE);
 	}
+}
+
+
+uint8_t getMissCallNun()
+{
+	return 0;
 }
 
 
@@ -396,6 +428,12 @@ void	setMissCallNum(uint8_t num)
 }
 
 
+uint8_t getSecurityAlarmNum()
+{
+	return 0;
+}
+
+
 void setSecurityAlarmNum(uint8_t num)
 {
 	char numstr[4] = { 0 };
@@ -432,6 +470,7 @@ void setSecurityAlarmNum(uint8_t num)
 		ituWidgetSetVisible(page0SecurityNumText, FALSE);
 	}
 }
+
 
 void setSecurityStatus(uint8_t status)
 {

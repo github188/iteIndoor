@@ -337,7 +337,7 @@ void setInformationContent(uint8_t index)
 
 	if (index == 0)
 	{
-		strcpy(gInformationImageFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_05.jpg");
+		strcpy(gInformationImageFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_01.jpg");
 	}
 	else if (index == 1)
 	{

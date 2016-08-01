@@ -195,7 +195,8 @@ extern void SetAlarmSingleAttrLayerOnReturn(void);
 ITUActionFunction actionFunctions[] =
 {
     //mainMenu
-	"mainMenuLayerOnEnter", mainMenuLayerOnEnter,
+	"mainLayerOnEnter", mainLayerOnEnter,
+	"mainLayerTimeoutOnTimer", mainLayerTimeoutOnTimer,
 	"mainDistrubStatusOnChange", mainDistrubStatusOnChange,
 
 	//elevatorCall

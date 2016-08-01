@@ -394,7 +394,7 @@ void setPhotoMsgList()
 		{
 			if (i < msgNum)
 			{
-				strcpy(gPhotoMsgListIconFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_05.jpg");
+				strcpy(gPhotoMsgListIconFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_02.jpg");
 				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
 
 				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);

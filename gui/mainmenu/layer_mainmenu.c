@@ -37,6 +37,8 @@ static ITUText*		page0InformationNumText;
 static ITUIcon*		page0MissCallNumIcon;
 static ITUText*		page0MissCallNumText;
 
+static ITUText*		page0SecurityText;
+
 
 static bool		gDistrubStstus = FALSE;
 static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
@@ -48,7 +50,13 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
 	mainLayerCornerNumReload();
 
-
+	if (!page0SecurityText)
+	{
+		page0SecurityText = ituSceneFindWidget(&theScene, "page0SecurityText");
+		assert(page0SecurityText);
+	}
+	ituWidgetHide(page0SecurityText, ITU_EFFECT_SCROLL_UP, 10);
+	
 	setNetworkStatus(TRUE);				//设置网络状态
 	setDeviceNo((char*)"NO:010101011");	//设置设备编号
 	setSOSBtnType(TRUE);				//设置SOS按键状态
@@ -87,6 +95,10 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 	{
 		gMainLayerLastTimeTick = curtime;
 		//TODO:读取存储和全局变量对比，不一样时候在设置各种状态值
+		if (ituWidgetIsVisible(page0SecurityText) == false)
+			ituWidgetShow(page0SecurityText, ITU_EFFECT_SCROLL_UP, 10);
+		else
+			ituWidgetHide(page0SecurityText, ITU_EFFECT_SCROLL_UP, 10);
 	}
 }
 
@@ -341,7 +353,7 @@ void setPhotoMsgNum(uint8_t num)
 }
 
 
-uint8_t setInformationNum()
+uint8_t getInformationNum()
 {
 	return 0;
 }

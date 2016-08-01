@@ -47,7 +47,7 @@ uint8_t	getRecorderNum();
 void	setRecorderNum(uint8_t num);
 uint8_t getPhotoMsgNum();
 void	setPhotoMsgNum(uint8_t num);
-uint8_t setInformationNum();
+uint8_t getInformationNum();
 void	setInformationNum(uint8_t num);
 uint8_t getSecurityAlarmNum();
 void	setSecurityAlarmNum(uint8_t num);

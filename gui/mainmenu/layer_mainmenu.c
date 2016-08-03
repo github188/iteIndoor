@@ -25,6 +25,7 @@ static ITUIcon*		page1NoDisturbOnIcon;
 static ITUText*		page1NoDisturbOnText;
 static ITUIcon*		page1NoDisturbOffIcon;
 static ITUText*		page1NoDisturbOffText;
+
 static ITUIcon*		page1RecorderNumIcon;
 static ITUText*		page1RecorderNumText;
 static ITUText*		page1RecorderText;
@@ -32,17 +33,49 @@ static ITUIcon*		page1RecorderIcon;
 static ITUIcon*		page1RecorderMiniIcon;
 static ITUText*		page1RecorderScrollTittleText;
 static ITUText*		page1RecorderScrollTimeText;
+
 static ITUIcon*		page0SecurityNumIcon;
 static ITUText*		page0SecurityNumText;
 static ITUSprite*   page0SecuritySprite;
+static ITUText*		page0SecurityScrollAlarmTypeText;
+static ITUText*		page0SecurityScrollTrigerText;
+static ITUText*		page0SecurityScrollTimeText;
+static ITUText*		page0SecurityText;
+static ITUIcon*		page0SecurityMiniIcon;
+static ITUIcon*		page0SecurityIcon;
+
 static ITUIcon*		page0PhotoMsgNumIcon;
 static ITUText*		page0PhotoMsgNumText;
+static ITUText*		page0PhotoMsgScrollTimeText;
+static ITUIcon*		page0PhotoMsgMiniIcon;
+static ITUIcon*		page0PhotoMsgIcon;
+static ITUText*		page0PhotoMsgText;
+
 static ITUIcon*		page0InformationNumIcon;
 static ITUText*		page0InformationNumText;
+static ITUText*		page0InformationScrollThemeText;
+static ITUText*		page0InformationScrollContentText0;
+static ITUText*		page0InformationScrollContentText1;
+static ITUIcon*		page0InformationMiniIcon;
+static ITUIcon*		page0InformationIcon;
+static ITUText*		page0InformationText;
+
 static ITUIcon*		page0MissedCallNumIcon;
 static ITUText*		page0MissedCallNumText;
+static ITUText*		page0IntercomScrollTittleText;
+static ITUText*		page0IntercomScrollFromText;
+static ITUText*		page0IntercomScrollTimeText;
+static ITUIcon*		page0IntercomMiniIcon;
+static ITUText*		page0IntercomText;
+static ITUIcon*		page0IntercomIcon;
+
 
 static ITUWidget*	page1RecorderScrollTextContainer;
+static ITUWidget*	page0PhotoMsgScrollTextContainer;
+static ITUWidget*	page0IntercomScrollTextContainer;
+static ITUWidget*	page0SecurityScrollTextContainer;
+static ITUWidget*	page0InformationScrollTextContainer;
+
 
 
 static bool		gDistrubStstus;
@@ -51,7 +84,7 @@ static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
 
 static bool		gIsScrollingRecorder;
 static uint8_t  gRecorderTextIndex;
-static bool		gIsScrollinginformation;
+static bool		gIsScrollingInformation;
 static uint8_t  gInformationTextIndex;
 static bool		gIsScrollingPhotoMsg;
 static uint8_t  gPhotoMsgTextIndex;
@@ -67,25 +100,19 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 {
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
 	mainLayerCornerNumReload();
-
-	if (!page1RecorderScrollTextContainer)
-	{
-		page1RecorderScrollTextContainer = ituSceneFindWidget(&theScene, "page1RecorderScrollTextContainer");
-		assert(page1RecorderScrollTextContainer);
-	}
-	ituWidgetHide(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, 20);
 	
 	setNetworkStatus(TRUE);				//设置网络状态
 	setDeviceNo((char*)"NO:010101011");	//设置设备编号
 	setSOSBtnType(TRUE);				//设置SOS按键状态
 	setDisturbStatus(gDistrubStstus);	//设置免打扰状态
-	setUnreadRecorderNum((uint8_t)5);	    //设置家人留言条数
-	setUnreadPhotoMsgNum((uint8_t)15);		//设置留影留言条数
-	setUnreadInformationNum((uint8_t)18);		//设置信息条数
-	setSecurityStatus((uint8_t)1);			//设置安防状态
-	setUnsolvedSecurityAlarmNum((uint8_t)11);	//设置安防报警数
-	setUnreadMissCallNum((uint8_t)11);		//设置未接来电数
-	setIpIconStatus(TRUE);					//设置IP模块启用与否
+	setIpIconStatus(TRUE);				//设置IP模块启用与否
+
+	setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());	    //设置家人留言条数
+	setUnreadPhotoMsgNum((uint8_t)getUnreadPhotoMsgNum());		//设置留影留言条数
+	setUnreadInformationNum((uint8_t)getUnreadInformationNum());	//设置信息条数
+	setSecurityStatus((uint8_t)1);								//设置安防状态
+	setUnsolvedSecurityAlarmNum((uint8_t)11);					//设置安防报警数
+	setUnreadMissCallNum((uint8_t)11);							//设置未接来电数
 
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
@@ -116,29 +143,9 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 		//TODO:读取存储和全局变量对比，不一样时候在设置各种状态值
 		gScrollTimeCount++;
 
-		if (gIsScrollingRecorder == true)
-		{
-			if (ituWidgetIsVisible(page1RecorderScrollTextContainer) == false)
-			{
-				if (gRecorderTextIndex >= getUnreadRecorderNum())
-				{
-					gRecorderTextIndex = 0;
-				}
-				else
-				{
-					gRecorderTextIndex++;
-				}
-				setUnreadRecorderText(gRecorderTextIndex);
-				ituWidgetShow(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
-			}
-			else
-			{
-				if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
-				{
-					ituWidgetHide(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
-				}
-			}
-		}
+		setUnreadRecorderScroll();		//未读家人留言滚动功能
+		setUnreadPhotoMsgScroll();		//设置留影留言滚动功能
+		setUnreadInformationScroll();	//设置信息滚动功能
 
 		if (gScrollTimeCount > MAIN_SCROLLTEXT_SHOW_TIME)
 		{
@@ -347,6 +354,11 @@ void setUnreadRecorderNum(uint8_t num)
 		page1RecorderMiniIcon = ituSceneFindWidget(&theScene, "page1RecorderMiniIcon");
 		assert(page1RecorderMiniIcon);
 	}
+	if (!page1RecorderScrollTextContainer)
+	{
+		page1RecorderScrollTextContainer = ituSceneFindWidget(&theScene, "page1RecorderScrollTextContainer");
+		assert(page1RecorderScrollTextContainer);
+	}
 	
 	if (num > 0)
 	{
@@ -377,6 +389,7 @@ void setUnreadRecorderNum(uint8_t num)
 		gRecorderTextIndex = 0;
 		gScrollTimeCount = 0;
 
+		ituWidgetSetVisible(page1RecorderScrollTextContainer, FALSE);
 		ituWidgetSetVisible(page1RecorderMiniIcon, FALSE);
 		ituWidgetSetVisible(page1RecorderNumIcon, FALSE);
 		ituWidgetSetVisible(page1RecorderNumText, FALSE);
@@ -390,28 +403,48 @@ void setUnreadRecorderText(uint8_t index)
 {
 	char tmpStr[50] = { 0 };
 
-	//if (!page1RecorderScrollTittleText)
-	//{
-	//	page1RecorderScrollTittleText = ituSceneFindWidget(&theScene, "page1RecorderScrollTittleText");
-	//	assert(page1RecorderScrollTittleText);
-	//}
 	if (!page1RecorderScrollTimeText)
 	{
 		page1RecorderScrollTimeText = ituSceneFindWidget(&theScene, "page1RecorderScrollTimeText");
 		assert(page1RecorderScrollTimeText);
 	}
+	//TODO:读取存储设置文字内容！！
 	sprintf(tmpStr, "%s%d", "2016-08-03 08:11:1", index);
-
-	//ituTextSetString(page1RecorderScrollTittleText, numstr);
 	ituTextSetString(page1RecorderScrollTimeText, tmpStr);
+}
 
 
+void setUnreadRecorderScroll()
+{
+	if (gIsScrollingRecorder == true)
+	{
+		if (ituWidgetIsVisible(page1RecorderScrollTextContainer) == false)
+		{
+			if (gRecorderTextIndex >= getUnreadRecorderNum())
+			{
+				gRecorderTextIndex = 0;
+			}
+			else
+			{
+				gRecorderTextIndex++;
+			}
+			setUnreadRecorderText(gRecorderTextIndex);
+			ituWidgetShow(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+		}
+		else
+		{
+			if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
+			{
+				ituWidgetHide(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+			}
+		}
+	}
 }
 
 
 uint8_t getUnreadPhotoMsgNum()
 {
-	return 0;
+	return 10;
 }
 
 
@@ -429,8 +462,34 @@ void setUnreadPhotoMsgNum(uint8_t num)
 		page0PhotoMsgNumText = ituSceneFindWidget(&theScene, "page0PhotoMsgNumText");
 		assert(page0PhotoMsgNumText);
 	}
+
+	if (!page0PhotoMsgMiniIcon)
+	{
+		page0PhotoMsgMiniIcon = ituSceneFindWidget(&theScene, "page0PhotoMsgMiniIcon");
+		assert(page0PhotoMsgMiniIcon);
+	}
+	if (!page0PhotoMsgIcon)
+	{
+		page0PhotoMsgIcon = ituSceneFindWidget(&theScene, "page0PhotoMsgIcon");
+		assert(page0PhotoMsgIcon);
+	}
+	if (!page0PhotoMsgText)
+	{
+		page0PhotoMsgText = ituSceneFindWidget(&theScene, "page0PhotoMsgText");
+		assert(page0PhotoMsgText);
+	}
+	if (!page0PhotoMsgScrollTextContainer)
+	{
+		page0PhotoMsgScrollTextContainer = ituSceneFindWidget(&theScene, "page0PhotoMsgScrollTextContainer");
+		assert(page0PhotoMsgScrollTextContainer);
+	}
+
 	if (num > 0)
 	{
+		gIsScrollingPhotoMsg = true;
+		gPhotoMsgTextIndex = 0;
+		gScrollTimeCount = 0;
+
 		if (num > MAIN_MAX_MSG_NUM)
 		{
 			sprintf(numstr, "%d", MAIN_MAX_MSG_NUM);
@@ -441,21 +500,76 @@ void setUnreadPhotoMsgNum(uint8_t num)
 			sprintf(numstr, "%d", num);
 		}
 
+		
 		ituTextSetString(page0PhotoMsgNumText, numstr);
+		ituWidgetSetVisible(page0PhotoMsgText, FALSE);
+		ituWidgetSetVisible(page0PhotoMsgIcon, FALSE);
+		ituWidgetSetVisible(page0PhotoMsgMiniIcon, TRUE);
 		ituWidgetSetVisible(page0PhotoMsgNumText, TRUE);
 		ituWidgetSetVisible(page0PhotoMsgNumIcon, TRUE);
 	}
 	else
 	{
+		gIsScrollingPhotoMsg = false;
+		gPhotoMsgTextIndex = 0;
+		gScrollTimeCount = 0;
+
+		ituWidgetSetVisible(page0PhotoMsgScrollTextContainer, FALSE);
+		ituWidgetSetVisible(page0PhotoMsgMiniIcon, FALSE);
 		ituWidgetSetVisible(page0PhotoMsgNumIcon, FALSE);
 		ituWidgetSetVisible(page0PhotoMsgNumText, FALSE);
+		ituWidgetSetVisible(page0PhotoMsgText, TRUE);
+		ituWidgetSetVisible(page0PhotoMsgIcon, TRUE);
+	}
+}
+
+
+void setUnreadPhotoMsgText(uint8_t index)
+{
+	char tmpStr[50] = { 0 };
+
+	if (!page0PhotoMsgScrollTimeText)
+	{
+		page0PhotoMsgScrollTimeText = ituSceneFindWidget(&theScene, "page0PhotoMsgScrollTimeText");
+		assert(page0PhotoMsgScrollTimeText);
+	}
+	//TODO:读取存储设置文字内容！！
+	sprintf(tmpStr, "%s%d", "2016-08-03 09:22:1", index);
+	ituTextSetString(page0PhotoMsgScrollTimeText, tmpStr);
+}
+
+
+void setUnreadPhotoMsgScroll()
+{
+	if (gIsScrollingPhotoMsg == true)
+	{
+		if (ituWidgetIsVisible(page0PhotoMsgScrollTextContainer) == false)
+		{
+			if (gPhotoMsgTextIndex >= getUnreadPhotoMsgNum())
+			{
+				gPhotoMsgTextIndex = 0;
+			}
+			else
+			{
+				gPhotoMsgTextIndex++;
+			}
+			setUnreadPhotoMsgText(gPhotoMsgTextIndex);
+			ituWidgetShow(page0PhotoMsgScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+		}
+		else
+		{
+			if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
+			{
+				ituWidgetHide(page0PhotoMsgScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+			}
+		}
 	}
 }
 
 
 uint8_t getUnreadInformationNum()
 {
-	return 0;
+	return 8;
 }
 
 void setUnreadInformationNum(uint8_t num)
@@ -472,6 +586,27 @@ void setUnreadInformationNum(uint8_t num)
 		page0InformationNumText = ituSceneFindWidget(&theScene, "page0InformationNumText");
 		assert(page0InformationNumText);
 	}
+	if (!page0InformationScrollTextContainer)
+	{
+		page0InformationScrollTextContainer = ituSceneFindWidget(&theScene, "page0InformationScrollTextContainer");
+		assert(page0InformationScrollTextContainer);
+	}
+	if (!page0InformationText)
+	{
+		page0InformationText = ituSceneFindWidget(&theScene, "page0InformationText");
+		assert(page0InformationText);
+	}
+	if (!page0InformationIcon)
+	{
+		page0InformationIcon = ituSceneFindWidget(&theScene, "page0InformationIcon");
+		assert(page0InformationIcon);
+	}
+	if (!page0InformationMiniIcon)
+	{
+		page0InformationMiniIcon = ituSceneFindWidget(&theScene, "page0InformationMiniIcon");
+		assert(page0InformationMiniIcon);
+	}
+
 	if (num > 0)
 	{
 		if (num > MAX_INFORMATION_NUM)
@@ -484,14 +619,86 @@ void setUnreadInformationNum(uint8_t num)
 			sprintf(numstr, "%d", num);
 		}
 
+		gIsScrollingInformation = TRUE;
+		gInformationTextIndex = 0;
+		gScrollTimeCount = 0;
+
 		ituTextSetString(page0InformationNumText, numstr);
+		ituWidgetSetVisible(page0InformationText, FALSE);
+		ituWidgetSetVisible(page0InformationIcon, FALSE);
+		ituWidgetSetVisible(page0InformationMiniIcon, TRUE);
 		ituWidgetSetVisible(page0InformationNumText, TRUE);
 		ituWidgetSetVisible(page0InformationNumIcon, TRUE);
 	}
 	else
 	{
+		gIsScrollingInformation = false;
+		gInformationTextIndex = 0;
+		gScrollTimeCount = 0;
+
 		ituWidgetSetVisible(page0InformationNumIcon, FALSE);
 		ituWidgetSetVisible(page0InformationNumText, FALSE);
+		ituWidgetSetVisible(page0InformationMiniIcon, FALSE);
+		ituWidgetSetVisible(page0InformationScrollTextContainer, FALSE);
+	}
+}
+
+
+void setUnreadInformationText(uint8_t index)
+{
+	char tmpStr[50] = { 0 };
+
+	if (!page0InformationScrollContentText1)
+	{
+		page0InformationScrollContentText1 = ituSceneFindWidget(&theScene, "page0InformationScrollContentText1");
+		assert(page0InformationScrollContentText1);
+	}
+	if (!page0InformationScrollContentText0)
+	{
+		page0InformationScrollContentText0 = ituSceneFindWidget(&theScene, "page0InformationScrollContentText0");
+		assert(page0InformationScrollContentText0);
+	}
+	if (!page0InformationScrollThemeText)
+	{
+		page0InformationScrollThemeText = ituSceneFindWidget(&theScene, "page0InformationScrollThemeText");
+		assert(page0InformationScrollThemeText);
+	}
+	//TODO:读取存储设置文字内容！！
+	sprintf(tmpStr, "%s%d", "Theme", index);
+	ituTextSetString(page0InformationScrollThemeText, tmpStr);
+
+	sprintf(tmpStr, "%s%d", "01234567890", index);
+	ituTextSetString(page0InformationScrollContentText0, tmpStr);
+	sprintf(tmpStr, "%s%d", "01234567890", index);
+	ituTextSetString(page0InformationScrollContentText1, tmpStr);
+
+}
+
+
+void setUnreadInformationScroll()
+{
+	if (gIsScrollingInformation == true)
+	{
+		if (ituWidgetIsVisible(page0InformationScrollTextContainer) == false)
+		{
+			if (gInformationTextIndex >= getUnreadInformationNum())
+			{
+				gInformationTextIndex = 0;
+			}
+			else
+			{
+				gInformationTextIndex++;
+			}
+			setUnreadInformationText(gInformationTextIndex);
+			ituWidgetShow(page0InformationScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+		}
+		else
+		{
+			if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
+			{
+				ituWidgetHide(page0InformationScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+			}
+		}
 	}
 }
 

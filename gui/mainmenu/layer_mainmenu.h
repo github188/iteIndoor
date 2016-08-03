@@ -49,10 +49,18 @@ void	setSOSBtnType(bool status);
 uint8_t	getUnreadRecorderNum();
 void	setUnreadRecorderNum(uint8_t num);
 void	setUnreadRecorderText(uint8_t index);
+void	setUnreadRecorderScroll();
+
 uint8_t getUnreadPhotoMsgNum();
 void	setUnreadPhotoMsgNum(uint8_t num);
+void	setUnreadPhotoMsgText(uint8_t index);
+void	setUnreadPhotoMsgScroll();
+
 uint8_t getUnreadInformationNum();
 void	setUnreadInformationNum(uint8_t num);
+void	setUnreadInformationText(uint8_t index);
+void	setUnreadInformationScroll();
+
 uint8_t getUnsolvedSecurityAlarmNum();
 void	setUnsolvedSecurityAlarmNum(uint8_t num);
 uint8_t getUnreadMissCallNun();

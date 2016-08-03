@@ -514,7 +514,7 @@ void setInformationList()
 	char tmpStr[50] = { 0 };
 
 	uint8_t msgNum = 20;
-	//uint8_t msgNum = getinformationNum();
+	//uint8_t msgNum = getUnreadinformationNum();
 
 	//TODO: 读取存储内容设置列表信息！！！！！！！
 	for (i = 0; i < MAX_INFORMATION_NUM; i++)

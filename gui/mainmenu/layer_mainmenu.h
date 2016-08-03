@@ -63,7 +63,12 @@ void	setUnreadInformationScroll();
 
 uint8_t getUnsolvedSecurityAlarmNum();
 void	setUnsolvedSecurityAlarmNum(uint8_t num);
-uint8_t getUnreadMissCallNun();
-void	setUnreadMissCallNum(uint8_t num);
+void	setUnsolvedSecurityAlarmText(uint8_t index);
+void	setUnsolvedSecurityAlarmScroll();
+
+uint8_t getUnreadMissedCallNun();
+void	setUnreadMissedCallNum(uint8_t num);
+void	setUnreadMissedCallText(uint8_t index);
+void	setUnreadMissedCallScroll();
 
 #endif // LAYER_MAINMENU_H

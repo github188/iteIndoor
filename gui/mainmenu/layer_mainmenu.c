@@ -62,7 +62,6 @@ static ITUText*		page0InformationText;
 
 static ITUIcon*		page0MissedCallNumIcon;
 static ITUText*		page0MissedCallNumText;
-static ITUText*		page0IntercomScrollTittleText;
 static ITUText*		page0IntercomScrollFromText;
 static ITUText*		page0IntercomScrollTimeText;
 static ITUIcon*		page0IntercomMiniIcon;
@@ -112,7 +111,7 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	setUnreadInformationNum((uint8_t)getUnreadInformationNum());	//设置信息条数
 	setSecurityStatus((uint8_t)1);								//设置安防状态
 	setUnsolvedSecurityAlarmNum((uint8_t)11);					//设置安防报警数
-	setUnreadMissCallNum((uint8_t)11);							//设置未接来电数
+	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());	//设置未接来电数
 
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
@@ -146,6 +145,7 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 		setUnreadRecorderScroll();		//未读家人留言滚动功能
 		setUnreadPhotoMsgScroll();		//设置留影留言滚动功能
 		setUnreadInformationScroll();	//设置信息滚动功能
+		setUnreadMissedCallScroll();	//设置未接来电滚动功能
 
 		if (gScrollTimeCount > MAIN_SCROLLTEXT_SHOW_TIME)
 		{
@@ -216,7 +216,7 @@ char* getDeviceNo()
 	char tmpStr[50] = { 0 };
 	PFULL_DEVICE_NO tmpDev = storage_get_devparam();
 	sprintf(tmpStr, "%s%s", "No:", tmpDev->DeviceNoStr);
-
+	//TODO:返回地址需要申请变量！！！！！！malloc！！！
 	return tmpStr;
 }
 
@@ -632,7 +632,7 @@ void setUnreadInformationNum(uint8_t num)
 	}
 	else
 	{
-		gIsScrollingInformation = false;
+		gIsScrollingInformation = FALSE;
 		gInformationTextIndex = 0;
 		gScrollTimeCount = 0;
 
@@ -640,6 +640,8 @@ void setUnreadInformationNum(uint8_t num)
 		ituWidgetSetVisible(page0InformationNumText, FALSE);
 		ituWidgetSetVisible(page0InformationMiniIcon, FALSE);
 		ituWidgetSetVisible(page0InformationScrollTextContainer, FALSE);
+		ituWidgetSetVisible(page0InformationText, TRUE);
+		ituWidgetSetVisible(page0InformationIcon, TRUE);
 	}
 }
 
@@ -677,7 +679,7 @@ void setUnreadInformationText(uint8_t index)
 
 void setUnreadInformationScroll()
 {
-	if (gIsScrollingInformation == true)
+	if (gIsScrollingInformation == TRUE)
 	{
 		if (ituWidgetIsVisible(page0InformationScrollTextContainer) == false)
 		{
@@ -703,16 +705,16 @@ void setUnreadInformationScroll()
 }
 
 
-uint8_t getUnreadMissCallNun()
+uint8_t getUnreadMissedCallNun()
 {
-	return 0;
+	return 10;
 }
 
 
-void	setUnreadMissCallNum(uint8_t num)
+void	setUnreadMissedCallNum(uint8_t num)
 {
 	char numstr[4] = { 0 };
-
+	
 	if (!page0MissedCallNumIcon)
 	{
 		page0MissedCallNumIcon = ituSceneFindWidget(&theScene, "page0MissedCallNumIcon");
@@ -723,6 +725,27 @@ void	setUnreadMissCallNum(uint8_t num)
 		page0MissedCallNumText = ituSceneFindWidget(&theScene, "page0MissedCallNumText");
 		assert(page0MissedCallNumText);
 	}
+	if (!page0IntercomScrollTextContainer)
+	{
+		page0IntercomScrollTextContainer = ituSceneFindWidget(&theScene, "page0IntercomScrollTextContainer");
+		assert(page0IntercomScrollTextContainer);
+	}
+	if (!page0IntercomIcon)
+	{
+		page0IntercomIcon = ituSceneFindWidget(&theScene, "page0IntercomIcon");
+		assert(page0IntercomIcon);
+	}
+	if (!page0IntercomMiniIcon)
+	{
+		page0IntercomMiniIcon = ituSceneFindWidget(&theScene, "page0IntercomMiniIcon");
+		assert(page0IntercomMiniIcon);
+	}
+	if (!page0IntercomText)
+	{
+		page0IntercomText = ituSceneFindWidget(&theScene, "page0IntercomText");
+		assert(page0IntercomText);
+	}
+
 	if (num > 0)
 	{
 		if (num > MAIN_MAX_MISSCALL_NUM)
@@ -735,14 +758,82 @@ void	setUnreadMissCallNum(uint8_t num)
 			sprintf(numstr, "%d", num);
 		}
 
+		gIsScrollingMissedCall = TRUE;
+		gMissedCallTextIndex = 0;
+		gScrollTimeCount = 0;
+
 		ituTextSetString(page0MissedCallNumText, numstr);
+		ituWidgetSetVisible(page0IntercomText, FALSE);
+		ituWidgetSetVisible(page0IntercomIcon, FALSE);
+		ituWidgetSetVisible(page0IntercomMiniIcon, TRUE);
 		ituWidgetSetVisible(page0MissedCallNumText, TRUE);
 		ituWidgetSetVisible(page0MissedCallNumIcon, TRUE);
 	}
 	else
 	{
+		gIsScrollingMissedCall = FALSE;
+		gMissedCallTextIndex = 0;
+		gScrollTimeCount = 0;
+
+		ituWidgetSetVisible(page0IntercomScrollTextContainer, FALSE);
+		ituWidgetSetVisible(page0IntercomMiniIcon, FALSE);
 		ituWidgetSetVisible(page0MissedCallNumIcon, FALSE);
 		ituWidgetSetVisible(page0MissedCallNumText, FALSE);
+		ituWidgetSetVisible(page0IntercomText, TRUE);
+		ituWidgetSetVisible(page0IntercomIcon, TRUE);
+	}
+}
+
+
+void setUnreadMissedCallText(uint8_t index)
+{
+	char tmpStr[50] = { 0 };
+
+	if (!page0IntercomScrollFromText)
+	{
+		page0IntercomScrollFromText = ituSceneFindWidget(&theScene, "page0IntercomScrollFromText");
+		assert(page0IntercomScrollFromText);
+	}
+	if (!page0IntercomScrollTimeText)
+	{
+		page0IntercomScrollTimeText = ituSceneFindWidget(&theScene, "page0IntercomScrollTimeText");
+		assert(page0IntercomScrollTimeText);
+	}
+
+	//TODO:读取存储设置文字内容！！
+	sprintf(tmpStr, "%s%d", "Admin", index);
+	ituTextSetString(page0IntercomScrollFromText, tmpStr);
+
+	sprintf(tmpStr, "%s%d", "2016-08-03 16:33:1", index);
+	ituTextSetString(page0IntercomScrollTimeText, tmpStr);
+
+}
+
+
+void setUnreadMissedCallScroll()
+{
+	if (gIsScrollingMissedCall == TRUE)
+	{
+		if (ituWidgetIsVisible(page0IntercomScrollTextContainer) == false)
+		{
+			if (gMissedCallTextIndex >= getUnreadMissedCallNun())
+			{
+				gMissedCallTextIndex = 0;
+			}
+			else
+			{
+				gMissedCallTextIndex++;
+			}
+			setUnreadMissedCallText(gMissedCallTextIndex);
+			ituWidgetShow(page0IntercomScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+		}
+		else
+		{
+			if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
+			{
+				ituWidgetHide(page0IntercomScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
+			}
+		}
 	}
 }
 
@@ -810,6 +901,19 @@ void setSecurityStatus(uint8_t status)
 		ituWidgetSetVisible(page0SecuritySprite, FALSE);
 	}
 }
+
+
+void setUnsolvedSecurityAlarmText(uint8_t index)
+{
+
+}
+
+
+void setUnsolvedSecurityAlarmScroll()
+{
+
+}
+
 
 void mainMenuLayerReset()
 {

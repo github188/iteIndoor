@@ -512,9 +512,10 @@ void setInformationList()
 	bool a = FALSE;
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
-
-	uint8_t msgNum = 20;
-	//uint8_t msgNum = getUnreadinformationNum();
+	uint8_t msgNum = 0;
+	MSGLIST* tmpList;
+	tmpList = storage_read_msg_list();
+	msgNum = tmpList->ncount;
 
 	//TODO: 读取存储内容设置列表信息！！！！！！！
 	for (i = 0; i < MAX_INFORMATION_NUM; i++)
@@ -523,20 +524,11 @@ void setInformationList()
 		{
 			if (i < msgNum)
 			{
-				if (a)
-				{
-					a = FALSE;
-				}
-				else
-				{
-					a = TRUE;
-				}
-				setInformationIsReaded(i, a);
-
+				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);
 				sprintf(tmpStr, "%s%d", "Center", i);
 				setInformationListSender(i, tmpStr);
 
-				sprintf(tmpStr, "%s%d", "01234567890123456789", i);
+				sprintf(tmpStr, "%d%d", tmpList->pinfo_data[i].time.year, tmpList->pinfo_data[i].time.month);
 				setInformationListTheme(i, tmpStr);
 
 				sprintf(tmpStr, "%s%d", "2016-06-06 11:11:", i);
@@ -608,6 +600,8 @@ void setInformationList()
 
 		}
 	}
+
+	free(tmpList);
 }
 
 void informationLayerReset()

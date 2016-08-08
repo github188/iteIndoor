@@ -1,10 +1,10 @@
 /*************************************************
   Copyright (C), 2006-2010, Aurine
   File name: 	logic_model_func.c
-  Author:    	xiewr
+  Author:    	chenbh 
   Version:   	1.0
   Date: 
-  Description:  公共命令
+  Description:  
 				
   History:        
     1. Date:
@@ -14,36 +14,84 @@
 *************************************************/
 #include "logic_include.h"
 
+#define NODISTURB_TIME				1				// 没秒检测一次
 
-
+static int g_NofaceTime	= 100;						// 免打扰超时时间
+static uint32 g_NofaceTimer = 0;					// 免打扰定时器
 
 /*************************************************
-  Function:     timer_reboot_control
-  Description:  定时重启屏背光控制切换
-  Input:        
-    1.flag       1: 单片机控制屏背光 
-                 0: N32926控制屏背光
-  Output:       无
-  Return:       无
-  Others:   
-  夜间重启时不能亮屏、不能响开机声音
-  ，以免用户察觉异常。
+  Function:		disturb_timer_proc
+  Description:  免打扰记时定时器
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
 *************************************************/
-void timer_reboot_control(uint8 flag)
-{	
-    if(flag == TRUE)
-    {
-    	storage_set_isOpenScreen(TRUE);
-    }
-    else
-    {
-    	storage_set_isOpenScreen(FALSE);
-		sys_close_lcd();
-		// 为了保证网络芯片模块重启后正常工作
-		sleep(2); 
-    }
-	hw_set_lcd_pwm0(flag);
+void* disturb_timer_proc(uint32 ID, void * arg)
+{
+	if (storage_get_noface())
+	{
+		if (g_NofaceTime > 0)
+		{
+			g_NofaceTime--;			
+		}
+		else
+		{
+			storage_set_noface_enable(FALSE);
+			cancel_aurine_timer(&g_NofaceTimer, NULL);	
+			g_NofaceTimer = 0;
+		}
+	}
+	else
+	{
+		if (g_NofaceTimer)
+		{
+			cancel_aurine_timer(&g_NofaceTimer, NULL);	
+			g_NofaceTimer = 0;
+		}
+	}
 }
 
+/*************************************************
+  Function:		start_disturb_timer
+  Description:  开启免打扰定时器
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
+*************************************************/
+void start_disturb_timer(void)
+{
+	g_NofaceTime = storage_get_noface_time();
+	if (storage_get_noface())
+	{
+		if (g_NofaceTimer)
+		{
+			cancel_aurine_timer(&g_NofaceTimer, NULL);	
+			g_NofaceTimer = 0;
+		}
+
+		// 三秒定时器
+		g_NofaceTimer = add_aurine_realtimer((1000*NODISTURB_TIME), disturb_timer_proc, NULL);	
+		dprintf("g_NofaceTimer : %d \n", g_NofaceTimer);
+	}
+}
+
+/*************************************************
+  Function:		stop_disturb_timer
+  Description:  停止免打扰定时器
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
+*************************************************/
+void stop_disturb_timer(void)
+{
+	if (g_NofaceTimer)
+	{
+		cancel_aurine_timer(&g_NofaceTimer, NULL);	
+		g_NofaceTimer = 0;
+	}
+}
 
 

@@ -12,33 +12,43 @@ Modification:
 *************************************************/
 #include "gui_include.h"
 
-static ITULayer* g_NowLayer = NULL;					// 记录当前页面
-static ITULayer* mainLayer = NULL;					// 主界面
-static ITULayer* SetMenuLayer;						// 设置界面
-static ITULayer* SetPersonalityLayer;				// 个性设置界面
-static ITULayer* SetPersonalityPhotoFrameLayer;		// 电子相框设置界面
-static ITULayer* SetVolumeLayer;					// 音量设置界面
-static ITULayer* SetNoDisturbLayer;					// 免打扰设置界面
-static ITULayer* SetNumKeyBordLayer;				// 数字键盘输入界面
-static ITULayer* SetPasswordLayer;					// 开门密码界面和安防密码界面
-static ITULayer* SetSystemLanguageLayer;			// 系统语言设置
-static ITULayer* SetLinkLayer;						// 联动设置
-static ITULayer* SetUserLayer;						// 用户设置
-static ITULayer* SetAlarmNumLayer;					// 安防号码设置
-static ITULayer* SetAlarmAreaListLayer;				// 防区隔离、防区局防有效
-static ITULayer* SetProjectLayer;					// 工程设置界面
-static ITULayer* SetDataTimeLayer;					// 设置时间和日期
-static ITULayer* SetRingtoneLayer;					// 声音设置
-static ITULayer* SetAlarmRemoteLayer;				// 远程控制
-static ITULayer* SetJDLayer;						// 家电设置
-static ITULayer* SetAlarmLayer;						// 安防设置
-static ITULayer* SetNetParamLayer;					// 网络参数设置
-static ITULayer* SetExtModuleLayer;					// 外部模块设置
-static ITULayer* SetDevnoLayer;						// 设备编号设置
-static ITULayer* SetDiantiParamLayer;				// 电梯IP设置
-static ITULayer* MsgFailHintSuccessLayer;			// 失败、警告、成功消息框
-static ITULayer* SetRtspLayer;						// 监视设置
-static ITULayer* SetAlarmSingleAttrLayer;			// 防区属性设置
+static ITULayer* g_NowLayer = NULL;						// 记录当前页面
+static ITULayer* mainLayer = NULL;						// 主界面
+static ITULayer* SetMenuLayer = NULL;					// 设置界面
+static ITULayer* SetPersonalityLayer = NULL;			// 个性设置界面
+static ITULayer* SetPersonalityPhotoFrameLayer = NULL;	// 电子相框设置界面
+static ITULayer* SetVolumeLayer = NULL;					// 音量设置界面
+static ITULayer* SetNoDisturbLayer = NULL;				// 免打扰设置界面
+static ITULayer* SetNumKeyBordLayer = NULL;				// 数字键盘输入界面
+static ITULayer* SetPasswordLayer = NULL;				// 开门密码界面和安防密码界面
+static ITULayer* SetSystemLanguageLayer = NULL;			// 系统语言设置
+static ITULayer* SetLinkLayer = NULL;					// 联动设置
+static ITULayer* SetUserLayer = NULL;					// 用户设置
+static ITULayer* SetAlarmNumLayer = NULL;				// 安防号码设置
+static ITULayer* SetAlarmAreaListLayer = NULL;			// 防区隔离、防区局防有效
+static ITULayer* SetProjectLayer = NULL;				// 工程设置界面
+static ITULayer* SetDataTimeLayer = NULL;				// 设置时间和日期
+static ITULayer* SetRingtoneLayer = NULL;				// 声音设置
+static ITULayer* SetAlarmRemoteLayer = NULL;			// 远程控制
+static ITULayer* SetJDLayer = NULL;						// 家电设置
+static ITULayer* SetAlarmLayer = NULL;					// 安防设置
+static ITULayer* SetNetParamLayer = NULL;				// 网络参数设置
+static ITULayer* SetExtModuleLayer = NULL;				// 外部模块设置
+static ITULayer* SetDevnoLayer = NULL;					// 设备编号设置
+static ITULayer* SetDiantiParamLayer = NULL;			// 电梯IP设置
+static ITULayer* MsgFailHintSuccessLayer = NULL;		// 失败、警告、成功消息框
+static ITULayer* SetRtspLayer = NULL;					// 监视设置
+static ITULayer* SetAlarmSingleAttrLayer = NULL;		// 防区属性设置
+static ITULayer* SetNetDoorLayer = NULL;				// 门前机设置
+static ITULayer* SetNetDoorNetParamLayer = NULL;		// 门前网络参数设置
+static ITULayer* SetNetDoorLockLayer = NULL;			// 门前锁类型数设置
+static ITULayer* SetNetDoorCardLayer = NULL;			// 门前卡管理
+static ITULayer* SetNetDoorOtherLayer = NULL;			// 门前其他设置
+static ITULayer* SetNetDoorSysInfoLayer = NULL;			// 门前系统信息
+static ITULayer* SetSysInfoLayer = NULL;				// 系统信息
+static ITULayer* SetStorageLayer = NULL;				// 存储管理
+static ITULayer* SetIpProtocolHostLayer = NULL;			// IP协议转换器主机
+static ITULayer* SetIpProtocolFenjiLayer = NULL;		// IP协议转换器分机
 
 /*************************************************
 Function:		SetBottonReturnOnEnter
@@ -129,6 +139,36 @@ bool SetBottonReturnOnEnter(ITUWidget* widget, char* param)
 
 		SetAlarmSingleAttrLayer = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrLayer");
 		assert(SetAlarmSingleAttrLayer);
+
+		SetNetDoorLayer = ituSceneFindWidget(&theScene, "SetNetDoorLayer");
+		assert(SetNetDoorLayer);
+
+		SetNetDoorNetParamLayer = ituSceneFindWidget(&theScene, "SetNetDoorNetParamLayer");
+		assert(SetNetDoorNetParamLayer);
+
+		SetNetDoorLockLayer = ituSceneFindWidget(&theScene, "SetNetDoorLockLayer");
+		assert(SetNetDoorLockLayer);
+
+		SetNetDoorCardLayer = ituSceneFindWidget(&theScene, "SetNetDoorCardLayer");
+		assert(SetNetDoorCardLayer);
+
+		SetNetDoorOtherLayer = ituSceneFindWidget(&theScene, "SetNetDoorOtherLayer");
+		assert(SetNetDoorOtherLayer);
+
+		SetNetDoorSysInfoLayer = ituSceneFindWidget(&theScene, "SetNetDoorSysInfoLayer");
+		assert(SetNetDoorSysInfoLayer);
+
+		SetSysInfoLayer = ituSceneFindWidget(&theScene, "SetSysInfoLayer");
+		assert(SetSysInfoLayer);
+
+		SetStorageLayer = ituSceneFindWidget(&theScene, "SetStorageLayer");
+		assert(SetStorageLayer);
+
+		SetIpProtocolHostLayer = ituSceneFindWidget(&theScene, "SetIpProtocolHostLayer");
+		assert(SetIpProtocolHostLayer);
+
+		SetIpProtocolFenjiLayer = ituSceneFindWidget(&theScene, "SetIpProtocolFenjiLayer");
+		assert(SetIpProtocolFenjiLayer);
 	}
 
 	return true;
@@ -164,12 +204,18 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		if (!ituWidgetIsVisible(mainLayer))
 		{
 			ituLayerGoto(mainLayer);
-		}
-			
+		}	
 		return true;
 	}
 
 	if (g_NowLayer == SetPersonalityLayer)
+	{
+		if (!ituWidgetIsVisible(SetMenuLayer))
+			ituLayerGoto(SetMenuLayer);
+		return true;
+	}
+
+	if ((g_NowLayer == SetSysInfoLayer) || (g_NowLayer == SetStorageLayer) || (g_NowLayer == SetIpProtocolHostLayer) || (g_NowLayer == SetIpProtocolFenjiLayer))
 	{
 		if (!ituWidgetIsVisible(SetMenuLayer))
 			ituLayerGoto(SetMenuLayer);
@@ -242,7 +288,7 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		return true;
 	}
 
-	if (g_NowLayer == SetProjectLayer)
+	if (g_NowLayer == SetProjectLayer) 
 	{
 		if (!ituWidgetIsVisible(SetMenuLayer))
 		{
@@ -335,11 +381,47 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		return true;
 	}
 
-	return false;
-}
+	if (g_NowLayer == SetNetDoorLayer)
+	{
+		SetNetDoorLayerOnReturn();
+		return true;
+	}
 
-void SetBottonReturnReset(void)
-{
-	g_NowLayer = NULL;
-	mainLayer = NULL;
+	if (g_NowLayer == SetNetDoorNetParamLayer)
+	{
+		SetNetDoorNetparamLayerOnReturn();
+		return true;
+	}
+
+	if (g_NowLayer == SetNetDoorLockLayer)
+	{
+		SetNetDoorLockLayerOnReturn();
+		return true;
+	}
+
+	if (g_NowLayer == SetNetDoorCardLayer)
+	{
+		if (!ituWidgetIsVisible(SetNetDoorLayer))
+		{
+			ituLayerGoto(SetNetDoorLayer);
+		}
+		return true;
+	}
+
+	if (g_NowLayer == SetNetDoorOtherLayer)
+	{
+		SetNetDoorOtherLayerOnReturn();
+		return true;
+	}
+
+	if (g_NowLayer == SetNetDoorSysInfoLayer)
+	{
+		if (!ituWidgetIsVisible(SetNetDoorLayer))
+		{
+			ituLayerGoto(SetNetDoorLayer);
+		}
+		return true;
+	}
+
+	return false;
 }

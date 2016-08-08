@@ -20,17 +20,16 @@
 
 extern RP_EVENT_SERVER_INFO g_Event_Server;
 
-#ifdef _RTSP_REG_KEEP_
+
 /*************************************************
-  Function:    	logic_rtsp_ontimer
-  Description:	与流媒体服务器定时保持
-  Input:		无	
-  Output:		无
-  Return:		无
-  Others:		ipad与iPhone才能获取到室内摄像头	
+  Function:			init_rtsp_timer
+  Description:		
+  Input: 	
+  Output:			无
+  Return:			
+  Others:
 *************************************************/
-void logic_rtsp_ontimer(void);
-#endif
+void init_rtsp_timer(void);
 
 /*************************************************
   Function:    		logic_reg_center_state

@@ -18,8 +18,6 @@
 
 
 #define	SYS_FAMILY_RECORD_MAXTIME		30
-extern uint8 g_LylyNum;
-extern uint8 g_MsgNum;
 
 // 时间、进度、状态:TRUE-正常/FALSE-出错
 typedef int32 (*MediaPlayCallback)(int32 param1,int32 param2,int32 state);
@@ -223,6 +221,17 @@ void sys_set_hint_state(SYS_HINT_TYPE HintType, uint8 flg);
   Others:			
 *************************************************/
 uint8 sys_get_hint_state(SYS_HINT_TYPE HintType);
+
+/*************************************************
+  Function:			sys_get_hint_num
+  Description: 		获得每种状态的信息条数
+  Input: 		
+  	1.HintType		系统状态类型
+  Output:			无
+  Return:			
+  Others:			
+*************************************************/
+uint8 sys_get_hint_num(SYS_HINT_TYPE HintType);
 
 /*************************************************
   Function:			sys_sync_hint_state

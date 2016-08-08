@@ -80,17 +80,7 @@ int32 rtsp_monitor_stop(void);
 void init_ipc_state(void);
 
 /*************************************************
-  Function:			ipc_ontimer
-  Description:		
-  Input: 	
-  Output:			无
-  Return:			
-  Others:			ipc状态定时器
-*************************************************/
-void ipc_ontimer(void);
-
-/*************************************************
-  Function:			ipc_ontimer
+  Function:			get_ipc_state
   Description:		
   Input: 	
   	index			设备编号索引 0-9

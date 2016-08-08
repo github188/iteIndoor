@@ -219,6 +219,9 @@ config BL_INFO
 config BL_DBG
     def_bool y
 
+config BUILD_LEAF
+    def_bool y
+
 endif
 ######################################################################
 # End of bootloader setting

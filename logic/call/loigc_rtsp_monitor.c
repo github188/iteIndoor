@@ -71,6 +71,7 @@ typedef struct
 static SelfIPCameraList g_ipc_list[MAX_HOME_NUM];	// IPC已保持列表
 static PNewMonitorDeviceList g_CommDevlist = NULL;	// 社区列表
 static uint32 g_MainDevIP = 0;						// 获得的主机IP
+static uint32 g_IpcTimerID = 0;						// ipc定时器id
 #endif
 
 /*************************************************
@@ -1398,6 +1399,26 @@ exit:
 
 #ifdef _NEW_SELF_IPC_
 /*************************************************
+  Function:			ipc_ontimer
+  Description:		
+  Input: 	
+  Output:			无
+  Return:			
+  Others:			ipc状态定时器
+*************************************************/
+static void* ipc_ontimer_proc(uint32 ID, void * arg)
+{
+	int i = 0;
+	for (i=0; i<MAX_HOME_NUM; i++)
+	{
+		if (g_ipc_list[i].TimeOut > 0)
+		{
+			g_ipc_list[i].TimeOut--;
+		}
+	}
+}
+
+/*************************************************
   Function:			init_ipc_state
   Description:		
   Input: 	
@@ -1431,26 +1452,12 @@ void init_ipc_state(void)
 			g_CommDevlist->Comdev[i].isOnLine = 1;		// 默认都是在线的
 		}
 	}
-}
 
-/*************************************************
-  Function:			ipc_ontimer
-  Description:		
-  Input: 	
-  Output:			无
-  Return:			
-  Others:			ipc状态定时器
-*************************************************/
-void ipc_ontimer(void)
-{
-	int i = 0;
-	for (i=0; i<MAX_HOME_NUM; i++)
+	if (TRUE == is_main_DeviceNo())
 	{
-		if (g_ipc_list[i].TimeOut > 0)
-		{
-			g_ipc_list[i].TimeOut--;
-		}
-	}
+		g_IpcTimerID = add_aurine_realtimer((1000), ipc_ontimer_proc, NULL);	
+		dprintf("g_IpcTimerID : %d \n", g_IpcTimerID);
+	}	
 }
 
 /*************************************************

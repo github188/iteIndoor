@@ -4,52 +4,39 @@ File name:  	layer_set_ringtone.c
 Author:     	zxc
 Version:
 Date: 		2016-06-15
-Description:
+Description:	铃声设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-static ITUBackground* SetRingtoneBackground;
-static ITUBackground* SetRingtonePromptMsgBackground;
-static ITULayer* SetMenuLayer;
-static ITUSprite* SetRingtonePromptMsg1Sprite;
-static ITUSprite* SetRingtonePromptMsg2Sprite;
-static ITUSprite* SetRingtonePromptMsg3Sprite;
-static ITUSprite* SetRingtonePromptMsg4Sprite;
-static ITUText* SetAlarmRingtone2Text;
-static ITUText* SetHitRingtone2Text;
-static ITUText* SetLylyRingtone2Text;
-static ITUText* SetRingtonePromptMsgTitleText;
-static ITUText* SetRingtoneTitleText;
-static ITUText* SetCallRingStair2Text;
-static ITUText* SetCallRingArea2Text;
-static ITUText* SetCallRingDoor2Text;
-static ITUText* SetCallRingCenter2Text;
-static ITUText* SetCallRingRoom2Text;
-static ITUText* SetCallRingFenji2Text;
-static ITUCalendar* SetCallRingtoneListContainer;
-static ITUCalendar* SetRingtoneListContainer;
-static ITUBackground* SetCallRingMsgBackground;
-static ITUSprite* SetCallRingMsg1Sprite;
-static ITUSprite* SetCallRingMsg2Sprite;
-static ITUSprite* SetCallRingMsg3Sprite;
-static ITUSprite* SetCallRingMsg4Sprite;
-static ITUSprite* SetCallRingMsg5Sprite;
-static ITUSprite* SetCallRingMsg6Sprite;
-static ITUSprite* SetCallRingMsg7Sprite;
-static ITUSprite* SetCallRingMsg8Sprite;
-static ITUText* SetCallRingMsgTitleText;
-static ITUCoverFlow* SetCallRingMsgCoverFlow;
-static ITUCoverFlow* SetCallRingtoneListCoverFlow;
+static ITUBackground* SetRingtoneBackground = NULL;
+static ITUBackground* SetRingtonePromptMsgBackground = NULL;
+static ITUBackground* SetCallRingMsgBackground = NULL;
+static ITUBackground* SetAlarmRingtoneMsgBackground = NULL;
+static ITUBackground* SetLylyRingRecMsgBackground = NULL;
+static ITUCalendar* SetCallRingtoneListContainer = NULL;
+static ITUCalendar* SetRingtoneListContainer = NULL;
+static ITULayer* SetMenuLayer = NULL;
+static ITUText* SetRingtoneTitleText = NULL;
+static ITUText* SetAlarmRingtone2Text = NULL;
+static ITUText* SetHitRingtone2Text = NULL;
+static ITUText* SetLylyRingtone2Text = NULL;
+static ITUCoverFlow* SetCallRingtoneListCoverFlow = NULL;
+static ITUText* SetCallRingtoneList[6] = { NULL };
+static ITUCoverFlow* SetCallRingMsgCoverFlow = NULL;
+static ITUText* SetCallRingMsgTitleText = NULL;
+static ITUSprite* SetCallRingMsgSprite[8] = { NULL };
+static ITUSprite* SetRingtonePromptMsgSprite[4] = { NULL };
+static ITUSprite* SetAlarmRingtoneMsgListSprite[5] = { NULL };
 
+static int g_page = 0;
 static uint8 g_index[MAX_RING_ID];					// 声音ID(梯口 区口 门口 中心 住户 分机 信息 预警)
 static LYLY_PARAM *g_param = NULL;
-static uint8 g_page = 0;
-static uint8 g_index_hit_flag = 0;		//记录预警提示音、信息提示音消息框按下的值
-static uint8 g_index_ring_flag = 0;		//记录来电铃声消息框按下的值
+static uint8 g_alarm_time_param[3] = { 0 };				//  g_alarm_time_param[2]:是否启用预警提示音
+static uint8 g_index_flag = 0;						//缓存设置的值
 
 /*************************************************
 Function:		SetRingtoneOnEnter
@@ -63,7 +50,6 @@ bool SetRingtoneOnEnter(ITUWidget* widget, char* param)
 {
 	uint8 i;
 	uint8 tmp[40];
-	uint8 buf[40];
 
 	if (!SetRingtoneBackground)
 	{
@@ -76,6 +62,12 @@ bool SetRingtoneOnEnter(ITUWidget* widget, char* param)
 		SetCallRingMsgBackground = ituSceneFindWidget(&theScene, "SetCallRingMsgBackground");
 		assert(SetCallRingMsgBackground);
 
+		SetAlarmRingtoneMsgBackground = ituSceneFindWidget(&theScene, "SetAlarmRingtoneMsgBackground");
+		assert(SetAlarmRingtoneMsgBackground);
+
+		SetLylyRingRecMsgBackground = ituSceneFindWidget(&theScene, "SetLylyRingRecMsgBackground");
+		assert(SetLylyRingRecMsgBackground);
+
 		SetCallRingtoneListContainer = ituSceneFindWidget(&theScene, "SetCallRingtoneListContainer");
 		assert(SetCallRingtoneListContainer); 
 
@@ -85,17 +77,8 @@ bool SetRingtoneOnEnter(ITUWidget* widget, char* param)
 		SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
 		assert(SetMenuLayer);
 
-		SetRingtonePromptMsg1Sprite = ituSceneFindWidget(&theScene, "SetRingtonePromptMsg1Sprite");
-		assert(SetRingtonePromptMsg1Sprite);
-
-		SetRingtonePromptMsg2Sprite = ituSceneFindWidget(&theScene, "SetRingtonePromptMsg2Sprite");
-		assert(SetRingtonePromptMsg2Sprite);
-
-		SetRingtonePromptMsg3Sprite = ituSceneFindWidget(&theScene, "SetRingtonePromptMsg3Sprite");
-		assert(SetRingtonePromptMsg3Sprite);
-
-		SetRingtonePromptMsg4Sprite = ituSceneFindWidget(&theScene, "SetRingtonePromptMsg4Sprite");
-		assert(SetRingtonePromptMsg4Sprite);
+		SetRingtoneTitleText = ituSceneFindWidget(&theScene, "SetRingtoneTitleText");
+		assert(SetRingtoneTitleText);
 
 		SetAlarmRingtone2Text = ituSceneFindWidget(&theScene, "SetAlarmRingtone2Text");
 		assert(SetAlarmRingtone2Text);
@@ -105,82 +88,26 @@ bool SetRingtoneOnEnter(ITUWidget* widget, char* param)
 
 		SetLylyRingtone2Text = ituSceneFindWidget(&theScene, "SetLylyRingtone2Text");
 		assert(SetLylyRingtone2Text);
-
-		SetRingtonePromptMsgTitleText = ituSceneFindWidget(&theScene, "SetRingtonePromptMsgTitleText");
-		assert(SetRingtonePromptMsgTitleText); 
-
-		SetRingtoneTitleText = ituSceneFindWidget(&theScene, "SetRingtoneTitleText");
-		assert(SetRingtoneTitleText);
-
-		SetCallRingStair2Text = ituSceneFindWidget(&theScene, "SetCallRingStair2Text");
-		assert(SetCallRingStair2Text);
-
-		SetCallRingArea2Text = ituSceneFindWidget(&theScene, "SetCallRingArea2Text");
-		assert(SetCallRingArea2Text);
-
-		SetCallRingDoor2Text = ituSceneFindWidget(&theScene, "SetCallRingDoor2Text");
-		assert(SetCallRingDoor2Text);
-
-		SetCallRingCenter2Text = ituSceneFindWidget(&theScene, "SetCallRingCenter2Text");
-		assert(SetCallRingCenter2Text);
-
-		SetCallRingRoom2Text = ituSceneFindWidget(&theScene, "SetCallRingRoom2Text");
-		assert(SetCallRingRoom2Text);
-
-		SetCallRingFenji2Text = ituSceneFindWidget(&theScene, "SetCallRingFenji2Text");
-		assert(SetCallRingFenji2Text);
-
-		SetCallRingMsg1Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg1Sprite");
-		assert(SetCallRingMsg1Sprite);
-
-		SetCallRingMsg2Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg2Sprite");
-		assert(SetCallRingMsg2Sprite);
-
-		SetCallRingMsg3Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg3Sprite");
-		assert(SetCallRingMsg3Sprite);
-
-		SetCallRingMsg4Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg4Sprite");
-		assert(SetCallRingMsg4Sprite);
-
-		SetCallRingMsg5Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg5Sprite");
-		assert(SetCallRingMsg5Sprite);
-
-		SetCallRingMsg6Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg6Sprite");
-		assert(SetCallRingMsg6Sprite);
-
-		SetCallRingMsg7Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg7Sprite");
-		assert(SetCallRingMsg7Sprite);
-
-		SetCallRingMsg8Sprite = ituSceneFindWidget(&theScene, "SetCallRingMsg8Sprite");
-		assert(SetCallRingMsg8Sprite); 
-
-		SetCallRingMsgTitleText = ituSceneFindWidget(&theScene, "SetCallRingMsgTitleText");
-		assert(SetCallRingMsgTitleText); 
-
-		SetCallRingMsgCoverFlow = ituSceneFindWidget(&theScene, "SetCallRingMsgCoverFlow");
-		assert(SetCallRingMsgCoverFlow); 
-
-		SetCallRingtoneListCoverFlow = ituSceneFindWidget(&theScene, "SetCallRingtoneListCoverFlow");
-		assert(SetCallRingtoneListCoverFlow);
 	}
 
 	for (i = 0; i < MAX_RING_TYPE; i++)
 	{
 		g_index[i] = storage_get_ring_id(i);
-		printf("g_index[i] = %d\n", g_index[i]);
 	}
+	storage_get_time_param(g_alarm_time_param);
 
 	memset(tmp, 0, sizeof(tmp));
-	strcpy(tmp, get_str(SID_Set_Ring_Hit));
-	memset(buf, 0, sizeof(buf));
-	sprintf(buf, "%d", g_index[7] + 1);
-	strcat(tmp, buf);
+	if (g_alarm_time_param[2])
+	{	
+		sprintf(tmp, "%s%d", get_str(SID_Set_Ring_Hit), g_index[7] + 1);
+	}
+	else
+	{
+		strcpy(tmp, get_str(SID_Set_Null));
+	}
 	ituTextSetString(SetAlarmRingtone2Text, tmp);
 	memset(tmp, 0, sizeof(tmp));
-	strcpy(tmp, get_str(SID_Set_Ring_Hit));
-	memset(buf, 0, sizeof(buf));
-	sprintf(buf, "%d", g_index[6] + 1);
-	strcat(tmp, buf);
+	sprintf(tmp, "%s%d", get_str(SID_Set_Ring_Hit), g_index[6] + 1);
 	ituTextSetString(SetHitRingtone2Text, tmp);
 
 	g_param = (PLYLY_PARAM)malloc(sizeof(LYLY_PARAM));
@@ -195,8 +122,14 @@ bool SetRingtoneOnEnter(ITUWidget* widget, char* param)
 	
 	ituWidgetSetVisible(SetRingtonePromptMsgBackground, false);
 	ituWidgetSetVisible(SetCallRingMsgBackground, false);
+	ituWidgetSetVisible(SetAlarmRingtoneMsgBackground, false);
+	ituWidgetSetVisible(SetLylyRingRecMsgBackground, false);
 	ituWidgetSetVisible(SetRingtoneBackground, true);
 	ituWidgetSetVisible(SetCallRingtoneListContainer, false);
+	if (!ituWidgetIsEnabled(SetRingtoneBackground))
+	{
+		ituWidgetEnable(SetRingtoneBackground);
+	}
 
 	return true;
 }
@@ -213,131 +146,44 @@ bool SetCallRingtoneButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 i;
 	uint8 tmp[40];
-	uint8 buf[40];
-	ITUText* text[6] = { SetCallRingStair2Text, SetCallRingArea2Text, SetCallRingDoor2Text,
-						 SetCallRingCenter2Text, SetCallRingRoom2Text, SetCallRingFenji2Text };
+
+	if (!SetCallRingtoneListCoverFlow)
+	{
+		SetCallRingtoneListCoverFlow = ituSceneFindWidget(&theScene, "SetCallRingtoneListCoverFlow");
+		assert(SetCallRingtoneListCoverFlow);
+
+		SetCallRingtoneList[0] = ituSceneFindWidget(&theScene, "SetCallRingStair2Text");
+		assert(SetCallRingtoneList[0]);
+
+		SetCallRingtoneList[1] = ituSceneFindWidget(&theScene, "SetCallRingArea2Text");
+		assert(SetCallRingtoneList[1]);
+
+		SetCallRingtoneList[2] = ituSceneFindWidget(&theScene, "SetCallRingDoor2Text");
+		assert(SetCallRingtoneList[2]);
+
+		SetCallRingtoneList[3] = ituSceneFindWidget(&theScene, "SetCallRingCenter2Text");
+		assert(SetCallRingtoneList[3]);
+
+		SetCallRingtoneList[4] = ituSceneFindWidget(&theScene, "SetCallRingRoom2Text");
+		assert(SetCallRingtoneList[4]);
+
+		SetCallRingtoneList[5] = ituSceneFindWidget(&theScene, "SetCallRingFenji2Text");
+		assert(SetCallRingtoneList[5]);
+	}
 
 	for (i = 0; i < 6; i++)
 	{
 		memset(tmp, 0, sizeof(tmp));
-		strcpy(tmp, get_str(SID_Set_Ring_Ring));
-		memset(buf, 0, sizeof(buf));
-		sprintf(buf, "%d", g_index[i] + 1);
-		strcat(tmp, buf);
-		ituTextSetString(text[i], tmp);
+		sprintf(tmp, "%s%d", get_str(SID_Set_Ring_Ring), g_index[i] + 1);
+		ituTextSetString(SetCallRingtoneList[i], tmp);
 	}
 	
 	ituCoverFlowGoto(SetCallRingtoneListCoverFlow, 0);
 	ituTextSetString(SetRingtoneTitleText, get_str(SID_Set_Ring_CallRing));
 	ituWidgetSetVisible(SetRingtoneListContainer, false);
 	ituWidgetSetVisible(SetCallRingtoneListContainer, true);
-	
+
 	return true;
-}
-
-/*************************************************
-Function:		SetRingPageShow
-Description: 	设置显示第几个
-Input:		无
-Output:		无
-Return:		TRUE 是 FALSE 否
-Others:
-*************************************************/
-static void SetRingPageShow(uint8 index)
-{
-	switch (index)
-	{
-	case 0:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 1:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 2:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 3:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 4:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 5:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 6:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 1);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 0);
-		break;
-
-	case 7:
-		ituSpriteGoto(SetCallRingMsg1Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg2Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg3Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg4Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg5Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg6Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg7Sprite, 0);
-		ituSpriteGoto(SetCallRingMsg8Sprite, 1);
-		break;
-
-	default:
-		break;
-	}
 }
 
 /*************************************************
@@ -350,11 +196,41 @@ Others:
 *************************************************/
 bool SetCallRingtoneListButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	int value = atoi(param);
+	uint8 i = 0;
 
-	g_page = value;
-	SetRingPageShow(g_index[g_page]);
-	g_index_ring_flag = g_index[g_page];
+	if (!SetCallRingMsgCoverFlow)
+	{
+		char textname[50];
+
+		SetCallRingMsgCoverFlow = ituSceneFindWidget(&theScene, "SetCallRingMsgCoverFlow");
+		assert(SetCallRingMsgCoverFlow);
+
+		SetCallRingMsgTitleText = ituSceneFindWidget(&theScene, "SetCallRingMsgTitleText");
+		assert(SetCallRingMsgTitleText);
+
+		for (i = 0; i < 8; i++)
+		{
+			memset(textname, 0, sizeof(textname));
+			sprintf(textname, "%s%d%s", "SetCallRingMsg", i + 1, "Sprite");
+			SetCallRingMsgSprite[i] = ituSceneFindWidget(&theScene, textname);
+			assert(SetCallRingMsgSprite[i]);
+		}
+	}
+
+	g_page = atoi(param);
+	for (i = 0; i < 8; i++)
+	{
+		if (i != g_index[g_page])
+		{
+			ituSpriteGoto(SetCallRingMsgSprite[i], 0);
+		}
+		else
+		{
+			ituSpriteGoto(SetCallRingMsgSprite[i], 1);
+		}
+	}
+
+	g_index_flag = g_index[g_page];
 
 	ituCoverFlowGoto(SetCallRingMsgCoverFlow, 0);
 	ituTextSetString(SetCallRingMsgTitleText, get_str(SID_Set_Ring_Stair + g_page));
@@ -374,112 +250,14 @@ Others:
 *************************************************/
 bool SetCallRingMsgButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ITUSprite* sprite[8] = { SetCallRingMsg1Sprite, SetCallRingMsg2Sprite, SetCallRingMsg3Sprite, SetCallRingMsg4Sprite,
-							 SetCallRingMsg5Sprite, SetCallRingMsg6Sprite, SetCallRingMsg7Sprite, SetCallRingMsg8Sprite };
 	int value = atoi(param);
 
-	ituSpriteGoto(sprite[g_index_ring_flag], 0);
-	g_index_ring_flag = (uint8)value;
-	ituSpriteGoto(sprite[g_index_ring_flag], 1);
+	ituSpriteGoto(SetCallRingMsgSprite[g_index_flag], 0);
+	g_index_flag = (uint8)value;
+	ituSpriteGoto(SetCallRingMsgSprite[g_index_flag], 1);
 	//sys_start_play_audio(SYS_MEDIA_MUSIC, (char *)storage_get_ring_by_id(value), FALSE, storage_get_ringvolume(), NULL, NULL);
 
 	return true;
-}
-
-/*************************************************
-Function:		SetCallRingMsgYesButtonOnMouseUp
-Description: 	来电铃声消息框确认 按钮
-Input:		无
-Output:		无
-Return:		TRUE 是 FALSE 否
-Others:
-*************************************************/
-bool SetCallRingMsgYesButtonOnMouseUp(ITUWidget* widget, char* param)
-{
-	uint8 tmp[40];
-	uint8 buf[40];
-	ITUText* text[6] = { SetCallRingStair2Text, SetCallRingArea2Text, SetCallRingDoor2Text,
-						 SetCallRingCenter2Text, SetCallRingRoom2Text, SetCallRingFenji2Text };
-
-	g_index[g_page] = g_index_ring_flag;
-
-	//sys_stop_play_audio(SYS_MEDIA_MUSIC);
-	storage_set_ring_id(g_page, g_index[g_page]);
-
-	memset(tmp, 0, sizeof(tmp));
-	strcpy(tmp, get_str(SID_Set_Ring_Ring));
-	memset(buf, 0, sizeof(buf));
-	sprintf(buf, "%d", g_index[g_page] + 1);
-	strcat(tmp, buf);
-	ituTextSetString(text[g_page], tmp);
-
-	ituWidgetSetVisible(SetCallRingMsgBackground, false);
-	ituWidgetEnable(SetRingtoneBackground);
-
-	return true;
-}
-
-/*************************************************
-Function:		SetCallRingMsgNoButtonOnMouseUp
-Description: 	来电铃声消息框取消 按钮
-Input:		无
-Output:		无
-Return:		TRUE 是 FALSE 否
-Others:
-*************************************************/
-bool SetCallRingMsgNoButtonOnMouseUp(ITUWidget* widget, char* param)
-{
-	//sys_stop_play_audio(SYS_MEDIA_MUSIC);
-
-	ituWidgetSetVisible(SetCallRingMsgBackground, false);
-	ituWidgetEnable(SetRingtoneBackground);
-
-	return true;
-}
-
-/*************************************************
-Function:		SetHitPageShow
-Description: 	设置显示第几个
-Input:		无
-Output:		无
-Return:		TRUE 是 FALSE 否
-Others:
-*************************************************/
-static void SetHitPageShow(uint8 index)
-{
-	switch (index)
-	{
-	case 0:
-		ituSpriteGoto(SetRingtonePromptMsg1Sprite, 1);
-		ituSpriteGoto(SetRingtonePromptMsg2Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg3Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg4Sprite, 0);
-		break;
-
-	case 1:
-		ituSpriteGoto(SetRingtonePromptMsg1Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg2Sprite, 1);
-		ituSpriteGoto(SetRingtonePromptMsg3Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg4Sprite, 0);
-		break;
-
-	case 2:
-		ituSpriteGoto(SetRingtonePromptMsg1Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg2Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg3Sprite, 1);
-		ituSpriteGoto(SetRingtonePromptMsg4Sprite, 0);
-		break;
-
-	case 3:
-		ituSpriteGoto(SetRingtonePromptMsg1Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg2Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg3Sprite, 0);
-		ituSpriteGoto(SetRingtonePromptMsg4Sprite, 1);
-		break;
-
-	default:
-		break;
-	}
 }
 
 /*************************************************
@@ -492,13 +270,113 @@ Others:
 *************************************************/
 bool SetAlarmRingtoneButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ituTextSetString(SetRingtonePromptMsgTitleText, get_str(SID_Set_Ring_Alarm));
+	uint8 i = 0;
+	if (!SetAlarmRingtoneMsgListSprite[0])
+	{
+		char textname[50];
+
+		for (i = 0; i < 5; i++)
+		{
+			memset(textname, 0, sizeof(textname));
+			sprintf(textname, "%s%d%s", "SetAlarmRingtoneMsgList", i, "Sprite");
+			SetAlarmRingtoneMsgListSprite[i] = ituSceneFindWidget(&theScene, textname);
+			assert(SetAlarmRingtoneMsgListSprite[i]);
+		}
+	}
+
 	g_page = 7;
-	SetHitPageShow(g_index[g_page]);
-	g_index_hit_flag = g_index[g_page];
+
+	if (g_alarm_time_param[2])
+	{
+		for (i = 0; i < 5; i++)
+		{
+			if (i != g_index[g_page] + 1)
+			{
+				ituSpriteGoto(SetAlarmRingtoneMsgListSprite[i], 0);
+			}
+			else
+			{
+				ituSpriteGoto(SetAlarmRingtoneMsgListSprite[i], 1);
+			}
+		}
+		g_index_flag = g_index[g_page] + 1;
+	}
+	else
+	{
+		ituSpriteGoto(SetAlarmRingtoneMsgListSprite[0], 1);
+		for (i = 1; i < 5; i++)
+		{
+			ituSpriteGoto(SetAlarmRingtoneMsgListSprite[i], 0);
+		}
+		g_index_flag = 0;
+	}
 
 	ituWidgetDisable(SetRingtoneBackground);
-	ituWidgetSetVisible(SetRingtonePromptMsgBackground, true);
+	ituWidgetSetVisible(SetAlarmRingtoneMsgBackground, true);
+
+	return true;
+}
+
+/*************************************************
+Function:		SetAlarmRingtoneMsgListButtonOnMouseUp
+Description: 	预警提示音消息框按钮
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetAlarmRingtoneMsgListButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	int value = atoi(param);
+
+	ituSpriteGoto(SetAlarmRingtoneMsgListSprite[g_index_flag], 0);
+	g_index_flag = (uint8)value;
+	ituSpriteGoto(SetAlarmRingtoneMsgListSprite[g_index_flag], 1);
+
+	if (0 != g_index_flag)
+	{
+		//sys_start_play_audio(SYS_MEDIA_MUSIC, (char *)storage_get_yj_path_byID(value - 1), FALSE, storage_get_ringvolume(), NULL, NULL);
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		SetAlarmRingtoneMsgOkButtonOnMouseUp
+Description: 	报警提示音消息框确认 按钮
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetAlarmRingtoneMsgOkButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	uint8 tmp[40];
+	memset(tmp, 0, sizeof(tmp));
+
+	if (0 == g_index_flag)
+	{
+		g_alarm_time_param[2] = 0;
+
+		strcpy(tmp, get_str(SID_Set_Null));
+	}
+	else
+	{
+		g_alarm_time_param[2] = 1;
+		g_index[g_page] = g_index_flag - 1;
+
+		storage_set_ring_id(g_page, g_index[g_page]);
+		//sys_stop_play_audio(SYS_MEDIA_MUSIC);
+
+		sprintf(tmp, "%s%d", get_str(SID_Set_Ring_Hit), g_index[g_page] + 1);
+	}
+	g_index_flag = 0;
+	storage_set_time_param(g_alarm_time_param);
+
+	ituTextSetString(SetAlarmRingtone2Text, tmp);
+
+	ituWidgetSetVisible(SetAlarmRingtoneMsgBackground, false);
+	ituWidgetEnable(SetRingtoneBackground);
 
 	return true;
 }
@@ -513,10 +391,35 @@ Others:
 *************************************************/
 bool SetHitRingtoneButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ituTextSetString(SetRingtonePromptMsgTitleText, get_str(SID_Set_Ring_Info));
+	uint8 i = 0;
+	if (!SetRingtonePromptMsgSprite[0])
+	{
+		char textname[50];
+
+		for (i = 0; i < 4; i++)
+		{
+			memset(textname, 0, sizeof(textname));
+			sprintf(textname, "%s%d%s", "SetRingtonePromptMsg", i + 1, "Sprite");
+			SetRingtonePromptMsgSprite[i] = ituSceneFindWidget(&theScene, textname);
+			assert(SetRingtonePromptMsgSprite[i]);
+		}
+	}
+
 	g_page = 6;
-	SetHitPageShow(g_index[g_page]);
-	g_index_hit_flag = g_index[g_page];
+
+	for (i = 0; i < 4; i++)
+	{
+		if (i != g_index[g_page])
+		{
+			ituSpriteGoto(SetRingtonePromptMsgSprite[i], 0);
+		}
+		else
+		{
+			ituSpriteGoto(SetRingtonePromptMsgSprite[i], 1);
+		}
+	}
+
+	g_index_flag = g_index[g_page];
 
 	ituWidgetDisable(SetRingtoneBackground);
 	ituWidgetSetVisible(SetRingtonePromptMsgBackground, true);
@@ -526,7 +429,7 @@ bool SetHitRingtoneButtonOnMouseUp(ITUWidget* widget, char* param)
 
 /*************************************************
 Function:		SetRingtonePromptMsgButtonOnMouseUp
-Description: 	信息提示音、预警提示音消息框按钮
+Description: 	信息提示音消息框按钮
 Input:		无
 Output:		无
 Return:		TRUE 是 FALSE 否
@@ -534,28 +437,20 @@ Others:
 *************************************************/
 bool SetRingtonePromptMsgButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ITUSprite* sprite[4] = { SetRingtonePromptMsg1Sprite, SetRingtonePromptMsg2Sprite, SetRingtonePromptMsg3Sprite, SetRingtonePromptMsg4Sprite };
 	int value = atoi(param);
 
-	ituSpriteGoto(sprite[g_index_hit_flag], 0);
-	g_index_hit_flag = (uint8)value;
-	ituSpriteGoto(sprite[g_index_hit_flag], 1);
+	ituSpriteGoto(SetRingtonePromptMsgSprite[g_index_flag], 0);
+	g_index_flag = (uint8)value;
+	ituSpriteGoto(SetRingtonePromptMsgSprite[g_index_flag], 1);
 
-	if (6 == g_page)
-	{
-		//sys_start_play_audio(SYS_MEDIA_MUSIC, (char *)storage_get_msg_hit_byID(value), FALSE, storage_get_ringvolume(), NULL, NULL);
-	}
-	else if (7 == g_page)
-	{
-		//sys_start_play_audio(SYS_MEDIA_MUSIC, (char *)storage_get_yj_path_byID(value), FALSE, storage_get_ringvolume(), NULL, NULL);
-	}
+	//sys_start_play_audio(SYS_MEDIA_MUSIC, (char *)storage_get_msg_hit_byID(value), FALSE, storage_get_ringvolume(), NULL, NULL);
 
 	return true;
 }
 
 /*************************************************
 Function:		SetRingtonePromptMsgTureButtonOnMouseUp
-Description: 	信息提示音、预警提示音消息框确认 按钮
+Description: 	消息框确认 按钮
 Input:		无
 Output:		无
 Return:		TRUE 是 FALSE 否
@@ -564,36 +459,35 @@ Others:
 bool SetRingtonePromptMsgTureButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 tmp[40];
-	uint8 buf[40];
 
-	g_index[g_page] = g_index_hit_flag;
+	g_index[g_page] = g_index_flag;
+	g_index_flag = 0;
 
-	//sys_stop_play_audio(SYS_MEDIA_MUSIC);
 	storage_set_ring_id(g_page, g_index[g_page]);
+	//sys_stop_play_audio(SYS_MEDIA_MUSIC);
 
 	memset(tmp, 0, sizeof(tmp));
-	strcpy(tmp, get_str(SID_Set_Ring_Hit));
-	memset(buf, 0, sizeof(buf));
-	sprintf(buf, "%d", g_index[g_page] + 1);
-	strcat(tmp, buf);
+
 	if (6 == g_page)
 	{
+		sprintf(tmp, "%s%d", get_str(SID_Set_Ring_Hit), g_index[g_page] + 1);
 		ituTextSetString(SetHitRingtone2Text, tmp);
+		ituWidgetSetVisible(SetRingtonePromptMsgBackground, false);
 	}
-	else if (7 == g_page)
+	else
 	{
-		ituTextSetString(SetAlarmRingtone2Text, tmp);
-	}
-
-	ituWidgetSetVisible(SetRingtonePromptMsgBackground, false);
+		sprintf(tmp, "%s%d", get_str(SID_Set_Ring_Ring), g_index[g_page] + 1);
+		ituTextSetString(SetCallRingtoneList[g_page], tmp);
+		ituWidgetSetVisible(SetCallRingMsgBackground, false);
+	}	
 	ituWidgetEnable(SetRingtoneBackground);
-	
+
 	return true;
 }
 
 /*************************************************
 Function:		SetRingtonePromptMsgFalseButtonOnMouseUp
-Description: 	信息提示音、预警提示音消息框取消 按钮
+Description: 	消息框取消 按钮
 Input:		无
 Output:		无
 Return:		TRUE 是 FALSE 否
@@ -602,9 +496,25 @@ Others:
 bool SetRingtonePromptMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	//sys_stop_play_audio(SYS_MEDIA_MUSIC);
+	g_index_flag = 0;
 
-	ituWidgetSetVisible(SetRingtonePromptMsgBackground, false);
-	ituWidgetEnable(SetRingtoneBackground);
+	switch (g_page)
+	{
+	case 6:
+		ituWidgetSetVisible(SetRingtonePromptMsgBackground, false);
+		ituWidgetEnable(SetRingtoneBackground);
+		break;
+
+	case 7:
+		ituWidgetSetVisible(SetAlarmRingtoneMsgBackground, false);
+		ituWidgetEnable(SetRingtoneBackground);
+		break;
+
+	default:
+		ituWidgetSetVisible(SetCallRingMsgBackground, false);
+		ituWidgetEnable(SetRingtoneBackground);
+		break;
+	}
 
 	return true;
 }
@@ -619,6 +529,7 @@ Others:
 *************************************************/
 bool SetLylyRingtoneButtonOnMouseUp(ITUWidget* widget, char* param)
 {
+
 
 	return true;
 }
@@ -650,9 +561,15 @@ void SetRingtoneOnReturn(void)
 		ituWidgetEnable(SetRingtoneBackground);
 		return;
 	}
-	if (ituWidgetIsVisible(SetCallRingMsgBackground))
+	else if (ituWidgetIsVisible(SetCallRingMsgBackground))
 	{
 		ituWidgetSetVisible(SetCallRingMsgBackground, false);
+		ituWidgetEnable(SetRingtoneBackground);
+		return;
+	}
+	else if (ituWidgetIsVisible(SetAlarmRingtoneMsgBackground))
+	{
+		ituWidgetSetVisible(SetAlarmRingtoneMsgBackground, false);
 		ituWidgetEnable(SetRingtoneBackground);
 		return;
 	}
@@ -668,9 +585,4 @@ void SetRingtoneOnReturn(void)
 		ituLayerGoto(SetMenuLayer);
 		return;
 	}
-}
-
-void SetRingToneLayerReset(void)
-{
-	SetRingtoneBackground = NULL;
 }

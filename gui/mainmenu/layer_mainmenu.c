@@ -571,7 +571,7 @@ void setUnreadPhotoMsgScroll()
 
 uint8_t getUnreadInformationNum()
 {
-	return 6;
+	return (uint8_t)storage_get_msg_state();
 }
 
 void setUnreadInformationNum(uint8_t num)

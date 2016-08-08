@@ -29,15 +29,20 @@ static ITUText* SetAlarmSingleAttrTitleText = NULL;
 static ITUText* SetAlarmSingleAttrList1Text[8] = { NULL };
 static ITUText* SetAlarmSingleAttrList2Text[8] = { NULL }; 
 static ITUCalendar* SetAlarmSingleAttrListContainer[8] = { NULL };
+static ITURadioBox* SetAlarmSingleAttrTimeMsgRadioBox[5] = { NULL };
+static ITUSprite* SetAlarmSingleAttrAreaMsgSprite[8] = { NULL };
+static ITURadioBox* SetAlarmSingleAttrFinderMsgRadioBox[2] = { NULL };
 static ITUSprite* SetAlarmSingleAttrEnableSprite = NULL;
 static ITUSprite* SetAlarmSingleAttrJufangSprite = NULL;
 static ITUSprite* SetAlarmSingleAttr24hSprite = NULL;
 static ITUSprite* SetAlarmSingleAttrSeeSprite = NULL;
 static ITUSprite* SetAlarmSingleAttrHearSprite = NULL;
-static ITUCoverFlow* SetAlarmSingleAttrListCoverFlow = NULL;
+static ITUCoverFlow* SetAlarmSingleAttrListCoverFlow = NULL; 
+static ITUCoverFlow* SetAlarmSingleAttrAreaMsgCoverFlow = NULL;
 static ITUBackground* SetAlarmSingleAttrTimeMsgBackground = NULL;
 static ITUBackground* SetAlarmSingleAttrBackground = NULL;
-static ITURadioBox* SetAlarmSingleAttrTimeMsgRadioBox[5] = { NULL };
+static ITUBackground* SetAlarmSingleAttrAreaMsgBackground = NULL; 
+static ITUBackground* SetAlarmSingleAttrFinderMsgBackground = NULL;
 
 static AF_FLASH_DATA g_ui_secu_data;
 static uint8  g_area_num =	0;	 					//取值从0-7		
@@ -243,6 +248,11 @@ bool SetAlarmSingleAttrOnEnter(ITUWidget* widget, char* param)
 			sprintf(tmp, "%s%d%s", "SetAlarmSingleAttrList", i, "Container");
 			SetAlarmSingleAttrListContainer[i] = ituSceneFindWidget(&theScene, tmp);
 			assert(SetAlarmSingleAttrListContainer[i]);
+
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d%s", "SetAlarmSingleAttrAreaMsg", i, "Sprite");
+			SetAlarmSingleAttrAreaMsgSprite[i] = ituSceneFindWidget(&theScene, tmp);
+			assert(SetAlarmSingleAttrAreaMsgSprite[i]);
 		}
 
 		for (i = 0; i < 5; i++)
@@ -251,6 +261,14 @@ bool SetAlarmSingleAttrOnEnter(ITUWidget* widget, char* param)
 			sprintf(tmp, "%s%d%s", "SetAlarmSingleAttrTimeMsg", i, "RadioBox");
 			SetAlarmSingleAttrTimeMsgRadioBox[i] = ituSceneFindWidget(&theScene, tmp);
 			assert(SetAlarmSingleAttrTimeMsgRadioBox[i]); 
+		}
+
+		for (i = 0; i < 2; i++)
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d%s", "SetAlarmSingleAttrFinderMsg", i, "RadioBox");
+			SetAlarmSingleAttrFinderMsgRadioBox[i] = ituSceneFindWidget(&theScene, tmp);
+			assert(SetAlarmSingleAttrFinderMsgRadioBox[i]);
 		}
 
 		SetAlarmSingleAttrTitleText = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrTitleText");
@@ -274,11 +292,20 @@ bool SetAlarmSingleAttrOnEnter(ITUWidget* widget, char* param)
 		SetAlarmSingleAttrListCoverFlow = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrListCoverFlow");
 		assert(SetAlarmSingleAttrListCoverFlow);
 
+		SetAlarmSingleAttrAreaMsgCoverFlow = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrAreaMsgCoverFlow");
+		assert(SetAlarmSingleAttrAreaMsgCoverFlow);
+
 		SetAlarmSingleAttrTimeMsgBackground = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrTimeMsgBackground");
 		assert(SetAlarmSingleAttrTimeMsgBackground);
 
 		SetAlarmSingleAttrBackground = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrBackground");
 		assert(SetAlarmSingleAttrBackground);
+
+		SetAlarmSingleAttrAreaMsgBackground = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrAreaMsgBackground");
+		assert(SetAlarmSingleAttrAreaMsgBackground);
+
+		SetAlarmSingleAttrFinderMsgBackground = ituSceneFindWidget(&theScene, "SetAlarmSingleAttrFinderMsgBackground");
+		assert(SetAlarmSingleAttrFinderMsgBackground);
 	}
 
 	ituCoverFlowGoto(SetAlarmSingleAttrListCoverFlow, 0);
@@ -287,6 +314,8 @@ bool SetAlarmSingleAttrOnEnter(ITUWidget* widget, char* param)
 	SetAlarmSingleAttrListShow();
 
 	ituWidgetSetVisible(SetAlarmSingleAttrTimeMsgBackground, false);
+	ituWidgetSetVisible(SetAlarmSingleAttrAreaMsgBackground, false);
+	ituWidgetSetVisible(SetAlarmSingleAttrFinderMsgBackground, false);
 	ituWidgetSetVisible(SetAlarmSingleAttrBackground, true);
 	
 	return true;
@@ -303,6 +332,7 @@ Others:
 bool SetAlarmSingleAttrListButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
+	uint8 i = 0;
 
 	switch (index)
 	{
@@ -321,7 +351,20 @@ bool SetAlarmSingleAttrListButtonOnMouseUp(ITUWidget* widget, char* param)
 		break;
 
 	case ATTR_AREA_TYPE:
-		
+		for (i = 0; i < 8; i++)
+		{
+			if (i != g_ui_secu_data.area_type[g_area_num])
+			{
+				ituSpriteGoto(SetAlarmSingleAttrAreaMsgSprite[i], 0);
+			}
+			else
+			{
+				ituSpriteGoto(SetAlarmSingleAttrAreaMsgSprite[i], 1);
+			}
+		}
+		ituCoverFlowGoto(SetAlarmSingleAttrAreaMsgCoverFlow, 0);
+		ituWidgetDisable(SetAlarmSingleAttrBackground);
+		ituWidgetSetVisible(SetAlarmSingleAttrAreaMsgBackground, true);
 		break;
 
 	case ATTR_DELAY:
@@ -389,17 +432,10 @@ bool SetAlarmSingleAttrListButtonOnMouseUp(ITUWidget* widget, char* param)
 		break;
 
 	case ATTR_FINDER:
-		if (1 == ((g_ui_secu_data.finder_state >> g_area_num) & 0x01))
-		{
-			SET_ONE_VALUE(g_ui_secu_data.finder_state, 0, g_area_num);
-		}
-		else
-		{
-			SET_ONE_VALUE(g_ui_secu_data.finder_state, 1, g_area_num);
-		}
-
-		logic_set_alarm_param((uint8*)(&g_ui_secu_data));
-		SetAlarmSingleAttrListShow();
+		ituRadioBoxSetChecked(SetAlarmSingleAttrFinderMsgRadioBox[(g_ui_secu_data.finder_state >> g_area_num) & 0x01], true);
+		
+		ituWidgetDisable(SetAlarmSingleAttrBackground);
+		ituWidgetSetVisible(SetAlarmSingleAttrFinderMsgBackground, true);
 		break;
 	}
 
@@ -426,6 +462,54 @@ bool SetAlarmSingleAttrTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 	logic_set_alarm_param((uint8*)(&g_ui_secu_data));
 	
 	ituWidgetSetVisible(SetAlarmSingleAttrTimeMsgBackground, false);
+	ituWidgetEnable(SetAlarmSingleAttrBackground);
+
+	return true;
+}
+
+/*************************************************
+Function:		SetAlarmSingleAttrTimeMsgRadioBoxOnMouseUp
+Description: 	探头类型列表按下处理函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetAlarmSingleAttrAreaMsgSpriteOnMouseUp(ITUWidget* widget, char* param)
+{
+	int index = atoi(param);
+	
+	g_ui_secu_data.area_type[g_area_num] = (uint8)index;
+
+	ituTextSetString(SetAlarmSingleAttrList2Text[ATTR_AREA_TYPE], get_str(SID_Bj_SOS + index));
+
+	logic_set_alarm_param((uint8*)(&g_ui_secu_data));
+
+	ituWidgetSetVisible(SetAlarmSingleAttrAreaMsgBackground, false);
+	ituWidgetEnable(SetAlarmSingleAttrBackground);
+
+	return true;
+}
+
+/*************************************************
+Function:		SetAlarmSingleAttrFinderMsgRadioBoxOnMouseUp
+Description: 	探头状态列表按下处理函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetAlarmSingleAttrFinderMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
+{
+	int index = atoi(param);
+
+	SET_ONE_VALUE(g_ui_secu_data.finder_state, index, g_area_num);
+
+	ituTextSetString(SetAlarmSingleAttrList2Text[ATTR_FINDER], get_str(SID_Bj_Tantou_Close + index)); 
+
+	logic_set_alarm_param((uint8*)(&g_ui_secu_data));
+
+	ituWidgetSetVisible(SetAlarmSingleAttrFinderMsgBackground, false);
 	ituWidgetEnable(SetAlarmSingleAttrBackground);
 
 	return true;
@@ -470,6 +554,18 @@ void SetAlarmSingleAttrLayerOnReturn(void)
 	if (ituWidgetIsVisible(SetAlarmSingleAttrTimeMsgBackground))
 	{
 		ituWidgetSetVisible(SetAlarmSingleAttrTimeMsgBackground, false);
+		ituWidgetEnable(SetAlarmSingleAttrBackground);
+		return;
+	}
+	if (ituWidgetIsVisible(SetAlarmSingleAttrAreaMsgBackground))
+	{
+		ituWidgetSetVisible(SetAlarmSingleAttrAreaMsgBackground, false);
+		ituWidgetEnable(SetAlarmSingleAttrBackground);
+		return;
+	}
+	if (ituWidgetIsVisible(SetAlarmSingleAttrFinderMsgBackground))
+	{
+		ituWidgetSetVisible(SetAlarmSingleAttrFinderMsgBackground, false);
 		ituWidgetEnable(SetAlarmSingleAttrBackground);
 		return;
 	}

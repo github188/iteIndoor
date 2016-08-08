@@ -380,15 +380,13 @@ ECHO_STORAGE storage_set_jrlyrecord_flag(uint32 Index, uint8 State)
   Description:  获取是否有未听
   Input:		无
   Output:		无
-  Return:		TRUE --  有
-  				FALSE -- 没有
+  Return:		未听条数  				
   Others:		
 *************************************************/
 uint8 storage_get_jrlyrecord_flag(void)
 {
 	PJRLYLIST_INFO jrlylist = NULL;
-	uint8 ret = FALSE;
-	uint8 i;
+	uint8 i, unread_num = 0;
 	
 	storage_malloc_jrly_memory(&jrlylist, MAX_JRLY_NUM);
 	get_jrlyrecord_from_storage(jrlylist);
@@ -398,13 +396,12 @@ uint8 storage_get_jrlyrecord_flag(void)
 		{
 			if (jrlylist->JrlyInfo[i].UnRead == TRUE)
 			{
-				ret = TRUE;
-				break;
+				unread_num++;
 			}
 		}
 	}
 	storage_free_jrly_memory(&jrlylist);
-	return ret;
+	return unread_num;
 }
 
 /*************************************************

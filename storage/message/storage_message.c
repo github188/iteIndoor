@@ -484,8 +484,6 @@ ECHO_STORAGE storage_write_msg(const REC_BULLETIN_HEAD *pHead, uint8 * data, uin
 	}
 	#endif
 	dprintf("storage_write_msg end\n");
-	//sys_set_hint_state(SYS_HINT_INFO, 1);
-	//PMU_ExitModule(PMU_HDMI);
 	sync_data();
 	DelayMs_nops(200);
 	
@@ -591,9 +589,7 @@ ECHO_STORAGE storage_clear_msg (void)
 		storage_delete_msg_data(&msg_data);
 	}
 	FSFileDelete(MSG_MANAGE_PATH);
-	//sys_set_hint_state(SYS_HINT_INFO, 0);
-	//DelayMs_nops(200);
-		
+	
 	return ECHO_STORAGE_OK;
 }
 

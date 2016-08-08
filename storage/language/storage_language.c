@@ -206,6 +206,9 @@ const char * get_str(STRID_E id)
 	case SID_Set_Used:
 		return ESID_Set_Used;
 
+	case SID_Set_Null:
+		return ESID_Set_Null;
+
 	case SID_Set_UnUsed:
 		return ESID_Set_UnUsed;
 
@@ -292,6 +295,74 @@ const char * get_str(STRID_E id)
 
 	case SID_Set_Rtsp_Channel_Null:
 		return ESID_Set_Rtsp_Channel_Null;
+
+	case SID_Msg_Connect_Outtime:
+		return ESID_Msg_Connect_Outtime;
+
+	case SID_Msg_Save_OK:
+		return ESID_Msg_Save_OK;
+
+	case SID_Msg_Save_Err:
+		return ESID_Msg_Save_Err;
+
+	case SID_Msg_Param_Save:
+		return ESID_Msg_Param_Save;
+
+	case SID_Msg_Operat_OK:
+		return ESID_Msg_Operat_OK;
+
+	case SID_Msg_Operat_Err:
+		return ESID_Msg_Operat_Err;
+
+	case SID_Net_Door_Card_Delet_All:
+		return ESID_Net_Door_Card_Delet_All;
+
+	case SID_Msg_Format:
+		return ESID_Msg_Format;
+
+// IP协议转换器
+	case SID_Set_Unbounded:
+		return ESID_Set_Unbounded;
+
+	case SID_Set_Bounded:
+		return ESID_Set_Bounded;
+
+	case SID_Set_Generate_Binding_Code:
+		return ESID_Set_Generate_Binding_Code;
+
+	case SID_Set_Binding_Code:
+		return ESID_Set_Binding_Code;
+
+	case SID_Set_ExtenNo:
+		return ESID_Set_ExtenNo;
+
+	case SID_Set_Online:
+		return ESID_Set_Online;
+
+	case SID_Set_Offline:
+		return ESID_Set_Offline;
+
+
+
+
+// 网络门前机文字
+	case SID_Net_Door:
+		return ESID_Net_Door;
+
+	case SID_Net_Door_First:
+		return ESID_Net_Door_First;
+
+	case SID_Net_Door_Second:
+		return ESID_Net_Door_Second;
+
+	case SID_Net_Door_NetParam:
+		return ESID_Net_Door_NetParam;
+
+	case SID_Net_Door_Get_MAC:
+		return ESID_Net_Door_Get_MAC;
+
+	case SID_Net_Door_Save_Reboot_Door:
+		return ESID_Net_Door_Save_Reboot_Door;
 
 // 报警文字
 	case SID_Bj_Report_Type_Chufa:
@@ -558,6 +629,13 @@ const char * get_str(STRID_E id)
 
 	case SID_Bj_Query_Del_Rec_All:
 		return ESID_Bj_Query_Del_Rec_All;
+
+	case SID_Unregistered:
+		return ESID_Unregistered;
+
+	case SID_Registered:
+		return ESID_Registered;
+
 
 	default:
 		return ESID_NULL;

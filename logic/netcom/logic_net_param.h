@@ -17,6 +17,15 @@
 
 #include "logic_include.h"
 
+/*************************************************
+  Function:    		NetworkIsReady
+  Description:		网络是否可用
+  Input: 			
+  Output:			无
+  Return:			无
+  Others:
+*************************************************/
+bool NetworkIsReady(void);
 
 /*************************************************
   Function:    		NetworkInit

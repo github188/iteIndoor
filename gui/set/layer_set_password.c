@@ -29,7 +29,6 @@ typedef enum
 
 static ITUBackground* SetPasswordBackground;
 static ITUBackground* SetPasswordMsgBackground;
-//static ITUBackground* SetPasswordMsgOKBackground;
 static ITUText* SetPasswordTitleText;
 static ITUText* SetUserPwd1Text;
 static ITUText* SetUserPwd2Text;
@@ -42,7 +41,6 @@ static ITUText* SetPasswordMsgTruePassBtnText;
 static ITUTextBox* SetNumKeyBordTextBox;
 static ITURadioBox* SetPasswordMsgNewPassBtnRadioBox;
 static ITURadioBox* SetPasswordMsgTruePassBtnRadioBox;
-//static ITULayer* SetNumKeyBordLayer;
 static ITULayer* SetProjectLayer;
 //static ITULayer* MsgFailHintSuccessLayer;
 
@@ -75,9 +73,6 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 
 		SetPasswordMsgBackground = ituSceneFindWidget(&theScene, "SetPasswordMsgBackground");
 		assert(SetPasswordMsgBackground); 
-
-		//SetPasswordMsgOKBackground = ituSceneFindWidget(&theScene, "SetPasswordMsgOKBackground");
-		//assert(SetPasswordMsgOKBackground);
 
 		SetPasswordTitleText = ituSceneFindWidget(&theScene, "SetPasswordTitleText");
 		assert(SetPasswordTitleText);
@@ -115,14 +110,8 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 		SetPasswordMsgTruePassBtnRadioBox = ituSceneFindWidget(&theScene, "SetPasswordMsgTruePassBtnRadioBox");
 		assert(SetPasswordMsgTruePassBtnRadioBox);
 
-		//SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
-		//assert(SetNumKeyBordLayer);		
-
 		SetProjectLayer = ituSceneFindWidget(&theScene, "SetProjectLayer");
 		assert(SetProjectLayer); 
-
-		//MsgFailHintSuccessLayer = ituSceneFindWidget(&theScene, "MsgFailHintSuccessLayer");
-		//assert(MsgFailHintSuccessLayer);
 	}
 
 	if (1 == g_background_flag)
@@ -164,9 +153,11 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 			ituTextSetString(SetPasswordMsgNewPassBtnText, "");
 			ituRadioBoxSetChecked(SetPasswordMsgNewPassBtnRadioBox, true);
 
-			//ituWidgetDisable(SetProjectLayer);
 			ituWidgetSetVisible(SetPasswordBackground, false);
 			ituWidgetSetVisible(SetPasswordMsgBackground, true);
+
+			ituWidgetDisable(SetProjectLayer);
+			ituWidgetShow(SetProjectLayer, ITU_EFFECT_NONE, 0);
 			break;
 		}		
 	}
@@ -177,22 +168,22 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 
 		memset(buf1, 0, sizeof(buf1));
 		memset(buf2, 0, sizeof(buf2));
-		memcpy(buf1, ".....", strlen(g_new_pass));
-		memcpy(buf2, ".....", strlen(g_ture_pass));
+		memcpy(buf1, "......", strlen(g_new_pass));
+		memcpy(buf2, "......", strlen(g_ture_pass));
 
 		if (NEWPWDBOTTON == g_new_ture_btn)
 		{
 			ituRadioBoxSetChecked(SetPasswordMsgNewPassBtnRadioBox, true);
 			sprintf(g_new_pass, "%s", strbuf);
 			memset(buf1, 0, sizeof(buf1));
-			memcpy(buf1, ".....", strlen(g_new_pass));
+			memcpy(buf1, "......", strlen(g_new_pass));
 		}
 		else if (TRUENEWPWDBOTTON == g_new_ture_btn)
 		{
 			ituRadioBoxSetChecked(SetPasswordMsgTruePassBtnRadioBox, true);
 			sprintf(g_ture_pass, "%s", strbuf);
 			memset(buf2, 0, sizeof(buf2));
-			memcpy(buf2, ".....", strlen(g_ture_pass));
+			memcpy(buf2, "......", strlen(g_ture_pass));
 		}
 		else
 		{
@@ -205,12 +196,6 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(SetPasswordMsgBackground, true);
 	}
 
-	if (PRJPASSWORDPAGE == g_page_pass)
-	{
-		ituWidgetShow(SetProjectLayer, ITU_EFFECT_NONE, 0);
-	}
-
-	//ituWidgetSetVisible(SetPasswordMsgOKBackground, false);
 	return true;
 }
 
@@ -285,8 +270,15 @@ Others:
 bool SetPasswordMsgNewPassBtnRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
 	g_new_ture_btn = NEWPWDBOTTON;
-	//ituLayerGoto(SetNumKeyBordLayer);
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, 33, 0, NULL);
+
+	if (PRJPASSWORDPAGE == g_page_pass)
+	{
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+	}
+	else
+	{
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, CIPHERTEXT, CANCEL_BTN, NULL);
+	}
 
 	return true;
 }
@@ -302,8 +294,15 @@ Others:
 bool SetPasswordMsgTruePassBtnRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
 	g_new_ture_btn = TRUENEWPWDBOTTON;
-	//ituLayerGoto(SetNumKeyBordLayer);
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, 33, 0, NULL);
+
+	if (PRJPASSWORDPAGE == g_page_pass)
+	{
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+	}
+	else
+	{
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, CIPHERTEXT, CANCEL_BTN, NULL);
+	}
 
 	return true;
 }
@@ -331,6 +330,7 @@ bool SetPasswordMsgTureButtonOnMouseUp(ITUWidget* widget, char* param)
 		
 		if (PASS_TYPE_ADMIN == g_type_pass)
 		{
+			ituWidgetEnable(SetProjectLayer);
 			ituLayerGoto(SetProjectLayer);
 		}
 		else
@@ -341,9 +341,7 @@ bool SetPasswordMsgTureButtonOnMouseUp(ITUWidget* widget, char* param)
 	}
 	else
 	{
-		//ituWidgetSetVisible(SetPasswordMsgBackground, false);
-		//ituWidgetSetVisible(SetPasswordMsgOKBackground, true);
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Pwd_Two_Err);
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Pwd_Two_Err, 0);
 	}
 
 	memset(g_new_pass, 0, sizeof(g_new_pass));
@@ -366,6 +364,7 @@ bool SetPasswordMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	if (PASS_TYPE_ADMIN == g_type_pass)
 	{
+		ituWidgetEnable(SetProjectLayer);
 		ituLayerGoto(SetProjectLayer);
 	}
 	else
@@ -376,26 +375,7 @@ bool SetPasswordMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	return true;
 }
-#if 0
-/*************************************************
-Function:		SetPasswordMsgOKButtonOnMouseUp
-Description: 	两次密码不同消息框确定键按下
-Input:		无
-Output:		无
-Return:		TRUE 是 FALSE 否
-Others:
-*************************************************/
-bool SetPasswordMsgOKButtonOnMouseUp(ITUWidget* widget, char* param)
-{
-	memset(g_new_pass, 0, sizeof(g_new_pass));
-	memset(g_ture_pass, 0, sizeof(g_ture_pass));
 
-	//ituWidgetSetVisible(SetPasswordMsgOKBackground, false);
-	ituWidgetEnable(SetPasswordBackground);
-
-	return true;
-}
-#endif
 /*************************************************
 Function:		SetNoDisturLayerOnReturn
 Description: 	底部退出键按下执行函数
@@ -411,13 +391,6 @@ void SetPasswordLayerOnReturn(void)
 		SetPasswordMsgFalseButtonOnMouseUp(NULL, NULL);
 		return;
 	}
-#if 0
-	else if (ituWidgetIsVisible(SetPasswordMsgOKBackground))
-	{
-		SetPasswordMsgOKButtonOnMouseUp(NULL, NULL);
-		return;
-	}
-#endif
 	else if (!ituWidgetIsVisible(SetMenuLayer))
 	{
 		ituLayerGoto(SetMenuLayer);

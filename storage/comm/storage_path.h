@@ -36,15 +36,15 @@
 #define CALL_MISS_PATH			CFG_TEMP_DRIVE":/RECORD/MISS.BIN" 						// 对讲未接记录
 
 // 铃声路径
-#define CALL_RING1_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING1.WAV"				// 铃声1
-#define CALL_RING2_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING2.WAV"				// 铃声2
-#define CALL_RING3_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING3.WAV"				// 铃声3
-#define CALL_RING4_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING4.WAV"				// 铃声4
-#define CALL_RING5_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING5.WAV"				// 铃声5
-#define CALL_RING6_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING6.WAV"				// 铃声6
-#define CALL_RING7_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING7.WAV"				// 铃声7
-#define CALL_RING8_PATH			CFG_PRIVATE_DRIVE":/rings/Ring/RING8.WAV"				// 铃声8
-#define CALL_RINGOUT_PATH		CFG_PRIVATE_DRIVE":/rings/Ring/RINGOUT.WAV"				// 回铃声
+#define CALL_RING1_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING1.WAV"			// 铃声1
+#define CALL_RING2_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING2.WAV"			// 铃声2
+#define CALL_RING3_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING3.WAV"			// 铃声3
+#define CALL_RING4_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING4.WAV"			// 铃声4
+#define CALL_RING5_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING5.WAV"			// 铃声5
+#define CALL_RING6_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING6.WAV"			// 铃声6
+#define CALL_RING7_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING7.WAV"			// 铃声7
+#define CALL_RING8_PATH			CFG_PRIVATE_DRIVE":/res/rings/Ring/RING8.WAV"			// 铃声8
+#define CALL_RINGOUT_PATH		CFG_PRIVATE_DRIVE":/res/rings/Ring/RINGOUT.WAV"			// 回铃声
 
 /**************************************************************************/
 /*									报警								  */	
@@ -54,41 +54,41 @@
 #define AF_BJ_REC_PATH			CFG_TEMP_DRIVE":/ALARM/BJBRE.BIN"						// 安防报警记录
 
 // 中文提示音路径
-#define AF_YJ_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/YUJING.WAV"				// 预警声音路径
-#define AF_BJ_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/BAOJING.WAV"			// 报警声音路径
-#define AF_YJ_WC_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/YJ_WC.WAV"				// 预警的“外出请关好门”的声音
-#define AF_YJQ_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/YJQ.WAV"				// 撤防时有警情语音提示“请注意有警情”
-#define AF_FQCF_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/FQCF.WAV"				// "防区触发不能布防"的语音提示
-#define AF_JJYJC_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/JJYJC.WAV"				// 进行撤防的语音提示：你好！警戒已解除
-#define AF_WANAN_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/WANAN.WAV"				// 进行局防时语音提示：晚安
-#define AF_ZONE1_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE1.WAV"				// 请注意有警情, 1防区触发
-#define AF_ZONE2_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE2.WAV"	
-#define AF_ZONE3_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE3.WAV"	
-#define AF_ZONE4_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE4.WAV"	
-#define AF_ZONE5_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE5.WAV"	
-#define AF_ZONE6_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE6.WAV"	
-#define AF_ZONE7_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE7.WAV"	
-#define AF_ZONE8_PATH			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE8.WAV"	
+#define AF_YJ_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YUJING.WAV"			// 预警声音路径
+#define AF_BJ_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/BAOJING.WAV"			// 报警声音路径
+#define AF_YJ_WC_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/YJ_WC.WAV"			// 预警的“外出请关好门”的声音
+#define AF_YJQ_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YJQ.WAV"			// 撤防时有警情语音提示“请注意有警情”
+#define AF_FQCF_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/FQCF.WAV"			// "防区触发不能布防"的语音提示
+#define AF_JJYJC_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/JJYJC.WAV"			// 进行撤防的语音提示：你好！警戒已解除
+#define AF_WANAN_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/WANAN.WAV"			// 进行局防时语音提示：晚安
+#define AF_ZONE1_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE1.WAV"			// 请注意有警情, 1防区触发
+#define AF_ZONE2_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE2.WAV"	
+#define AF_ZONE3_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE3.WAV"	
+#define AF_ZONE4_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE4.WAV"	
+#define AF_ZONE5_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE5.WAV"	
+#define AF_ZONE6_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE6.WAV"	
+#define AF_ZONE7_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE7.WAV"	
+#define AF_ZONE8_PATH			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE8.WAV"	
 // 英文提示音路径
-#define AF_YJ_WC_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/YJ_WC_E.WAV"			// 预警的“外出请关好门”的声音
-#define AF_YJQ_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/YJQ_E.WAV"				// 撤防时有警情语音提示“请注意有警情”
-#define AF_FQCF_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/FQCF_E.WAV"				// "防区触发不能布防"的语音提示
-#define AF_JJYJC_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/JJYJC_E.WAV"			// 进行撤防的语音提示：你好！警戒已解除
-#define AF_WANAN_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/WANAN_E.WAV"			// 进行局防时语音提示：晚安
-#define AF_ZONE1_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE1_E.WAV"			// 请注意有警情, 1防区触发
-#define AF_ZONE2_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE2_E.WAV"	
-#define AF_ZONE3_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE3_E.WAV"	
-#define AF_ZONE4_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE4_E.WAV"	
-#define AF_ZONE5_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE5_E.WAV"	
-#define AF_ZONE6_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE6_E.WAV"	
-#define AF_ZONE7_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE7_E.WAV"	
-#define AF_ZONE8_PATH_E			CFG_PRIVATE_DRIVE":/rings/Alarm/ZONE8_E.WAV"	
+#define AF_YJ_WC_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/YJ_WC_E.WAV"			// 预警的“外出请关好门”的声音
+#define AF_YJQ_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/YJQ_E.WAV"			// 撤防时有警情语音提示“请注意有警情”
+#define AF_FQCF_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/FQCF_E.WAV"			// "防区触发不能布防"的语音提示
+#define AF_JJYJC_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/JJYJC_E.WAV"			// 进行撤防的语音提示：你好！警戒已解除
+#define AF_WANAN_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/WANAN_E.WAV"			// 进行局防时语音提示：晚安
+#define AF_ZONE1_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE1_E.WAV"			// 请注意有警情, 1防区触发
+#define AF_ZONE2_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE2_E.WAV"	
+#define AF_ZONE3_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE3_E.WAV"	
+#define AF_ZONE4_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE4_E.WAV"	
+#define AF_ZONE5_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE5_E.WAV"	
+#define AF_ZONE6_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE6_E.WAV"	
+#define AF_ZONE7_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE7_E.WAV"	
+#define AF_ZONE8_PATH_E			CFG_PRIVATE_DRIVE":/res/rings/Alarm/ZONE8_E.WAV"	
 
 // 预警提示音
-#define AF_YJ1_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/YUJING1.WAV"			// 预警提示音1
-#define AF_YJ2_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/YUJING2.WAV"			// 预警提示音2
-#define AF_YJ3_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/YUJING3.WAV"			// 预警提示音3
-#define AF_YJ4_PATH				CFG_PRIVATE_DRIVE":/rings/Alarm/YUJING4.WAV"			// 预警提示音4
+#define AF_YJ1_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YUJING1.WAV"			// 预警提示音1
+#define AF_YJ2_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YUJING2.WAV"			// 预警提示音2
+#define AF_YJ3_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YUJING3.WAV"			// 预警提示音3
+#define AF_YJ4_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YUJING4.WAV"			// 预警提示音4
 
 /**************************************************************************/
 /*									信息								  */	
@@ -98,10 +98,10 @@
 #define MSG_VOICE_PATH			CFG_TEMP_DRIVE":/INFO/VOICE"							// 信息声音文件
 
 // 信息提示音
-#define MSG_HIT1_PATH			CFG_PRIVATE_DRIVE":/rings/Hit/MSG1.WAV"					// 信息提示音1
-#define MSG_HIT2_PATH			CFG_PRIVATE_DRIVE":/rings/Hit/MSG2.WAV"					// 信息提示音2
-#define MSG_HIT3_PATH			CFG_PRIVATE_DRIVE":/rings/Hit/MSG3.WAV"					// 信息提示音3
-#define MSG_HIT4_PATH			CFG_PRIVATE_DRIVE":/rings/Hit/MSG4.WAV"					// 信息提示音4
+#define MSG_HIT1_PATH			CFG_PRIVATE_DRIVE":/res/rings/Hit/MSG1.WAV"				// 信息提示音1
+#define MSG_HIT2_PATH			CFG_PRIVATE_DRIVE":/res/rings/Hit/MSG2.WAV"				// 信息提示音2
+#define MSG_HIT3_PATH			CFG_PRIVATE_DRIVE":/res/rings/Hit/MSG3.WAV"				// 信息提示音3
+#define MSG_HIT4_PATH			CFG_PRIVATE_DRIVE":/res/rings/Hit/MSG4.WAV"				// 信息提示音4
 
 /**************************************************************************/
 /*									抓拍								  */	
@@ -116,8 +116,8 @@
 #define LYLY_MANAGE_PATH		CFG_TEMP_DRIVE":/LYLY/MANAGE.BIN"						// 留影留言管理文件
 
 // 留言提示音
-#define LYLY_HIT_CN_PATH		CFG_PRIVATE_DRIVE":/rings/Hit/LYLYCN.WAV"				// 默认中文留言提示音
-#define LYLY_HIT_EN_PATH		CFG_PRIVATE_DRIVE":/rings/Hit/LYLYEN.WAV"				// 默认英文留言提示音
+#define LYLY_HIT_CN_PATH		CFG_PRIVATE_DRIVE":/res/rings/Hit/LYLYCN.WAV"			// 默认中文留言提示音
+#define LYLY_HIT_EN_PATH		CFG_PRIVATE_DRIVE":/res/rings/Hit/LYLYEN.WAV"			// 默认英文留言提示音
 #define LYLY_HIT_RE_PATH		CFG_PRIVATE_DRIVE":/LYLY/LYLY.WAV"						// 录制留言提示音
 
 /**************************************************************************/
@@ -129,7 +129,7 @@
 /**************************************************************************/
 /*								  家电									  */	
 /**************************************************************************/
-#define JD_DIR_PATH				CFG_TEMP_DRIVE":/JD"								// 家电文件夹
+#define JD_DIR_PATH				CFG_TEMP_DRIVE":/JD"								
 #define JD_LIGHT_VALUE_PATH     CFG_TEMP_DRIVE":/JD/ALIGHT.BIN"
 #define JD_KONGTIAO_VALUE_PATH  CFG_TEMP_DRIVE":/JD/AKONGTIAO.BIN"
 #define JD_DEVICE_LIGHT_PATH	CFG_TEMP_DRIVE":/JD/LIGHT.BIN"							// 家电灯光管理文件

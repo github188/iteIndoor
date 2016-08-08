@@ -215,12 +215,14 @@ ECHO_STORAGE storage_add_callrecord (PMCALLINFO pcallinfo)
 		calllistnew->CallCount = 0;
 		calllistnew->CallInfo = (PMCALLINFO)malloc(sizeof(MCALLINFO)*(calllist->CallCount+1));
 		
-		memset((char *)calllistnew, 0, sizeof(MCALLLISTINFO));
 		memset((char *)calllistnew->CallInfo, 0, sizeof(MCALLINFO)*(calllist->CallCount+1));
 
 		pcallinfo->UnRead = TRUE;
 		memcpy(&calllistnew->CallInfo[0], pcallinfo, sizeof(MCALLINFO));
-		memcpy(&calllistnew->CallInfo[1], calllist->CallInfo, calllist->CallCount);
+		if (calllist->CallCount > 0)
+		{
+			memcpy(&calllistnew->CallInfo[1], calllist->CallInfo, (calllist->CallCount)*sizeof(MCALLINFO));
+		}
 		calllistnew->CallCount = (calllist->CallCount+1)>MAX_RECORD_NUM ? MAX_RECORD_NUM : (calllist->CallCount+1);				
 		
 		save_call_storage(flag, calllistnew);
@@ -232,7 +234,6 @@ ECHO_STORAGE storage_add_callrecord (PMCALLINFO pcallinfo)
 		calllistnew->CallCount = 0;
 		calllistnew->CallInfo = (PMCALLINFO)malloc(sizeof(MCALLINFO));
 		
-		memset(calllistnew, 0, sizeof(MCALLLISTINFO));
 		memset(calllistnew->CallInfo, 0, sizeof(MCALLINFO)*(calllist->CallCount+1));
 		pcallinfo->UnRead = TRUE;
 		memcpy(&calllistnew->CallInfo[0], pcallinfo, sizeof(MCALLINFO));
@@ -298,14 +299,13 @@ ECHO_STORAGE storage_del_callrecord (CALL_TYPE Calltype, PDEL_LIST DelList)
 		calllistnew = (PMCALLLISTINFO)malloc(sizeof(MCALLLISTINFO));
 		calllistnew->CallCount = 0;
 		calllistnew->CallInfo = (PMCALLINFO)malloc(sizeof(MCALLINFO)*calllist->CallCount);
-		memset(calllistnew, 0, sizeof(MCALLLISTINFO));
 		memset(calllistnew->CallInfo, 0, sizeof(MCALLINFO)*calllist->CallCount);
 		
 		for (i=0; i<calllist->CallCount; i++)
 		{
 			if (DelList->DelFlg[i] == 0)			// flg == 1 表示需要删除的
 			{
-				memcpy(&calllistnew->CallInfo[i], &calllist->CallInfo[i], sizeof(MCALLINFO));
+				memcpy(&calllistnew->CallInfo[calllistnew->CallCount], &calllist->CallInfo[i], sizeof(MCALLINFO));
 				calllistnew->CallCount++;
 			}
 		}	
@@ -429,14 +429,12 @@ void storage_clear_all_callrecord(void)
   Description:  获取是否有未接来电
   Input:		无
   Output:		无
-  Return:		TRUE -- 有未接来电
-  				FALSE -- 没有未接来电
+  Return:		  				
   Others:		
 *************************************************/
 uint8 storage_get_callrecord_state(void)
 {
-	uint8 i;
-	uint8 ret = FALSE;
+	uint8 i, unread_num = 0;
 	
 	PMCALLLISTINFO calllist = storage_get_callrecord(MISSED);
 	if (calllist && calllist->CallCount > 0)
@@ -445,14 +443,13 @@ uint8 storage_get_callrecord_state(void)
 		{
 			if (1 == calllist->CallInfo[i].UnRead)
 			{
-				ret = TRUE;
-				break;
+				unread_num++;
 			}
 		}
 		free_call_memory(&calllist);
 	}
 	
-	return ret;
+	return unread_num;
 }
 
 /*************************************************

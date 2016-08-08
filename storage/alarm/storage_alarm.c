@@ -919,23 +919,38 @@ uint8 storage_set_validate_code(uint32 validate_code)
   Description: 		获取安防状态
   Input:			无
   Output:    		无
-  Return:			0: 撤防 1:布防 2:报警
+  Return:			FLASE: 撤防 TRUE:布防 
   Others:           
 *************************************************/
 uint8 storage_get_alarm_state(void)
 {
-	uint8 i;
+	if (DIS_DEFEND == gpAfParam->defend_state)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+/*************************************************
+  Function:    		storage_get_alarm_undeal_num
+  Description: 		防区触发的数
+  Input:			无
+  Output:    		无
+  Return:			
+  Others:           
+*************************************************/
+uint8 storage_get_alarm_undeal_num(void)
+{
+	uint8 i, undeal_num = 0;
 	
 	for (i = 0; i < AREA_AMOUNT; i++)
 	{
 		if (ALARM_SHOW_STATE == (SHOW_STATE)gpAfParam->show_state[i])
 		{
-			return 2;
+			undeal_num++;
 		}
 	}
-	if (DIS_DEFEND == gpAfParam->defend_state)
-	{
-		return 0;
-	}
-	return 1;
+	return undeal_num;
 }
+
+

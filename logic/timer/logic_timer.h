@@ -124,7 +124,7 @@ uint32 add_aurine_abstimer(struct tm abstime, FTIMER_FUNC func, void * param);
   Return:			是否成功 TRUE/FALSE
   Others:
 *************************************************/
-int cancel_aurine_timer(uint32 ID, FTIMER_FUNC func);
+int cancel_aurine_timer(uint32 *ID, FTIMER_FUNC func);
 
 
 /*************************************************
@@ -136,19 +136,6 @@ int cancel_aurine_timer(uint32 ID, FTIMER_FUNC func);
   Others:
 *************************************************/
 void free_aurine_timer(void);
-
-/*************************************************
-  Function:    		cancel_aurine_timer
-  Description: 		取消一个定时器
-  Input: 			
-	1.when			定时器ID
-	2.func			定时器设置要执行的动作
-  Output:			无
-  Return:			是否成功 TRUE/FALSE
-  Others:
-*************************************************/
-int cancel_aurine_timer(uint32 ID, FTIMER_FUNC func);
-
 
 #ifdef __cplusplus
 };

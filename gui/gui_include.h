@@ -41,6 +41,8 @@
 #include "photomsg\layer_photomsg.h"
 #include "recorder\layer_recorder.h"
 
+#include "set/layer_set.h"
+
 
 #ifdef __cplusplus
 extern "C" {

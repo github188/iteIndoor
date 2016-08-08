@@ -733,6 +733,38 @@ void storage_init(void);
 uint8 storage_set_noface_enable(uint8 enable);
 
 /*************************************************
+Function:		storage_get_noface_index
+Description: 	免打扰时间
+Input:		无
+Output:		无
+Return:		无
+Others:
+*************************************************/
+uint8 storage_get_noface_index(void);
+
+/*************************************************
+Function:		storage_get_noface_time
+Description: 	免打扰时间
+Input:		无
+Output:		无
+Return:		无
+Others:
+*************************************************/
+uint32 storage_get_noface_time(void);
+
+/*************************************************
+Function:		storage_set_noface
+Description: 	设置免打扰状态
+Input:
+1.enable
+2.index
+Output:		无
+Return:		无
+Others:
+*************************************************/
+uint32 storage_set_noface(uint8 enable, uint8 index);
+
+/*************************************************
   Function:		storage_get_closelcd_time
   Description: 	关屏幕时间
   Input:		无
@@ -886,16 +918,6 @@ uint32 storage_get_center_ip(void);
   Others:
 *************************************************/
 uint32 storage_get_manager_ip(uint8 NO);
-
-/*************************************************
-  Function:    		storage_set_subdev_ip
-  Description:		设置分机设备IP
-  Input: 			
-  Output:			无
-  Return:			理员机IP
-  Others:
-*************************************************/
-uint32 storage_clear_subdev_ip(void);
 
 /*************************************************
   Function:    		storage_set_subdev_ip

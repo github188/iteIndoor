@@ -4,22 +4,22 @@ File name:  	layer_set_volume.c
 Author:     	zxc
 Version:
 Date: 		2016-06-17
-Description:
+Description:	音量设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-static ITUBackground* SetVolumeBackground;
-static ITUBackground* SetVolumeMsgBackground;
-static ITULayer* SetMenuLayer;				
-static ITUText* SetKeypadTone2Text;
-static ITUSprite* SetKeypadToneSprite; 
-static ITUText* SetVolumeMsgTitleText;
-static ITUProgressBar* SetVolumeMsgProgressBar;
-static ITUTrackBar* SetVolumeMsgTrackBar;
+static ITUBackground* SetVolumeBackground = NULL;
+static ITUBackground* SetVolumeMsgBackground = NULL;
+static ITULayer* SetMenuLayer = NULL;
+static ITUText* SetKeypadTone2Text = NULL;
+static ITUSprite* SetKeypadToneSprite = NULL;
+static ITUText* SetVolumeMsgTitleText = NULL;
+static ITUProgressBar* SetVolumeMsgProgressBar = NULL;
+static ITUTrackBar* SetVolumeMsgTrackBar = NULL;
 
 static uint8 g_index[3];
 
@@ -77,6 +77,13 @@ bool SetVolumeOnEnter(ITUWidget* widget, char* param)
 	{
 		ituTextSetString(SetKeypadTone2Text, get_str(SID_Set_KeyTone_ON));
 		ituSpriteGoto(SetKeypadToneSprite, 1);
+	}
+
+	ituWidgetSetVisible(SetVolumeMsgBackground, false);
+	ituWidgetSetVisible(SetVolumeBackground, true);
+	if (!ituWidgetIsEnabled(SetVolumeBackground))
+	{
+		ituWidgetEnable(SetVolumeBackground);
 	}
 
 	return true;
@@ -222,9 +229,4 @@ void SetVolumeLayerOnReturn(void)
 		ituLayerGoto(SetMenuLayer);
 		return;
 	}
-}
-
-void SetVolumeReset(void)
-{
-	SetVolumeBackground = NULL;
 }

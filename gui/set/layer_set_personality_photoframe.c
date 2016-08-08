@@ -4,30 +4,22 @@ File name:  	layer_set_personality_photoframe.c
 Author:     	zxc
 Version:
 Date: 		2016-06-13
-Description:
+Description:	电子相框，设置关屏屏保时间
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-static ITUBackground* SetPersonalityPhotoFrameBackground;
-static ITUBackground* SetCloseLcdTimeMsgBackground;
-static ITUBackground* SetSaveLcdTimeMsgBackground;
-static ITULayer* SetPersonalityLayer;				//个性设置界面
-static ITUText* SetCloseLcd2Text;
-static ITUText* SetLcdSave2Text;
-static ITURadioBox* SetSaveLcdTimeMsg1RadioBox;
-static ITURadioBox* SetSaveLcdTimeMsg2RadioBox;
-static ITURadioBox* SetSaveLcdTimeMsg3RadioBox;
-static ITURadioBox* SetSaveLcdTimeMsg4RadioBox;
-static ITURadioBox* SetSaveLcdTimeMsg5RadioBox;
-static ITURadioBox* SetSaveLcdTimeMsg6RadioBox;
-static ITURadioBox* SetCloseLcdTimeMsg1RadioBox;
-static ITURadioBox* SetCloseLcdTimeMsg2RadioBox;
-static ITURadioBox* SetCloseLcdTimeMsg3RadioBox;
-static ITURadioBox* SetCloseLcdTimeMsg4RadioBox;
+static ITUBackground* SetPersonalityPhotoFrameBackground = NULL;
+static ITUBackground* SetCloseLcdTimeMsgBackground = NULL;
+static ITUBackground* SetSaveLcdTimeMsgBackground = NULL;
+static ITULayer* SetPersonalityLayer = NULL;				//个性设置界面
+static ITUText* SetCloseLcd2Text = NULL;
+static ITUText* SetLcdSave2Text = NULL;
+static ITURadioBox* SetSaveLcdTimeMsgRadioBox[6] = { NULL };
+static ITURadioBox* SetCloseLcdTimeMsgRadioBox[4] = { NULL };
 
 static EPHOTO_TIME g_time;
 static EPHOTO_PARAM g_param;
@@ -64,42 +56,10 @@ bool SetPersonalityPhotoFrameOnEnter(ITUWidget* widget, char* param)
 
 		SetLcdSave2Text = ituSceneFindWidget(&theScene, "SetLcdSave2Text");
 		assert(SetLcdSave2Text);
-
-		SetSaveLcdTimeMsg1RadioBox = ituSceneFindWidget(&theScene, "SetSaveLcdTimeMsg1RadioBox");
-		assert(SetSaveLcdTimeMsg1RadioBox);
-
-		SetSaveLcdTimeMsg2RadioBox = ituSceneFindWidget(&theScene, "SetSaveLcdTimeMsg2RadioBox");
-		assert(SetSaveLcdTimeMsg2RadioBox);
-
-		SetSaveLcdTimeMsg3RadioBox = ituSceneFindWidget(&theScene, "SetSaveLcdTimeMsg3RadioBox");
-		assert(SetSaveLcdTimeMsg3RadioBox);
-
-		SetSaveLcdTimeMsg4RadioBox = ituSceneFindWidget(&theScene, "SetSaveLcdTimeMsg4RadioBox");
-		assert(SetSaveLcdTimeMsg4RadioBox);
-
-		SetSaveLcdTimeMsg5RadioBox = ituSceneFindWidget(&theScene, "SetSaveLcdTimeMsg5RadioBox");
-		assert(SetSaveLcdTimeMsg5RadioBox);
-
-		SetSaveLcdTimeMsg6RadioBox = ituSceneFindWidget(&theScene, "SetSaveLcdTimeMsg6RadioBox");
-		assert(SetSaveLcdTimeMsg6RadioBox); 
-
-		SetCloseLcdTimeMsg1RadioBox = ituSceneFindWidget(&theScene, "SetCloseLcdTimeMsg1RadioBox");
-		assert(SetCloseLcdTimeMsg1RadioBox);
-
-		SetCloseLcdTimeMsg2RadioBox = ituSceneFindWidget(&theScene, "SetCloseLcdTimeMsg2RadioBox");
-		assert(SetCloseLcdTimeMsg2RadioBox);
-
-		SetCloseLcdTimeMsg3RadioBox = ituSceneFindWidget(&theScene, "SetCloseLcdTimeMsg3RadioBox");
-		assert(SetCloseLcdTimeMsg3RadioBox);
-
-		SetCloseLcdTimeMsg4RadioBox = ituSceneFindWidget(&theScene, "SetCloseLcdTimeMsg4RadioBox");
-		assert(SetCloseLcdTimeMsg4RadioBox); 
 	}
 
 	memset(&g_param, 0, sizeof(EPHOTO_PARAM));
 	memcpy(&g_param, (PEPHOTO_PARAM)storage_get_screenparam(), sizeof(EPHOTO_PARAM));
-
-	printf("g_param.used %d, g_param.intime %d,  g_param.holdtime %d\n", g_param.used, g_param.intime, g_param.holdtime);
 
 	if (g_param.used)
 	{
@@ -107,13 +67,11 @@ bool SetPersonalityPhotoFrameOnEnter(ITUWidget* widget, char* param)
 		timeflag = storage_get_screen_intime();
 		if (timeflag >= 60)
 		{
-			sprintf(temp, "%d", timeflag / 60);
-			strcat(temp, get_str(SID_Time_Min));
+			sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
 		}
 		else
 		{
-			sprintf(temp, "%d", timeflag);
-			strcat(temp, get_str(SID_Time_Sec));
+			sprintf(temp, "%d%s", timeflag, get_str(SID_Time_Sec));
 		}
 		ituTextSetString(SetLcdSave2Text, temp);
 	}
@@ -123,13 +81,16 @@ bool SetPersonalityPhotoFrameOnEnter(ITUWidget* widget, char* param)
 	}
 	memset(temp, 0, sizeof(temp));
 	timeflag = storage_get_closelcd_time();
-	sprintf(temp, "%d", timeflag/60);
-	strcat(temp, get_str(SID_Time_Min));
+	sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
 	ituTextSetString(SetCloseLcd2Text, temp);
 	
 	ituWidgetSetVisible(SetCloseLcdTimeMsgBackground, false);
 	ituWidgetSetVisible(SetSaveLcdTimeMsgBackground, false);
 	ituWidgetSetVisible(SetPersonalityPhotoFrameBackground, true);
+	if (!ituWidgetIsEnabled(SetPersonalityPhotoFrameBackground))
+	{
+		ituWidgetEnable(SetPersonalityPhotoFrameBackground);
+	}
 
 	return true;
 }
@@ -144,26 +105,40 @@ Others:
 *************************************************/
 bool SetCloseLcdButtonOnMouseUp(ITUWidget* widget, char* param)
 {
+	if (!SetCloseLcdTimeMsgRadioBox[0])
+	{
+		char tmp[50];
+		uint8 i = 0;
+
+		for (i = 0; i < 4; i++)
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d%s", "SetCloseLcdTimeMsg", i+1, "RadioBox");
+			SetCloseLcdTimeMsgRadioBox[i] = ituSceneFindWidget(&theScene, tmp);
+			assert(SetCloseLcdTimeMsgRadioBox[i]);
+		}
+	}
+
 	switch (g_param.holdtime)
 	{
 	case EPHOTO_TIME_5:
-		ituRadioBoxSetChecked(SetCloseLcdTimeMsg1RadioBox, true);
+		ituRadioBoxSetChecked(SetCloseLcdTimeMsgRadioBox[0], true);
 		break;
 
 	case EPHOTO_TIME_10:
-		ituRadioBoxSetChecked(SetCloseLcdTimeMsg2RadioBox, true);
+		ituRadioBoxSetChecked(SetCloseLcdTimeMsgRadioBox[1], true);
 		break;
 
 	case EPHOTO_TIME_30:
-		ituRadioBoxSetChecked(SetCloseLcdTimeMsg3RadioBox, true);
+		ituRadioBoxSetChecked(SetCloseLcdTimeMsgRadioBox[2], true);
 		break;
 
 	case EPHOTO_TIME_60:
-		ituRadioBoxSetChecked(SetCloseLcdTimeMsg4RadioBox, true);
+		ituRadioBoxSetChecked(SetCloseLcdTimeMsgRadioBox[3], true);
 		break;
 
 	default:
-		ituRadioBoxSetChecked(SetCloseLcdTimeMsg1RadioBox, true);
+		ituRadioBoxSetChecked(SetCloseLcdTimeMsgRadioBox[0], true);
 		break;
 	}
 
@@ -183,38 +158,52 @@ Others:
 *************************************************/
 bool SetLcdSaveButtonOnMouseUp(ITUWidget* widget, char* param)
 {
+	if (!SetSaveLcdTimeMsgRadioBox[0])
+	{
+		char tmp[50];
+		uint8 i = 0;
+
+		for (i = 0; i < 6; i++)
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d%s", "SetSaveLcdTimeMsg", i + 1, "RadioBox");
+			SetSaveLcdTimeMsgRadioBox[i] = ituSceneFindWidget(&theScene, tmp);
+			assert(SetSaveLcdTimeMsgRadioBox[i]);
+		}
+	}
+
 	if (g_param.used)
 	{
 		switch (g_param.intime)
 		{
 		case EPHOTO_TIME_HALF:
-			ituRadioBoxSetChecked(SetSaveLcdTimeMsg1RadioBox, true);
+			ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[0], true);
 			break;
 
 		case EPHOTO_TIME_1:
-			ituRadioBoxSetChecked(SetSaveLcdTimeMsg2RadioBox, true);
+			ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[1], true);
 			break;
 
 		case EPHOTO_TIME_3:
-			ituRadioBoxSetChecked(SetSaveLcdTimeMsg3RadioBox, true);
+			ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[2], true);
 			break;
 
 		case EPHOTO_TIME_5:
-			ituRadioBoxSetChecked(SetSaveLcdTimeMsg4RadioBox, true);
+			ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[3], true);
 			break;
 
 		case EPHOTO_TIME_10:
-			ituRadioBoxSetChecked(SetSaveLcdTimeMsg5RadioBox, true);
+			ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[4], true);
 			break;
 
 		default:
-			ituRadioBoxSetChecked(SetSaveLcdTimeMsg1RadioBox, true);
+			ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[0], true);
 			break;
 		}
 	}
 	else
 	{
-		ituRadioBoxSetChecked(SetSaveLcdTimeMsg6RadioBox, true);
+		ituRadioBoxSetChecked(SetSaveLcdTimeMsgRadioBox[5], true);
 	}
 
 	ituWidgetDisable(SetPersonalityPhotoFrameBackground);
@@ -237,21 +226,29 @@ bool SetCloseLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 	uint8 temp[40];
 	int16 timeflag = 0;
 
-	if (ituRadioBoxIsChecked(SetCloseLcdTimeMsg1RadioBox))
+	int index = atoi(param);
+
+	switch (index)
 	{
+	case 0:
 		g_param.holdtime = EPHOTO_TIME_5;
-	}
-	else if (ituRadioBoxIsChecked(SetCloseLcdTimeMsg2RadioBox))
-	{
+		break;
+
+	case 1:
 		g_param.holdtime = EPHOTO_TIME_10;
-	}
-	else if (ituRadioBoxIsChecked(SetCloseLcdTimeMsg3RadioBox))
-	{
+		break;
+
+	case 2:
 		g_param.holdtime = EPHOTO_TIME_30;
-	}
-	else if (ituRadioBoxIsChecked(SetCloseLcdTimeMsg4RadioBox))
-	{
+		break;
+
+	case 3:
 		g_param.holdtime = EPHOTO_TIME_60;
+		break;
+
+	default:
+		g_param.holdtime = EPHOTO_TIME_5;
+		break;
 	}
 	
 	ret = storage_set_screenparam(&g_param);
@@ -262,8 +259,7 @@ bool SetCloseLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 
 	memset(temp, 0, sizeof(temp));
 	timeflag = storage_get_closelcd_time();
-	sprintf(temp, "%d", timeflag/60);
-	strcat(temp, get_str(SID_Time_Min));
+	sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
 	ituTextSetString(SetCloseLcd2Text, temp);
 
 	ituWidgetSetVisible(SetCloseLcdTimeMsgBackground, false);
@@ -286,34 +282,39 @@ bool SetSaveLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 	uint8 temp[40];
 	int16 timeflag = 0;
 
-	if (ituRadioBoxIsChecked(SetSaveLcdTimeMsg1RadioBox))
+	int index = atoi(param);
+
+	switch (index)
 	{
+	case 0:
 		g_param.used = TRUE;
 		g_param.intime = EPHOTO_TIME_HALF;
-	}
-	else if (ituRadioBoxIsChecked(SetSaveLcdTimeMsg2RadioBox))
-	{
+		break;
+
+	case 1:
 		g_param.used = TRUE;
 		g_param.intime = EPHOTO_TIME_1;
-	}
-	else if (ituRadioBoxIsChecked(SetSaveLcdTimeMsg3RadioBox))
-	{
+		break;
+
+	case 2:
 		g_param.used = TRUE;
 		g_param.intime = EPHOTO_TIME_3;
-	}
-	else if (ituRadioBoxIsChecked(SetSaveLcdTimeMsg4RadioBox))
-	{
+		break;
+
+	case 3:
 		g_param.used = TRUE;
 		g_param.intime = EPHOTO_TIME_5;
-	}
-	else if (ituRadioBoxIsChecked(SetSaveLcdTimeMsg5RadioBox))
-	{
+		break;
+
+	case 4:
 		g_param.used = TRUE;
 		g_param.intime = EPHOTO_TIME_10;
-	}
-	else if (ituRadioBoxIsChecked(SetSaveLcdTimeMsg6RadioBox))
-	{
+		break;
+
+	case 5:
+	default:
 		g_param.used = FALSE;
+		break;
 	}
 
 	ret = storage_set_screenparam(&g_param);
@@ -328,13 +329,11 @@ bool SetSaveLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 		timeflag = storage_get_screen_intime();
 		if (timeflag >= 60)
 		{
-			sprintf(temp, "%d", timeflag / 60);
-			strcat(temp, get_str(SID_Time_Min));
+			sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
 		}
 		else
 		{
-			sprintf(temp, "%d", timeflag);
-			strcat(temp, get_str(SID_Time_Sec));
+			sprintf(temp, "%d%s", timeflag, get_str(SID_Time_Sec));
 		}
 		ituTextSetString(SetLcdSave2Text, temp);
 	}
@@ -376,9 +375,4 @@ void SetPersonalityPhotoFrameLayerOnReturn(void)
 		ituLayerGoto(SetPersonalityLayer);
 		return;
 	}
-}
-
-void SetPersonalityPhotoFrameLayerReset(void)
-{
-	SetPersonalityPhotoFrameBackground = NULL;
 }

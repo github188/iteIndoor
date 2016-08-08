@@ -57,7 +57,7 @@ static void save_rtsp_param()
 
 	if (NULL == g_list || NULL == g_list->Homedev)
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Data_Save_Err);
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Data_Save_Err, 0);
 		return;
 	}
 
@@ -80,7 +80,7 @@ static void save_rtsp_param()
 	{
 		memcpy(&g_list->Homedev[g_camera_index], &dev, sizeof(HOMEDEVICE));
 		memcpy(&g_homedev, &dev, sizeof(HOMEDEVICE));
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Data_Save_Err);
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Data_Save_Err, 0);
 	}
 	return;
 }
@@ -99,7 +99,7 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 
 	if (!SetRtspCoverFlow)
 	{
-		char textname[30];
+		char textname[50];
 
 		SetRtspCoverFlow = ituSceneFindWidget(&theScene, "SetRtspCoverFlow");
 		assert(SetRtspCoverFlow);
@@ -216,7 +216,7 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 			ret = check_ip_to_true(TextBox_data);
 			if (FALSE == ret)
 			{
-				ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err);
+				ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
 			}
 			else
 			{
@@ -233,7 +233,7 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 			count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
 			if (0 == count_textbox)
 			{
-				ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Port_Null);
+				ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Port_Null, 0);
 				return false;
 			}
 			g_homedev.DevPort = atoi(TextBox_data);
@@ -249,7 +249,7 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 			count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
 			if (0 == count_textbox)
 			{
-				ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Channel_Null);
+				ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Channel_Null, 0);
 				return false;
 			}
 			g_homedev.ChannelNumber = atoi(TextBox_data);
@@ -439,17 +439,17 @@ bool SetRtspParamListButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	case 2:
 		sprintf(text_tmp, "%s", UlongtoIP(g_homedev.DeviceIP));
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, 32, 1, text_tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, text_tmp);
 		break;
 
 	case 3:
 		sprintf(text_tmp, "%d", g_homedev.DevPort);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 4, 32, 0, text_tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 4, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 
 	case 4:
 		sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 3, 32, 0, text_tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 3, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 
 	case 5:
@@ -467,12 +467,12 @@ bool SetRtspParamListButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	case 6:
 		sprintf(text_tmp, "%s", g_homedev.UserName);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 12, 32, 0, text_tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 12, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 
 	case 7:
 		sprintf(text_tmp, "%s", g_homedev.Password);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 12, 32, 0, text_tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 12, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 	}
 

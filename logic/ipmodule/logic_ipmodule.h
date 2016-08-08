@@ -42,6 +42,26 @@ typedef struct
 
 
 /*************************************************
+  Function:			get_ipmodule_online
+  Description:		获取IP模块状态
+  Input: 			无
+  Output:			无
+  Return:			IP地址
+  Others:
+*************************************************/
+uint8 get_ipmodule_online(void);
+
+/*************************************************
+  Function:     get_ipmodule_state
+  Description:  IP模块图标显示状态
+  Input:        无
+  Output:       无
+  Return:       无
+  Others:       
+*************************************************/
+uint8 get_ipmodule_state(void);
+
+/*************************************************
   Function:			public_distribute
   Description:		公共模块接收发送包回调函数
   Input: 	
@@ -153,14 +173,14 @@ void ipmodule_get_manager_list(const PRECIVE_PACKET recPacket);
 uint32 get_ipmodule_address(void);
 
 /*************************************************
-  Function:			ipmodule_init
+  Function:			init_ipmodule
   Description:		IP模块初始化
   Input: 			无
   Output:			无
   Return:			无
   Others:
 *************************************************/
-void ipmodule_init(void);
+void init_ipmodule(void);
 #endif
 
 

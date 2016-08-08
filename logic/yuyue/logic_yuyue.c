@@ -14,9 +14,9 @@
 #include "logic_include.h"
 
 #ifdef _YUYUE_MODE_
+#define YUYUE_TIME				30					// 定时器时间
 extern PBE_COMM_LIST JdYuyueList;					// 家电预约列表
-
-static uint8 TimeCount = 0;
+static uint32 g_YuyueTimerID = 0;
 
 /*************************************************
   Function:		yuyue_time
@@ -142,114 +142,122 @@ static uint8 yuyue_time(BE_DATETIME BeTime)
   Return:		
   Others:		
 *************************************************/
-void yuyue_ontimer(void)
+static void* yuyue_timer_proc(uint32 ID, void *arg)
 {
 	uint8 i;
 	uint16 type, betype, addr, degree, act, index, istune;
 	
-	//if (++TimeCount >= 60)
-	if (++TimeCount >= 30)                        // 容易出现开两次的现象
+	if (JdYuyueList)
 	{
-		TimeCount = 0;
-		if (JdYuyueList)
+		for (i = 0; i < JdYuyueList->nCount; i++)
 		{
-			for (i = 0; i < JdYuyueList->nCount; i++)
+			if (JdYuyueList->be_comm[i].Used)
 			{
-				if (JdYuyueList->be_comm[i].Used)
+				//dprintf("yuyue_ontimer: i = %d\n", i);
+				if (TRUE == yuyue_time(JdYuyueList->be_comm[i].BeTime))
 				{
-					//dprintf("yuyue_ontimer: i = %d\n", i);
-					if (TRUE == yuyue_time(JdYuyueList->be_comm[i].BeTime))
+					dprintf("yuyue_time: index = %d\n", i);
+					betype = JdYuyueList->be_comm[i].BeType;	// 预约类型
+					type = JdYuyueList->be_comm[i].Type;		// 设备类型
+					index = JdYuyueList->be_comm[i].Index;		// 设备索引
+					addr = JdYuyueList->be_comm[i].Address;		// 设备地址
+					act = JdYuyueList->be_comm[i].Action;		// 执行动作
+					degree = JdYuyueList->be_comm[i].Degree;	// 调节级数
+                    istune = JdYuyueList->be_comm[i].IsTune;
+					dprintf("yuyue betype: %d\n", betype);
+					switch (betype)
 					{
-						dprintf("yuyue_time: index = %d\n", i);
-						betype = JdYuyueList->be_comm[i].BeType;	// 预约类型
-						type = JdYuyueList->be_comm[i].Type;		// 设备类型
-						index = JdYuyueList->be_comm[i].Index;		// 设备索引
-						addr = JdYuyueList->be_comm[i].Address;		// 设备地址
-						act = JdYuyueList->be_comm[i].Action;		// 执行动作
-						degree = JdYuyueList->be_comm[i].Degree;	// 调节级数
-                        istune = JdYuyueList->be_comm[i].IsTune;
-						dprintf("yuyue betype: %d\n", betype);
-						switch (betype)
-						{
-							case EV_BE_SM:	
-							    #ifdef _AURINE_ELEC_NEW_
+						case EV_BE_SM:	
+						    #ifdef _AURINE_ELEC_NEW_
+							if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY) )
+							{
+							    if (index < 5)
+							    {
+							        exec_jd_scene_mode(index);
+							    }
+							    else
+							    {
+							        jd_aurine_scene_open(JdYuyueList->be_comm[i].Address,JdYuyueList->be_comm[i].Address,JdYuyueList->be_comm[i].Index+1);
+							    }
+							}
+							else
+							{
+							    exec_jd_scene_mode(index);
+							}
+							#else
+							exec_jd_scene_mode(index);
+							#endif
+							break;
+							
+						case EV_BE_JD:
+							if (act)
+							{
+								dprintf("485send  device_on: addr = %d, degree = %d\n", addr, degree);
+								#ifdef _AURINE_ELEC_NEW_
 								if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY) )
 								{
-								    if (index < 5)
+								    if (type == JD_TYPE_DENGGUANG)
 								    {
-								        exec_jd_scene_mode(index);
+								        if (istune)
+								        {
+								            jd_aurine_light_open(index, addr, degree*10);
+								        }
+								        else
+								        {
+								            jd_aurine_light_open(index, addr, 100);
+								        }
 								    }
 								    else
 								    {
-								        jd_aurine_scene_open(JdYuyueList->be_comm[i].Address,JdYuyueList->be_comm[i].Address,JdYuyueList->be_comm[i].Index+1);
+								        jd_aurine_yuyue_oper(JD_ON, type-1, index, addr, 100);
 								    }
 								}
 								else
 								{
-								    exec_jd_scene_mode(index);
+								    device_on(addr, degree);
 								}
 								#else
-								exec_jd_scene_mode(index);
+								device_on(addr, degree);
 								#endif
-								break;
-								
-							case EV_BE_JD:
-								if (act)
+							}
+							else
+							{
+							    #ifdef _AURINE_ELEC_NEW_
+								if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY))
 								{
-									dprintf("485send  device_on: addr = %d, degree = %d\n", addr, degree);
-									#ifdef _AURINE_ELEC_NEW_
-									if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY) )
-									{
-									    if (type == JD_TYPE_DENGGUANG)
-									    {
-									        if (istune)
-									        {
-									            jd_aurine_light_open(index, addr, degree*10);
-									        }
-									        else
-									        {
-									            jd_aurine_light_open(index, addr, 100);
-									        }
-									    }
-									    else
-									    {
-									        jd_aurine_yuyue_oper(JD_ON, type-1, index, addr, 100);
-									    }
-									}
-									else
-									{
-									    device_on(addr, degree);
-									}
-									#else
-									device_on(addr, degree);
-									#endif
+								    jd_aurine_yuyue_oper(JD_OFF,type-1,index,addr,100);
 								}
 								else
 								{
-								    #ifdef _AURINE_ELEC_NEW_
-									if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY))
-									{
-									    jd_aurine_yuyue_oper(JD_OFF,type-1,index,addr,100);
-									}
-									else
-									{
-									    device_off(addr);
-									}
-									#else
-									device_off(addr);
-									#endif
-									dprintf("485send  device_off: addr = %d\n", addr);
+								    device_off(addr);
 								}
-								break;
+								#else
+								device_off(addr);
+								#endif
+								dprintf("485send  device_off: addr = %d\n", addr);
+							}
+							break;
 
-							default:
-								break;
-						}
+						default:
+							break;
 					}
 				}
 			}
 		}
 	}
+}
+
+/*************************************************
+  Function:		init_yuyue_timer
+  Description: 	预约定时器
+  Input:		无
+  Output:		无
+  Return:		
+  Others:		
+*************************************************/
+void init_yuyue_timer(void)
+{
+	g_YuyueTimerID = add_aurine_realtimer((1000*YUYUE_TIME), yuyue_timer_proc, NULL);	
 }
 #endif
 

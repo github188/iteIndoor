@@ -23,6 +23,8 @@
 #include "lwip/ip.h"
 #include "lwip/dns.h"
 #include "ite/itp.h"
+#include "SDL/SDL.h"
+#include "ite/itv.h"
 
 #include "timer/logic_timer.h"
 #include "timer/logic_time.h"

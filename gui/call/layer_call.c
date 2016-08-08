@@ -810,7 +810,7 @@ bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param)
 			memset(&DelList, 0, sizeof(DEL_LIST));
 			for (i = 0; i < g_CallRecord->CallCount; i++)
 			{
-				if (CallChoseIcon == CallRecordListSprite[i]->frame);
+				if (CallChoseIcon == CallRecordListSprite[i]->frame)
 				{
 					DelList.DelFlg[i] = 1;
 					DelList.Counts++;

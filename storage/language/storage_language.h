@@ -83,14 +83,15 @@ extern "C" {
 #define ESID_Set_User_AfGeLi_Close      (g_China ? (g_Big5 ? "防區不隔離" : "防区不隔离") : "Zone non-bypass")
 #define ESID_Set_User_AfJuFang_Close    (g_China ? (g_Big5 ? "局防無效" : "局防无效") : "Invalid local arm ")
 #define ESID_Set_User_AfJuFang_Open     (g_China ? (g_Big5 ? "局防有效" : "局防有效") : "Valid local arm")
-#define ESID_Set_Used                   (g_China ? (g_Big5 ? "啟用" : "启用") : "Activate")
 #define ESID_Set_UnUsed                 (g_China ? (g_Big5 ? "未啟用" : "未启用") : "Deactivate")
+#define ESID_Set_Used                   (g_China ? (g_Big5 ? "啟用" : "启用") : "Activate")
+#define ESID_Set_Null                   (g_China ? (g_Big5 ? "無" : "无") : "Null")
 #define ESID_Set_Prj_ExtJD_Used         (g_China ? (g_Big5 ? "家電控制器已啟用" : "家电控制器已启用") : "Appliance Controller Enabled")
 #define ESID_Set_Prj_ExtJD_Unused       (g_China ? (g_Big5 ? "家電控制器未啟用" : "家电控制器未启用") : "Appliance Controller Disabled")
-#define ESID_Set_Prj_ExtDoor1_Used      (g_China ? (g_Big5 ? "門前機一已啟用" : "门前机一已启用") : "Outdoor Phone1 Enabled")
 #define ESID_Set_Prj_ExtDoor1_Unused    (g_China ? (g_Big5 ? "門前機一未啟用" : "门前机一未启用") : "Outdoor Phone1 Disabled")
-#define ESID_Set_Prj_ExtDoor2_Used      (g_China ? (g_Big5 ? "門前機二已啟用" : "门前机二已启用") : "Outdoor Phone2 Enabled")
+#define ESID_Set_Prj_ExtDoor1_Used      (g_China ? (g_Big5 ? "門前機一已啟用" : "门前机一已启用") : "Outdoor Phone1 Enabled")
 #define ESID_Set_Prj_ExtDoor2_Unused    (g_China ? (g_Big5 ? "門前機二未啟用" : "门前机二未启用") : "Outdoor Phone2 Disabled")
+#define ESID_Set_Prj_ExtDoor2_Used      (g_China ? (g_Big5 ? "門前機二已啟用" : "门前机二已启用") : "Outdoor Phone2 Enabled")
 #define ESID_Set_Prj_ExtStair_Used      (g_China ? (g_Big5 ? "通用梯口機已啟用" : "通用梯口机已启用") : "General Secondary Entry Station Enabled")
 #define ESID_Set_Prj_ExtStair_Unused    (g_China ? (g_Big5 ? "通用梯口機未啟用" : "通用梯口机未启用") : "General Secondary Entry Station Disabled")
 #define ESID_Set_Prj_Rule_Riser_Used    (g_China ? (g_Big5 ? "單元號長度有效" : "单元号长度有效") : "Valid Riser NO.")
@@ -113,6 +114,33 @@ extern "C" {
 #define ESID_Set_Data_Save_Err			(g_China ? (g_Big5 ? "數據保存失敗" : "数据保存失败") : "Data Save Error")
 #define ESID_Set_Rtsp_Port_Null			(g_China ? (g_Big5 ? "端口號不能為空" : "端口号不能为空") : "Pls enter port number!")
 #define ESID_Set_Rtsp_Channel_Null		(g_China ? (g_Big5 ? "視頻通道不能為空" : "视频通道不能为空") : "Pls enter channel number!")
+#define ESID_Msg_Connect_Outtime        (g_China ? (g_Big5 ? "連接超時..." : "连接超时...") : "Connection timeout!")
+#define ESID_Msg_Save_OK				(g_China ? (g_Big5 ? "保存成功" : "保存成功") : "OK!")
+#define ESID_Msg_Save_Err				(g_China ? (g_Big5 ? "保存失敗" : "保存失败") : "Failed!")
+#define ESID_Msg_Param_Save				(g_China ? (g_Big5 ? "參數有更改，是否保存？" : "参数有更改，是否保存？") : "There are some changes of parameters,sure to save it?")
+#define ESID_Msg_Operat_OK				(g_China ? (g_Big5 ? "操作成功" : "操作成功") : "Operation successfully")
+#define ESID_Msg_Operat_Err				(g_China ? (g_Big5 ? "操作失敗" : "操作失败") : "Operation failed")
+#define ESID_Msg_Format                 (g_China ? (g_Big5 ? "確定是否清空" : "确定是否清空?") : "Sure to delete all?")
+
+// IP协议转换器
+#define ESID_Set_Unbounded				 (g_China ? (g_Big5 ? "ゼ竕﹚" : "未绑定") : "Unbounded")
+#define ESID_Set_Bounded  				 (g_China ? (g_Big5 ? "竕﹚" : "已绑定") : "Binding")
+#define ESID_Set_Generate_Binding_Code   (g_China ? (g_Big5 ? "生成綁定碼" : "生成绑定码") : "Binding Code")
+#define ESID_Set_Binding_Code        	 (g_China ? (g_Big5 ? "綁定碼" : "绑定码") : "Binding Code")
+#define ESID_Set_ExtenNo 				 (g_China ? (g_Big5 ? "分機" : "分机") : "EXT")
+#define ESID_Set_Online				     (g_China ? (g_Big5 ? "在線" : "在线") : "OnLine")
+#define ESID_Set_Offline 				 (g_China ? (g_Big5 ? "瞒絬" : "離線") : "UnLine")
+
+
+
+// 网络门前机文字
+#define ESID_Net_Door             		 (g_China ? (g_Big5 ? "網絡門前機" : "网络门前机") : "IP Camera")
+#define ESID_Net_Door_First              (g_China ? (g_Big5 ? "網絡門前機一" : "网络门前机一") : "IP Camera 1")
+#define ESID_Net_Door_Second             (g_China ? (g_Big5 ? "網絡門前機二" : "网络门前机二") : "IP Camera 2")
+#define ESID_Net_Door_NetParam           (g_China ? (g_Big5 ? "網絡參數" : "网络参数") : "Network Parameters")
+#define ESID_Net_Door_Get_MAC            (g_China ? (g_Big5 ? "是否獲取MAC？" : "是否获取MAC？") : "Sure to obtain MAC?")
+#define ESID_Net_Door_Save_Reboot_Door   (g_China ? (g_Big5 ? "是否保存？保存后門前機將重啟" : "是否保存？保存后门前机将重启") : "Sure to save? Outdoor Camera will be rebooted after saving.")
+#define ESID_Net_Door_Card_Delet_All     (g_China ? (g_Big5 ? "是否刪除網絡門前機的所有卡？" : "是否删除网络门前机的所有卡？") : "Sure to save? Outdoor Camera will be rebooted after saving.")
 
 
 // 报警文字
@@ -214,6 +242,8 @@ extern "C" {
 // 公共文字
 #define ESID_Bj_Query_Del_Rec_One        (g_China ? (g_Big5 ? "是否刪除該數據?" : "是否删除该数据?") : "Sure to delete it?")  
 #define ESID_Bj_Query_Del_Rec_All        (g_China ? (g_Big5 ? "是否清空數據?" : "是否清空数据?") : "Sure to delete all?") 
+#define ESID_Unregistered           	 (g_China ? (g_Big5 ? "未註冊" : "未注册") : "Unregistered")
+#define ESID_Registered           		 (g_China ? (g_Big5 ? "已註冊" : "已注册") : "Registered")
 
 typedef enum
 {
@@ -278,12 +308,13 @@ typedef enum
 	SID_Set_User_AfJuFang_Open,
 	SID_Set_UnUsed,
 	SID_Set_Used,
+	SID_Set_Null,
 	SID_Set_Prj_ExtJD_Used,
 	SID_Set_Prj_ExtJD_Unused,
-	SID_Set_Prj_ExtDoor1_Used,
 	SID_Set_Prj_ExtDoor1_Unused,
-	SID_Set_Prj_ExtDoor2_Used,
+	SID_Set_Prj_ExtDoor1_Used,
 	SID_Set_Prj_ExtDoor2_Unused,
+	SID_Set_Prj_ExtDoor2_Used,
 	SID_Set_Prj_ExtStair_Used,
 	SID_Set_Prj_ExtStair_Unused,
 	SID_Set_Prj_Rule_Riser_Used,
@@ -306,6 +337,33 @@ typedef enum
 	SID_Set_Data_Save_Err,
 	SID_Set_Rtsp_Port_Null,
 	SID_Set_Rtsp_Channel_Null,
+	SID_Msg_Connect_Outtime,
+	SID_Msg_Save_OK,
+	SID_Msg_Save_Err,
+	SID_Msg_Param_Save,
+	SID_Msg_Operat_OK,
+	SID_Msg_Operat_Err,
+	SID_Net_Door_Card_Delet_All,
+	SID_Msg_Format,
+
+	// IP协议转换器
+	SID_Set_Unbounded,
+	SID_Set_Bounded,
+	SID_Set_Generate_Binding_Code,
+	SID_Set_Binding_Code,
+	SID_Set_ExtenNo,
+	SID_Set_Online,
+	SID_Set_Offline, 	
+
+
+	// 网络门前机文字
+	SID_Net_Door, 
+	SID_Net_Door_First,
+	SID_Net_Door_Second,
+	SID_Net_Door_NetParam,
+	SID_Net_Door_Get_MAC,
+	SID_Net_Door_Save_Reboot_Door,
+
 
 	// 报警文字
 	SID_Bj_Report_Type_Chufa,
@@ -402,6 +460,8 @@ typedef enum
 	// 公共文字
 	SID_Bj_Query_Del_Rec_One,
 	SID_Bj_Query_Del_Rec_All,
+	SID_Unregistered,
+	SID_Registered,
 
 	SID_MAX
 }STRID_E;

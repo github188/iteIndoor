@@ -472,5 +472,15 @@ uint8 storage_set_validate_code(uint32 validate_code);
   Others:           
 *************************************************/
 uint8 storage_get_alarm_state(void);
+
+/*************************************************
+  Function:    		storage_get_alarm_undeal_num
+  Description: 		防区触发的数
+  Input:			无
+  Output:    		无
+  Return:			
+  Others:           
+*************************************************/
+uint8 storage_get_alarm_undeal_num(void);
 #endif
 

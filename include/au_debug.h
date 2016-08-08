@@ -17,6 +17,7 @@
 
 
 #define AU_DEBUG_PRINT			1
+#define MEDIA_DEBUG_PRINT		1
 
 
 #define CLR_RED       	 		"\033[0;31m"    // "\033[0;31;40m"

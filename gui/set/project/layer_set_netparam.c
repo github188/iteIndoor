@@ -43,7 +43,7 @@ static void KeyBordGotoSetNetParam()
 	uint8 ret = check_ip_to_true(IP_data);
 	if (FALSE == ret)
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err);
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
 	}
 	else
 	{
@@ -244,7 +244,7 @@ bool SetAllNetParamButtonOnMouseUp(ITUWidget* widget, char* param)
 	memset(tmp, 0, sizeof(tmp));
 	change_ip_to_str(g_ip[index], tmp);
 
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, 32, 1, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
 
 	return true;
 }

@@ -142,7 +142,7 @@ bool SetAlarmNumButtonOnMouseUp(ITUWidget* widget, char* param)
 		strcpy(tmp, msg2);
 	}
 
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, TELNUM_LEN, 32, 0, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, TELNUM_LEN, EXPRESS_CHAR, CANCEL_BTN, tmp);
 
 	return true;
 }

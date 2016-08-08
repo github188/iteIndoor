@@ -97,7 +97,7 @@ bool SetDiantiParamIPButtonOnMouseUp(ITUWidget* widget, char* param)
 	char tmp[40];
 	memset(tmp, 0, sizeof(tmp));
 	change_ip_to_str(g_dianti_ip, tmp);
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, 32, 1, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
 
 	return true;
 }

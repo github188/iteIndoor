@@ -56,6 +56,7 @@ void logic_init(void)
 	init_auTimer();        							// 初始化定时器
 	init_timer();
 	storage_init();									// 初始化存储模块
+	init_list_address();							// 初始化监视列表
 	NetworkInit();
 	
 	#ifdef _JD_MODE_
@@ -90,31 +91,36 @@ void logic_init(void)
 	net_start_comm(pDevNo, pNetParam);
 	net_send_cmd_packet(NULL, 0, INADDR_BROADCAST, NETCMD_UDP_PORT);
 
-	int ret = init_reboot_timer();					// 定时重启设置
-	//int ret = test_reboot_timer(); 				// 定时重启设置 测试用
-	if (ret == FALSE)
-	{
-		dprintf(" error : init_reboot_timer !!!\n");
-	}
+	init_reboot_timer();							// 定时重启设置
 	
 	#ifdef _USE_NEW_CENTER_
-	logic_reg_center_ini();
-	#endif
-
-	// add by chenbh 2016-03-09 初始化家居监视列表在线状态值
-	#ifdef _NEW_SELF_IPC_
-	init_ipc_state();
-	#endif
-
-	#ifdef _IP_MODULE_
-	ipmodule_init();
+	logic_reg_center_ini();							// 新上位机注册保持
 	#endif
 	
+	#ifdef _NEW_SELF_IPC_
+	init_ipc_state();								// add by chenbh 2016-03-09 初始化家居监视列表在线状态值
+	#endif
+	
+	#ifdef _IP_MODULE_
+	init_ipmodule();								// IP模块绑定 保持
+	#endif
+
+	#ifdef _RTSP_REG_KEEP_			
+	init_rtsp_timer();								// 室内主机需要向流媒体服务器保持 
+	#endif
+
+	#ifdef _YUYUE_MODE_	
+	init_yuyue_timer();								// 预约模块定时器
+	#endif
+
+
+	// 请求时间同步
 	uint32 center = storage_get_center_ip();
 	set_nethead(G_CENTER_DEVNO, PRIRY_DEFAULT);
-	net_direct_send(CMD_REQ_SYN_TIME, NULL, 0, center, NETCMD_UDP_PORT);	// 请求时间同步
-	init_list_address();							// 初始化监视列表
-	check_sysconfig_ifcorrect(); 					// 测试校验数据是否正确
+	net_direct_send(CMD_REQ_SYN_TIME, NULL, 0, center, NETCMD_UDP_PORT);	
+
+	// 测试校验数据是否正确
+	check_sysconfig_ifcorrect(); 					
 	dprintf("devno: %s \n", pDevNo->DeviceNoStr);
 }
 

@@ -31,7 +31,7 @@
 
 #define	ALARM_TIME_MAX				60				//最长定时时间
 #define	DEFAULT_TIMER_COUNT_MAX		1000			//默认最大定时器数量
-#define MSEC_10MS       			10				//定时时间用
+#define MSEC_100MS       			100				//定时时间用
 
 static PMY_TIMER g_timers;
 static PMY_TIMER g_FreeTimers;
@@ -92,7 +92,7 @@ static int check_realtimer(PMY_TIMER curtimer)
 {
 	curtimer->uRelCount++;
 	int ret =0;
-	if ( curtimer->uRelCount*MSEC_10MS >= curtimer->ulRelTmLen)
+	if ( curtimer->uRelCount*MSEC_100MS >= curtimer->ulRelTmLen)
 	{
 		ret = 1;
 	}
@@ -275,7 +275,7 @@ static void *check_proc(void)
 				q = q -> next;
 			}	
 		}	
-		usleep(MSEC_10MS*1000);
+		usleep(MSEC_100MS*1000);
 	}
 	pthread_exit(NULL);
 }
@@ -582,7 +582,7 @@ uint32 add_aurine_abstimer(struct tm abstime, FTIMER_FUNC func, void * param)
   Return:			是否成功 TRUE/FALSE
   Others:
 *************************************************/
-int cancel_aurine_timer(uint32 ID, FTIMER_FUNC func)
+int cancel_aurine_timer(uint32 *ID, FTIMER_FUNC func)
 {	
 	#ifdef _THREAD_VERSIOR_
 		TIMER_LOCK();
@@ -599,7 +599,7 @@ int cancel_aurine_timer(uint32 ID, FTIMER_FUNC func)
 	
 	for (q = g_timers; q; q = q->next) 
 	{
-		if ( q->ID == ID )//&& q->func == func) 
+		if ( q->ID == *ID )//&& q->func == func) 
 		{
 			if (t)
 				t -> next = q -> next;
@@ -609,6 +609,8 @@ int cancel_aurine_timer(uint32 ID, FTIMER_FUNC func)
 		}
 		t = q;
 	}
+	
+	*ID = 0;
 	int ret = FALSE;
 	//找到
 	if (q) 

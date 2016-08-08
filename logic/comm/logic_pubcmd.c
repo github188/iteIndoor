@@ -209,15 +209,18 @@ void logic_reg_aurine_ini(void)
 #endif
 
 #ifdef _RTSP_REG_KEEP_
+#define RTSP_REG_TIME 		15
+uint32 g_RtspRegTimerID = 0;
+
 /*************************************************
-  Function:    	logic_rtsp_ontimer
+  Function:    	logic_rtsp_timer_proc
   Description:	与流媒体服务器定时保持
   Input:		无	
   Output:		无
   Return:		无
   Others:		ipad与iPhone才能获取到室内摄像头	
 *************************************************/
-void logic_rtsp_ontimer(void)
+static void* logic_rtsp_timer_proc(uint32 ID, void * arg)
 {
 	uint8 sMac[60]; 
 	uint8 tmp[100];
@@ -249,11 +252,34 @@ void logic_rtsp_ontimer(void)
 		}
 	}
 }
+
+/*************************************************
+  Function:			init_rtsp_timer
+  Description:		
+  Input: 	
+  Output:			无
+  Return:			
+  Others:			ipad与iPhone才能获取到室内摄像头	
+*************************************************/
+void init_rtsp_timer(void)
+{
+	if (is_main_DeviceNo())
+	{
+		g_RtspRegTimerID = add_aurine_realtimer((1000*RTSP_REG_TIME), logic_rtsp_timer_proc, NULL);	
+	}
+}
 #endif
 
 #ifdef _USE_NEW_CENTER_
+#define REGTIME					3		// 定时器时间 秒
+#define REG_CENTER_TIME			30		// 注册保持时间
+#define REG_AGAIM_TIME			600		// 失败重新注册时间
+
 static uint8 g_regflag = 0;				// 终端注册状态 0未注册 1注册
 static uint8 g_regkeeptimes = 0;		// 终端保持命令无应答次数
+static uint16 g_keeptime = 0;			// 保持时间
+static uint32 g_RegTimer_ID = 0;		// 服务器定时器ID
+
 
 /*************************************************
   Function:			requst_event_ip
@@ -272,48 +298,6 @@ void logic_requst_event_ip(void)
 }
 
 /*************************************************
-  Function:    		logic_reg_center_ini
-  Description:		终端注册
-  Input:			
-  Output:			
-  Return:			
-  Others:		MAC 码+旧设备编号+硬件版本标识（64B）+软件版本标识（64B）+本机设备名称（32字节，’\0’结尾					
-*************************************************/
-void logic_reg_center_ini(void)
-{
-	uint8 sMac[10] = {0}; 							// mac 码
-	uint8 DevStr[50] = {0};							// 本机设备名称
-	uint8 HardVer[64] = {0};						// 硬件版本标示
-	uint8 SoftVer[64] = {0};						// 软件版本标示
-	uint8 SendData[200] = {0};
-	uint32 CenterIp = 0;
-	DEVICE_NO devno;
-
-	CenterIp = storage_get_center_ip();
-	if (CenterIp == 0)
-	{
-		return;
-	}
-	memcpy(sMac, storage_get_mac(HOUSE_MAC), 6);		// mac 码
-	memset(&devno, 0, sizeof(DEVICE_NO));
-	devno = storage_get_predevno();						// 旧设备编号
-	memcpy(HardVer, HARD_VER, 64);						// 硬件版本标示
-	memcpy(SoftVer, SOFT_VER, 64);						// 软件版本标示
-	get_houseno_desc(storage_get_devno_str(),DevStr);	// 本机设备编号描述
-
-	memset(SendData, 0, sizeof(SendData));
-	memcpy(SendData, sMac, 6);
-	memcpy(SendData+6, &devno, sizeof(DEVICE_NO));
-	memcpy(SendData+6+sizeof(DEVICE_NO), HardVer, 64);
-	memcpy(SendData+70+sizeof(DEVICE_NO), SoftVer, 64);
-	memcpy(SendData+134+sizeof(DEVICE_NO), DevStr, 32);
-
-	set_nethead(G_CENTER_DEVNO, PRIRY_DEFAULT);
-	net_direct_send(CMD_REGISTER_AURINE, SendData, 178, CenterIp, NETCMD_UDP_PORT);
-}
-
-
-/*************************************************
   Function:    		logic_reg_center_ontimer
   Description:		与服务器保持
   Input:			
@@ -321,7 +305,7 @@ void logic_reg_center_ini(void)
   Return:			
   Others:			MAC 码 6B+本机设备名称（32字节，’\0’结尾
 *************************************************/
-void logic_reg_center_ontimer(void)
+static void logic_keep_to_center(void)
 {
 	uint8 tmp[50];
 	uint8 sMac[50]; 
@@ -349,6 +333,92 @@ void logic_reg_center_ontimer(void)
 }
 
 /*************************************************
+  Function:		reg_center_ontime
+  Description: 	终端保持定时器
+  Input:		
+  	1.win
+  	2.wParam
+  	3.lParam
+  Output:		无
+  Return:		TRUE 是 FALSE 否
+  Others:		
+*************************************************/
+static void *logic_reg_center_timer_proc(uint32 ID, void * arg)
+{
+	int32 ret = 0;
+	
+	g_keeptime++;
+	if (g_regflag == 0)
+	{
+		if (g_keeptime*REGTIME >= REG_AGAIM_TIME)
+		{
+			// 如果十分钟后还没注册成功,重新发送注册
+			logic_reg_center_ini();
+			g_keeptime = 0;
+		}
+		return;
+	}	
+
+	//dprintf("g_keeptime : %d\n",g_keeptime);
+	if (g_keeptime*REGTIME >= REG_CENTER_TIME)
+	{
+		g_keeptime = 0;
+		logic_keep_to_center();
+	}
+}
+
+/*************************************************
+  Function:    		logic_reg_center_ini
+  Description:		终端注册
+  Input:			
+  Output:			
+  Return:			
+  Others:		MAC 码+旧设备编号+硬件版本标识（64B）+软件版本标识（64B）+本机设备名称（32字节，’\0’结尾					
+*************************************************/
+void logic_reg_center_ini(void)
+{
+	uint8 sMac[10] = {0}; 							// mac 码
+	uint8 DevStr[50] = {0};							// 本机设备名称
+	uint8 HardVer[64] = {0};						// 硬件版本标示
+	uint8 SoftVer[64] = {0};						// 软件版本标示
+	uint8 SendData[200] = {0};
+	uint32 CenterIp = 0;
+	DEVICE_NO devno;
+
+	CenterIp = storage_get_center_ip();
+	if (CenterIp == 0)
+	{
+		return;
+	}
+
+	// 每次重新注册 就重新开始计时
+	g_keeptime = 0;
+	if (g_RegTimer_ID == 0)
+	{
+		// 三秒定时器
+		g_RegTimer_ID = add_aurine_realtimer((1000*REGTIME), logic_reg_center_timer_proc, NULL);	
+		dprintf("g_RegTimer_ID : %d \n", g_RegTimer_ID);
+	}
+	
+	memcpy(sMac, storage_get_mac(HOUSE_MAC), 6);		// mac 码
+	memset(&devno, 0, sizeof(DEVICE_NO));
+	devno = storage_get_predevno();						// 旧设备编号
+	memcpy(HardVer, HARD_VER, 64);						// 硬件版本标示
+	memcpy(SoftVer, SOFT_VER, 64);						// 软件版本标示
+	get_houseno_desc(storage_get_devno_str(),DevStr);	// 本机设备编号描述
+
+	memset(SendData, 0, sizeof(SendData));
+	memcpy(SendData, sMac, 6);
+	memcpy(SendData+6, &devno, sizeof(DEVICE_NO));
+	memcpy(SendData+6+sizeof(DEVICE_NO), HardVer, 64);
+	memcpy(SendData+70+sizeof(DEVICE_NO), SoftVer, 64);
+	memcpy(SendData+134+sizeof(DEVICE_NO), DevStr, 32);
+
+	set_nethead(G_CENTER_DEVNO, PRIRY_DEFAULT);
+	net_direct_send(CMD_REGISTER_AURINE, SendData, 178, CenterIp, NETCMD_UDP_PORT);
+}
+
+/*************************************************
   Function:    		logic_reg_center_state
   Description:		获取终端注册状态
   Input:			
@@ -362,13 +432,16 @@ int32 logic_reg_center_state(void)
 	{
 		return 0;
 	}
-	else if (g_regkeeptimes >= 3)
-	{
-		return 1;
-	}	
 	else
 	{
-		return 2;
+		if (g_regkeeptimes >= 3)
+		{
+			return 1;
+		}	
+		else
+		{
+			return 2;
+		}
 	}
 }
 

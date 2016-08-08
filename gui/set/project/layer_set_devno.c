@@ -157,7 +157,7 @@ static void save_devno_param(void)
 			g_devparam->Rule.Subsection = (g_devparam->Rule.StairNoLen - g_devparam->Rule.CellNoLen) * 100 + g_devparam->Rule.CellNoLen * 10 + g_devparam->Rule.RoomNoLen;
 			storage_save_devno(TRUE, g_devparam->Rule, g_devparam->DeviceNoStr);
 			memcpy(g_devparam, storage_get_devparam(), sizeof(FULL_DEVICE_NO));
-			net_change_comm_deviceno();
+			//net_change_comm_deviceno();
 			break;
 
 		case 1:
@@ -414,25 +414,25 @@ bool SetDevnoListButtonOnMouseUp(ITUWidget* widget, char* param)
 	case DEVICE_RULE:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%s", g_devparam->DeviceNoStr);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 16, 32, 0, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 16, EXPRESS_CHAR, CANCEL_BTN, tmp);
 		break;
 
 	case STAIR_LEN:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%d", g_devparam->Rule.StairNoLen);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, 32, 0, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp);
 		break;
 
 	case ROOM_LEN:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%d", g_devparam->Rule.RoomNoLen);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, 32, 0, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp);
 		break;
 
 	case RISER_LEN:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%d", g_devparam->Rule.CellNoLen);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, 32, 0, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp);
 		break;
 
 	case RISER_ENABLE:

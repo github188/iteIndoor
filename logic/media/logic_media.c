@@ -28,10 +28,14 @@
 #include <wchar.h>
 #include <sys/mman.h>
 #include "logic_media.h"
+#include "leaf_mediastream.h"
 
 #define LEAVE_PIC_TYPE			".jpg"
 #define LEAVE_AVI_TYPE			".avi"
 #define LEAVE_WAV_TYPE			".wav"
+
+static LeafCall *g_LeafCall;
+
 
 MEDIA_LYLY_CTRL g_LylyRecordCtrl = 
 {
@@ -460,6 +464,8 @@ void media_del_audio_send_addr(uint32 IP, uint16 AudioPort)
 *************************************************/
 uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 {
+	int level = (vol%9)*12;
+	//leaf_set_play_level(g_LeafCall, level);
 	return TRUE;
 }
 
@@ -474,6 +480,8 @@ uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 *************************************************/
 uint32 media_set_ring_volume(uint32 vol)
 {
+	int level = (vol%9)*12;
+    //leaf_set_ring_level(g_LeafCall, level);	
 	return TRUE;
 }
 
@@ -739,6 +747,10 @@ int media_disable_audio_aec(void)
 *************************************************/
 uint32 media_play_sound(char *filename, uint8 IsRepeat, void * proc)
 {
+	 if(!g_LeafCall->audiostream)
+	 {
+        //leaf_start_sound_play(g_LeafCall, filename, IsRepeat, proc);
+    }
 	return TRUE;
 }
 
@@ -751,7 +763,9 @@ uint32 media_play_sound(char *filename, uint8 IsRepeat, void * proc)
   Others:
 *************************************************/
 void media_stop_sound (void)
-{}
+{
+	//leaf_stop_sound_play(g_LeafCall);
+}
 
 /*************************************************
   Function:			media_start_rtsp
@@ -870,28 +884,11 @@ int32 media_clear_fb(void)
 *************************************************/
 void media_init(void)
 {
-#if 0
-	ms_media_init();
-	ms_rtp_session_Init();
-
-	mMediaStream.AlawAgc = ms_media_new(MS_ALAW_AGC_ID);
-	mMediaStream.Speex = ms_media_new(MS_SPEEX_ID);
-	mMediaStream.AudioDec= ms_media_new(MS_ALAW_DEC_ID);
-	mMediaStream.AudioRtpSend = ms_media_new(MS_RTP_SEND_A_ID);
-	mMediaStream.AudioRtpRecv = ms_media_new(MS_RTP_RECV_A_ID);
-	mMediaStream.AudioSfEnc = ms_media_new(MS_ALAW_SF_ENC_ID);
-	mMediaStream.VideoDec = ms_media_new(MS_H264_DEC_ID);
-	mMediaStream.VideoRtpRecv = ms_media_new(MS_RTP_RECV_V_ID);
-	mMediaStream.JpegDec  = ms_media_new(MS_JPEG_DEC_ID);
-	mMediaStream.JpegEnc  = ms_media_new(MS_JPEG_ENC_ID);
-	mMediaStream.FilePlayer = ms_media_new(MS_FILE_PLAYER_ID);
-	mMediaStream.AudioAI = ms_media_new(MS_AUDIO_AI_ID);
-	mMediaStream.AudioAo = ms_media_new(MS_ALAW_AO_ID);
-	mMediaStream.AviPlay = ms_media_new(MS_AVI_PLAY_ID);
-	mMediaStream.Mp3Play = ms_media_new(MS_MP3_PLAY_ID);
-	mMediaStream.AviRecord = ms_media_new(MS_AVI_RECORD_ID);	
-	mMediaStream.LylyFilePlayer = ms_media_new(MS_FILE_LYLY_ID);
-	mMediaStream.RtspPlay = ms_media_new(MS_RTSP_PLAY_ID);
-#endif
+	// ¿ªÆô
+	#if MEDIA_DEBUG_PRINT
+	int ret = putenv("MEDIASTREAMER_DEBUG=1");
+	dprintf("ret: %d\n", ret);
+	#endif
+	//g_LeafCall = leaf_init();
 }
 

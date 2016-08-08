@@ -32,6 +32,8 @@ Others:
 *************************************************/
 bool SetNumKeyBordOnEnter(ITUWidget* widget, char* param)
 {
+	dprintf("SetNumKeyBordOnEnter param = %s\n", param);
+
 	GotoOldLayer = ituSceneFindWidget(&theScene, param);
 	assert(GotoOldLayer);
 
@@ -180,7 +182,7 @@ bool SetNumKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param)
 		ituWidgetEnable(GotoOldLayer);
 		ituLayerGoto(GotoOldLayer);
 	}
-
+	
 	return true;
 }
 
@@ -198,7 +200,7 @@ Output:		无
 Return:		
 Others:
 *************************************************/
-void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, uint32 text_flag, int sprite_flag, char * buf)
+void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, NUM_CAHR_TYPE text_flag, SPRITE_KEYBORD_BTN_TYPE sprite_flag, char * buf)
 {
 	if (!SetNumKeyBordTextBox)
 	{
@@ -248,6 +250,23 @@ void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, 
 
 	ituLayerGoto(SetNumKeyBordLayer);
 
+}
+
+/*************************************************
+Function:		MsgFailHintSuccessLayerOnLeave
+Description:
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetNumKeyBordLayerOnLeave(ITUWidget* widget, char* param)
+{
+	if (!ituWidgetIsEnabled(GotoOldLayer))
+	{
+		ituWidgetEnable(GotoOldLayer);
+	}
+	return true;
 }
 
 void SetNumKeyBordReset(void)

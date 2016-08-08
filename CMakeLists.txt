@@ -173,6 +173,7 @@ gui/call/layer_monitor_search.c
 gui/comm/au_model_func.c	
 gui/set/layer_set_menu.c
 gui/set/layer_set_bottom_return.c   
+gui/set/layer_set_personality_desk.c
 gui/set/layer_set_personality_photoframe.c
 gui/set/layer_set_ring.c
 gui/set/layer_set_volume.c
@@ -182,6 +183,10 @@ gui/set/layer_set_password.c
 gui/set/layer_set_link.c
 gui/set/layer_set_language.c 
 gui/set/layer_set_data_time.c 
+gui/set/layer_set_sysinfo.c
+gui/set/layer_set_storage.c
+gui/set/layer_set_ip_protocol_host.c
+gui/set/layer_set_ip_protocol_fenji.c
 gui/set/user/layer_set_user.c
 gui/set/user/layer_set_alarm_num.c
 gui/set/user/layer_set_alarm_area_list.c
@@ -194,7 +199,15 @@ gui/set/project/layer_set_project.c
 gui/set/project/layer_set_diantiIP.c
 gui/set/project/layer_set_rtsp.c
 gui/set/project/layer_set_alarm_single_attr.c
-gui/msg/layer_msg_fail_hint_success.c
+gui/set/project/layer_set_netdoor.c
+gui/set/project/layer_set_netdoor_netparam.c
+gui/set/project/layer_set_netdoor_card.c
+gui/set/project/layer_set_netdoor_lock.c
+gui/set/project/layer_set_netdoor_other.c
+gui/set/project/layer_set_netdoor_sysinfo.c
+gui/set/msg/layer_msg_fail_hint_success.c
+gui/set/msg/layer_msg_link_out_time.c
+gui/set/layer_set.h
     )
 
 # files

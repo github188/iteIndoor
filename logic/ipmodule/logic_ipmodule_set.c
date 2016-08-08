@@ -17,11 +17,48 @@
 #define IPMODULE_ONLINE_TIMEOUT			20 	// IP模块在线超时时间
 #define IPMODULETIME					2	// 定时器间隔
 
-static uint32 g_ipmoduleID = 0;			    // 定时器ID			
+static uint32 g_OnTimerID = 0;			    // 定时器ID			
 static uint8 g_ipModule_online = 0;
 static ZONE_DATE_TIME g_Timer;
 static IP_MODULE_ERR_CODE g_errcode = IP_MODULE_CODE_UNLINE;
 static int g_count = 10;				    // 在线时计数
+
+/*************************************************
+  Function:     get_ipmodule_state
+  Description:  IP模块图标显示状态
+  Input:        无
+  Output:       无
+  Return:       无
+  Others:       
+*************************************************/
+uint8 get_ipmodule_state(void)
+{
+    uint8 state = 0;
+	
+    if (get_ipmodule_bindstate())
+    {
+    	if (is_main_DeviceNo())
+    	{
+	        if (get_ipmodule_online())
+	        {
+	            state = 2;
+	        }
+	        else
+	        {
+	            state = 1;
+	        }
+    	}
+		else
+		{
+			state = 2;
+		}
+    }
+    else
+    {
+        state = 0;
+    }	
+  return state;
+}
 
 /*************************************************
   Function:			get_ipmodule_online
@@ -35,7 +72,6 @@ uint8 get_ipmodule_bind(void)
 {
 	return get_ipmodule_bindcode();
 }
-
 
 /*************************************************
   Function:			get_ipmodule_online
@@ -141,9 +177,8 @@ uint32 get_ipmodule(void)
 
 /*************************************************
   Function:			ipmodule_request_bind
-  Description:		室内主机向绑定IP模块
+  Description:		室内分机向IP模块绑定注册
   Input: 	
-  	1.recPacket		接收包
   Output:			无
   Return:			无
   Others:
@@ -404,31 +439,23 @@ int ipmodule_distribute(const PRECIVE_PACKET recPacket)
 }
 
 /*************************************************
-  Function:			ipmodule_init
+  Function:			init_ipmodule
   Description:		IP模块初始化
   Input: 			无
   Output:			无
   Return:			无
   Others:
 *************************************************/
-void ipmodule_init(void)
+void init_ipmodule(void)
 {
 	// 不是主机时不进行在线状态处理
 	if ( is_main_DeviceNo() == FALSE)
 	{
-		int ret = ipmodule_request_bind();
-		if (ret)
-		{
-			set_ipmodule_bindstate(1);
-		}
-		else
-		{	
-			set_ipmodule_bindstate(0);
-		}
+		ipmodule_request_bind();	
 	}
-	else if (!g_ipmoduleID)
+	else if (!g_OnTimerID)
 	{
-		g_ipmoduleID = add_aurine_realtimer(1000*IPMODULETIME, ipmodule_online, NULL);
+		g_OnTimerID = add_aurine_realtimer(1000*IPMODULETIME, ipmodule_online, NULL);
 	}
 }
 #endif

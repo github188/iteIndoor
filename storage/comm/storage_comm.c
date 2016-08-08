@@ -1075,7 +1075,6 @@ uint8 storage_get_noface(void)
 uint8 storage_set_noface_enable(uint8 enable)
 {
 	gpSysParam->Nofaceparam.noface = enable;
-//	SaveRegInfo();
 	return TRUE;
 }
 
@@ -2093,38 +2092,6 @@ int storage_set_predevno(PDEVICE_NO DeviceNo)
 	sync_data();
 }
 #endif
-
-/*************************************************
-  Function:    		UlongtoIP
-  Description:		将long型IP地址转化为IP地址字符串
-  Input:
-  	1.uIp			unsigned long型IP地址
-  Output:			
-  Return:			转化后的字符串指针
-  Others:			
-*************************************************/
-static char* UlongtoIP1(uint32 uIp)
-{
-	static char strIp[20];
-	char temp[20];
-	int32 i;
-	uint32 t;
-	
-	memset(strIp, 0, 20);
-	for (i = 3; i >= 0; i--)
-	{
-		t = uIp >> (i * 8);
-		t = t & 0xFF;
-		sprintf(temp, "%d", (uint32)t);
-		strcat(strIp, temp);
-		if (i != 0)
-		{
-			strcat(strIp, ".");
-		}
-	}
-	
-	return strIp;
-}
 
 /*************************************************
   Function:		storage_init

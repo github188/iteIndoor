@@ -1032,7 +1032,6 @@ int32 init_list_address(void)
 {
 	int32 index = 0;
 	uint8 i = 0, j = 0;
-	PMONITORINFO info = NULL;
 	PMONITORLISTINFO monitorlist = NULL;
 	DEVICE_TYPE_E devtype[4] = {DEVICE_TYPE_AREA, DEVICE_TYPE_STAIR, DEVICE_TYPE_DOOR_NET, DEVICE_TYPE_DOOR_PHONE};
 
@@ -1042,15 +1041,6 @@ int32 init_list_address(void)
 		if (monitorlist->MonitorCount == 0)
 		{
 			dprintf(" storage_get_monitorlist return 0 \n");
-			free_monitorlist_memory(&monitorlist);
-			monitorlist = NULL;
-			continue;
-		}
-
-		// 记得使用完 内存释放
-		info = (PMONITORINFO)malloc(sizeof(MONITORINFO));
-		if (NULL == info)
-		{
 			free_monitorlist_memory(&monitorlist);
 			monitorlist = NULL;
 			continue;

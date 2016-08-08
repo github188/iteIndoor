@@ -4,32 +4,57 @@ File name:  	layer_set_no_disturb.c
 Author:     	zxc
 Version:
 Date: 		2016-06-18
-Description:
+Description:免打扰设置界面
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-static ITUBackground* SetNoDisturbTimeBackground;
-static ITUBackground* SetNoDisturbBackground;
-static ITULayer* SetMenuLayer;
-static ITUSprite* SetEnableNoDisturSprite;
-static ITUText* SetNoDisturTimeBtn1Text;
-static ITUText* SetNoDisturTimeBtn2Text; 
-static ITUCalendar* SetNoDisturTimeBtnContainer; 
-static ITURadioBox* SetNoDisturbTime0RadioBox;
-static ITURadioBox* SetNoDisturbTime1RadioBox;
-static ITURadioBox* SetNoDisturbTime2RadioBox;
-static ITURadioBox* SetNoDisturbTime3RadioBox;
-static ITURadioBox* SetNoDisturbTime4RadioBox;
-static ITURadioBox* SetNoDisturbTime5RadioBox;
-
-static ITULayer* SetNumKeyBordLayer;
+static ITUBackground* SetNoDisturbTimeBackground = NULL;
+static ITUBackground* SetNoDisturbBackground = NULL;
+static ITULayer* SetMenuLayer = NULL;
+static ITUSprite* SetEnableNoDisturSprite = NULL;
+static ITUText* SetNoDisturTimeBtn1Text = NULL;
+static ITUText* SetNoDisturTimeBtn2Text = NULL;
+static ITUCalendar* SetNoDisturTimeBtnContainer = NULL;
+static ITURadioBox* SetNoDisturbTime0RadioBox = NULL;
+static ITURadioBox* SetNoDisturbTime1RadioBox = NULL;
+static ITURadioBox* SetNoDisturbTime2RadioBox = NULL;
+static ITURadioBox* SetNoDisturbTime3RadioBox = NULL;
+static ITURadioBox* SetNoDisturbTime4RadioBox = NULL;
+static ITURadioBox* SetNoDisturbTime5RadioBox = NULL;
 
 static uint8 g_enable_no_disturb = FALSE;						//是否启用免打扰
-static NOFACE_TIME g_no_disturb_time = NOFACE_TIME_30;		//免打扰时长
+static uint8 g_no_disturb_time = NOFACE_TIME_30;				//免打扰时长
+
+/*************************************************
+Function:		SetNoDisturbOnEnter
+Description: 	进入免打扰设置界面初始化函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool ShowListTime()
+{
+	uint32 NofaceTime = 0;
+	char timetmp[80];
+
+	NofaceTime = storage_get_noface_time();
+	memset(timetmp, 0, sizeof(timetmp));
+
+	if ((g_no_disturb_time > NOFACE_TIME_30) && (g_no_disturb_time < NOFACE_TIME_MAX))
+	{
+		sprintf(timetmp, "%d%s", NofaceTime / 3600, get_str(SID_Time_Hour));
+	}
+	else
+	{
+		sprintf(timetmp, "%d%s", NofaceTime / 60, get_str(SID_Time_Min));
+	}
+	ituTextSetString(SetNoDisturTimeBtn2Text, timetmp);
+}
 
 /*************************************************
 Function:		SetNoDisturbOnEnter
@@ -41,10 +66,6 @@ Others:
 *************************************************/
 bool SetNoDisturbOnEnter(ITUWidget* widget, char* param)
 {
-	char timetmp[80];
-	char tmp[40];
-	uint16 NofaceTime;
-
 	if (!SetNoDisturbBackground)
 	{
 		SetNoDisturbBackground = ituSceneFindWidget(&theScene, "SetNoDisturbBackground");
@@ -85,38 +106,11 @@ bool SetNoDisturbOnEnter(ITUWidget* widget, char* param)
 
 		SetNoDisturbTime5RadioBox = ituSceneFindWidget(&theScene, "SetNoDisturbTime5RadioBox");
 		assert(SetNoDisturbTime5RadioBox);
-
-		SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
-		assert(SetNumKeyBordLayer);
 	}
 
 	g_enable_no_disturb = storage_get_noface();			//存储获取是否启用免打扰
 	g_no_disturb_time = storage_get_noface_index();		//存储获取免打扰时长
-	NofaceTime = storage_get_noface_time();
-
-	printf("g_enable_no_disturb = %d, g_no_disturb_time=%d, NofaceTime=%d\n", g_enable_no_disturb, g_no_disturb_time, NofaceTime);
-	
-	if ((g_no_disturb_time > NOFACE_TIME_30) && (g_no_disturb_time < NOFACE_TIME_MAX))
-	{
-		memset(tmp, 0, sizeof(tmp));
-		memset(timetmp, 0, sizeof(timetmp));
-		sprintf(tmp, "%d", NofaceTime / 3600);
-		strcpy(timetmp, tmp);
-		memset(tmp, 0, sizeof(tmp));
-		strcpy(tmp, get_str(SID_Time_Hour));
-		strcat(timetmp, tmp);
-	}
-	else
-	{
-		memset(tmp, 0, sizeof(tmp));
-		memset(timetmp, 0, sizeof(timetmp));
-		sprintf(tmp, "%d", NofaceTime / 60);
-		strcpy(timetmp, tmp);
-		memset(tmp, 0, sizeof(tmp));
-		strcpy(tmp, get_str(SID_Time_Min));
-		strcat(timetmp, tmp);
-	}
-	ituTextSetString(SetNoDisturTimeBtn2Text, timetmp);
+	ShowListTime();
 
 	if (g_enable_no_disturb)
 	{
@@ -271,30 +265,7 @@ bool SetNoDisturbTimeRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 		//init_distrub();
 	}
 
-	char timetmp[80];
-	char tmp[40];
-	uint16 NofaceTime; NofaceTime = storage_get_noface_time();
-	if ((g_no_disturb_time > NOFACE_TIME_30) && (g_no_disturb_time < NOFACE_TIME_MAX))
-	{
-		memset(tmp, 0, sizeof(tmp));
-		memset(timetmp, 0, sizeof(timetmp));
-		sprintf(tmp, "%d", NofaceTime / 3600);
-		strcpy(timetmp, tmp);
-		memset(tmp, 0, sizeof(tmp));
-		strcpy(tmp, get_str(SID_Time_Hour));
-		strcat(timetmp, tmp);
-	}
-	else
-	{
-		memset(tmp, 0, sizeof(tmp));
-		memset(timetmp, 0, sizeof(timetmp));
-		sprintf(tmp, "%d", NofaceTime / 60);
-		strcpy(timetmp, tmp);
-		memset(tmp, 0, sizeof(tmp));
-		strcpy(tmp, get_str(SID_Time_Min));
-		strcat(timetmp, tmp);
-	}
-	ituTextSetString(SetNoDisturTimeBtn2Text, timetmp);
+	ShowListTime();
 
 	ituWidgetSetVisible(SetNoDisturbTimeBackground, false);
 	ituWidgetEnable(SetNoDisturbBackground);
@@ -323,9 +294,4 @@ void SetNoDisturLayerOnReturn(void)
 		ituLayerGoto(SetMenuLayer);
 		return;
 	}
-}
-
-void SetNoDisturReset(void)
-{
-	SetNoDisturbBackground = NULL;
 }

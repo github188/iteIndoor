@@ -10,7 +10,7 @@
 *************************************************/
 #include "storage_ipmodule.h"
 
-#ifdef _IP_MODULE_
+//#ifdef _IP_MODULE_
 static IPAD_EXTENSION_LIST g_ipadList;
 
 /*************************************************
@@ -181,5 +181,5 @@ uint32 get_ipad_extension_addr(uint32 devno)
 	
 	return address;
 }
-#endif
+//#endif
 

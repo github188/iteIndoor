@@ -15,15 +15,13 @@
 #include "logic_include.h"
 
 
-uint8 g_LylyNum;
-uint8 g_MsgNum;
-
 static SYS_MEDIA_TYPE g_CurMediaType;
 static MediaPlayCallback g_ProgressProc;
 static MediaStopedCallback g_StoppedProc;
 static uint8 g_isRepeat;
 static uint8 g_ViewPict_State = 0;
 
+static uint8 g_sysHintsNum[SYS_HINT_MAX_NUM];	// 消息记录未读条数
 static uint8 g_sysHints[SYS_HINT_MAX_NUM];
 SYS_LCD_STATE g_LcdState = SYS_LCD_CLOSE;
 static 	pthread_mutex_t g_MediaLock;
@@ -118,7 +116,7 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 				// add by chenbh 删除定时器
 				if (0 != g_RecordTimer)
 				{
-					cancel_aurine_timer(g_RecordTimer, NULL);
+					cancel_aurine_timer(&g_RecordTimer, NULL);
 					g_RecordTimer = 0;
 				}
 				// 停止家人留言录制
@@ -796,7 +794,8 @@ int32 sys_start_family_record(char *FileName, MediaPlayCallback ProcessProc, Med
 	{
 		if (0 != g_RecordTimer)
 		{
-			cancel_aurine_timer(g_RecordTimer, NULL);
+			cancel_aurine_timer(&g_RecordTimer, NULL);
+			g_RecordTimer = 0;
 		}
 		g_RecordStartTime = time(NULL);
 		g_RecordTimer = 0;
@@ -824,7 +823,7 @@ int32 sys_stop_family_record(void)
 	// add by chenbh 删除定时器
 	if (0 != g_RecordTimer)
 	{
-		cancel_aurine_timer(g_RecordTimer, NULL);
+		cancel_aurine_timer(&g_RecordTimer, NULL);
 		g_RecordTimer = 0;
 	}
 	
@@ -1125,6 +1124,39 @@ uint8 sys_get_hint_state(SYS_HINT_TYPE HintType)
 }
 
 /*************************************************
+  Function:			sys_get_hint_num
+  Description: 		获得每种状态的信息条数
+  Input: 		
+  	1.HintType		系统状态类型
+  Output:			无
+  Return:			
+  Others:			
+*************************************************/
+uint8 sys_get_hint_num(SYS_HINT_TYPE HintType)
+{
+	if (HintType >= SYS_HINT_MAX_NUM || HintType < SYS_HINT_INFO)
+	{
+		return FALSE;
+	}
+
+	// 免打扰即时获取状态
+	if (SYS_HINT_NO_DISTURB == HintType)
+	{
+		g_sysHintsNum[HintType] = linkage_get_nodisturb_state();	
+	}
+	else if (SYS_HINT_ALARM_STATE == HintType)
+	{
+		g_sysHintsNum[HintType] = storage_get_alarm_state();
+	}
+	else if (SYS_HINT_ALARM_WARNING == HintType)
+	{
+		g_sysHintsNum[HintType] = storage_get_alarm_undeal_num();
+	}
+	
+	return g_sysHintsNum[HintType];
+}
+
+/*************************************************
   Function:			sys_sync_hint_state
   Description: 		同步系统状态
   Input: 		
@@ -1134,11 +1166,11 @@ uint8 sys_get_hint_state(SYS_HINT_TYPE HintType)
 *************************************************/
 void sys_sync_hint_state(void)
 {
-	uint8 flg;
+	uint8 flg, unread_num;
 	
 	// 获取信息未读状态
-	flg = storage_get_msg_state();
-	if (flg)
+	unread_num = storage_get_msg_state();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_INFO, TRUE);
 	}
@@ -1146,11 +1178,11 @@ void sys_sync_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_INFO, FALSE);
 	}
-	g_MsgNum = flg;
+	g_sysHintsNum[SYS_HINT_INFO] = unread_num;
 	
 	// 获取留影留言未读状态
-	flg = storage_get_lylyrecord_flag();
-	if (flg)
+	unread_num = storage_get_lylyrecord_flag();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_LEAVEWORD, TRUE);
 	}
@@ -1158,11 +1190,11 @@ void sys_sync_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_LEAVEWORD, FALSE);
 	}
-	g_LylyNum = flg;
+	g_sysHintsNum[SYS_HINT_LEAVEWORD] = unread_num;
 	
 	// 获取家人留言未读状态
-	flg = storage_get_jrlyrecord_flag();
-	if (flg == TRUE)
+	unread_num = storage_get_jrlyrecord_flag();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_FAMILY, TRUE);
 	}
@@ -1170,10 +1202,11 @@ void sys_sync_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_FAMILY, FALSE);
 	}
+	g_sysHintsNum[SYS_HINT_FAMILY] = unread_num;
 	
 	// 获取未接来电未读状态
-	flg = storage_get_callrecord_state();
-	if (flg == TRUE)
+	unread_num = storage_get_callrecord_state();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_MISSED_CALLS, TRUE);
 	}
@@ -1181,6 +1214,7 @@ void sys_sync_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_MISSED_CALLS, FALSE);
 	}
+	g_sysHintsNum[SYS_HINT_MISSED_CALLS] = unread_num;
 
 	// 初始化免打扰-无免打扰
 	flg = storage_get_noface();
@@ -1192,6 +1226,7 @@ void sys_sync_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_NO_DISTURB, FALSE);
 	}
+	g_sysHintsNum[SYS_HINT_NO_DISTURB] = flg;
 }
 
 /*************************************************
@@ -1305,13 +1340,14 @@ void sys_key_beep(void)
 *************************************************/
 void sys_init_hint_state(void)
 {
-	uint8 flg;
+	uint8 flg, unread_num;
 
+	memset(g_sysHintsNum, 0, sizeof(g_sysHintsNum));
 	pthread_mutex_init(&g_MediaLock, NULL);
 	
 	// 获取信息未读状态
-	flg = storage_get_msg_state();
-	if (flg)
+	unread_num = storage_get_msg_state();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_INFO, TRUE);
 	}
@@ -1319,10 +1355,11 @@ void sys_init_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_INFO, FALSE);
 	}
+	g_sysHintsNum[SYS_HINT_INFO] = unread_num;
 
 	// 获取留影留言未读状态
-	flg = storage_get_lylyrecord_flag();
-	if (flg)
+	unread_num = storage_get_lylyrecord_flag();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_LEAVEWORD, TRUE);
 	}
@@ -1330,10 +1367,11 @@ void sys_init_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_LEAVEWORD, FALSE);
 	}
+	g_sysHintsNum[SYS_HINT_LEAVEWORD] = unread_num;
 
 	// 获取家人留言未读状态
-	flg = storage_get_jrlyrecord_flag();
-	if (flg == TRUE)
+	unread_num = storage_get_jrlyrecord_flag();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_FAMILY, TRUE);
 	}
@@ -1341,10 +1379,11 @@ void sys_init_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_FAMILY, FALSE);
 	}
-
+	g_sysHintsNum[SYS_HINT_FAMILY] = unread_num;
+	
 	// 获取未接来电未读状态
-	flg = storage_get_callrecord_state();
-	if (flg == TRUE)
+	unread_num = storage_get_callrecord_state();
+	if (unread_num)
 	{
 		sys_set_hint_state(SYS_HINT_MISSED_CALLS, TRUE);
 	}
@@ -1352,28 +1391,32 @@ void sys_init_hint_state(void)
 	{
 		sys_set_hint_state(SYS_HINT_MISSED_CALLS, FALSE);
 	}
-
+	g_sysHintsNum[SYS_HINT_MISSED_CALLS] = unread_num;
+	
 	// 初始化免打扰-无免打扰
 	storage_set_noface_enable(FALSE);
 	sys_set_hint_state(SYS_HINT_NO_DISTURB, FALSE);
-
+	g_sysHintsNum[SYS_HINT_NO_DISTURB] = FALSE;
+	
 	// 获取安防状态
-	flg = storage_get_alarm_state();
-	// 撤防
-	if (flg == 0)
+	flg = storage_get_alarm_state();	
+	if (flg == FALSE)						// 撤防
 	{
 		sys_set_hint_state(SYS_HINT_ALARM_STATE, FALSE);
-	}
-	// 布防
-	else if (flg == 1)
+	}	
+	else									// 布防
 	{
-		sys_set_hint_state(SYS_HINT_ALARM_STATE, TRUE);
-	}
-	// 报警, 有警情
-	else
+		sys_set_hint_state(SYS_HINT_ALARM_STATE, TRUE);		
+	}	
+	g_sysHintsNum[SYS_HINT_ALARM_STATE] = flg;
+	
+	// 获取报警未读条数
+	unread_num = storage_get_alarm_undeal_num();
+	if (unread_num)
 	{
-		sys_set_hint_state(SYS_HINT_ALARM_WARNING, TRUE);
+		sys_set_hint_state(SYS_HINT_ALARM_WARNING, TRUE);		
 	}
+	g_sysHintsNum[SYS_HINT_ALARM_WARNING] = unread_num;
 
 	// 初始化系统为操作状态
 	dprintf("sys_init_hint_state open lcd!\n");

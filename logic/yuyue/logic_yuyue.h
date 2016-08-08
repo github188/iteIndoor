@@ -22,5 +22,15 @@
   Others:		
 *************************************************/
 void yuyue_ontimer(void);
+
+/*************************************************
+  Function:		init_yuyue_timer
+  Description: 	预约定时器
+  Input:		无
+  Output:		无
+  Return:		
+  Others:		
+*************************************************/
+void init_yuyue_timer(void);
 #endif
 

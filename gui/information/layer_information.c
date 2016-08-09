@@ -524,15 +524,12 @@ void setInformationList()
 		{
 			if (i < msgNum)
 			{
-				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);
-				sprintf(tmpStr, "%s%d", "Center", i);
-				setInformationListSender(i, tmpStr);
+				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);		//设置已读未读
+				setInformationListSender(i, tmpList->pinfo_data[i].des);			//设置信息发送者
+				setInformationListTheme(i, tmpList->pinfo_data[i].Head.title);		//设置信息主题
 
-				sprintf(tmpStr, "%d%d", tmpList->pinfo_data[i].time.year, tmpList->pinfo_data[i].time.month);
-				setInformationListTheme(i, tmpStr);
-
-				sprintf(tmpStr, "%s%d", "2016-06-06 11:11:", i);
-				setInformationListTime(i, tmpStr);
+				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);			
+				setInformationListTime(i, tmpStr);									//设置信息时间
 			}
 			else if (i >= msgNum && i < INFORMATION_PER_PAGE)
 			{
@@ -550,24 +547,12 @@ void setInformationList()
 		{
 			if (i < msgNum)
 			{
-				if (a)
-				{
-					a = FALSE;
-				}
-				else
-				{
-					a = TRUE;
-				}
-				setInformationIsReaded(i, a);
+				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);		//设置已读未读
+				setInformationListSender(i, tmpList->pinfo_data[i].des);			//设置信息发送者
+				setInformationListTheme(i, tmpList->pinfo_data[i].Head.title);		//设置信息主题
 
-				sprintf(tmpStr, "%s%d", "Center", i);
-				setInformationListSender(i, tmpStr);
-
-				sprintf(tmpStr, "%s%d", "01234567890123456789", i);
-				setInformationListTheme(i, tmpStr);
-
-				sprintf(tmpStr, "%s%d", "2016-06-06 11:11:", i);
-				setInformationListTime(i, tmpStr);
+				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);
+				setInformationListTime(i, tmpStr);									//设置信息时间
 			}
 			else
 			{

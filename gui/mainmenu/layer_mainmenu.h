@@ -38,6 +38,9 @@ bool    mainLayerTimeoutOnTimer(ITUWidget* widget, char* param);
 void	mainLayerCornerNumReload();
 void	mainMenuLayerReset();
 
+
+void 	zoneDateTimeToString(ZONE_DATE_TIME time, char* tmpStr);
+
 //以下是需要定时器实时获取的状态值！！
 bool	getIpIconStatus();
 void	setIpIconStatus(bool status);
@@ -49,7 +52,6 @@ bool	getDisturbStatus();
 void	setDisturbStatus(bool status);
 void	setSecurityStatus(MAIN_SECURITY_STATUS_e status);
 MAIN_SECURITY_STATUS_e	getSecurityStatus();
-
 void	setSOSBtnType(bool status);
 
 //以下是在界面重新进入时候读取一次就行

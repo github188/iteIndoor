@@ -20,7 +20,7 @@ static ITUCoverFlow*	photoMsgListCoverFlow;
 static ITUBackground*	photoMsgVideoDrawBackground;
 static ITUBackground*	photoMsgTipsTransparencyBackground;
 static ITUBackground*	photoMsgBackground;
-static ITUWidget*		photoMsgPageContainer;
+//static ITUWidget*		photoMsgPageContainer;
 static ITUWidget*		photoMsgListContainer;
 static ITUWidget*		photoMsgEmptyContainer;
 static ITUWidget*		photoMsgNullContainer0;
@@ -410,7 +410,7 @@ void setPhotoMsgList()
 	//将没有内容的页面隐藏起来，达到不能滑动的效果！
 	for (i = 0; i < MAX_PHOTOMSG_PAGE_NUM; i++)
 	{
-		sprintf(tmpStr, "%s%d", "photoMsgPageContainer", i);
+		/*sprintf(tmpStr, "%s%d", "photoMsgPageContainer", i);
 		photoMsgPageContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(photoMsgPageContainer);
 
@@ -429,7 +429,7 @@ void setPhotoMsgList()
 		{
 			ituWidgetSetVisible(photoMsgPageContainer, FALSE);
 
-		}
+		}*/
 	}
 }
 

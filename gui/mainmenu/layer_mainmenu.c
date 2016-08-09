@@ -158,6 +158,13 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 }
 
 
+void zoneDateTimeToString(ZONE_DATE_TIME time, char* tmpStr)
+{
+	sprintf(tmpStr, "%d-%d-%d %d:%d:%d", time.year, time.month, time.day, time.hour, time.min, time.sec);
+	return tmpStr;
+}
+
+
 void mainLayerCornerNumReload()
 {
 	//TODO:用户在界面Enter时候载入不需要实时去获取的数据！！！！！

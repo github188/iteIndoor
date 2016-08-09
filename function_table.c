@@ -27,6 +27,7 @@ ITUActionFunction actionFunctions[] =
 	"mainLayerOnEnter", mainLayerOnEnter,
 	"mainLayerTimeoutOnTimer", mainLayerTimeoutOnTimer,
 	"mainDistrubStatusOnChange", mainDistrubStatusOnChange,
+	"mainSOSBtnOnPress", mainSOSBtnOnPress,
 
 	//elevatorCall
 	"elevatorCallBtnOnClicked", elevatorCallBtnOnClicked,

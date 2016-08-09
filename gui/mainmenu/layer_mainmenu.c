@@ -81,16 +81,18 @@ static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
 
 
 static bool		gIsScrollingRecorder;
-static uint8	gRecorderTextIndex;
+static uint8_t	gRecorderTextIndex;
 static bool		gIsScrollingInformation;
-static uint8    gInformationTextIndex;
+static uint8_t  gInformationTextIndex;
 static bool		gIsScrollingPhotoMsg;
-static uint8    gPhotoMsgTextIndex;
+static uint8_t  gPhotoMsgTextIndex;
 static bool		gIsScrollingSecurity;
-static uint8    gSecurityTextIndex;
+static uint8_t  gSecurityTextIndex;
 static bool		gIsScrollingMissedCall;
-static uint8    gMissedCallTextIndex;
+static uint8_t  gMissedCallTextIndex;
 
+static uint8_t	gSOSBtnLongPressCount;
+static bool		gSOSBtnIsPress;
 static uint8_t  gScrollTimeCount;
 
 
@@ -111,6 +113,8 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
 	setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
 	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
+
+	gSOSBtnIsPress = false;
 
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
@@ -152,16 +156,45 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 		{
 			gScrollTimeCount = 0;
 		}
+
+		if (gSOSBtnIsPress == true)
+		{
+			gSOSBtnLongPressCount++;
+			if (gSOSBtnLongPressCount >= 3)
+			{
+				setSOSBtnType(TRUE);
+				//TODO:逻辑发送SOS求助命令！！
+			}
+		}
+		else
+		{
+			setSOSBtnType(FALSE);
+			gSOSBtnLongPressCount = 0;
+		}
 	}
 
 	return true;
 }
 
 
+bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
+{
+	if (atoi(param) == 0)
+	{
+		gSOSBtnIsPress = TRUE;
+		gSOSBtnLongPressCount = 0;
+	}
+	else
+	{
+		gSOSBtnIsPress = FALSE;
+	}
+
+	return true;
+}
+
 void zoneDateTimeToString(ZONE_DATE_TIME time, char* tmpStr)
 {
 	sprintf(tmpStr, "%d-%d-%d %d:%d:%d", time.year, time.month, time.day, time.hour, time.min, time.sec);
-	return tmpStr;
 }
 
 

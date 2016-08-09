@@ -77,7 +77,6 @@ static ITUWidget*	page0InformationScrollTextContainer;
 
 
 
-static bool		gDistrubStstus;
 static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
 
 
@@ -103,7 +102,7 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	setNetworkStatus(TRUE);				//设置网络状态
 	setDeviceNo((char*)"NO:010101011");	//设置设备编号
 	setSOSBtnType(TRUE);				//设置SOS按键状态
-	setDisturbStatus(gDistrubStstus);	//设置免打扰状态
+	setDisturbStatus(getDisturbStatus());	//设置免打扰状态
 	setIpIconStatus(TRUE);				//设置IP模块启用与否
 
 	setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());				//设置家人留言条数
@@ -306,15 +305,13 @@ void setDisturbStatus(bool status)
 
 bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 {
-	if (gDistrubStstus)
+	if (getDisturbStatus())
 	{
-		gDistrubStstus = FALSE;
-		setDisturbStatus(gDistrubStstus);
+		setDisturbStatus(FALSE);
 	}
 	else
 	{
-		gDistrubStstus = TRUE;
-		setDisturbStatus(gDistrubStstus);
+		setDisturbStatus(TRUE);
 	}
 
 	return TRUE;

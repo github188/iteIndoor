@@ -75,7 +75,7 @@ typedef struct
 {
 	uint8 			type;							// 布防,撤防,局防,旁路,取消旁路
 	EXECUTOR_E 		executor;						// 操作者
-	ZONE_DATE_TIME 	time;							// 操作时间
+	DATE_TIME	 	time;							// 操作时间
 }AF_CZ_REC, * PAF_CZ_REC;							// 安防操作记录
 
 typedef struct
@@ -89,7 +89,7 @@ typedef struct
 	uint8			areaNum;		 				// 防区号
 	uint8     		bReaded;		 				// 是否已读
 	uint8     		type;			 				// 报警的类型 故障、触发
-	ZONE_DATE_TIME	time;	 						// 报警触发时间
+	DATE_TIME		time;	 						// 报警触发时间
 }AF_BJ_REC, * PAF_BJ_REC;							// 报警触发记录
 
 typedef struct

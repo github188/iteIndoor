@@ -15,8 +15,6 @@
 *************************************************/
 #include "logic_include.h"
 
-//#include <sys/ipc.h>
-//#include <sys/msg.h>
 #include <sys/types.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -34,7 +32,7 @@
 #define LEAVE_AVI_TYPE			".avi"
 #define LEAVE_WAV_TYPE			".wav"
 
-static LeafCall *g_LeafCall;
+static LeafCall *g_LeafCall = NULL;
 
 
 MEDIA_LYLY_CTRL g_LylyRecordCtrl = 
@@ -76,34 +74,6 @@ static struct ThreadInfo VideoPreviewThread;		// 模拟门前机视频预览线程
 void media_Ad_set_audio_PackMode(uint8 packmode)
 {
 	//set_audio_packmode(packmode);
-}
-
-/*************************************************
-  Function:			media_start_net_video
-  Description:		启动网络视频播放
-  Input: 	
-  	1.addres		对端地址
-  	2.mode			视频模式 发送、接收
-  Output:			无
-  Return:			成功或失败
-  Others:
-*************************************************/
-uint32 media_start_net_video(uint32 address, uint8 mode)
-{
-	return TRUE;
-}
-
-/*************************************************
-  Function:			media_stop_net_video
-  Description:		停止网络视频播放
-  Input: 			无
-  Output:			无
-  Return:			无
-  Others:
-*************************************************/
-void media_stop_net_video(uint8 mode)
-{	
-	return;
 }
 
 /*************************************************
@@ -217,55 +187,48 @@ uint32 media_set_analog_talk_volume(uint32 vol)
 }
 
 /*************************************************
-  Function:			media_start_rtsp_video
-  Description:		启动RTSP视频播放
+  Function:			media_get_wav_time
+  Description:		获取wav文件播放时长
   Input: 	
-  	1.tp			视频格式
-  	2.vorect		视频输出位置
-  Output:			无
-  Return:			TRUE/FALSE
+  Output:			
+  Return:			
   Others:
 *************************************************/
-uint32 media_start_rtsp_video(PAYLOAD_TYPE_E tp, V_RECT_S * vorect, void * proc)
+int media_get_wav_time(char *filename)
+{
+	int ret = 0;
+	if (filename)
+	{
+		//ret = leaf_get_wav_file_play_time(filename);
+	}
+	return ret;
+}
+
+/*************************************************
+  Function:			media_start_net_video
+  Description:		启动网络视频播放
+  Input: 	
+  	1.addres		对端地址
+  	2.mode			视频模式 发送、接收
+  Output:			无
+  Return:			成功或失败
+  Others:
+*************************************************/
+uint32 media_start_net_video(uint32 address, uint8 mode)
 {
 	return TRUE;
 }
 
 /*************************************************
-  Function:			media_stop_rtsp_video
-  Description:		停止RTSP视频播放
+  Function:			media_stop_net_video
+  Description:		停止网络视频播放
   Input: 			无
   Output:			无
   Return:			无
   Others:
 *************************************************/
-void media_stop_rtsp_video(void)
-{
-}
-
-/*************************************************
-  Function:			media_start_raw_video_file
-  Description:		启动播放H264裸码流文件
-  Input: 	
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-uint32 media_start_raw_video_file(char * filename)
+void media_stop_net_video(uint8 mode)
 {	
-	return TRUE;
-}
-
-/*************************************************
-  Function:			media_stop_raw_video_file
-  Description:		停止播放H264裸码流文件
-  Input: 	
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-void media_stop_raw_video_file(void)
-{
 	return;
 }
 
@@ -441,6 +404,35 @@ int32 media_add_audio_sendaddr(uint32 IP, uint16 AudioPort)
 }
 
 /*************************************************
+  Function:			media_start_local_record
+  Description:		启动本地录音
+  Input: 			
+  	1.filename		文件名
+  	2.maxtime		录制的最长时间
+  	3.proc			回调
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_start_local_record(char *filename)
+{
+	return TRUE;
+}
+
+/*************************************************
+  Function:			media_stop_local_record
+  Description:		停止本地录音
+  Input: 			
+  	1.issave		是否保存
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+void media_stop_local_record(void)
+{
+}
+
+/*************************************************
   Function:			media_del_audio_send_addr
   Description:		删除音频的发送地址和端口
   Input: 
@@ -465,7 +457,7 @@ void media_del_audio_send_addr(uint32 IP, uint16 AudioPort)
 uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 {
 	int level = (vol%9)*12;
-	//leaf_set_play_level(g_LeafCall, level);
+	leaf_set_play_level(g_LeafCall, level);
 	return TRUE;
 }
 
@@ -481,7 +473,7 @@ uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 uint32 media_set_ring_volume(uint32 vol)
 {
 	int level = (vol%9)*12;
-    //leaf_set_ring_level(g_LeafCall, level);	
+   	leaf_set_ring_level(g_LeafCall, level);	
 	return TRUE;
 }
 
@@ -497,41 +489,6 @@ uint32 media_set_ring_volume(uint32 vol)
 uint32 media_set_mic_volume(uint8 vol)
 {
 	return TRUE;
-}
-
-/*************************************************
-  Function:			media_fill_audio_data
-  Description:		将网络音频数据填到buf
-  Input: 
-  	1.data			数据指针
-  	2.len			数据长度
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-uint32 media_fill_audio_data(uint8 *data, uint32 len, uint32 time)
-{
-#if 0
-	uint32 ret;
-	
-	if (LeaveFlag & 0x01)							// 留影留言
-	{
-		//dprintf("media_fill_audio_data : leave\n");
-		leave_fill_data(data, len, time, 0);		// 填充音频数据
-	}
-#if 1
-	if (g_MediaAuCtrl.mode == AM_NET_TALK)
-	{
-		ret = talk_audio_put_data(data, len, time);
-		if (ret != TRUE)
-		{
-			return ret;
-		}
-	}
-#endif
-	return TRUE;
-#endif
-return TRUE;
 }
 
 /*************************************************
@@ -747,9 +704,9 @@ int media_disable_audio_aec(void)
 *************************************************/
 uint32 media_play_sound(char *filename, uint8 IsRepeat, void * proc)
 {
-	 if(!g_LeafCall->audiostream)
-	 {
-        //leaf_start_sound_play(g_LeafCall, filename, IsRepeat, proc);
+	if(!g_LeafCall->audiostream)
+	{
+    	leaf_start_sound_play(g_LeafCall, filename, IsRepeat, proc);
     }
 	return TRUE;
 }
@@ -764,7 +721,7 @@ uint32 media_play_sound(char *filename, uint8 IsRepeat, void * proc)
 *************************************************/
 void media_stop_sound (void)
 {
-	//leaf_stop_sound_play(g_LeafCall);
+	leaf_stop_sound_play(g_LeafCall);
 }
 
 /*************************************************
@@ -819,49 +776,6 @@ void media_stop_lyly (void)
 }
 
 /*************************************************
-  Function:			media_start_local_record
-  Description:		启动本地录音
-  Input: 			
-  	1.filename		文件名
-  	2.maxtime		录制的最长时间
-  	3.proc			回调
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-uint32 media_start_local_record(char *filename)
-{
-	return TRUE;
-}
-
-/*************************************************
-  Function:			media_stop_local_record
-  Description:		停止本地录音
-  Input: 			
-  	1.issave		是否保存
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-void media_stop_local_record(void)
-{
-}
-
-
-/*************************************************
-  Function:    		media_w_close
-  Description: 		
-  Input:		无
-  Output:		无
-  Return:		无
-  Others:
-*************************************************/
-void media_w_close(void)
-{
-	
-}
-
-/*************************************************
   Function:		media_clear_fb
   Description: 	清空fb
   Input: 		无
@@ -889,6 +803,10 @@ void media_init(void)
 	int ret = putenv("MEDIASTREAMER_DEBUG=1");
 	dprintf("ret: %d\n", ret);
 	#endif
-	//g_LeafCall = leaf_init();
+
+	if (g_LeafCall == NULL)
+	{
+		g_LeafCall = leaf_init();
+	}
 }
 

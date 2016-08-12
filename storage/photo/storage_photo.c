@@ -97,7 +97,7 @@ void storage_malloc_photo_memory (PPHOTOLIST_INFO *list,uint32 MaxNum)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_photo_path(char *filename, PZONE_DATE_TIME Time) 
+char* get_photo_path(char *filename, PDATE_TIME Time) 
 {	
 	if (Time && filename)
 	{
@@ -164,7 +164,7 @@ void storage_get_photo(PPHOTOLIST_INFO *photolist)
   Return:		
   Others:
 *************************************************/
-ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, ZONE_DATE_TIME Time)
+ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, DATE_TIME Time)
 {
 	PPHOTOLIST_INFO photolist = NULL;
 	ECHO_STORAGE ret = ECHO_STORAGE_ERR;
@@ -185,7 +185,7 @@ ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, ZONE_DATE_TIME 
 		{
 			photolist->PhotoInfo[0].Type = Type;
 			memcpy(photolist->PhotoInfo[0].DevNo,DevNo,nlen);
-			memcpy(&(photolist->PhotoInfo[0].Time), &Time, sizeof(ZONE_DATE_TIME));			
+			memcpy(&(photolist->PhotoInfo[0].Time), &Time, sizeof(DATE_TIME));			
 			photolist->Count = 1;
 		}
 		else
@@ -193,7 +193,7 @@ ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, ZONE_DATE_TIME 
 			memset(buf, 0, sizeof(buf));
 			buf[0].Type = Type;
 			memcpy(buf[0].DevNo,DevNo,nlen);
-			memcpy(&(buf[0].Time), &Time, sizeof(ZONE_DATE_TIME));	
+			memcpy(&(buf[0].Time), &Time, sizeof(DATE_TIME));	
 			num = photolist->Count;
 			if (num >= MAX_PHOTO_NUM)
 			{

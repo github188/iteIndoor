@@ -546,21 +546,12 @@ int32 public_distribute(const PRECIVE_PACKET recPacket)
 
 		case CMD_SYN_TIME:							// 时间同步
 		{
-			ZONE_DATE_TIME LocalDateTime = {0};
 			DATE_TIME *datetime = (DATE_TIME *)(recPacket->data+NET_HEAD_SIZE);
 			dprintf("public_distribute : CMD_SYN_TIME! \nyear: %d, month: %d, day: %d, hour: %d, min: %d, sec: %d\n",
 					datetime->year, datetime->month, datetime->day, datetime->hour, datetime->min, datetime->sec);
-					
-			LocalDateTime.year = datetime->year;
-			LocalDateTime.month = datetime->month;
-			LocalDateTime.day = datetime->day;
-			LocalDateTime.hour = datetime->hour;
-			LocalDateTime.min = datetime->min;
-			LocalDateTime.sec = datetime->sec;
-			LocalDateTime.week = datetime->week;
-			
-			get_local_time(&LocalDateTime, 8);
-			set_rtc_timer(&LocalDateTime);
+		
+			get_local_time(datetime, 8);
+			set_rtc_timer(datetime);
 			return TRUE;
 		}
 
@@ -755,7 +746,7 @@ void public_responsion(const PRECIVE_PACKET recPacket, const PSEND_PACKET SendPa
 		{
 			if (head->EchoValue == ECHO_OK)
 			{
-				ZONE_DATE_TIME LocalDateTime = {0};
+				DATE_TIME LocalDateTime = {0};
 				DATE_TIME *datetime = (DATE_TIME *)(recPacket->data+NET_HEAD_SIZE);
 				dprintf("public_distribute : CMD_SYN_TIME! \nyear: %d, month: %d, day: %d, hour: %d, min: %d, sec: %d\n",
 						datetime->year, datetime->month, datetime->day, datetime->hour, datetime->min, datetime->sec);

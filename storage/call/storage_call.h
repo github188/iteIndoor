@@ -34,7 +34,7 @@ typedef struct
 	uint8 LylyFlag;									// 留影留言状态
 	char devno[MAX_DEVNO_NUM];						// 设备编号
 	DEVICE_TYPE_E Type;								// 设备类型
-	ZONE_DATE_TIME Time;		    				// 通话的时间	
+	DATE_TIME Time;		    						// 通话的时间	
 }MCALLINFO, * PMCALLINFO;
 
 // 通话记录列表的结构
@@ -149,7 +149,7 @@ ECHO_STORAGE storage_clear_callrecord (CALL_TYPE Calltype);
   Return:		无
   Others:
 *************************************************/
-FLAG_STORAGE storage_set_callrecord_lylyflag(ZONE_DATE_TIME time, uint8 LylyFlag);
+FLAG_STORAGE storage_set_callrecord_lylyflag(DATE_TIME time, uint8 LylyFlag);
 
 /*************************************************
   Function:		storage_clear_all_callrecord

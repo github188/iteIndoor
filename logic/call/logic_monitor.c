@@ -1216,7 +1216,7 @@ int32 monitor_video_snap(void)
 {
 	uint32 ret;
 	char FileName[50] = {0};
-	ZONE_DATE_TIME DateTime;
+	DATE_TIME DateTime;
 	
 	dprintf("[%d]\n", __LINE__);	
 	get_timer(&DateTime);

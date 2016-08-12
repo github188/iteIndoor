@@ -594,8 +594,6 @@ int SceneRun(void)
 
     /* Watch keystrokes */
     dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
-    //LinphonePlayKeySound();//(add dummysound to avoid abnormal sound)
-    //usleep(500000);
     for (;;)
     {
         bool result = false;

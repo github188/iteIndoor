@@ -19,7 +19,7 @@
 
 static uint32 g_OnTimerID = 0;			    // 定时器ID			
 static uint8 g_ipModule_online = 0;
-static ZONE_DATE_TIME g_Timer;
+static DATE_TIME g_Timer;
 static IP_MODULE_ERR_CODE g_errcode = IP_MODULE_CODE_UNLINE;
 static int g_count = 10;				    // 在线时计数
 

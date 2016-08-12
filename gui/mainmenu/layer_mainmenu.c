@@ -93,29 +93,18 @@ static uint8_t  gMissedCallTextIndex;
 
 static uint8_t	gSOSBtnLongPressCount;
 static bool		gSOSBtnIsPress;
+static bool		gSOSIsAlarm;
 static uint8_t  gScrollTimeCount;
 
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
 {
+	uint8_t tmpSize = get_size(MSG_MANAGE_PATH);
+	printf("444444444444444444444 = %d", tmpSize);
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
 	mainLayerCornerNumReload();
-	
-	setNetworkStatus(TRUE);				//设置网络状态
-	setDeviceNo((char*)"NO:010101011");	//设置设备编号
-	setSOSBtnType(TRUE);				//设置SOS按键状态
-	setDisturbStatus(getDisturbStatus());	//设置免打扰状态
-	setIpIconStatus(TRUE);				//设置IP模块启用与否
-
-	setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());				//设置家人留言条数
-	setUnreadPhotoMsgNum((uint8_t)getUnreadPhotoMsgNum());				//设置留影留言条数
-	setUnreadInformationNum((uint8_t)getUnreadInformationNum());		//设置信息条数
-	setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
-	setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
-	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
-
 	gSOSBtnIsPress = false;
-
+	gSOSIsAlarm = false;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
 	return TRUE;
@@ -128,6 +117,8 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 
 	uint32_t duration;
 	uint32_t curtime = SDL_GetTicks();
+
+	uint8_t tmp = 0;
 
 	if (curtime >= gMainLayerLastTimeTick)
 	{
@@ -151,6 +142,10 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 		setUnreadMissedCallScroll();		//设置未接来电滚动功能
 		setUnsolvedSecurityAlarmScroll();	//设置报警滚动功能
 
+		setNetworkStatus(getNetworkStatus());		//设置网络状态
+		setDeviceNo(getDeviceNo());					//设置设备编号
+		setDisturbStatus(getDisturbStatus());		//设置免打扰状态
+		setIpIconStatus(getIpIconStatus());			//设置IP模块启用与否
 
 		if (gScrollTimeCount > MAIN_SCROLLTEXT_SHOW_TIME)
 		{
@@ -164,10 +159,16 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 			{
 				setSOSBtnType(TRUE);
 				//TODO:逻辑发送SOS求助命令！！
+				if (gSOSIsAlarm == false)
+				{
+					gSOSIsAlarm = true;
+					sos_alarm_report();
+				}
 			}
 		}
 		else
 		{
+			gSOSIsAlarm = false;
 			setSOSBtnType(FALSE);
 			gSOSBtnLongPressCount = 0;
 		}
@@ -192,7 +193,7 @@ bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 	return true;
 }
 
-void zoneDateTimeToString(ZONE_DATE_TIME time, char* tmpStr)
+void zoneDateTimeToString(DATE_TIME time, char* tmpStr)
 {
 	sprintf(tmpStr, "%d-%d-%d %d:%d:%d", time.year, time.month, time.day, time.hour, time.min, time.sec);
 }
@@ -201,6 +202,12 @@ void zoneDateTimeToString(ZONE_DATE_TIME time, char* tmpStr)
 void mainLayerCornerNumReload()
 {
 	//TODO:用户在界面Enter时候载入不需要实时去获取的数据！！！！！
+	setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());				//设置家人留言条数
+	setUnreadPhotoMsgNum((uint8_t)getUnreadPhotoMsgNum());				//设置留影留言条数
+	setUnreadInformationNum((uint8_t)getUnreadInformationNum());		//设置信息条数
+	setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
+	setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
+	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
 }
 
 
@@ -254,9 +261,9 @@ void setNetworkStatus(bool status)
 
 char* getDeviceNo()
 {
-	char tmpStr[50] = { 0 };
+	char* tmpStr = (char*)malloc(50);
 	PFULL_DEVICE_NO tmpDev = storage_get_devparam();
-	sprintf(tmpStr, "%s%s", "No:", tmpDev->DeviceNoStr);
+	sprintf(tmpStr, "%s%s", "NO:", tmpDev->DeviceNoStr);
 	//TODO:返回地址需要申请变量！！！！！！malloc！！！
 	return tmpStr;
 }
@@ -270,6 +277,8 @@ void setDeviceNo(char* deviceno)
 		assert(mainDeviceNoText);
 	}
 	ituTextSetString(mainDeviceNoText, deviceno);
+
+	free(deviceno);
 }
 
 

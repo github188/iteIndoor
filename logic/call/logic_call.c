@@ -108,7 +108,7 @@ static uint8 g_Use_SDP = FALSE;								// 用来判断是否需要发送SDP参数
 static CALL_INFO g_BeCallInfo;
 static CALL_INFO g_NewBeCallInfo;
 static HEART_PARAM HeartParam;
-static ZONE_DATE_TIME g_LylyDateTime = {0};
+static DATE_TIME g_LylyDateTime = {0};
 
 static int16 g_RemainTime;									// 剩余时间	
 static uint8 g_ErrType;
@@ -324,7 +324,7 @@ static int32 get_ring_file(char *FileName)
 static void add_inter_record(CALL_TYPE RecordType, DEVICE_TYPE_E DevType, char *DevStr)
 {
 	MCALLINFO callinfo;
-	ZONE_DATE_TIME DateTime = {0};
+	DATE_TIME DateTime = {0};
 #if 1	
 	#if 0
 	if (g_UnlockFlag == TRUE)
@@ -338,7 +338,7 @@ static void add_inter_record(CALL_TYPE RecordType, DEVICE_TYPE_E DevType, char *
 	callinfo.Calltype = RecordType;
 	callinfo.Type = DevType;	
 	get_timer(&DateTime);
-	memcpy(&callinfo.Time, &DateTime, sizeof(ZONE_DATE_TIME));
+	memcpy(&callinfo.Time, &DateTime, sizeof(DATE_TIME));
 	
 	if (RecordType == OUTGOING)
 	{
@@ -2941,7 +2941,7 @@ int32 inter_video_snap(void)
 {
 	uint32 ret;
 	char FileName[50] = {0};
-	ZONE_DATE_TIME DateTime;	
+	DATE_TIME DateTime;	
 	get_timer(&DateTime);
 	get_photo_path(FileName, &DateTime);
 	
@@ -3431,12 +3431,6 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 		{	
 			dprintf("CMD_CALL_HANDDOWN : CallID : %d, g_CallInfo.ID : %d, g_BeCallInfo.ID : %d\n", CallID, g_CallInfo.ID, g_BeCallInfo.ID);
 
-			// modi by chenbh 2015-11-13 增加IsStartAudio的判断 否则调用media_w_close可能会死机
-			if ((g_CallInfo.state == CALL_STATE_TALK && g_CallInfo.address == recPacket->address && g_CallInfo.IsStartAudio)||
-				(g_BeCallInfo.state == CALL_STATE_TALK && g_BeCallInfo.address == recPacket->address && g_BeCallInfo.IsStartAudio))
-			{
-				media_w_close();  //清空音频播放输出缓冲区
-			}
 
 			if (CallID == g_CallInfo.ID)
 			{

@@ -30,7 +30,7 @@ static uint8 yuyue_time(BE_DATETIME BeTime)
 {
 	uint32 year, BeYear;
 	uint8 ret = FALSE;
-	ZONE_DATE_TIME g_time;
+	DATE_TIME g_time;
 	uint8 mon, day, week, hour, min, BeMon, BeDay, BeWeek, BeHour, BeMin;
 	
 	get_timer(&g_time);

@@ -287,18 +287,6 @@ uint32 media_play_lyly (char *filename, void * proc);
 void media_stop_lyly (void);
 
 /*************************************************
-  Function:			media_fill_audio_data
-  Description:		将网络音频数据填到buf
-  Input: 
-  	1.data			数据指针
-  	2.len			数据长度
-  Output:			无
-  Return:			成功或失败
-  Others:
-*************************************************/
-uint32 media_fill_audio_data(uint8 *data, uint32 len, uint32 time);
-
-/*************************************************
   Function:			media_fill_video_data
   Description:		将网络视频数据填到buf
   Input: 
@@ -394,16 +382,6 @@ uint32 media_start_net_video(uint32 address, uint8 mode);
   Others:
 *************************************************/
 void media_stop_net_video(uint8 mode);
-
-/*************************************************
-  Function:			media_start_raw_video_file
-  Description:		启动播放H264裸码流文件
-  Input: 	
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-uint32 media_start_raw_video_file(char * filename);
 
 /*************************************************
   Function:			media_start_net_audio
@@ -567,14 +545,13 @@ int32 media_start_show_pict(char *filename, uint16 pos_x, uint16 pos_y, uint16 w
 void media_stop_show_pict(void);
 
 /*************************************************
-  Function:    	media_w_close
-  Description: 		
-  Input:		无
-  Output:		无
-  Return:		无
+  Function:			media_get_wav_time
+  Description:		获取wav文件播放时长
+  Input: 	
+  Output:			
+  Return:			
   Others:
 *************************************************/
-void media_w_close(void);
-
+int media_get_wav_time(char *filename);
 #endif
 

@@ -21,19 +21,6 @@
 #define RTC_USE				0
 #define IsLeapYear(AYear)   (((AYear) % 4 == 0) && (((AYear) % 100 != 0) || ((AYear) % 400 == 0)))
 
-#if 0
-typedef struct
-{
-	uint32 year;
-	uint8 month;
-	uint8 day;
-	uint8 hour;
-	uint8 min;
-	uint8 sec;	
-	uint8 week;
-}ZONE_DATE_TIME, * PZONE_DATE_TIME;					// 时间结构体
-#endif
-
 /*************************************************
   Function:		WeekDay
   Description: 	特定年月日对应的星期数
@@ -89,7 +76,7 @@ void init_rtc_timer(void);
   Return:		ECHO_VALUE
   Others:
 *************************************************/
-uint32 set_rtc_timer(PZONE_DATE_TIME datatime);
+uint32 set_rtc_timer(PDATE_TIME datatime);
 
 /*************************************************
   Function:		get_timer
@@ -100,7 +87,7 @@ uint32 set_rtc_timer(PZONE_DATE_TIME datatime);
   Return:		无
   Others:
 *************************************************/
-void get_timer(PZONE_DATE_TIME datatime);
+void get_timer(PDATE_TIME datatime);
 
 /*************************************************
   Function:		get_timer
@@ -111,7 +98,7 @@ void get_timer(PZONE_DATE_TIME datatime);
   Return:		无
   Others:
 *************************************************/
-void get_gmtime(PZONE_DATE_TIME datatime);
+void get_gmtime(PDATE_TIME datatime);
 
 /*************************************************
   Function:		get_timeofday
@@ -153,7 +140,7 @@ void init_timer(void);
   Return:			无
   Others:
 *************************************************/
-void get_utc_time(PZONE_DATE_TIME DateTime, uint8 TimeZone);
+void get_utc_time(PDATE_TIME DateTime, uint8 TimeZone);
 
 /*************************************************
   Function:			get_local_time
@@ -165,6 +152,6 @@ void get_utc_time(PZONE_DATE_TIME DateTime, uint8 TimeZone);
   Return:			无
   Others:
 *************************************************/
-void get_local_time(PZONE_DATE_TIME DateTime, uint8 TimeZone);
+void get_local_time(PDATE_TIME DateTime, uint8 TimeZone);
 #endif
 

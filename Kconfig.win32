@@ -140,9 +140,6 @@ config BUILD_INIPARSER
 config BUILD_ITU
     def_bool y
 
-config BUILD_LINPHONE
-    def_bool y
-
 config BUILD_MICROHTTPD
     def_bool y
 
@@ -158,6 +155,12 @@ config BUILD_UPGRADE
 config BUILD_XML2
     def_bool y
 
+config BUILD_LINPHONE
+    def_bool y
+
+config BUILD_LEAF
+    def_bool y
+	
 ######################################################################
 # Start of bootloader setting
 ######################################################################
@@ -217,9 +220,6 @@ config BL_INFO
     def_bool y
 
 config BL_DBG
-    def_bool y
-
-config BUILD_LEAF
     def_bool y
 
 endif

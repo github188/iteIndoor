@@ -24,7 +24,7 @@ static ITUText* SetTime2Text;
 static ITUWheel* SetTimeHourWheel;
 static ITUWheel* SetTimeMinWheel;
 
-static ZONE_DATE_TIME g_time;
+static DATE_TIME g_time;
 
 /*************************************************
 Function:		SetDataTimeOnEnter

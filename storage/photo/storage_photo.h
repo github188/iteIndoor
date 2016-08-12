@@ -23,7 +23,7 @@ typedef struct
 {
 	char DevNo[20];									// 设备号
 	DEVICE_TYPE_E Type;								// 设备类型
-	ZONE_DATE_TIME Time;		    				// 时间	           
+	DATE_TIME Time;		    						// 时间	           
 }PHOTO_INFO, * PPHOTO_INFO;							// 照片结构
 
 // 通话记录列表的结构
@@ -63,7 +63,7 @@ void storage_malloc_photo_memory (PPHOTOLIST_INFO *list,uint32 MaxNum);
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_photo_path(char *filename, PZONE_DATE_TIME Time);
+char* get_photo_path(char *filename, PDATE_TIME Time);
 
 /*************************************************
   Function:		storage_add_photo
@@ -87,7 +87,7 @@ void storage_get_photo(PPHOTOLIST_INFO *photolist);
   Return:		
   Others:
 *************************************************/
-ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, ZONE_DATE_TIME Time);
+ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, DATE_TIME Time);
 
 /*************************************************
   Function:		storage_del_photo

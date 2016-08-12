@@ -14,7 +14,7 @@
 *********************************************************/
 #include "storage_include.h"
 
-static ZONE_DATE_TIME g_timer;
+static DATE_TIME g_timer;
 #ifdef _LIVEMEDIA_
 static unsigned long long  g_tick = 0;
 #endif
@@ -164,7 +164,7 @@ void init_rtc_timer(void)
   Return:		ECHO_VALUE
   Others:
 *************************************************/
-uint32 set_rtc_timer(PZONE_DATE_TIME datatime)
+uint32 set_rtc_timer(PDATE_TIME datatime)
 {
 	uint32 ret = FALSE;
 	
@@ -175,7 +175,7 @@ uint32 set_rtc_timer(PZONE_DATE_TIME datatime)
         if (datatime->hour >= 24) datatime->hour = 0;
         if (datatime->min >= 60) datatime->min = 0;
         if (datatime->sec >= 60) datatime->sec = 0;
-		memcpy(&g_timer,datatime,sizeof(ZONE_DATE_TIME));
+		memcpy(&g_timer,datatime,sizeof(DATE_TIME));
 		g_timer.week  = WeekDay(g_timer.year,g_timer.month,g_timer.day);
 
 		au_settimeofday(datatime->year, datatime->month, datatime->day, datatime->hour, datatime->min, datatime->sec);
@@ -194,7 +194,7 @@ uint32 set_rtc_timer(PZONE_DATE_TIME datatime)
   Return:		无
   Others:
 *************************************************/
-void get_timer(PZONE_DATE_TIME datatime)
+void get_timer(PDATE_TIME datatime)
 {
 	if (datatime)
 	{
@@ -222,7 +222,7 @@ void get_timer(PZONE_DATE_TIME datatime)
   Return:		无
   Others:
 *************************************************/
-void get_gmtime(PZONE_DATE_TIME datatime)
+void get_gmtime(PDATE_TIME datatime)
 {
 	if (datatime)
 	{
@@ -340,7 +340,7 @@ void init_timer(void)
   Return:			无
   Others:
 *************************************************/
-void get_utc_time(PZONE_DATE_TIME DateTime, uint8 TimeZone)
+void get_utc_time(PDATE_TIME DateTime, uint8 TimeZone)
 {
 	// 只改变时钟
 	if (DateTime->hour >= TimeZone)
@@ -387,7 +387,7 @@ void get_utc_time(PZONE_DATE_TIME DateTime, uint8 TimeZone)
   Return:			无
   Others:
 *************************************************/
-void get_local_time(PZONE_DATE_TIME DateTime, uint8 TimeZone)
+void get_local_time(PDATE_TIME DateTime, uint8 TimeZone)
 {
 	// 增加TimeZone个时区
 	if (DateTime->hour < (24-TimeZone))

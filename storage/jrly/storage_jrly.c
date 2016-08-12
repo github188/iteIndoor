@@ -97,7 +97,7 @@ void storage_malloc_jrly_memory (PJRLYLIST_INFO *list,uint32 MaxNum)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_jrlyrecord_path(char *filename, PZONE_DATE_TIME Time) 
+char* get_jrlyrecord_path(char *filename, PDATE_TIME Time) 
 {	
 	if (Time && filename)
 	{
@@ -121,7 +121,7 @@ char* get_jrlyrecord_path(char *filename, PZONE_DATE_TIME Time)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_jrlyrecord_file(char *filename, PZONE_DATE_TIME Time) 
+char* get_jrlyrecord_file(char *filename, PDATE_TIME Time) 
 {	
 	if (Time && filename)
 	{
@@ -184,7 +184,7 @@ void storage_get_jrlyrecord(PJRLYLIST_INFO *jrlylist)
   Return:		
   Others:
 *************************************************/
-ECHO_STORAGE storage_add_jrlyrecord (ZONE_DATE_TIME Time)
+ECHO_STORAGE storage_add_jrlyrecord (DATE_TIME Time)
 {
 	PJRLYLIST_INFO jrlylist = NULL;
 	ECHO_STORAGE ret = ECHO_STORAGE_ERR;
@@ -201,14 +201,14 @@ ECHO_STORAGE storage_add_jrlyrecord (ZONE_DATE_TIME Time)
 		if (0 == jrlylist->Count)
 		{
 			jrlylist->JrlyInfo[0].UnRead = TRUE;
-			memcpy(&(jrlylist->JrlyInfo[0].Time), &Time, sizeof(ZONE_DATE_TIME));			
+			memcpy(&(jrlylist->JrlyInfo[0].Time), &Time, sizeof(DATE_TIME));			
 			jrlylist->Count = 1;
 		}
 		else
 		{
 			memset(buf, 0, sizeof(buf));
 			buf[0].UnRead= TRUE;
-			memcpy(&(buf[0].Time), &Time, sizeof(ZONE_DATE_TIME));	
+			memcpy(&(buf[0].Time), &Time, sizeof(DATE_TIME));	
 			num = jrlylist->Count;
 			if (num >= MAX_JRLY_NUM)
 			{

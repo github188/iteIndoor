@@ -25,7 +25,7 @@ typedef struct
 	char DevNo[20];									// 设备号
 	DEVICE_TYPE_E DevType;							// 设备类型
 	LYLY_TYPE LyType;								// 留言类型
-	ZONE_DATE_TIME Time;		    				// 时间	           
+	DATE_TIME Time;		    						// 时间	           
 }LYLY_INFO, * PLYLY_INFO;							// 留影留言结构
 
 // 通话记录列表的结构
@@ -66,7 +66,7 @@ void storage_malloc_lyly_memory (PLYLYLIST_INFO *list,uint32 MaxNum);
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_lylyrecord_path(char *filename, PZONE_DATE_TIME Time) ;
+char* get_lylyrecord_path(char *filename, PDATE_TIME Time) ;
 
 /*************************************************
   Function:		get_lylypic_path
@@ -77,7 +77,7 @@ char* get_lylyrecord_path(char *filename, PZONE_DATE_TIME Time) ;
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_lylypic_path(char *filename, PZONE_DATE_TIME Time);
+char* get_lylypic_path(char *filename, PDATE_TIME Time);
 
 /*************************************************
   Function:		storage_get_lylyrecord
@@ -102,7 +102,7 @@ void storage_get_lylyrecord(PLYLYLIST_INFO *lylylist);
   Return:		
   Others:
 *************************************************/
-ECHO_STORAGE storage_add_lylyrecord (LYLY_TYPE LyType, DEVICE_TYPE_E DevType, char* DevIndex, ZONE_DATE_TIME Time);
+ECHO_STORAGE storage_add_lylyrecord (LYLY_TYPE LyType, DEVICE_TYPE_E DevType, char* DevIndex, DATE_TIME Time);
 
 /*************************************************
   Function:		storage_del_lylyrecord

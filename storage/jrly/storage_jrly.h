@@ -22,7 +22,7 @@
 typedef struct
 {
 	uint8 UnRead;									// 未读标志 1 - 未读 0 - 已读 
-	ZONE_DATE_TIME Time;		    				// 时间	           
+	DATE_TIME Time;		    						// 时间	           
 }JRLY_INFO, * PJRLY_INFO;							// 家人留言结构
 
 // 通话记录列表的结构
@@ -41,7 +41,7 @@ typedef struct
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_jrlyrecord_file(char *filename, PZONE_DATE_TIME Time);
+char* get_jrlyrecord_file(char *filename, PDATE_TIME Time);
 
 /*************************************************
   Function:		storage_free_jrly_memory
@@ -73,7 +73,7 @@ void storage_malloc_jrly_memory (PJRLYLIST_INFO *list,uint32 MaxNum);
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_jrlyrecord_path(char *filename, PZONE_DATE_TIME Time);
+char* get_jrlyrecord_path(char *filename, PDATE_TIME Time);
 
 /*************************************************
   Function:		storage_get_jrlyrecord
@@ -95,7 +95,7 @@ void storage_get_jrlyrecord(PJRLYLIST_INFO *jrlylist);
   Return:		
   Others:
 *************************************************/
-ECHO_STORAGE storage_add_jrlyrecord (ZONE_DATE_TIME Time);
+ECHO_STORAGE storage_add_jrlyrecord (DATE_TIME Time);
 
 /*************************************************
   Function:		storage_del_jrlyrecord

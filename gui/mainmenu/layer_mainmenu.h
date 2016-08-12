@@ -40,7 +40,7 @@ void	mainLayerCornerNumReload();
 void	mainMenuLayerReset();
 
 
-void 	zoneDateTimeToString(ZONE_DATE_TIME time, char* tmpStr);
+void 	zoneDateTimeToString(DATE_TIME time, char* tmpStr);
 
 //以下是需要定时器实时获取的状态值！！
 bool	getIpIconStatus();

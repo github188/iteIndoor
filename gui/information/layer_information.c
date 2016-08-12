@@ -514,8 +514,10 @@ void setInformationList()
 	char tmpStr[50] = { 0 };
 	uint8_t msgNum = 0;
 	MSGLIST* tmpList;
+	printf("1111111111111111111111111111111111111 = %d", msgNum);
 	tmpList = storage_read_msg_list();
 	msgNum = tmpList->ncount;
+	printf("msgNum = %d", msgNum);
 
 	//TODO: 读取存储内容设置列表信息！！！！！！！
 	for (i = 0; i < MAX_INFORMATION_NUM; i++)
@@ -525,10 +527,16 @@ void setInformationList()
 			if (i < msgNum)
 			{
 				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);		//设置已读未读
+				printf("unread = %d", tmpList->pinfo_data[i].is_unread);
+
 				setInformationListSender(i, tmpList->pinfo_data[i].des);			//设置信息发送者
+				printf("des = %s", tmpList->pinfo_data[i].des);
+
 				setInformationListTheme(i, tmpList->pinfo_data[i].Head.title);		//设置信息主题
+				printf("tittle = %s", tmpList->pinfo_data[i].Head.title);
 
 				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);			
+				printf("time = %s", tmpStr);
 				setInformationListTime(i, tmpStr);									//设置信息时间
 			}
 			else if (i >= msgNum && i < INFORMATION_PER_PAGE)
@@ -548,10 +556,16 @@ void setInformationList()
 			if (i < msgNum)
 			{
 				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);		//设置已读未读
+				printf("unread = %d", tmpList->pinfo_data[i].is_unread);
+
 				setInformationListSender(i, tmpList->pinfo_data[i].des);			//设置信息发送者
+				printf("des = %s", tmpList->pinfo_data[i].des);
+
 				setInformationListTheme(i, tmpList->pinfo_data[i].Head.title);		//设置信息主题
+				printf("tittle = %s", tmpList->pinfo_data[i].Head.title);
 
 				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);
+				printf("time = %s", tmpStr);
 				setInformationListTime(i, tmpStr);									//设置信息时间
 			}
 			else

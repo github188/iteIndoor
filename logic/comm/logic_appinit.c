@@ -122,5 +122,8 @@ void logic_init(void)
 	// 测试校验数据是否正确
 	check_sysconfig_ifcorrect(); 					
 	dprintf("devno: %s \n", pDevNo->DeviceNoStr);
+
+	dprintf("MSGDATA: %d\n", sizeof(MSGDATA));
+	dprintf("MSGLIST: %d\n", sizeof(MSGLIST));
 }
 

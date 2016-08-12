@@ -378,7 +378,7 @@ ECHO_STORAGE storage_clear_callrecord (CALL_TYPE Calltype)
   Return:		нч
   Others:
 *************************************************/
-FLAG_STORAGE storage_set_callrecord_lylyflag(ZONE_DATE_TIME time, uint8 LylyFlag)
+FLAG_STORAGE storage_set_callrecord_lylyflag(DATE_TIME time, uint8 LylyFlag)
 {	
 	//FLAG_STORAGE flag;
 	PMCALLLISTINFO calllist = NULL;

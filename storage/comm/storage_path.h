@@ -93,7 +93,7 @@
 /**************************************************************************/
 /*									信息								  */	
 /**************************************************************************/
-#define MSG_DIR_PATH			CFG_TEMP_DRIVE":/INFO"								// 信息文件夹		
+#define MSG_DIR_PATH			CFG_TEMP_DRIVE":/INFO"									// 信息文件夹		
 #define MSG_MANAGE_PATH			CFG_TEMP_DRIVE":/INFO/MANAGE.BIN"						// 信息管理文件
 #define MSG_VOICE_PATH			CFG_TEMP_DRIVE":/INFO/VOICE"							// 信息声音文件
 
@@ -157,6 +157,19 @@
 #define MONITOR_DOOR_PATH		CFG_TEMP_DRIVE":/MONITOR/MONITOR_DOOR.BIN"	
 #define MONITOR_STAIR_PATH		CFG_TEMP_DRIVE":/MONITOR/MONITOR_STAIR.BIN"	
 #define MONITOR_AREA_PATH		CFG_TEMP_DRIVE":/MONITOR/MONITOR_AREA.BIN"	
+
+/**************************************************************************/
+/*								 屏幕保护								  */	
+/**************************************************************************/
+#define SCREEN_SAVER_DIR_PATH	CFG_PRIVATE_DRIVE":/res/wallpaper/"					// 屏幕保护资源		
+
+/**************************************************************************/
+/*								 桌面背景								  */	
+/**************************************************************************/
+#define WALL_PAPER_DIR_PATH		CFG_PRIVATE_DRIVE":/res/wallpaper/"					// 桌面背景图片资源		
+
+
+
 
 #ifdef _USE_NEW_CENTER_
 /**************************************************************************/

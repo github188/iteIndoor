@@ -32,7 +32,7 @@ typedef struct
 {
 	uint8 is_unread;								// 0 - 已读，1 - 未读标志	
 	uint8 voice_type;								// 0x20:mp3 0x21:wav
-	ZONE_DATE_TIME time;							// 信息接收到的时间
+	DATE_TIME time;									// 信息接收到的时间
 	uint8 des[14];									// 执行者的描述或者电话号码
 	REC_BULLETIN_HEAD Head;							// 信息头
 }MSGDATA, * PMSGDATA;

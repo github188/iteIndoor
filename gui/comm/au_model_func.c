@@ -570,4 +570,3 @@ uint8 check_ip_to_true(char *ip)
 	return TRUE;
 }
 
-

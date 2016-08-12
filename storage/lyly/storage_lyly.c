@@ -97,7 +97,7 @@ void storage_malloc_lyly_memory (PLYLYLIST_INFO *list,uint32 MaxNum)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_lylyrecord_path(char *filename, PZONE_DATE_TIME Time) 
+char* get_lylyrecord_path(char *filename, PDATE_TIME Time) 
 {	
 	if (filename)
 	{
@@ -121,7 +121,7 @@ char* get_lylyrecord_path(char *filename, PZONE_DATE_TIME Time)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_lylypic_path(char *filename, PZONE_DATE_TIME Time) 
+char* get_lylypic_path(char *filename, PDATE_TIME Time) 
 {
 	if (Time && filename)
 	{
@@ -145,7 +145,7 @@ char* get_lylypic_path(char *filename, PZONE_DATE_TIME Time)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_lylywav_path(char *filename, PZONE_DATE_TIME Time) 
+char* get_lylywav_path(char *filename, PDATE_TIME Time) 
 {
 	if (Time && filename)
 	{
@@ -169,7 +169,7 @@ char* get_lylywav_path(char *filename, PZONE_DATE_TIME Time)
   Return:		ECHO_STORAGE
   Others:
 *************************************************/
-char* get_lylyavi_path(char *filename, PZONE_DATE_TIME Time) 
+char* get_lylyavi_path(char *filename, PDATE_TIME Time) 
 {
 	if (Time && filename)
 	{
@@ -256,7 +256,7 @@ void storage_get_lylyrecord(PLYLYLIST_INFO *lylylist)
   Return:		
   Others:
 *************************************************/
-ECHO_STORAGE storage_add_lylyrecord (LYLY_TYPE LyType, DEVICE_TYPE_E DevType, char* DevIndex, ZONE_DATE_TIME Time)
+ECHO_STORAGE storage_add_lylyrecord (LYLY_TYPE LyType, DEVICE_TYPE_E DevType, char* DevIndex, DATE_TIME Time)
 {
 	PLYLYLIST_INFO lylylist = NULL;
 	ECHO_STORAGE ret = ECHO_STORAGE_ERR;
@@ -278,7 +278,7 @@ ECHO_STORAGE storage_add_lylyrecord (LYLY_TYPE LyType, DEVICE_TYPE_E DevType, ch
 			lylylist->LylyInfo[0].LyType = LyType;
 			lylylist->LylyInfo[0].DevType = DevType;
 			memcpy(lylylist->LylyInfo[0].DevNo,DevIndex,nlen);
-			memcpy(&(lylylist->LylyInfo[0].Time), &Time, sizeof(ZONE_DATE_TIME));			
+			memcpy(&(lylylist->LylyInfo[0].Time), &Time, sizeof(DATE_TIME));			
 			lylylist->Count = 1;
 		}
 		else
@@ -288,7 +288,7 @@ ECHO_STORAGE storage_add_lylyrecord (LYLY_TYPE LyType, DEVICE_TYPE_E DevType, ch
 			buf[0].LyType = LyType;
 			buf[0].DevType = DevType;
 			memcpy(buf[0].DevNo,DevIndex,nlen);
-			memcpy(&(buf[0].Time), &Time, sizeof(ZONE_DATE_TIME));	
+			memcpy(&(buf[0].Time), &Time, sizeof(DATE_TIME));	
 			num = lylylist->Count;
 			if (num >= MAX_LYLY_NUM)
 			{

@@ -133,7 +133,7 @@ ECHO_STORAGE storage_add_afcz_record(uint8 type, EXECUTOR_E executor)
 	uint8 			count;
 	ECHO_STORAGE	ret = ECHO_STORAGE_ERR;
 	AF_CZ_REC		buf[AF_REC_MAX];
-	ZONE_DATE_TIME	time;
+	DATE_TIME		time;
 
 	get_timer(&time);
 	if (pAfCzList && pAfCzList->pAfCzRec)
@@ -142,7 +142,7 @@ ECHO_STORAGE storage_add_afcz_record(uint8 type, EXECUTOR_E executor)
 		{
 			pAfCzList->pAfCzRec[0].type = type;
 			pAfCzList->pAfCzRec[0].executor = executor;
-			memcpy(&(pAfCzList->pAfCzRec[0].time), &time, sizeof(ZONE_DATE_TIME));
+			memcpy(&(pAfCzList->pAfCzRec[0].time), &time, sizeof(DATE_TIME));
 			pAfCzList->nCount = 1;
 		}
 		else
@@ -150,7 +150,7 @@ ECHO_STORAGE storage_add_afcz_record(uint8 type, EXECUTOR_E executor)
 			memset(buf, 0, sizeof(buf));
 			buf[0].type = type;
 			buf[0].executor = executor;
-			memcpy(&(buf[0].time), &time, sizeof(ZONE_DATE_TIME));
+			memcpy(&(buf[0].time), &time, sizeof(DATE_TIME));
 			count = pAfCzList->nCount;
 			if (count >= AF_REC_MAX)
 			{
@@ -190,7 +190,7 @@ ECHO_STORAGE storage_add_afbj_record(uint8 areaNum, uint8 type)
 	uint8 			count;
 	ECHO_STORAGE	ret = ECHO_STORAGE_ERR;
 	AF_BJ_REC		buf[AF_REC_MAX];
-	ZONE_DATE_TIME	time;
+	DATE_TIME		time;
 
 	get_timer(&time);
 	if (pAfBjList && pAfBjList->pAfBjRec)
@@ -200,7 +200,7 @@ ECHO_STORAGE storage_add_afbj_record(uint8 areaNum, uint8 type)
 			pAfBjList->pAfBjRec[0].areaNum = areaNum;
 			pAfBjList->pAfBjRec[0].type = type;
 			pAfBjList->pAfBjRec[0].bReaded = FALSE;
-			memcpy(&(pAfBjList->pAfBjRec[0].time), &time, sizeof(ZONE_DATE_TIME));
+			memcpy(&(pAfBjList->pAfBjRec[0].time), &time, sizeof(DATE_TIME));
 			pAfBjList->nCount = 1;
 		}
 		else
@@ -209,7 +209,7 @@ ECHO_STORAGE storage_add_afbj_record(uint8 areaNum, uint8 type)
 			buf[0].areaNum = areaNum;
 			buf[0].type = type;
 			buf[0].bReaded = FALSE;
-			memcpy(&(buf[0].time), &time, sizeof(ZONE_DATE_TIME));
+			memcpy(&(buf[0].time), &time, sizeof(DATE_TIME));
 			count = pAfBjList->nCount;
 			if (count >= AF_REC_MAX)
 			{

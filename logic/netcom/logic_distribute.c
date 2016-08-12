@@ -2248,7 +2248,7 @@ void net_stop_multipacket_send(uint32 ID, uint32 address)
 *************************************************/
 void net_now_time(DATE_TIME * DateTime)
 {
-	ZONE_DATE_TIME LocalTime;
+	DATE_TIME LocalTime;
 	get_timer(&LocalTime);
 	memset(DateTime, 0, sizeof(DATE_TIME));
 	DateTime->year = LocalTime.year;
@@ -2270,7 +2270,7 @@ void net_now_time(DATE_TIME * DateTime)
 *************************************************/
 void net_get_utc_time(DATE_TIME * DateTime)
 {
-	ZONE_DATE_TIME LocalTime;
+	DATE_TIME LocalTime;
 	get_timer(&LocalTime);
 
 #if 0

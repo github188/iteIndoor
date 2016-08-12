@@ -41,17 +41,6 @@ typedef struct
 	char 			FileName[50];
 }SOFT_INFO, * PSOFT_INFO;							// 网络门前机上报的信息
 
-typedef struct
-{
-	uint32 year;
-	uint8 month;
-	uint8 day;
-	uint8 hour;
-	uint8 min;
-	uint8 sec;	
-	uint8 week;
-}ZONE_DATE_TIME, * PZONE_DATE_TIME;					// 时间结构体
-
 // 室内机向服务器注册的信息
 typedef struct
 {

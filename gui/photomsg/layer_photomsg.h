@@ -72,7 +72,7 @@ void setPhotoMsgList();
 void photoMsgVoiceBtnOnClicked();
 void setPhotoMsgPlayVol(uint8_t volNum);
 bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr);
-bool setPhotoMsgListTime(uint8_t index, char* timeStr);
+bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread);
 bool setPhotoMsgListIsVisible(uint8_t index, bool status);
 
 

@@ -10,6 +10,7 @@
 #include "SysGlobal.h"
 #include "storage_include.h"
 #include "logic_include.h"
+#include "gui_include.h"
 
 #ifdef _WIN32
     #include <crtdbg.h>
@@ -28,10 +29,12 @@ typedef enum
     CMD_NONE,
     CMD_LOAD_SCENE,   	
     CMD_CALLIN_CALLBAK,
+	CMD_CALLREQUEST_CALLBAK,
     CMD_CALLOUT_CALLBAK,
     CMD_MONITOR_CALLBAK,
     CMD_RTSP_CALLBAK,
     CMD_GOTO_MAINMENU,
+	CMD_GOTO_BECALL,
     CMD_CHANGE_LANG,
     CMD_PREDRAW
 } CommandID;
@@ -72,6 +75,59 @@ int32 af_callback_gui(int32 Param1,int32 Param2)
 }
 
 /*************************************************
+Function:		callrequest_state_callbak
+Description:	呼叫请求回调函数
+Input:
+Output:			
+Return:
+Others:
+*************************************************/
+void callrequest_state_callbak(uint32 param1, uint32 param2)
+{
+	Command cmd;
+	char tmp[31] = { 0 };
+	INTER_CALLBACK callbak_data;
+	PFULL_DEVICE_NO dev = storage_get_devparam();
+
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
+
+	memset(&cmd, 0, sizeof(Command));
+	memset(&callbak_data, 0, sizeof(INTER_CALLBACK));
+	cmd.id = CMD_CALLREQUEST_CALLBAK;
+	callbak_data.InterState = (uint8)param1;
+
+	switch (param1)
+	{
+		case CALL_STATE_REQUEST:
+			memcpy(tmp, (char *)param2, sizeof(tmp));
+			if (tmp[0] == 0)
+			{
+				callbak_data.DataLen = 1;
+			}
+			else
+			{
+				callbak_data.DataLen = dev->DevNoLen;
+				strcpy(callbak_data.Buf, tmp+1);
+			}
+			break;
+
+		case CALL_STATE_END:
+			callbak_data.DataLen = 4;
+			sprintf(callbak_data.Buf, "%d", param2);
+			break;
+
+		default:
+			break;
+	}
+
+	memcpy(cmd.strarg1, &callbak_data, sizeof(INTER_CALLBACK));
+	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+}
+
+/*************************************************
   Function:			callout_state_callbak
   Description: 		
   Input:			
@@ -82,16 +138,18 @@ int32 af_callback_gui(int32 Param1,int32 Param2)
 void callout_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
-	uint16 callbak_cmd;
+	INTER_CALLBACK callbak_data;
 	
-    if (g_CommandQueue == -1)
-        return;
-
-    callbak_cmd = param1;
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
+   
 	memset(&cmd, 0, sizeof(Command));
-	memcpy(cmd.strarg1, &callbak_cmd, sizeof(uint16));		// ǰ�������ֽڴ洢�ص����� ����Ϊ���Ĳ���
-    cmd.id = CMD_CALLIN_CALLBAK;
-	
+	memset(&callbak_data, 0, sizeof(INTER_CALLBACK));
+    cmd.id = CMD_CALLOUT_CALLBAK;
+	callbak_data.InterState = (uint8)param1;
+
 	switch (param1)
 	{
 		case CALL_STATE_REQUEST:			
@@ -100,7 +158,16 @@ void callout_state_callbak(uint32 param1, uint32 param2)
 		case CALL_STATE_CALLING:
 			break;
 			
-		case CALL_NEW_CALLING:			
+		case CALL_NEW_CALLING:
+			if (0 == param2)
+			{
+				callbak_data.DataLen = 0;
+			}
+			else
+			{
+				callbak_data.DataLen = sizeof(INTER_INFO_S);
+				memcpy(callbak_data.Buf, (INTER_INFO_S *)param2, sizeof(INTER_INFO_S));
+			}
 			break;
 			
 		case CALL_STATE_RECORDHINT:
@@ -113,16 +180,17 @@ void callout_state_callbak(uint32 param1, uint32 param2)
 			break;
 			
 		case CALL_STATE_END:	
-			return;
 			break;
 
 		case CALL_TIMER:
+			callbak_data.DataLen = sizeof(uint32);
+			sprintf(callbak_data.Buf, "%d", param2);
 			break;
 
 		default:
 			break;
 	}
-
+	memcpy(cmd.strarg1, &callbak_data, sizeof(INTER_CALLBACK));
 	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 }
 
@@ -136,32 +204,44 @@ void callout_state_callbak(uint32 param1, uint32 param2)
 *************************************************/
 void callin_state_callbak(uint32 param1, uint32 param2)
 {
-	uint16 callbak_cmd;
 	Command cmd;
+	INTER_CALLBACK callbak_data;
 	
-    if (g_CommandQueue == -1)
-        return;
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
 
-	callbak_cmd = param1;
 	memset(&cmd, 0, sizeof(Command));
-	memcpy(cmd.strarg1, &callbak_cmd, sizeof(uint16));		// ǰ�������ֽڴ洢�ص����� ����Ϊ���Ĳ���
-    cmd.id = CMD_CALLIN_CALLBAK;
-	
-	
+	memset(&callbak_data, 0, sizeof(INTER_CALLBACK));
+	cmd.id = CMD_CALLIN_CALLBAK;
+	callbak_data.InterState = (uint8)param1;
+
 	switch (param1)
 	{			
 		case CALL_FORMSHOW_CALLING:
 			{
-				callbak_cmd = CALL_FORMSHOW_CALLING;
-				INTER_INFO_S *pInterInfo = (INTER_INFO_S *)param2;
-				memcpy(cmd.strarg1+sizeof(uint16), pInterInfo, sizeof(INTER_INFO_S));
+				cmd.id = CMD_GOTO_BECALL;
+				memcpy(cmd.strarg1, (PINTER_INFO_S)param2, sizeof(INTER_INFO_S));
+				dprintf("cmd.strarg1[0]: %d strarg1[1] : %x strarg1 : %s\n", cmd.strarg1[0], cmd.strarg1[1], cmd.strarg1+2);
+				mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+				return;
 			}
 			break;
 			
 		case CALL_STATE_CALLING:			
 			break;
 
-		case CALL_NEW_CALLING:			
+		case CALL_NEW_CALLING:
+			if (0 == param2)
+			{
+				callbak_data.DataLen = 0;
+			}
+			else
+			{
+				callbak_data.DataLen = sizeof(INTER_INFO_S);
+				memcpy(callbak_data.Buf, (INTER_INFO_S *)param2, sizeof(INTER_INFO_S));
+			}
 			break;
 			
 		case CALL_STATE_RECORDHINT:
@@ -177,13 +257,15 @@ void callin_state_callbak(uint32 param1, uint32 param2)
 			break;
 			
 		case CALL_TIMER:
+			callbak_data.DataLen = sizeof(uint32);
+			sprintf(callbak_data.Buf, "%d", param2);
 			break;
 
 		default:
 			return;
 			
 	}
-
+	memcpy(cmd.strarg1, &callbak_data, sizeof(INTER_CALLBACK));
 	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 }
 
@@ -200,13 +282,15 @@ void monitor_state_callbak(uint32 param1, uint32 param2)
 	Command cmd;
 	uint16 callbak_cmd;
 	
-    if (g_CommandQueue == -1)
-        return;
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
 
     callbak_cmd = param1;
 	memset(&cmd, 0, sizeof(Command));
 	memcpy(cmd.strarg1, &callbak_cmd, sizeof(uint16));		// ǰ�������ֽڴ洢�ص����� ����Ϊ���Ĳ���
-    cmd.id = CMD_CALLIN_CALLBAK;
+	cmd.id = CMD_MONITOR_CALLBAK;
 	
 	switch (param1)
 	{
@@ -231,8 +315,10 @@ void rtsp_monitor_state_callbak(uint32 param1, uint32 param2)
 	Command cmd;
 	uint16 callbak_cmd;
 	
-    if (g_CommandQueue == -1)
-        return;
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
 
     callbak_cmd = param1;
 	memset(&cmd, 0, sizeof(Command));
@@ -416,7 +502,16 @@ static void ProcessCommand(void)
 					char buf[MAX_STRARG_LEN];
 					memset(buf, 0, sizeof(buf));
 					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM12_CALLIN, buf);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM13_CALLIN, buf);
+				}
+				break;
+
+			case CMD_CALLREQUEST_CALLBAK:
+				{
+					char buf[MAX_STRARG_LEN];
+					memset(buf, 0, sizeof(buf));
+					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM11_CALLREQUEST, buf);
 				}
 				break;
 
@@ -425,7 +520,7 @@ static void ProcessCommand(void)
 					char buf[MAX_STRARG_LEN];
 					memset(buf, 0, sizeof(buf));
 					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM11_CALLOUT, buf);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM12_CALLOUT, buf);
 				}
 				break;
 
@@ -434,7 +529,7 @@ static void ProcessCommand(void)
 					char buf[MAX_STRARG_LEN];
 					memset(buf, 0, sizeof(buf));
 					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM13_MONITOR, buf);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM14_MONITOR, buf);
 				}
 				break;
 
@@ -443,7 +538,16 @@ static void ProcessCommand(void)
 					char buf[MAX_STRARG_LEN];
 					memset(buf, 0, sizeof(buf));
 					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM14_RTSP_MONITOR, buf);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM15_RTSP_MONITOR, buf);
+				}
+				break;
+
+			case CMD_GOTO_BECALL:
+				{
+					char buf[MAX_STRARG_LEN];
+					memset(buf, 0, sizeof(buf));
+					memcpy(buf, cmd.strarg1, sizeof(INTER_INFO_S));
+					LogicShowWin(SHOW_BECALL_WIN, buf);
 				}
 				break;
 				
@@ -594,6 +698,7 @@ int SceneRun(void)
 
     /* Watch keystrokes */
     dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
+
     for (;;)
     {
         bool result = false;

@@ -93,7 +93,7 @@
 /**************************************************************************/
 /*									信息								  */	
 /**************************************************************************/
-#define MSG_DIR_PATH			CFG_TEMP_DRIVE":/INFO"									// 信息文件夹		
+#define MSG_DIR_PATH			CFG_TEMP_DRIVE":/INFO"								// 信息文件夹		
 #define MSG_MANAGE_PATH			CFG_TEMP_DRIVE":/INFO/MANAGE.BIN"						// 信息管理文件
 #define MSG_VOICE_PATH			CFG_TEMP_DRIVE":/INFO/VOICE"							// 信息声音文件
 

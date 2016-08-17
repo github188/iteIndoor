@@ -38,7 +38,7 @@ bool cleanScreenOnEnter(ITUWidget* widget, char* param)
 	gCleanScreenTimeoutCount = CLEANSCREEN_TIMEOUT;
 	ituTextSetString(cleanScreenTimeText, "10");
 
-	return TRUE;
+	return true;
 }
 
 bool cleanScreenTimeoutOnTimer(ITUWidget* widget, char* param)
@@ -81,7 +81,7 @@ bool cleanScreenTimeoutOnTimer(ITUWidget* widget, char* param)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 void cleanScreenReset(void)

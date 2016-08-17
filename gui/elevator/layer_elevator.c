@@ -18,5 +18,5 @@ bool elevatorCallBtnOnClicked(ITUWidget* widget, char* param)
 {
 	printf("elevatorcall command send to logic          111111111111111111111111");
 
-	return TRUE;
+	return true;
 }

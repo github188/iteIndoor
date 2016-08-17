@@ -32,6 +32,14 @@ typedef enum
 	STYLE_MAIN_COUNT
 } MAIN_ICON_STYLE;							// 更改小图标类型
 
+typedef enum
+{
+	SHOW_MSG_WIN, 
+	SHOW_SAFETY_WIN,
+	SHOW_BECALL_WIN,
+	SHOW_MAX_WIN
+} SHOW_WIN_TYPE;							// 显示窗口
+
 // 异步操作仲裁: IO触发、感应按键、网络触发、界面入口
 // 主要处理页面跳转仲裁, 不处理媒体之间的仲裁
 typedef enum
@@ -138,6 +146,17 @@ Return:		无
 Others:
 *************************************************/
 uint32 change_char_to_ip(uint8* ipaddr);
+
+/*************************************************
+Function:		LogicShowWin
+Description:	逻辑回调显示窗口
+Input:
+1.type			显示类型
+Output:			无
+Return:			无
+Others:
+*************************************************/
+void LogicShowWin(SHOW_WIN_TYPE type, char* param);
 
 #ifdef __cplusplus 
 }

@@ -92,6 +92,7 @@ const VIDEO_SDP_PARAM g_lyly_venc_parm =
     .resver2 = 0,									// 保留位						
 };
 
+static CALL_INFO g_CallRequestInfo;
 static CALL_INFO g_CallInfo;
 static PCALL_NODE_INFO g_CallList = NULL;  			// 呼叫地址信息
 
@@ -138,6 +139,12 @@ uint32 g_Manager_Index[MANAGER_COUNTS_MAX] = {0,};			// 从服务器获取的管理机设备
 	{\
 		g_BeCallInfo.gui_notify((param1), (param2));\
 	}
+
+#define CallRequestGuiNotify(param1, param2)\
+if (g_CallRequestInfo.gui_notify)\
+{\
+	g_CallRequestInfo.gui_notify((param1), (param2)); \
+}
 
 /*************************************************
   Function:			fill_call_destdevno
@@ -554,12 +561,12 @@ static void * callout_proc(void *arg)
 		strcpy(DeviceNo, g_CallInfo.CallNo2);
 
 		// 呼出记录 此函数耗时比较多，注意此函数执行过程媒体状态改变的情况
-		//add_inter_record(OUTGOING, g_CallInfo.RemoteDeviceType, g_CallInfo.CallNo2);
+		add_inter_record(OUTGOING, g_CallInfo.RemoteDeviceType, g_CallInfo.CallNo2);
 		
 		// 回调GUI: 当前处于连接状态-开始获取IP
 		g_PreCallOutState = CALL_STATE_REQUEST;
 		memset(tmp, 0, sizeof(tmp));		
-		CallGuiNotify(CALL_STATE_REQUEST, (uint32)tmp);
+		CallRequestGuiNotify(CALL_STATE_REQUEST, (uint32)tmp);
 
 		// 获取IP地址
 		if (g_CallInfo.isNat == FALSE)
@@ -655,7 +662,7 @@ static void * callout_proc(void *arg)
 			{
 				tmp[0] = 1;
 				strcpy(tmp+1, g_CallInfo.CallNo2);
-				CallGuiNotify(CALL_STATE_REQUEST, (uint32)tmp);
+				CallRequestGuiNotify(CALL_STATE_REQUEST, (uint32)tmp);
 				g_CallInfo.state = CALL_STATE_CALLING;
 			}
 		}
@@ -665,6 +672,7 @@ static void * callout_proc(void *arg)
 	{
 		uint8 g_SendCall = 1;
 		uint8 house_desc[100] = {0};
+		usleep(20*1000);
 		CallGuiNotify(g_CallInfo.state, 0);
 		
 		if (g_RandSeed == 0xFFFF)
@@ -702,7 +710,7 @@ static void * callout_proc(void *arg)
 		#endif
 		
 		// 中心呼出记录
-		if (g_CallInfo.RemoteDeviceType == DEVICE_TYPE_MANAGER)
+		if (g_CallInfo.RemoteDeviceType == DEVICE_TYPE_MANAGER || (g_CallInfo.RemoteDeviceType == DEVICE_TYPE_ROOM && g_CallInfo.IsTerminal != -1))
 		{
 			add_inter_record(OUTGOING, g_CallInfo.RemoteDeviceType, g_CallInfo.CallNo2);
 		}	
@@ -935,6 +943,7 @@ static void * callout_proc(void *arg)
 	{
 		ret = FALSE;
 		CallGuiNotify(g_CallInfo.state, 0);
+		usleep(20*1000);
 		media_enable_audio_aec();
 		uint8 TalkVolume = storage_get_talkvolume();
 		
@@ -1012,7 +1021,7 @@ static void * callout_proc(void *arg)
 
 					// 消逝时间+剩余通话时间
 					temp = (g_CallInfo.TimeOut << 16) | HeartParam.Times;
-					//CallGuiNotify(CALL_TIMER, temp);	
+					CallGuiNotify(CALL_TIMER, temp);	
 				}
 			}
 			set_nethead(g_CallDestNo, PRIRY_DEFAULT);
@@ -1065,7 +1074,14 @@ static void * callout_proc(void *arg)
 	sys_set_intercomm_state(FALSE);
 	
 	g_CallInfo.state = CALL_STATE_END;
-	CallGuiNotify(g_CallInfo.state, g_ErrType);
+	if (g_ErrType == END_BY_REQUESET_ERR)
+	{
+		CallRequestGuiNotify(g_CallInfo.state, g_ErrType);
+	}
+	else
+	{
+		CallGuiNotify(g_CallInfo.state, g_ErrType);
+	}
 	g_ErrType = END_BY_SELF_ERR;
 	g_CallInfo.state = CALL_STATE_NONE;
 	g_PreCallOutState = CALL_STATE_NONE;
@@ -1208,7 +1224,7 @@ static void * becall_proc(void *arg)
 			{
 				g_RemainTime = LEAVEWORD_TIMEOUT - g_BeCallInfo.TimeOut;
 				temp = g_CallInfo.TimeOut << 16 | g_RemainTime;
-				BeCallGuiNotify(CALL_TIMER, temp);
+				//BeCallGuiNotify(CALL_TIMER, temp);
 			}
 			else
 			{
@@ -2099,7 +2115,7 @@ static int32 call_in(const PRECIVE_PACKET recPacket)
   Return:			
   Others:
 *************************************************/
-static void new_call_in(const PRECIVE_PACKET recPacket, char *NewCallNo)
+static void new_call_in(const PRECIVE_PACKET recPacket, INTER_INFO_S* NewCallInfo)
 {
 	char *data = NULL;
 	char LocalDevStr[30] = {0};
@@ -2226,10 +2242,6 @@ static void new_call_in(const PRECIVE_PACKET recPacket, char *NewCallNo)
 	}
 	
 	CallNo[29] = RemoteDeviceType;
-	if (NewCallNo)
-	{
-		memcpy(NewCallNo, CallNo, sizeof(CallNo));
-	}
 
 	g_NewBeCallInfo.address = recPacket->address;		
 	memset(g_NewBeCallInfo.CallNo1, 0, sizeof(g_NewBeCallInfo.CallNo1));
@@ -2237,6 +2249,12 @@ static void new_call_in(const PRECIVE_PACKET recPacket, char *NewCallNo)
 	sprintf(g_NewBeCallInfo.CallNo1, "%s", CallNo);
 	g_NewBeCallInfo.CallNo1[29] = 0;
 	g_NewBeCallInfo.RemoteDeviceType = RemoteDeviceType;
+	if (NewCallInfo)
+	{
+		NewCallInfo->InterType = INTER_CALLIN_E;
+		NewCallInfo->DevType =	g_NewBeCallInfo.RemoteDeviceType;
+		sprintf(NewCallInfo->DevStr, "%s", g_NewBeCallInfo.CallNo1);	
+	}
 }
 
 #ifdef _DOOR_PHONE_
@@ -2794,6 +2812,235 @@ int32 inter_call_manager(char *InputNo)
 }
 
 /*************************************************
+Function:			from_center_get_manager
+Description:		向中心机获取管理员机IP
+Input:				无
+Output:				无
+Return:				ip
+Others:				无
+*************************************************/
+static uint32 from_center_get_manager(void)
+{
+	uint8 EchoValue, ret, i;
+	uint16 ReciSize;
+	char RecData[200];
+	uint32 CenterIp = storage_get_center_ip();
+
+	for (i = 0; i < MANAGER_COUNTS_MAX; i++)
+	{
+		g_Manager_IP[i] = 0;
+	}
+	set_nethead(G_CENTER_DEVNO, PRIRY_DEFAULT);
+	ret = net_send_command(CMD_GET_MANAGER_IP, NULL, 0, CenterIp, NETCMD_UDP_PORT, 2, &EchoValue, RecData, &ReciSize);
+	if (ret == TRUE)
+	{
+		if (EchoValue == ECHO_OK && ReciSize == 8)
+		{
+			g_Manager_IP[0] = *(uint32 *)RecData;
+			return g_Manager_IP[0];
+		}
+	}
+	return 0;
+}
+
+/*************************************************
+Function:			logic_call_sub_terminal
+Description:		呼叫分机
+Input:
+1.InPutNo			输入号码
+Output:				无
+Return:				0 成功
+Others:				无
+*************************************************/
+int32 logic_call_sub_terminal(char *InputNo)
+{
+	PFULL_DEVICE_NO dev = storage_get_devparam();
+	uint32 LocalAreaCode = dev->AreaNo;
+	char no[50] = { 0 };								// 输入号码
+	char DeviceNo[50] = { 0 };						// 获取IP的设备号码
+	int32 len = 0;
+	int32 ret = 0;
+	uint32 ipaddr = 0;
+
+	strcpy(no, InputNo);
+	len = strlen(no);
+	if (len != 1)
+	{
+		return FALSE;
+	}
+	if (no[0] < '0' || no[0] > '7')
+	{
+		return FALSE;
+	}
+	strncpy(DeviceNo, dev->DeviceNoStr, dev->DevNoLen);
+	if (DeviceNo[dev->DevNoLen - 1] == no[0])		// 与本机分机号重复
+	{
+		return FALSE;
+	}
+
+	ipaddr = storage_get_subdev_ip(atoi(no));
+	printf("ipaddr : %0x\n", ipaddr);
+	if (ipaddr <= 0)
+	{
+		return FALSE;
+	}
+
+	DeviceNo[dev->DevNoLen - 1] = no[0];
+	DeviceNo[dev->DevNoLen] = 0;
+	dprintf("lgoic_call.c : logic_call_resident : DeviceNo = %s\n", DeviceNo);
+
+	if (g_CallList)
+	{
+		free(g_CallList);
+	}
+	g_CallList = malloc(sizeof(CALL_NODE_INFO));
+	memset(g_CallList, 0, sizeof(CALL_NODE_INFO));
+	g_CallListNum = 1;
+	g_CallList[0].address = ipaddr;
+	g_CallList[0].port = NETCMD_UDP_PORT;
+	g_CallList[0].EchoValue = TRC_UNKNOWN;
+
+	g_CallInfo.TimeMax = FENJI_TALK_TIMEOUT;
+	g_CallInfo.AudioPt = CALL_RTP_AUDIO_PT;
+	g_CallInfo.VideoPt = CALL_RTP_VIDEO_PT;
+	g_CallInfo.LocalAudioSendrecv = _SENDRECV;
+	g_CallInfo.LocalVideoSendrecv = _NONE;		// 低成本AH8不做室内机间视频
+	g_CallInfo.LocalAudioPort = NETAUDIO_UDP_PORT;
+	g_CallInfo.LocalVideoPort = 0;
+	g_CallInfo.RemoteDeviceType = DEVICE_TYPE_ROOM;
+	g_CallInfo.RemoteAreaNo = LocalAreaCode;
+	g_CallInfo.isNat = FALSE;
+	g_CallInfo.IsTerminal = no[0] - '0';
+
+	memset(g_CallRefuseList, 0, sizeof(g_CallRefuseList));
+	memset(g_CallInfo.CallNo1, 0, sizeof(g_CallInfo.CallNo1));
+	g_CallRefuseNum = 0;
+	strcpy(g_CallInfo.CallNo1, dev->DeviceNoStr);
+	g_CallInfo.CallNo1[29] = g_CallInfo.RemoteDeviceType;
+	memset(g_CallInfo.CallNo2, 0, sizeof(g_CallInfo.CallNo2));
+	strcpy(g_CallInfo.CallNo2, DeviceNo);
+
+	ret = sys_set_intercomm_state(TRUE);
+	if (ret != 0)
+	{
+		return FALSE;
+	}
+
+	g_CallInfo.state = CALL_STATE_CALLING;
+	fill_call_destdevno(InputNo, g_CallInfo.RemoteAreaNo);
+	ret = call_out();
+
+	return ret;
+}
+
+/*************************************************
+Function:			logic_call_center
+Description:		呼叫管理员机
+Input:
+1.InPutNo			输入号码
+Output:				无
+Return:				0 成功
+Others:
+*************************************************/
+int32 logic_call_center(char *InputNo)
+{
+	PFULL_DEVICE_NO dev = storage_get_devparam();
+	uint32 LocalAreaCode = dev->AreaNo;
+	char DeviceNo[50] = { 0 };						// 获取IP的设备号码
+	int32 len = 0;
+	uint32 ipaddr = 0;
+	uint32 ManagerNo = 0;
+	int32 ret = 0;
+
+	strcpy(DeviceNo, InputNo);
+
+	len = strlen(DeviceNo);
+
+	if (len != MANAGER_LEN)
+	{
+		return FALSE;
+	}
+
+	ManagerNo = atoi(DeviceNo);
+	switch (ManagerNo)
+	{
+	case MANAGER_NUM + 1:
+		ipaddr = storage_get_manager_ip(1);
+		break;
+
+	case MANAGER_NUM + 2:
+		ipaddr = storage_get_manager_ip(2);
+		break;
+
+	case MANAGER_NUM + 3:
+		ipaddr = storage_get_manager_ip(3);
+		break;
+
+	case 0xFF:
+		ipaddr = from_center_get_manager();
+		break;
+
+	default:
+		break;	// 中心机可能超过三台
+	}
+	if (ipaddr <= 0)
+	{
+		return FALSE;
+	}
+	dprintf("lgoic_call.c : logic_call_resident : DeviceNo = %s, ipaddr = 0x%x\n", DeviceNo, ipaddr);
+
+	if (g_CallList)
+	{
+		free(g_CallList);
+	}
+	g_CallList = malloc(sizeof(CALL_NODE_INFO));
+	memset(g_CallList, 0, sizeof(CALL_NODE_INFO));
+	g_CallListNum = 1;
+	g_CallList[0].address = ipaddr;
+	g_CallList[0].port = NETCMD_UDP_PORT;
+	g_CallList[0].EchoValue = TRC_UNKNOWN;
+
+	g_CallInfo.TimeMax = 90;
+	g_CallInfo.AudioPt = CALL_RTP_AUDIO_PT;
+	g_CallInfo.VideoPt = CALL_RTP_VIDEO_PT;
+
+	g_CallInfo.LocalAudioSendrecv = _SENDRECV;
+#ifdef _MANAGER_IS_VIDEO_
+	g_CallInfo.LocalVideoSendrecv = _RECVONLY;
+#else
+	g_CallInfo.LocalVideoSendrecv = _NONE;
+#endif
+	g_CallInfo.LocalAudioPort = NETAUDIO_UDP_PORT;
+
+#ifdef _MANAGER_IS_VIDEO_
+	g_CallInfo.LocalVideoPort = NETVIDEO_UDP_PORT;
+#else
+	g_CallInfo.LocalVideoPort = 0;
+#endif										
+	g_CallInfo.RemoteDeviceType = DEVICE_TYPE_MANAGER;
+	g_CallInfo.RemoteAreaNo = LocalAreaCode;
+	g_CallInfo.isNat = FALSE;
+
+	memset(g_CallInfo.CallNo1, 0, sizeof(g_CallInfo.CallNo1));
+	strcpy(g_CallInfo.CallNo1, dev->DeviceNoStr);
+	g_CallInfo.CallNo1[29] = g_CallInfo.RemoteDeviceType;
+	memset(g_CallInfo.CallNo2, 0, sizeof(g_CallInfo.CallNo2));
+	strcpy(g_CallInfo.CallNo2, DeviceNo);
+	g_MoveTempTimes = 0;
+
+	ret = sys_set_intercomm_state(TRUE);
+	if (ret != 0)
+	{
+		return FALSE;
+	}
+	fill_call_destdevno(InputNo, g_CallInfo.RemoteAreaNo);
+	g_CallInfo.state = CALL_STATE_CALLING;
+	ret = call_out();
+
+	return ret;
+}
+
+/*************************************************
   Function:				inter_answer_call
   Description:			被叫接听
   Input: 			
@@ -2917,16 +3164,18 @@ void inter_hand_down(void)
   Function:				inter_call_ini
   Description:			对讲初始化
   Input: 	
-  	1.CallGuiNotify		呼叫GUI回调函数
-  	2.BeCallGuiNotify	被叫GUI回调函数
+	1.CallRequestGuiNotify	请求时GUI回调函数
+  	2.CallGuiNotify			呼叫GUI回调函数
+  	3.BeCallGuiNotify		被叫GUI回调函数
   Output:				无
   Return:				
   Others:
 *************************************************/
-void inter_call_ini(PFGuiNotify CallGuiNotify, PFGuiNotify BeCallGuiNotify)
+void inter_call_ini(PFGuiNotify CallRequestGuiNotify, PFGuiNotify CallGuiNotify, PFGuiNotify BeCallGuiNotify)
 {
 	g_CallInfo.gui_notify = CallGuiNotify;
 	g_BeCallInfo.gui_notify = BeCallGuiNotify;
+	g_CallRequestInfo.gui_notify = CallRequestGuiNotify;
 }
 
 /*************************************************
@@ -3228,7 +3477,8 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 					else															
 					{
 						// 新的呼入提示
-						char CallNo[30] = {0};
+						INTER_INFO_S CallInfo;
+						memset(&CallInfo, 0, sizeof(INTER_INFO_S));
 						if (g_CallInfo.state == CALL_STATE_TALK)
 						{
 							/*
@@ -3244,8 +3494,8 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 							// modi by luofl 2011-09-09解决在通话中只显示一个新来电问题
 							//if (g_NewBeCallInfo.ID == 0)
 							{
-								new_call_in(recPacket, CallNo);
-								CallGuiNotify(CALL_NEW_CALLING, (uint32)CallNo);
+								new_call_in(recPacket, &CallInfo);
+								CallGuiNotify(CALL_NEW_CALLING, &CallInfo);
 							}	
 						}
 						state = TRC_BUSY;
@@ -3272,8 +3522,8 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 					else
 					{
 						// 新的呼入提示
-						char CallNo[30]; 
-						memset(CallNo, 0, sizeof(CallNo));
+						INTER_INFO_S CallInfo;
+						memset(&CallInfo, 0, sizeof(INTER_INFO_S));
 						if (g_BeCallInfo.state == CALL_STATE_TALK)
 						{
 							/*
@@ -3288,8 +3538,8 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 							// modi by luofl 2011-09-09解决在通话中只显示一个新来电问题
 							//if (g_NewBeCallInfo.ID == 0)
 							{
-								new_call_in(recPacket, CallNo);
-								BeCallGuiNotify(CALL_NEW_CALLING, (uint32)CallNo);
+								new_call_in(recPacket, &CallInfo);
+								BeCallGuiNotify(CALL_NEW_CALLING, &CallInfo);
 							}
 						}
 						state = TRC_BUSY;
@@ -3485,9 +3735,9 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 				if (recPacket->address != g_BeCallInfo.address && recPacket->address != g_CallInfo.address)	
 				{
 					// add by luofl 2011-09-20 修正未接来电中记录有时为空的问题
-					char CallNo[30]; 
-					memset(CallNo, 0, sizeof(CallNo));
-					new_call_in(recPacket, CallNo);
+					INTER_INFO_S CallInfo;
+					memset(&CallInfo, 0, sizeof(INTER_INFO_S));
+					new_call_in(recPacket, &CallInfo);
 					add_inter_record(MISSED, g_NewBeCallInfo.RemoteDeviceType, g_NewBeCallInfo.CallNo1);
 					memset(&g_NewBeCallInfo, 0, sizeof(g_NewBeCallInfo));
 					BeCallGuiNotify(CALL_NEW_CALLING, 0);

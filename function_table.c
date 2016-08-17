@@ -1,26 +1,5 @@
 ﻿#include "gui_include.h"
 
-// CallLayer
-extern bool CallLayerOnEnter(ITUWidget* widget, char* param);
-extern bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool CallKeyBordButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool CallKeyBordCalloutButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool CallKeyBordDelButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool CallLayerOnTimer(ITUWidget* widget, char* param);
-extern bool CallKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param);
-extern bool CallRecordListButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool CallCeterListButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param);
-
-// MonitorSearch
-extern bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param);
-extern bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param);
-extern bool MonitorSearchMSGButtonOnMouseUp(ITUWidget* widget, char* param);
-
-
-
-
 ITUActionFunction actionFunctions[] =
 {
     //mainMenu
@@ -69,12 +48,23 @@ ITUActionFunction actionFunctions[] =
 	"CallRecordListButtonOnMouseUp", CallRecordListButtonOnMouseUp,
 	"CallCeterListButtonOnMouseUp", CallCeterListButtonOnMouseUp,
 	"CallRecordMSGButtonOnMouseUp", CallRecordMSGButtonOnMouseUp,
+	"CallCallRequestState", CallCallRequestState,
 	
 	// MonitorSearch
 	"MonitorSearchLayerOnEnter", MonitorSearchLayerOnEnter,
 	"MonitorSearchLayerButtonOnMouseUp", MonitorSearchLayerButtonOnMouseUp,
 	"MonitorSearchListButtonOnMouseUp", MonitorSearchListButtonOnMouseUp,
 	"MonitorSearchMSGButtonOnMouseUp", MonitorSearchMSGButtonOnMouseUp,
+
+	// BeCall
+	"BeCallLayerOnEnter", BeCallLayerOnEnter,
+	"BeCallLayerButtonOnMouseUp", BeCallLayerButtonOnMouseUp,
+	"BeCallShowButtomBackgroundOnMouseUp", BeCallShowButtomBackgroundOnMouseUp,
+	"BeCallButtomSoundButtonOnMouseUp", BeCallButtomSoundButtonOnMouseUp,
+	"BeCallButtomSoundOnChanged", BeCallButtomSoundOnChanged,
+	"BeCallLayerOnTimer", BeCallLayerOnTimer,
+	"BeCallCallOutState", BeCallCallOutState,
+	"BeCallCallInState", BeCallCallInState,
 
 	//Set_Botton_Return_Layer
 	"SetBottonReturnOnEnter", SetBottonReturnOnEnter,

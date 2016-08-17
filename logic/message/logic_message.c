@@ -158,7 +158,7 @@ static void recv_msg_start(const PRECIVE_PACKET recPacket)
 	ID = net_start_multipacket_recive(recPacket->address, recPacket->port, 0, save_msg, update_msg_recv_state);
 	if (ID == 0)
 	{
-		dprintf("net_start_multipacket_recive = 0\n");
+		dprintf("net_start_multipacket_recive ECHO_BUSY 0\n");
 		net_send_echo_packet(recPacket, ECHO_BUSY, data, 4);	
 		return;
 	} 

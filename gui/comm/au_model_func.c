@@ -27,7 +27,7 @@ int32 ui_show_win_arbitration(SYS_ASYN_OPER_TYPE OperType)
 {
 	uint8 flg = FALSE;
 	SYS_MEDIA_TYPE CurState;
-	//CurState = sys_get_media_state();
+	CurState = sys_get_media_state();
 	
 	//ui_back_main_page();							// 退回到主界面
 	//SetScreenTimer();								// 开屏
@@ -199,6 +199,7 @@ char * get_houseno_desc(char * numtext, char * temp)
         }
     }
     sprintf(temp,"%s",tmp);
+
     return temp;
 }
 
@@ -570,3 +571,33 @@ uint8 check_ip_to_true(char *ip)
 	return TRUE;
 }
 
+/*************************************************
+Function:		LogicShowWin
+Description:	逻辑回调显示窗口
+Input:
+1.type			显示类型
+Output:			无
+Return:			无
+Others:
+*************************************************/
+void LogicShowWin(SHOW_WIN_TYPE type, char* param)
+{
+	switch (type)
+	{
+		case SHOW_MSG_WIN:
+			break;
+
+		case SHOW_SAFETY_WIN:
+			break;
+
+		case SHOW_BECALL_WIN:
+			{
+				PINTER_INFO_S pcallbak_data = (PINTER_INFO_S)param;
+				BeCallWin(pcallbak_data);
+			}
+			break;
+
+		default:
+			break;
+	}
+}

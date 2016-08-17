@@ -208,25 +208,16 @@ MSGLIST * storage_read_msg_list(void)
 		dprintf("storage_read_msg_list NULL == pinfolist \n");
 		return NULL;
 	}
+	memset(pinfolist, 0, sizeof(MSGLIST));
 	memcpy(path, MSG_MANAGE_PATH, sizeof(MSG_MANAGE_PATH));
 
 	fPListFile = fopen(path, "r");
-	if (NULL == fPListFile)
-    {
-    	free(pinfolist);
-		return NULL;
-    }
-	else
+	if (fPListFile)    
 	{
 		fread(pinfolist, sizeof(MSGLIST), 1, fPListFile);
-	}
-	
-	if (fPListFile)
-	{
 		fclose(fPListFile);
     	fPListFile = NULL;
-	}
-
+	}	
 	return pinfolist;
 }
 

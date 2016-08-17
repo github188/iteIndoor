@@ -55,7 +55,7 @@ bool informationLayerOnEnter(ITUWidget* widget, char* param)
 	ituCoverFlowGoto(informationMSGListCoverFlow, 0);
 	setInformationList();
 
-	return TRUE;
+	return true;
 }
 
 void informationLayerInit(INFORMATION_PAGE_e page)
@@ -105,37 +105,37 @@ void informationLayerInit(INFORMATION_PAGE_e page)
 		informationTipsTransparencyBackground = ituSceneFindWidget(&theScene, "informationTipsTransparencyBackground");
 		assert(informationTipsTransparencyBackground);
 	}
-	ituWidgetSetVisible(informationTipsTransparencyBackground, FALSE);
+	ituWidgetSetVisible(informationTipsTransparencyBackground, false);
 
 
 	switch (page)
 	{
 	case INFORMATION_LIST_PAGE:
-		ituWidgetSetVisible(informationMSGContentContainer, FALSE);
-		ituWidgetSetVisible(informationMSGListCoverFlow, TRUE);
+		ituWidgetSetVisible(informationMSGContentContainer, false);
+		ituWidgetSetVisible(informationMSGListCoverFlow, true);
 
-		ituWidgetSetVisible(informationDeleteContainer, FALSE);
-		ituWidgetSetVisible(informationEmptyContainer, TRUE);
+		ituWidgetSetVisible(informationDeleteContainer, false);
+		ituWidgetSetVisible(informationEmptyContainer, true);
 
-		ituWidgetSetVisible(informationPreContainer, FALSE);
-		ituWidgetSetVisible(informationNullContainer4, TRUE);
+		ituWidgetSetVisible(informationPreContainer, false);
+		ituWidgetSetVisible(informationNullContainer4, true);
 
-		ituWidgetSetVisible(informationNextContainer, FALSE);
-		ituWidgetSetVisible(informationNullContainer5, TRUE);
+		ituWidgetSetVisible(informationNextContainer, false);
+		ituWidgetSetVisible(informationNullContainer5, true);
 		break;
 
 	case INFORMATION_CONTENT_PAGE:
-		ituWidgetSetVisible(informationMSGListCoverFlow, FALSE);
-		ituWidgetSetVisible(informationMSGContentContainer, TRUE);
+		ituWidgetSetVisible(informationMSGListCoverFlow, false);
+		ituWidgetSetVisible(informationMSGContentContainer, true);
 
-		ituWidgetSetVisible(informationEmptyContainer, FALSE);
-		ituWidgetSetVisible(informationDeleteContainer, TRUE);
+		ituWidgetSetVisible(informationEmptyContainer, false);
+		ituWidgetSetVisible(informationDeleteContainer, true);
 		
-		ituWidgetSetVisible(informationNullContainer4, FALSE);
-		ituWidgetSetVisible(informationPreContainer, TRUE);
+		ituWidgetSetVisible(informationNullContainer4, false);
+		ituWidgetSetVisible(informationPreContainer, true);
 
-		ituWidgetSetVisible(informationNullContainer5, FALSE);
-		ituWidgetSetVisible(informationNextContainer, TRUE);
+		ituWidgetSetVisible(informationNullContainer5, false);
+		ituWidgetSetVisible(informationNextContainer, true);
 		break;
 
 	default:
@@ -170,7 +170,7 @@ bool informationBtnOnClicked(ITUWidget* widget, char* param)
 		break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 bool informationMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
@@ -185,8 +185,8 @@ bool informationMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 		else
 		{
 			//TODO:这里写删除一条的操作，删除完退出信息内容界面！！！！！！！
-			ituWidgetSetVisible(informationMSGContentContainer, FALSE);
-			ituWidgetSetVisible(informationMSGListCoverFlow, TRUE);
+			ituWidgetSetVisible(informationMSGContentContainer, false);
+			ituWidgetSetVisible(informationMSGListCoverFlow, true);
 		}
 		break;
 
@@ -195,9 +195,9 @@ bool informationMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	}
 
 	ituWidgetEnable(informationBackground);
-	ituWidgetSetVisible(informationTipsTransparencyBackground, FALSE);
+	ituWidgetSetVisible(informationTipsTransparencyBackground, false);
 
-	return TRUE;
+	return true;
 }
 
 bool setInformationIsReaded(uint8_t index, INFORMATION_MSGICON_STATUS_e status)
@@ -216,25 +216,25 @@ bool setInformationIsReaded(uint8_t index, INFORMATION_MSGICON_STATUS_e status)
 	switch (status)
 	{	
 	case INFORMATION_MSGICON_READED:
-		ituWidgetSetVisible(informationMSGListUnReadIcon, FALSE);
-		ituWidgetSetVisible(informationMSGListReadIcon, TRUE);
+		ituWidgetSetVisible(informationMSGListUnReadIcon, false);
+		ituWidgetSetVisible(informationMSGListReadIcon, true);
 		break;
 
 	case INFORMATION_MSGICON_UNREADED:
-		ituWidgetSetVisible(informationMSGListReadIcon, FALSE);
-		ituWidgetSetVisible(informationMSGListUnReadIcon, TRUE);
+		ituWidgetSetVisible(informationMSGListReadIcon, false);
+		ituWidgetSetVisible(informationMSGListUnReadIcon, true);
 		break;
 
 	case INFORMATION_MSGICON_HIDE:
-		ituWidgetSetVisible(informationMSGListReadIcon, FALSE);
-		ituWidgetSetVisible(informationMSGListUnReadIcon, FALSE);
+		ituWidgetSetVisible(informationMSGListReadIcon, false);
+		ituWidgetSetVisible(informationMSGListUnReadIcon, false);
 		break;
 
 	default:
 		break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 bool setInformationListSender(uint8_t index, char* senderStr)
@@ -248,7 +248,7 @@ bool setInformationListSender(uint8_t index, char* senderStr)
 	ituTextSetString(informationMSGListSenderText, senderStr);
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
-	return TRUE;
+	return true;
 }
 
 bool setInformationListTheme(uint8_t index, char* themeStr)
@@ -271,7 +271,7 @@ bool setInformationListTheme(uint8_t index, char* themeStr)
 	}
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
-	return TRUE;
+	return true;
 }
 
 bool setInformationListTime(uint8_t index, char* timeStr)
@@ -285,7 +285,7 @@ bool setInformationListTime(uint8_t index, char* timeStr)
 	ituTextSetString(informationMSGListTimeText, timeStr);
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
-	return TRUE;
+	return true;
 }
 
 bool setInformationListIsVisible(uint8_t index, bool status)
@@ -295,7 +295,7 @@ bool setInformationListIsVisible(uint8_t index, bool status)
 	if (index >= MAX_INFORMATION_NUM)
 	{
 		printf("setting index overflow!!!!!!!!!!");
-		return FALSE;
+		return false;
 	}
 	else
 	{
@@ -305,7 +305,7 @@ bool setInformationListIsVisible(uint8_t index, bool status)
 
 		ituWidgetSetVisible(informationMSGListContainer, status);
 	}
-	return TRUE;
+	return true;
 }
 
 bool informationMSGListClicked(ITUWidget* widget, char* param)
@@ -313,7 +313,7 @@ bool informationMSGListClicked(ITUWidget* widget, char* param)
 	informationLayerInit(INFORMATION_CONTENT_PAGE);
 	setInformationContent(atoi(param));
 
-	return TRUE;
+	return true;
 }
 
 void setInformationContent(uint8_t index)
@@ -413,19 +413,19 @@ bool setInformationContentImage(char* imageStr)
 	else
 	{
 		printf("open  minipic jepg icon icon failed!");
-		ituWidgetSetVisible(informationMSGContentImageIcon, FALSE);
-		return FALSE;
+		ituWidgetSetVisible(informationMSGContentImageIcon, false);
+		return false;
 	}
 	if (gInformationImageData)
 	{
 		ituIconLoadJpegData((ITUIcon*)informationMSGContentImageIcon, gInformationImageData, gInformationImageSize);
-		return TRUE;
+		return true;
 	}
 	else
 	{
 		printf("load minipic jepg icon failed!");
-		ituWidgetSetVisible(informationMSGContentImageIcon, FALSE);
-		return FALSE;
+		ituWidgetSetVisible(informationMSGContentImageIcon, false);
+		return false;
 	}
 }
 
@@ -445,8 +445,8 @@ void informationReturnBtnOnClicked()
 
 	if (ituWidgetIsVisible(informationMSGContentContainer))
 	{
-		/*ituWidgetSetVisible(informationMSGContentContainer, FALSE);
-		ituWidgetSetVisible(informationMSGListCoverFlow, TRUE);*/
+		/*ituWidgetSetVisible(informationMSGContentContainer, false);
+		ituWidgetSetVisible(informationMSGListCoverFlow, true);*/
 		informationLayerInit(INFORMATION_LIST_PAGE);
 	}
 	else
@@ -458,21 +458,21 @@ void informationReturnBtnOnClicked()
 		}
 		ituLayerGoto(mainLayer);
 	}
-	//return TRUE;
+	//return true;
 }
 
 void informationNextMsgBtnOnClicked()
 {
 	printf("informationNextMsgBTNOnClicked 111111111111111111111111111111");
 
-	//return TRUE;
+	//return true;
 }
 
 void informationPreMsgBtnOnClicked()
 {
 	printf("informationPreMsgBTNOnClicked 111111111111111111111111111111");
 
-	//return TRUE;
+	//return true;
 }
 
 void informationMsgBoxShow(INFORMATION_BTN_e index)
@@ -504,12 +504,12 @@ void informationMsgBoxShow(INFORMATION_BTN_e index)
 	}
 
 	ituWidgetDisable(informationBackground);
-	ituWidgetSetVisible(informationTipsTransparencyBackground, TRUE);
+	ituWidgetSetVisible(informationTipsTransparencyBackground, true);
 }
 
 void setInformationList()
 {
-	bool a = FALSE;
+	bool a = false;
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
 	uint8_t msgNum = 0;
@@ -548,7 +548,7 @@ void setInformationList()
 			}
 			else
 			{
-				setInformationListIsVisible(i, FALSE);
+				setInformationListIsVisible(i, false);
 			}
 		}
 		else
@@ -570,7 +570,7 @@ void setInformationList()
 			}
 			else
 			{
-				setInformationListIsVisible(i, FALSE);
+				setInformationListIsVisible(i, false);
 			}
 		}
 
@@ -586,16 +586,16 @@ void setInformationList()
 		{
 			if ((i == (msgNum / INFORMATION_PER_PAGE)) && (msgNum % INFORMATION_PER_PAGE) == 0)
 			{
-				ituWidgetSetVisible(informationPageContainer, FALSE);
+				ituWidgetSetVisible(informationPageContainer, false);
 			}
 			else
 			{
-				ituWidgetSetVisible(informationPageContainer, TRUE);
+				ituWidgetSetVisible(informationPageContainer, true);
 			}
 		}
 		else
 		{
-			ituWidgetSetVisible(informationPageContainer, FALSE);
+			ituWidgetSetVisible(informationPageContainer, false);
 
 		}
 	}

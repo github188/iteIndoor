@@ -107,7 +107,7 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	gSOSIsAlarm = false;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
-	return TRUE;
+	return true;
 }
 
 
@@ -157,11 +157,12 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 			gSOSBtnLongPressCount++;
 			if (gSOSBtnLongPressCount >= 3)
 			{
-				setSOSBtnType(TRUE);
+				setSOSBtnType(true);
 				//TODO:逻辑发送SOS求助命令！！
 				if (gSOSIsAlarm == false)
 				{
 					gSOSIsAlarm = true;
+					printf("11111111111111111 gSOSIsAlarm!!! ");
 					sos_alarm_report();
 				}
 			}
@@ -169,7 +170,7 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 		else
 		{
 			gSOSIsAlarm = false;
-			setSOSBtnType(FALSE);
+			setSOSBtnType(false);
 			gSOSBtnLongPressCount = 0;
 		}
 	}
@@ -182,16 +183,17 @@ bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 {
 	if (atoi(param) == 0)
 	{
-		gSOSBtnIsPress = TRUE;
+		gSOSBtnIsPress = true;
 		gSOSBtnLongPressCount = 0;
 	}
 	else
 	{
-		gSOSBtnIsPress = FALSE;
+		gSOSBtnIsPress = false;
 	}
 
 	return true;
 }
+
 
 void zoneDateTimeToString(DATE_TIME time, char* tmpStr)
 {
@@ -208,6 +210,12 @@ void mainLayerCornerNumReload()
 	setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
 	setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
 	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
+}
+
+
+void mainLayerScrollDataReload()
+{
+
 }
 
 
@@ -248,13 +256,13 @@ void setNetworkStatus(bool status)
 	}
 	if (status)
 	{
-		ituWidgetSetVisible(mainNetStatusOffIcon, FALSE);
-		ituWidgetSetVisible(mainNetStatusOnSprite, TRUE);
+		ituWidgetSetVisible(mainNetStatusOffIcon, false);
+		ituWidgetSetVisible(mainNetStatusOnSprite, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(mainNetStatusOnSprite, FALSE);
-		ituWidgetSetVisible(mainNetStatusOffIcon, TRUE);
+		ituWidgetSetVisible(mainNetStatusOnSprite, false);
+		ituWidgetSetVisible(mainNetStatusOffIcon, true);
 	}
 }
 
@@ -296,13 +304,13 @@ void setSOSBtnType(bool status)
 	}
 	if (status)
 	{
-		ituWidgetSetVisible(mainSOSOffButton, FALSE);
-		ituWidgetSetVisible(mainSOSOnButton, TRUE);
+		ituWidgetSetVisible(mainSOSOffButton, false);
+		ituWidgetSetVisible(mainSOSOnButton, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(mainSOSOnButton, FALSE);
-		ituWidgetSetVisible(mainSOSOffButton, TRUE);
+		ituWidgetSetVisible(mainSOSOnButton, false);
+		ituWidgetSetVisible(mainSOSOffButton, true);
 	}
 }
 
@@ -338,17 +346,17 @@ void setDisturbStatus(bool status)
 
 	if (status)
 	{
-		ituWidgetSetVisible(page1NoDisturbOffIcon, FALSE);
-		ituWidgetSetVisible(page1NoDisturbOffText, FALSE);
-		ituWidgetSetVisible(page1NoDisturbOnIcon, TRUE);
-		ituWidgetSetVisible(page1NoDisturbOnText, TRUE);
+		ituWidgetSetVisible(page1NoDisturbOffIcon, false);
+		ituWidgetSetVisible(page1NoDisturbOffText, false);
+		ituWidgetSetVisible(page1NoDisturbOnIcon, true);
+		ituWidgetSetVisible(page1NoDisturbOnText, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(page1NoDisturbOnIcon, FALSE);
-		ituWidgetSetVisible(page1NoDisturbOnText, FALSE);
-		ituWidgetSetVisible(page1NoDisturbOffIcon, TRUE);
-		ituWidgetSetVisible(page1NoDisturbOffText, TRUE);
+		ituWidgetSetVisible(page1NoDisturbOnIcon, false);
+		ituWidgetSetVisible(page1NoDisturbOnText, false);
+		ituWidgetSetVisible(page1NoDisturbOffIcon, true);
+		ituWidgetSetVisible(page1NoDisturbOffText, true);
 	}
 }
 
@@ -356,20 +364,20 @@ bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 {
 	if (getDisturbStatus())
 	{
-		setDisturbStatus(FALSE);
+		setDisturbStatus(false);
 	}
 	else
 	{
-		setDisturbStatus(TRUE);
+		setDisturbStatus(true);
 	}
 
-	return TRUE;
+	return true;
 }
 
 
 uint8_t	getUnreadRecorderNum()
 {
-	return 4;
+	return storage_get_jrlyrecord_flag();
 }
 
 
@@ -425,11 +433,11 @@ void setUnreadRecorderNum(uint8_t num)
 		}
 
 		ituTextSetString(page1RecorderNumText, numstr);
-		ituWidgetSetVisible(page1RecorderIcon, FALSE);
-		ituWidgetSetVisible(page1RecorderText, FALSE);
-		ituWidgetSetVisible(page1RecorderNumText, TRUE);
-		ituWidgetSetVisible(page1RecorderNumIcon, TRUE);
-		ituWidgetSetVisible(page1RecorderMiniIcon, TRUE);
+		ituWidgetSetVisible(page1RecorderIcon, false);
+		ituWidgetSetVisible(page1RecorderText, false);
+		ituWidgetSetVisible(page1RecorderNumText, true);
+		ituWidgetSetVisible(page1RecorderNumIcon, true);
+		ituWidgetSetVisible(page1RecorderMiniIcon, true);
 	}
 	else
 	{
@@ -437,13 +445,19 @@ void setUnreadRecorderNum(uint8_t num)
 		gRecorderTextIndex = -1;
 		gScrollTimeCount = 0;
 
-		ituWidgetSetVisible(page1RecorderScrollTextContainer, FALSE);
-		ituWidgetSetVisible(page1RecorderMiniIcon, FALSE);
-		ituWidgetSetVisible(page1RecorderNumIcon, FALSE);
-		ituWidgetSetVisible(page1RecorderNumText, FALSE);
-		ituWidgetSetVisible(page1RecorderIcon, TRUE);
-		ituWidgetSetVisible(page1RecorderText, TRUE);
+		ituWidgetSetVisible(page1RecorderScrollTextContainer, false);
+		ituWidgetSetVisible(page1RecorderMiniIcon, false);
+		ituWidgetSetVisible(page1RecorderNumIcon, false);
+		ituWidgetSetVisible(page1RecorderNumText, false);
+		ituWidgetSetVisible(page1RecorderIcon, true);
+		ituWidgetSetVisible(page1RecorderText, true);
 	}
+}
+
+
+void loadUnreadRecorderData()
+{
+	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
 }
 
 
@@ -492,7 +506,7 @@ void setUnreadRecorderScroll()
 
 uint8_t getUnreadPhotoMsgNum()
 {
-	return 5;
+	return storage_get_lylyrecord_flag();
 }
 
 
@@ -550,11 +564,11 @@ void setUnreadPhotoMsgNum(uint8_t num)
 
 		
 		ituTextSetString(page0PhotoMsgNumText, numstr);
-		ituWidgetSetVisible(page0PhotoMsgText, FALSE);
-		ituWidgetSetVisible(page0PhotoMsgIcon, FALSE);
-		ituWidgetSetVisible(page0PhotoMsgMiniIcon, TRUE);
-		ituWidgetSetVisible(page0PhotoMsgNumText, TRUE);
-		ituWidgetSetVisible(page0PhotoMsgNumIcon, TRUE);
+		ituWidgetSetVisible(page0PhotoMsgText, false);
+		ituWidgetSetVisible(page0PhotoMsgIcon, false);
+		ituWidgetSetVisible(page0PhotoMsgMiniIcon, true);
+		ituWidgetSetVisible(page0PhotoMsgNumText, true);
+		ituWidgetSetVisible(page0PhotoMsgNumIcon, true);
 	}
 	else
 	{
@@ -562,13 +576,19 @@ void setUnreadPhotoMsgNum(uint8_t num)
 		gPhotoMsgTextIndex = -1;
 		gScrollTimeCount = 0;
 
-		ituWidgetSetVisible(page0PhotoMsgScrollTextContainer, FALSE);
-		ituWidgetSetVisible(page0PhotoMsgMiniIcon, FALSE);
-		ituWidgetSetVisible(page0PhotoMsgNumIcon, FALSE);
-		ituWidgetSetVisible(page0PhotoMsgNumText, FALSE);
-		ituWidgetSetVisible(page0PhotoMsgText, TRUE);
-		ituWidgetSetVisible(page0PhotoMsgIcon, TRUE);
+		ituWidgetSetVisible(page0PhotoMsgScrollTextContainer, false);
+		ituWidgetSetVisible(page0PhotoMsgMiniIcon, false);
+		ituWidgetSetVisible(page0PhotoMsgNumIcon, false);
+		ituWidgetSetVisible(page0PhotoMsgNumText, false);
+		ituWidgetSetVisible(page0PhotoMsgText, true);
+		ituWidgetSetVisible(page0PhotoMsgIcon, true);
 	}
+}
+
+
+void loadUnreaPhotoMsgData()
+{	
+	//进入页面时候读取一次存储即可！
 }
 
 
@@ -667,30 +687,37 @@ void setUnreadInformationNum(uint8_t num)
 			sprintf(numstr, "%d", num);
 		}
 
-		gIsScrollingInformation = TRUE;
+		gIsScrollingInformation = true;
 		gInformationTextIndex = -1;
 		gScrollTimeCount = 0;
 
 		ituTextSetString(page0InformationNumText, numstr);
-		ituWidgetSetVisible(page0InformationText, FALSE);
-		ituWidgetSetVisible(page0InformationIcon, FALSE);
-		ituWidgetSetVisible(page0InformationMiniIcon, TRUE);
-		ituWidgetSetVisible(page0InformationNumText, TRUE);
-		ituWidgetSetVisible(page0InformationNumIcon, TRUE);
+		ituWidgetSetVisible(page0InformationText, false);
+		ituWidgetSetVisible(page0InformationIcon, false);
+		ituWidgetSetVisible(page0InformationMiniIcon, true);
+		ituWidgetSetVisible(page0InformationNumText, true);
+		ituWidgetSetVisible(page0InformationNumIcon, true);
 	}
 	else
 	{
-		gIsScrollingInformation = FALSE;
+		gIsScrollingInformation = false;
 		gInformationTextIndex = -1;
 		gScrollTimeCount = 0;
 
-		ituWidgetSetVisible(page0InformationNumIcon, FALSE);
-		ituWidgetSetVisible(page0InformationNumText, FALSE);
-		ituWidgetSetVisible(page0InformationMiniIcon, FALSE);
-		ituWidgetSetVisible(page0InformationScrollTextContainer, FALSE);
-		ituWidgetSetVisible(page0InformationText, TRUE);
-		ituWidgetSetVisible(page0InformationIcon, TRUE);
+		ituWidgetSetVisible(page0InformationNumIcon, false);
+		ituWidgetSetVisible(page0InformationNumText, false);
+		ituWidgetSetVisible(page0InformationMiniIcon, false);
+		ituWidgetSetVisible(page0InformationScrollTextContainer, false);
+		ituWidgetSetVisible(page0InformationText, true);
+		ituWidgetSetVisible(page0InformationIcon, true);
 	}
+}
+
+
+void loadUnreadInformationData()
+{
+	//进入页面时候读取一次存储即可！！！
+
 }
 
 
@@ -727,7 +754,7 @@ void setUnreadInformationText(uint8_t index)
 
 void setUnreadInformationScroll()
 {
-	if (gIsScrollingInformation == TRUE)
+	if (gIsScrollingInformation == true)
 	{
 		if (ituWidgetIsVisible(page0InformationScrollTextContainer) == false)
 		{
@@ -755,7 +782,7 @@ void setUnreadInformationScroll()
 
 uint8_t getUnreadMissedCallNun()
 {
-	return 7;
+	return storage_get_callrecord_state();
 }
 
 
@@ -806,30 +833,36 @@ void setUnreadMissedCallNum(uint8_t num)
 			sprintf(numstr, "%d", num);
 		}
 
-		gIsScrollingMissedCall = TRUE;
+		gIsScrollingMissedCall = true;
 		gMissedCallTextIndex = -1;
 		gScrollTimeCount = 0;
 
 		ituTextSetString(page0MissedCallNumText, numstr);
-		ituWidgetSetVisible(page0IntercomText, FALSE);
-		ituWidgetSetVisible(page0IntercomIcon, FALSE);
-		ituWidgetSetVisible(page0IntercomMiniIcon, TRUE);
-		ituWidgetSetVisible(page0MissedCallNumText, TRUE);
-		ituWidgetSetVisible(page0MissedCallNumIcon, TRUE);
+		ituWidgetSetVisible(page0IntercomText, false);
+		ituWidgetSetVisible(page0IntercomIcon, false);
+		ituWidgetSetVisible(page0IntercomMiniIcon, true);
+		ituWidgetSetVisible(page0MissedCallNumText, true);
+		ituWidgetSetVisible(page0MissedCallNumIcon, true);
 	}
 	else
 	{
-		gIsScrollingMissedCall = FALSE;
+		gIsScrollingMissedCall = false;
 		gMissedCallTextIndex = -1;
 		gScrollTimeCount = 0;
 
-		ituWidgetSetVisible(page0IntercomScrollTextContainer, FALSE);
-		ituWidgetSetVisible(page0IntercomMiniIcon, FALSE);
-		ituWidgetSetVisible(page0MissedCallNumIcon, FALSE);
-		ituWidgetSetVisible(page0MissedCallNumText, FALSE);
-		ituWidgetSetVisible(page0IntercomText, TRUE);
-		ituWidgetSetVisible(page0IntercomIcon, TRUE);
+		ituWidgetSetVisible(page0IntercomScrollTextContainer, false);
+		ituWidgetSetVisible(page0IntercomMiniIcon, false);
+		ituWidgetSetVisible(page0MissedCallNumIcon, false);
+		ituWidgetSetVisible(page0MissedCallNumText, false);
+		ituWidgetSetVisible(page0IntercomText, true);
+		ituWidgetSetVisible(page0IntercomIcon, true);
 	}
+}
+
+
+void loadUnreadMissedCallData()
+{
+	//进入页面时候读取一次存储即可！！！
 }
 
 
@@ -860,7 +893,7 @@ void setUnreadMissedCallText(uint8_t index)
 
 void setUnreadMissedCallScroll()
 {
-	if (gIsScrollingMissedCall == TRUE)
+	if (gIsScrollingMissedCall == true)
 	{
 		if (ituWidgetIsVisible(page0IntercomScrollTextContainer) == false)
 		{
@@ -888,7 +921,7 @@ void setUnreadMissedCallScroll()
 
 uint8_t getUnsolvedSecurityAlarmNum()
 {
-	return 9;
+	return storage_get_afbj_unread_record()->nCount;
 }
 
 
@@ -943,32 +976,38 @@ void setUnsolvedSecurityAlarmNum(uint8_t num)
 		{
 			sprintf(numstr, "%d", num);
 		}
-		gIsScrollingSecurity = TRUE;
+		gIsScrollingSecurity = true;
 		gSecurityTextIndex = -1;
 		gScrollTimeCount = 0;
 
 		ituTextSetString(page0SecurityNumText, numstr);
-		ituWidgetSetVisible(page0SecurityIcon, FALSE);
-		ituWidgetSetVisible(page0SecurityText, FALSE);
-		ituWidgetSetVisible(page0SecuritySprite, FALSE);
-		ituWidgetSetVisible(page0SecurityNumText, TRUE);
-		ituWidgetSetVisible(page0SecurityNumIcon, TRUE);
-		ituWidgetSetVisible(page0SecurityMiniIcon, TRUE);
+		ituWidgetSetVisible(page0SecurityIcon, false);
+		ituWidgetSetVisible(page0SecurityText, false);
+		ituWidgetSetVisible(page0SecuritySprite, false);
+		ituWidgetSetVisible(page0SecurityNumText, true);
+		ituWidgetSetVisible(page0SecurityNumIcon, true);
+		ituWidgetSetVisible(page0SecurityMiniIcon, true);
 
 	}
 	else
 	{
-		gIsScrollingSecurity = FALSE;
+		gIsScrollingSecurity = false;
 		gSecurityTextIndex = -1;
 		gScrollTimeCount = 0;
 
-		ituWidgetSetVisible(page0SecurityScrollTextContainer, FALSE);
-		ituWidgetSetVisible(page0SecurityNumIcon, FALSE);
-		ituWidgetSetVisible(page0SecurityNumText, FALSE);
-		ituWidgetSetVisible(page0SecurityMiniIcon, FALSE);
-		ituWidgetSetVisible(page0SecurityIcon, TRUE);
-		ituWidgetSetVisible(page0SecurityText, TRUE);
+		ituWidgetSetVisible(page0SecurityScrollTextContainer, false);
+		ituWidgetSetVisible(page0SecurityNumIcon, false);
+		ituWidgetSetVisible(page0SecurityNumText, false);
+		ituWidgetSetVisible(page0SecurityMiniIcon, false);
+		ituWidgetSetVisible(page0SecurityIcon, true);
+		ituWidgetSetVisible(page0SecurityText, true);
 	}
+}
+
+
+void loadUnsolvedSecurityAlarmData()
+{
+	//进入页面时候读取一次存储即可！
 }
 
 
@@ -1006,7 +1045,7 @@ void setUnsolvedSecurityAlarmText(uint8_t index)
 
 void setUnsolvedSecurityAlarmScroll()
 {
-	if (gIsScrollingSecurity == TRUE)
+	if (gIsScrollingSecurity == true)
 	{
 		if (ituWidgetIsVisible(page0SecurityScrollTextContainer) == false)
 		{
@@ -1033,7 +1072,21 @@ void setUnsolvedSecurityAlarmScroll()
 
 MAIN_SECURITY_STATUS_e	getSecurityStatus()
 {
-	return (MAIN_SECURITY_STATUS_e)1;
+	if (storage_get_defend_state() == SET_DEFEND)
+	{
+		//布防！！（外出）
+		return (MAIN_SECURITY_STATUS_e)1;
+	}
+	else if (storage_get_defend_state() == PART_DEFEND)
+	{
+		//局防！！！（夜间）
+		return (MAIN_SECURITY_STATUS_e)0;
+	}
+	else
+	{
+		//撤防！！！（无图标）
+		return (MAIN_SECURITY_STATUS_e)2;
+	}
 }
 
 
@@ -1048,12 +1101,12 @@ void setSecurityStatus(MAIN_SECURITY_STATUS_e status)
 	{
 	case MAIN_SECURITY_STATUS_NIGHT:
 	case MAIN_SECURITY_STATUS_OUTSIDE:
-		ituWidgetSetVisible(page0SecuritySprite, TRUE);
+		ituWidgetSetVisible(page0SecuritySprite, true);
 		ituSpriteGoto(page0SecuritySprite, (uint8_t)status);
 		break;
 
 	default:
-		ituWidgetSetVisible(page0SecuritySprite, FALSE);
+		ituWidgetSetVisible(page0SecuritySprite, false);
 		break;
 	}
 }

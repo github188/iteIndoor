@@ -52,10 +52,11 @@ typedef enum
 	EVENT_CUSTOM8_RESER, 									// Ԥ��
 	EVENT_CUSTOM9_RESER, 									// Ԥ��
 	EVENT_CUSTOM10_RESER, 									// Ԥ��
-	EVENT_CUSTOM11_CALLOUT, 								// ���лص���Ϣ						
-	EVENT_CUSTOM12_CALLIN, 									// ���лص���Ϣ
-	EVENT_CUSTOM13_MONITOR, 								// ���ӻص���Ϣ	
-	EVENT_CUSTOM14_RTSP_MONITOR, 							// RTSP���ӻص���Ϣ	
+	EVENT_CUSTOM11_CALLREQUEST, 							// 呼叫请求命令
+	EVENT_CUSTOM12_CALLOUT, 								// ���лص���Ϣ						
+	EVENT_CUSTOM13_CALLIN, 									// ���лص���Ϣ
+	EVENT_CUSTOM14_MONITOR, 								// ���ӻص���Ϣ	
+	EVENT_CUSTOM15_RTSP_MONITOR, 							// RTSP���ӻص���Ϣ	
 
 } CustomEvent;
 
@@ -84,6 +85,12 @@ typedef enum
 	SPOTTED_ALLOW,
 } SPOTTED_STATUS;
 
+typedef struct
+{
+	uint8 InterState;
+	uint8 DataLen;
+	char Buf[40];
+}INTER_CALLBACK, *PINTER_CALLBACK;
 
 /*************************************************
   Function:			af_callback_gui

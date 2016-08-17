@@ -56,7 +56,7 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 	gRecorderPlayVol = 35;
 	setRecorderPlayVol(gRecorderPlayVol);
 
-	return TRUE;
+	return true;
 }
 
 void recorderLayerInit()
@@ -80,7 +80,7 @@ void recorderLayerInit()
 			setRecorderRecordStatus(i, RECORDER_RECORD_UNREAD);
 	}
 
-	setRecordRadioBoxStatus(3, TRUE);
+	setRecordRadioBoxStatus(3, true);
 
 	setRecorderDuration("00:00");
 
@@ -88,7 +88,7 @@ void recorderLayerInit()
 	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
 
 
-	ituWidgetSetVisible(recorderTipsTransparencyBackground, FALSE);
+	ituWidgetSetVisible(recorderTipsTransparencyBackground, false);
 
 }
 
@@ -133,7 +133,7 @@ bool recorderBtnOnClicked(ITUWidget* widget, char* param)
 		break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -182,7 +182,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 		}	
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -193,7 +193,7 @@ bool recorderRecordRadioBoxChanged(ITUWidget* widget, char* param)
 	//TODO:∂¡»°¥Ê¥¢ÃÓ≥‰¬º“Ù¬º÷∆ ±º‰£°£°£°£°£°
 	setRecorderRecordCreateTime("2016-07-28 10:41:45");
 
-	return TRUE;
+	return true;
 }
 
 
@@ -207,16 +207,16 @@ bool recorderVolTrackBarOnChanged(ITUWidget* widget, char* param)
 	//TODO:Õ®÷™¬ﬂº≠…Ë÷√“Ù¡ø£°£°£°£°£°£°
 	if (tmpVol == 0)
 	{
-		ituWidgetSetVisible(recorderVoiceOnIcon, FALSE);
-		ituWidgetSetVisible(recorderVoiceOffIcon, TRUE);
+		ituWidgetSetVisible(recorderVoiceOnIcon, false);
+		ituWidgetSetVisible(recorderVoiceOffIcon, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(recorderVoiceOffIcon, FALSE);
-		ituWidgetSetVisible(recorderVoiceOnIcon, TRUE);
+		ituWidgetSetVisible(recorderVoiceOffIcon, false);
+		ituWidgetSetVisible(recorderVoiceOnIcon, true);
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -240,13 +240,13 @@ void setRecorderPlayVol(uint8_t volNum)
 
 	if (volNum == 0)
 	{
-		ituWidgetSetVisible(recorderVoiceOnIcon, FALSE);
-		ituWidgetSetVisible(recorderVoiceOffIcon, TRUE);
+		ituWidgetSetVisible(recorderVoiceOnIcon, false);
+		ituWidgetSetVisible(recorderVoiceOffIcon, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(recorderVoiceOffIcon, FALSE);
-		ituWidgetSetVisible(recorderVoiceOnIcon, TRUE);
+		ituWidgetSetVisible(recorderVoiceOffIcon, false);
+		ituWidgetSetVisible(recorderVoiceOnIcon, true);
 	}
 
 	ituTrackBarSetValue(recorderVolTrackBar, volNum);
@@ -279,38 +279,38 @@ void setRecorderAudioBtnStatus(RECORDER_STATUS_e status)
 	switch (status)
 	{
 	case RECORDER_STATUS_RECORDING:
-		ituWidgetSetVisible(recorderRecordStartButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPauseButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPlayButton, FALSE);
-		ituWidgetSetVisible(recorderRecordStopButton, TRUE);
+		ituWidgetSetVisible(recorderRecordStartButton, false);
+		ituWidgetSetVisible(recorderRecordPauseButton, false);
+		ituWidgetSetVisible(recorderRecordPlayButton, false);
+		ituWidgetSetVisible(recorderRecordStopButton, true);
 		break;
 
 	case RECORDER_STATUS_PLAYING:
-		ituWidgetSetVisible(recorderRecordPlayButton, FALSE);
-		ituWidgetSetVisible(recorderRecordStartButton, FALSE);
-		ituWidgetSetVisible(recorderRecordStopButton, TRUE);
-		ituWidgetSetVisible(recorderRecordPauseButton, TRUE);
+		ituWidgetSetVisible(recorderRecordPlayButton, false);
+		ituWidgetSetVisible(recorderRecordStartButton, false);
+		ituWidgetSetVisible(recorderRecordStopButton, true);
+		ituWidgetSetVisible(recorderRecordPauseButton, true);
 		break;
 
 	case RECORDER_STATUS_PAUSE:
-		ituWidgetSetVisible(recorderRecordStartButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPauseButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPlayButton, TRUE);
-		ituWidgetSetVisible(recorderRecordStopButton, TRUE);
+		ituWidgetSetVisible(recorderRecordStartButton, false);
+		ituWidgetSetVisible(recorderRecordPauseButton, false);
+		ituWidgetSetVisible(recorderRecordPlayButton, true);
+		ituWidgetSetVisible(recorderRecordStopButton, true);
 		break;
 
 	case RECORDER_STATUS_STOP:
-		ituWidgetSetVisible(recorderRecordStopButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPauseButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPlayButton, TRUE);
-		ituWidgetSetVisible(recorderRecordStartButton, TRUE);
+		ituWidgetSetVisible(recorderRecordStopButton, false);
+		ituWidgetSetVisible(recorderRecordPauseButton, false);
+		ituWidgetSetVisible(recorderRecordPlayButton, true);
+		ituWidgetSetVisible(recorderRecordStartButton, true);
 		break;
 
 	case RECORDER_STATUS_NULL:
-		ituWidgetSetVisible(recorderRecordStopButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPauseButton, FALSE);
-		ituWidgetSetVisible(recorderRecordPlayButton, FALSE);
-		ituWidgetSetVisible(recorderRecordStartButton, TRUE);
+		ituWidgetSetVisible(recorderRecordStopButton, false);
+		ituWidgetSetVisible(recorderRecordPauseButton, false);
+		ituWidgetSetVisible(recorderRecordPlayButton, false);
+		ituWidgetSetVisible(recorderRecordStartButton, true);
 		break;
 
 	default:
@@ -349,24 +349,24 @@ void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status)
 	switch (status)
 	{
 	case RECORDER_RECORD_NULL:
-		ituWidgetSetVisible(recorderRecordTopLeftIcon, FALSE);
-		ituWidgetSetVisible(recorderRecordRadioBox, FALSE);
-		ituWidgetSetVisible(recorderRecordText, FALSE);
-		ituWidgetSetVisible(recorderRecordNullButton, TRUE);
+		ituWidgetSetVisible(recorderRecordTopLeftIcon, false);
+		ituWidgetSetVisible(recorderRecordRadioBox, false);
+		ituWidgetSetVisible(recorderRecordText, false);
+		ituWidgetSetVisible(recorderRecordNullButton, true);
 		break;
 
 	case RECORDER_RECORD_READ:
-		ituWidgetSetVisible(recorderRecordTopLeftIcon, FALSE);
-		ituWidgetSetVisible(recorderRecordNullButton, FALSE);
-		ituWidgetSetVisible(recorderRecordRadioBox, TRUE);
-		ituWidgetSetVisible(recorderRecordText, TRUE);
+		ituWidgetSetVisible(recorderRecordTopLeftIcon, false);
+		ituWidgetSetVisible(recorderRecordNullButton, false);
+		ituWidgetSetVisible(recorderRecordRadioBox, true);
+		ituWidgetSetVisible(recorderRecordText, true);
 		break;
 
 	case RECORDER_RECORD_UNREAD:
-		ituWidgetSetVisible(recorderRecordNullButton, FALSE);
-		ituWidgetSetVisible(recorderRecordTopLeftIcon, TRUE);
-		ituWidgetSetVisible(recorderRecordRadioBox, TRUE);
-		ituWidgetSetVisible(recorderRecordText, TRUE);
+		ituWidgetSetVisible(recorderRecordNullButton, false);
+		ituWidgetSetVisible(recorderRecordTopLeftIcon, true);
+		ituWidgetSetVisible(recorderRecordRadioBox, true);
+		ituWidgetSetVisible(recorderRecordText, true);
 		break;
 
 	default:
@@ -402,13 +402,13 @@ RECORDER_STATUS_e getRecorderRecordStatus(uint8_t index)
 	assert(recorderRecordNullButton);
 
 
-	if ((ituWidgetIsVisible(recorderRecordTopLeftIcon) == FALSE) && (ituWidgetIsVisible(recorderRecordRadioBox) == FALSE) && (ituWidgetIsVisible(recorderRecordText) == FALSE) && (ituWidgetIsVisible(recorderRecordNullButton) == TRUE))
+	if ((ituWidgetIsVisible(recorderRecordTopLeftIcon) == false) && (ituWidgetIsVisible(recorderRecordRadioBox) == false) && (ituWidgetIsVisible(recorderRecordText) == false) && (ituWidgetIsVisible(recorderRecordNullButton) == true))
 		return RECORDER_RECORD_NULL;
 
-	else if ((ituWidgetIsVisible(recorderRecordTopLeftIcon) == FALSE) && (ituWidgetIsVisible(recorderRecordRadioBox) == TRUE) && (ituWidgetIsVisible(recorderRecordText) == TRUE) && (ituWidgetIsVisible(recorderRecordNullButton) == FALSE))
+	else if ((ituWidgetIsVisible(recorderRecordTopLeftIcon) == false) && (ituWidgetIsVisible(recorderRecordRadioBox) == true) && (ituWidgetIsVisible(recorderRecordText) == true) && (ituWidgetIsVisible(recorderRecordNullButton) == false))
 		return RECORDER_RECORD_READ;
 
-	else if ((ituWidgetIsVisible(recorderRecordTopLeftIcon) == TRUE) && (ituWidgetIsVisible(recorderRecordRadioBox) == TRUE) && (ituWidgetIsVisible(recorderRecordText) == TRUE) && (ituWidgetIsVisible(recorderRecordNullButton) == FALSE))
+	else if ((ituWidgetIsVisible(recorderRecordTopLeftIcon) == true) && (ituWidgetIsVisible(recorderRecordRadioBox) == true) && (ituWidgetIsVisible(recorderRecordText) == true) && (ituWidgetIsVisible(recorderRecordNullButton) == false))
 		return RECORDER_RECORD_UNREAD;
 
 	else
@@ -419,7 +419,7 @@ RECORDER_STATUS_e getRecorderRecordStatus(uint8_t index)
 void recorderRecordingBtnOnClicked()
 {
 	uint8_t i = 0;
-	bool recordFlag = FALSE;
+	bool recordFlag = false;
 
 	for (i = 0; i < MAX_RECORDER_NUM; i++)
 	{
@@ -427,7 +427,7 @@ void recorderRecordingBtnOnClicked()
 		if (getRecorderRecordStatus(i) == RECORDER_RECORD_NULL)
 		{
 			gNewRecordIndex = i;
-			recordFlag = TRUE;
+			recordFlag = true;
 			break;				
 		}
 	}
@@ -487,7 +487,7 @@ void recorderStopBtnOnClicked()
 	{
 		//TODO:¬º“ÙÕ£÷π
 		setRecorderRecordStatus(gNewRecordIndex, RECORDER_RECORD_UNREAD);
-		setRecordRadioBoxStatus(gNewRecordIndex, TRUE);
+		setRecordRadioBoxStatus(gNewRecordIndex, true);
 	}
 	gRecorderTimeCount = 0;
 	setRecorderDuration("00:00");
@@ -526,7 +526,7 @@ void setRecordRadioBoxStatus(uint8_t index, bool status)
 	recorderRecordRadioBox = ituSceneFindWidget(&theScene, tmpStr);
 	assert(recorderRecordRadioBox);
 
-	if (status == TRUE)
+	if (status == true)
 	{
 		gCurrentRecordIndex = index;
 	}
@@ -568,7 +568,7 @@ void recorderDeleteBtnOnClicked()
 	ituTextSetString(recorderTipsText, "Delete Message");
 
 	ituWidgetDisable(recorderBackground);
-	ituWidgetSetVisible(recorderTipsTransparencyBackground, TRUE);
+	ituWidgetSetVisible(recorderTipsTransparencyBackground, true);
 }
 
 
@@ -604,7 +604,7 @@ bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	}
 
 	ituWidgetEnable(recorderBackground);
-	ituWidgetSetVisible(recorderTipsTransparencyBackground, FALSE);
+	ituWidgetSetVisible(recorderTipsTransparencyBackground, false);
 
-	return TRUE;
+	return true;
 }

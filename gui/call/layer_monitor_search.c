@@ -26,7 +26,7 @@ static ITUBackground* MonitorSearchBottomBackground = NULL;
 static ITUCoverFlow* MonitorSearchListCoverFlow = NULL;
 static ITUBackground* MonitorSearchListBackgroundPage[MAX_MONITOR_PAGE_NUM] = { NULL };
 static ITUContainer* MonitorSearchListContainer[MAX_MONITOR_NUM] = { NULL };
-static ITUIcon* MonitorSearchListSprite[MAX_MONITOR_NUM] = { NULL };
+static ITUSprite* MonitorSearchListSprite[MAX_MONITOR_NUM] = { NULL };
 static ITUText* MonitorSearchListDevTypeText[MAX_MONITOR_NUM] = { NULL };
 
 /*****************常量定义***********************/

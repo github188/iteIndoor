@@ -707,8 +707,9 @@ uint32 media_play_sound(char *filename, uint8 IsRepeat, void * proc)
 	if(!g_LeafCall->audiostream)
 	{
     	leaf_start_sound_play(g_LeafCall, filename, IsRepeat, proc);
+		return TRUE;
     }
-	return TRUE;
+	return FALSE;	
 }
 
 /*************************************************
@@ -760,6 +761,7 @@ int media_stop_rtsp(void)
 *************************************************/
 uint32 media_play_lyly (char *filename, void * proc)
 {
+	leaf_start_video_memo_playback(g_LeafCall, filename);
 	return TRUE;
 }
 
@@ -773,6 +775,7 @@ uint32 media_play_lyly (char *filename, void * proc)
 *************************************************/
 void media_stop_lyly (void)
 {
+	leaf_stop_video_memo_playback(g_LeafCall);
 }
 
 /*************************************************

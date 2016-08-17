@@ -115,6 +115,28 @@ int32 inter_call_sub_terminal(char *InputNo);
 int32 inter_call_manager(char *InputNo);
 
 /*************************************************
+Function:			logic_call_sub_terminal
+Description:		呼叫分机
+Input:
+1.InPutNo			输入号码
+Output:				无
+Return:				0 成功
+Others:				无
+*************************************************/
+int32 logic_call_sub_terminal(char *InputNo);
+
+/*************************************************
+Function:			logic_call_center
+Description:		呼叫管理员机
+Input:
+1.InPutNo			输入号码
+Output:				无
+Return:				0 成功
+Others:
+*************************************************/
+int32 logic_call_center(char *InputNo);
+
+/*************************************************
   Function:				inter_answer_call
   Description:			被叫接听
   Input: 			
@@ -157,16 +179,17 @@ void phone_hand_down(void);
 int32 phone_call_in(uint8 index);
 
 /*************************************************
-  Function:				inter_call_ini
-  Description:			对讲初始化
-  Input: 	
-  	1.CallGuiNotify		呼叫GUI回调函数
-  	2.BeCallGuiNotify	被叫GUI回调函数
-  Output:				无
-  Return:				
-  Others:
+Function:				inter_call_ini
+Description:			对讲初始化
+Input:
+1.CallRequestGuiNotify	请求时GUI回调函数
+1.CallGuiNotify			呼叫GUI回调函数
+2.BeCallGuiNotify		被叫GUI回调函数
+Output:					无
+Return:
+Others:
 *************************************************/
-void inter_call_ini(PFGuiNotify CallGuiNotify, PFGuiNotify BeCallGuiNotify);
+void inter_call_ini(PFGuiNotify CallRequestGuiNotify, PFGuiNotify CallGuiNotify, PFGuiNotify BeCallGuiNotify);
 
 /*************************************************
   Function:			inter_video_snap

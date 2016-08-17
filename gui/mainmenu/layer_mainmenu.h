@@ -37,6 +37,7 @@ bool	mainDistrubStatusOnChange(ITUWidget* widget, char* param);
 bool    mainLayerTimeoutOnTimer(ITUWidget* widget, char* param);
 bool	mainSOSBtnOnPress(ITUWidget* widget, char* param);
 void	mainLayerCornerNumReload();
+void	mainLayerScrollDataReload();
 void	mainMenuLayerReset();
 
 
@@ -58,26 +59,31 @@ void	setSOSBtnType(bool status);
 //以下是在界面重新进入时候读取一次就行
 uint8_t	getUnreadRecorderNum();
 void	setUnreadRecorderNum(uint8_t num);
+void	loadUnreadRecorderData();
 void	setUnreadRecorderText(uint8_t index);
 void	setUnreadRecorderScroll();
 
 uint8_t getUnreadPhotoMsgNum();
 void	setUnreadPhotoMsgNum(uint8_t num);
+void	loadUnreaPhotoMsgData();
 void	setUnreadPhotoMsgText(uint8_t index);
 void	setUnreadPhotoMsgScroll();
 
 uint8_t getUnreadInformationNum();
 void	setUnreadInformationNum(uint8_t num);
+void	loadUnreadInformationData();
 void	setUnreadInformationText(uint8_t index);
 void	setUnreadInformationScroll();
 
 uint8_t getUnsolvedSecurityAlarmNum();
 void	setUnsolvedSecurityAlarmNum(uint8_t num);
+void	loadUnsolvedSecurityAlarmData();
 void	setUnsolvedSecurityAlarmText(uint8_t index);
 void	setUnsolvedSecurityAlarmScroll();
 
 uint8_t getUnreadMissedCallNun();
 void	setUnreadMissedCallNum(uint8_t num);
+void	loadUnreadMissedCallData();
 void	setUnreadMissedCallText(uint8_t index);
 void	setUnreadMissedCallScroll();
 

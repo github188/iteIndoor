@@ -20,7 +20,7 @@ static ITUCoverFlow*	photoMsgListCoverFlow;
 static ITUBackground*	photoMsgVideoDrawBackground;
 static ITUBackground*	photoMsgTipsTransparencyBackground;
 static ITUBackground*	photoMsgBackground;
-//static ITUWidget*		photoMsgPageContainer;
+static ITUWidget*		photoMsgPageContainer;
 static ITUWidget*		photoMsgListContainer;
 static ITUWidget*		photoMsgEmptyContainer;
 static ITUWidget*		photoMsgNullContainer0;
@@ -53,7 +53,7 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 	//TODO:暂时的全局变量
 	gPhotoMsgPlayVol = 9;
 
-	return TRUE;
+	return true;
 }
 
 void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
@@ -104,34 +104,34 @@ void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
 		photoMsgTipsTransparencyBackground = ituSceneFindWidget(&theScene, "photoMsgTipsTransparencyBackground");
 		assert(photoMsgTipsTransparencyBackground);
 	}
-	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, FALSE);
+	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, false);
 
 	switch (pageId)
 	{
 	case PHOTOMSG_LIST_PAGE:
-		ituWidgetSetVisible(photoMsgVideoDrawBackground, FALSE);
-		ituWidgetSetVisible(photoMsgListCoverFlow, TRUE);
-		ituWidgetSetVisible(photoMsgBottomBarContainer0, TRUE);
+		ituWidgetSetVisible(photoMsgVideoDrawBackground, false);
+		ituWidgetSetVisible(photoMsgListCoverFlow, true);
+		ituWidgetSetVisible(photoMsgBottomBarContainer0, true);
 
-		ituWidgetSetVisible(photoMsgPauseContainer, FALSE);
-		ituWidgetSetVisible(photoMsgPlayContainer, FALSE);
-		ituWidgetSetVisible(photoMsgMessageContainer, TRUE);
+		ituWidgetSetVisible(photoMsgPauseContainer, false);
+		ituWidgetSetVisible(photoMsgPlayContainer, false);
+		ituWidgetSetVisible(photoMsgMessageContainer, true);
 
-		ituWidgetSetVisible(photoMsgStopContainer, FALSE);
-		ituWidgetSetVisible(photoMsgNullContainer0, TRUE);
+		ituWidgetSetVisible(photoMsgStopContainer, false);
+		ituWidgetSetVisible(photoMsgNullContainer0, true);
 		break;
 
 	case PHOTOMSG_CONTENT_PAGE:
-		ituWidgetSetVisible(photoMsgBottomBarContainer0, FALSE);
-		ituWidgetSetVisible(photoMsgListCoverFlow, FALSE);
-		ituWidgetSetVisible(photoMsgVideoDrawBackground, TRUE);
+		ituWidgetSetVisible(photoMsgBottomBarContainer0, false);
+		ituWidgetSetVisible(photoMsgListCoverFlow, false);
+		ituWidgetSetVisible(photoMsgVideoDrawBackground, true);
 
-		ituWidgetSetVisible(photoMsgMessageContainer, FALSE);
-		ituWidgetSetVisible(photoMsgPlayContainer, FALSE);
-		ituWidgetSetVisible(photoMsgPauseContainer, TRUE);
+		ituWidgetSetVisible(photoMsgMessageContainer, false);
+		ituWidgetSetVisible(photoMsgPlayContainer, false);
+		ituWidgetSetVisible(photoMsgPauseContainer, true);
 
-		ituWidgetSetVisible(photoMsgNullContainer0, FALSE);
-		ituWidgetSetVisible(photoMsgStopContainer, TRUE);
+		ituWidgetSetVisible(photoMsgNullContainer0, false);
+		ituWidgetSetVisible(photoMsgStopContainer, true);
 		break;
 
 	default:
@@ -146,7 +146,7 @@ bool photoMsgListOnClicked(ITUWidget* widget, char* param)
 	photoMsgLayerInit(PHOTOMSG_CONTENT_PAGE);
 	setPhotoMsgVideoPlayByIndex(atoi(param));
 
-	return TRUE;
+	return true;
 }
 
 bool photoMsgBtnOnClicked(ITUWidget* widget, char* param)
@@ -178,7 +178,7 @@ bool photoMsgBtnOnClicked(ITUWidget* widget, char* param)
 		break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -192,16 +192,16 @@ bool photoMsgVolTrackBarOnChanged(ITUWidget* widget, char* param)
 	//TODO:通知逻辑设置音量！！！！！！
 	if (tmpVol == 0)
 	{
-		ituWidgetSetVisible(photoMsgVoiceOnIcon, FALSE);
-		ituWidgetSetVisible(photoMsgVoiceOffIcon, TRUE);
+		ituWidgetSetVisible(photoMsgVoiceOnIcon, false);
+		ituWidgetSetVisible(photoMsgVoiceOffIcon, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(photoMsgVoiceOffIcon, FALSE);
-		ituWidgetSetVisible(photoMsgVoiceOnIcon, TRUE);
+		ituWidgetSetVisible(photoMsgVoiceOffIcon, false);
+		ituWidgetSetVisible(photoMsgVoiceOnIcon, true);
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -229,9 +229,9 @@ bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	}
 
 	ituWidgetEnable(photoMsgBackground);
-	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, FALSE);
+	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, false);
 
-	return TRUE;
+	return true;
 }
 
 
@@ -264,7 +264,7 @@ void photoMsgBoxShow(PHOTOMSG_BTN_e btnId)
 	}
 
 	ituWidgetDisable(photoMsgBackground);
-	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, TRUE);
+	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, true);
 }
 
 
@@ -274,16 +274,16 @@ bool photoMsgVideoDrawBtnOnClicked(ITUWidget* widget, char* param)
 	{
 		if (ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
-			ituWidgetSetVisible(photoMsgBottomBarContainer1, FALSE);
+			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 		}
 		else
 		{
-			ituWidgetSetVisible(photoMsgBottomBarContainer1, TRUE);
+			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 
 			setPhotoMsgPlayVol(gPhotoMsgPlayVol);
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -324,13 +324,13 @@ void setPhotoMsgPlayVol(uint8_t volNum)
 
 	if (volNum == 0)
 	{
-		ituWidgetSetVisible(photoMsgVoiceOnIcon, FALSE);
-		ituWidgetSetVisible(photoMsgVoiceOffIcon, TRUE);
+		ituWidgetSetVisible(photoMsgVoiceOnIcon, false);
+		ituWidgetSetVisible(photoMsgVoiceOffIcon, true);
 	}
 	else
 	{
-		ituWidgetSetVisible(photoMsgVoiceOffIcon, FALSE);
-		ituWidgetSetVisible(photoMsgVoiceOnIcon, TRUE);
+		ituWidgetSetVisible(photoMsgVoiceOffIcon, false);
+		ituWidgetSetVisible(photoMsgVoiceOnIcon, true);
 	}
 
 	ituTrackBarSetValue(photoMsgVolTrackBar, volNum);
@@ -346,7 +346,7 @@ bool setPhotoMsgListIsVisible(uint8_t index, bool status)
 	if (index >= MAX_POOTOMSG_LIST_NUM)
 	{
 		printf("setting index overflow!!!!!!!!!!");
-		return FALSE;
+		return false;
 	}
 	else
 	{
@@ -355,7 +355,7 @@ bool setPhotoMsgListIsVisible(uint8_t index, bool status)
 		assert(photoMsgListContainer);
 		ituWidgetSetVisible(photoMsgListContainer, status);
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -365,7 +365,7 @@ void setPhotoMsgList()
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
 
-	uint8_t msgNum = 20;		//TODO:读取信息条数！！！！！
+	uint8_t msgNum = 5;		//TODO:读取信息条数！！！！！
 
 	//TODO: 读取存储内容设置列表信息！！！！！！！
 	for (i = 0; i < MAX_POOTOMSG_LIST_NUM; i++)
@@ -378,16 +378,16 @@ void setPhotoMsgList()
 				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
 
 				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
-				setPhotoMsgListTime(i, tmpStr);
+				setPhotoMsgListTime(i, tmpStr, true);
 			}
 			else if (i >= msgNum && i < PHOTOMSG_NUM_PER_PAGE)
 			{
 				setPhotoMsgListMiniIcon(i, "");
-				setPhotoMsgListTime(i, "");
+				setPhotoMsgListTime(i, "", false);
 			}
 			else
 			{
-				setPhotoMsgListIsVisible(i, FALSE);
+				setPhotoMsgListIsVisible(i, false);
 			}
 		}
 		else
@@ -398,11 +398,11 @@ void setPhotoMsgList()
 				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
 
 				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
-				setPhotoMsgListTime(i, tmpStr);
+				setPhotoMsgListTime(i, tmpStr, true);
 			}
 			else
 			{
-				setPhotoMsgListIsVisible(i, FALSE);
+				setPhotoMsgListIsVisible(i, false);
 			}
 		}
 		
@@ -410,7 +410,7 @@ void setPhotoMsgList()
 	//将没有内容的页面隐藏起来，达到不能滑动的效果！
 	for (i = 0; i < MAX_PHOTOMSG_PAGE_NUM; i++)
 	{
-		/*sprintf(tmpStr, "%s%d", "photoMsgPageContainer", i);
+		sprintf(tmpStr, "%s%d", "photoMsgPageContainer", i);
 		photoMsgPageContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(photoMsgPageContainer);
 
@@ -418,18 +418,18 @@ void setPhotoMsgList()
 		{
 			if ((i == (msgNum / PHOTOMSG_NUM_PER_PAGE)) && (msgNum % PHOTOMSG_NUM_PER_PAGE) == 0)
 			{
-				ituWidgetSetVisible(photoMsgPageContainer, FALSE);
+				ituWidgetSetVisible(photoMsgPageContainer, false);
 			}
 			else
 			{
-				ituWidgetSetVisible(photoMsgPageContainer, TRUE);
+				ituWidgetSetVisible(photoMsgPageContainer, true);
 			}
 		}
 		else
 		{
-			ituWidgetSetVisible(photoMsgPageContainer, FALSE);
+			ituWidgetSetVisible(photoMsgPageContainer, false);
 
-		}*/
+		}
 	}
 }
 
@@ -442,7 +442,7 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	if (index > MAX_POOTOMSG_LIST_NUM)
 	{
 		printf("photomsg list index overflow!!!!!!!!!!!!!");
-		return FALSE;
+		return false;
 	}
 	sprintf(tmpStr, "%s%d", "photoMsgListMiniPicIcon", index);
 	photoMsgListMiniPicIcon = ituSceneFindWidget(&theScene, tmpStr);
@@ -467,8 +467,8 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	else
 	{
 		printf("open  minipic jepg icon icon failed!");
-		ituWidgetSetVisible(photoMsgListMiniPicIcon, FALSE);
-		return FALSE;
+		ituWidgetSetVisible(photoMsgListMiniPicIcon, false);
+		return false;
 	}
 	if (gPhotoMsgListIconData)
 	{
@@ -477,24 +477,24 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	else
 	{
 		printf("load minipic jepg icon failed!");
-		ituWidgetSetVisible(photoMsgListMiniPicIcon, FALSE);
-		return FALSE;
+		ituWidgetSetVisible(photoMsgListMiniPicIcon, false);
+		return false;
 	}
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
-	return TRUE;
+	return true;
 
 }
 
 
-bool setPhotoMsgListTime(uint8_t index, char* timeStr)
+bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread)
 {
 	char tmpStr[50] = { 0 };
 
 	if (index > MAX_POOTOMSG_LIST_NUM)
 	{
 		printf("photomsg list index overflow!!!!!!!!!!!!!");
-		return FALSE;
+		return false;
 	}
 
 
@@ -504,8 +504,17 @@ bool setPhotoMsgListTime(uint8_t index, char* timeStr)
 
 	ituTextSetString(photoMsgListTimeText, timeStr);
 
+	if (isUnread)
+	{
+		ituTextSetBackColor(photoMsgListTimeText, 255,255,0,0);
+	}
+	else
+	{
+		ituTextSetBackColor(photoMsgListTimeText, 255, 255, 255, 0);
+	}
+
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
-	return TRUE;
+	return true;
 }
 
 
@@ -526,12 +535,12 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 	switch (mode)
 	{
 	case PHOTOMSG_VIDEOPLAY_PLAYING:
-		ituWidgetSetVisible(photoMsgPlayContainer, FALSE);
-		ituWidgetSetVisible(photoMsgPauseContainer, TRUE);
+		ituWidgetSetVisible(photoMsgPlayContainer, false);
+		ituWidgetSetVisible(photoMsgPauseContainer, true);
 			  
 		if (ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
-			ituWidgetSetVisible(photoMsgBottomBarContainer1, FALSE);
+			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_PLAYING;
 
@@ -539,8 +548,8 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 		break;
 	
 	case PHOTOMSG_VIDEOPLAY_PAUSE:
-		ituWidgetSetVisible(photoMsgPauseContainer, FALSE);
-		ituWidgetSetVisible(photoMsgPlayContainer, TRUE);
+		ituWidgetSetVisible(photoMsgPauseContainer, false);
+		ituWidgetSetVisible(photoMsgPlayContainer, true);
 
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_PAUSE;
 
@@ -548,12 +557,12 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 		break;
 
 	case PHOTOMSG_VIDEOPLAY_STOP:
-		ituWidgetSetVisible(photoMsgPauseContainer, FALSE);
-		ituWidgetSetVisible(photoMsgPlayContainer, TRUE);
+		ituWidgetSetVisible(photoMsgPauseContainer, false);
+		ituWidgetSetVisible(photoMsgPlayContainer, true);
 
 		if (!ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
-			ituWidgetSetVisible(photoMsgBottomBarContainer1, TRUE);
+			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_STOP;
 
@@ -580,8 +589,8 @@ void photoMsgReturnBtnOnClicked()
 
 	if (ituWidgetIsVisible(photoMsgVideoDrawBackground))
 	{
-		/*ituWidgetSetVisible(informationMSGContentContainer, FALSE);
-		ituWidgetSetVisible(informationMSGListCoverFlow, TRUE);*/
+		/*ituWidgetSetVisible(informationMSGContentContainer, false);
+		ituWidgetSetVisible(informationMSGListCoverFlow, true);*/
 		photoMsgLayerInit(PHOTOMSG_LIST_PAGE);
 		setPhotoMsgList();
 	}
@@ -594,7 +603,7 @@ void photoMsgReturnBtnOnClicked()
 		}
 		ituLayerGoto(mainLayer);
 	}
-	//return TRUE;
+	//return true;
 }
 
 

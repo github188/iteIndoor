@@ -40,7 +40,7 @@
 #include "mainmenu\layer_mainmenu.h"
 #include "photomsg\layer_photomsg.h"
 #include "recorder\layer_recorder.h"
-
+#include "call/layer_call.h"
 #include "set/layer_set.h"
 
 

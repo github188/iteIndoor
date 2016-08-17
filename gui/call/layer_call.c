@@ -20,6 +20,7 @@ Modification:
 
 /*****************变量定义***********************/
 static ITULayer* MainLayer = NULL;
+static ITULayer* BeCallLayer = NULL;
 static ITULayer* CallLayer = NULL;
 static ITUBackground* CallRightBackground = NULL;
 static ITUTextBox* CallKeyBordTextBox = NULL;
@@ -27,6 +28,7 @@ static ITUText* CallKeyBordHitText = NULL;
 static ITUKeyboard* CallKeyboard = NULL;
 static ITUButton* CallRightExitButton = NULL;
 static ITURadioBox* CallRightCeterRadioBox = NULL;
+static ITURadioBox* CallRightRecordRadioBox = NULL;
 static ITURadioBox* CallBottomRecordMissRadioBox = NULL;
 static ITUBackground* CallBottomBackground0 = NULL;		// 纯色底部背景
 static ITUBackground* CallBottomBackground1 = NULL;		// 通话记录底部背景
@@ -48,7 +50,7 @@ static ITUBackground* CallRecordMSGHitGrayBackground = NULL;
 /*****************常量定义***********************/
 static char g_CallNo[50];							// 呼叫号码
 static uint8 g_CurPage = 0;							// 当前页面
-static uint8 g_CallType = 0;						// 呼叫类型
+static uint8 g_CallType = 0;						// 呼叫类型 呼叫室内
 static uint8 g_MaxNoLen = 0;
 static uint32 g_HintStrID = 0;						// 提示文字ID
 static uint32 g_MainStrID = 0;						// 提示主文字ID
@@ -58,8 +60,10 @@ static uint8  g_TimerRuning = FALSE;				// 执行定时器
 static uint32 g_CallLastTick = 0;					// 实时更新的tick
 static PMCALLLISTINFO g_CallRecord;
 static CALL_TYPE g_RecordType;
-static uint8 g_event = 0;							// 判断是清空还是删除
-
+static uint8 g_Event = 0;							// 判断是清空还是删除
+static uint8 g_Index[8] = { 0 };					// 管理员机或分机列表
+static uint8 g_CenterType = 0;						//  0 管理员机 1 分机
+		
 typedef enum
 {
 	CallCeterEvent = 0x00,
@@ -176,6 +180,56 @@ static void SetCallRecordPageDisable(uint8 type)
 }
 
 /*************************************************
+Function:		WhetherMissUnRead
+Description: 	判断是否有未读的未接记录
+Input:			无
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+static uint8 WhetherMissUnRead(void)
+{
+	uint8 i, max = 0;
+
+	if (g_CallRecord)
+	{
+		if (g_CallRecord->CallInfo)
+		{
+			free(g_CallRecord->CallInfo);
+			g_CallRecord->CallInfo = NULL;
+		}
+		free(g_CallRecord);
+		g_CallRecord = NULL;
+	}
+
+	g_CallRecord = storage_get_callrecord(MISSED);
+	if (g_CallRecord == NULL)
+	{
+		printf("g_CallRecord is NULL\n");
+		return;
+	}
+
+	if (g_CallRecord && g_CallRecord->CallCount > 0)
+	{
+		max = g_CallRecord->CallCount;
+		if (max > MAX_RECORD_NUM)
+		{
+			max = MAX_RECORD_NUM;
+		}
+
+		for (i = 0; i < max; i++)
+		{
+			if (g_CallRecord->CallInfo[i].UnRead)
+			{
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+/*************************************************
 Function:		SetRecordShowInit
 Description: 	通话记录页面初始化
 Input:			无
@@ -187,8 +241,6 @@ static void SetRecordShowInit(void)
 {
 	uint8 i;
 
-	// 初始化默认为首页
-	ituCoverFlowGoto(CallRecordListCoverFlow, 0);
 	for (i = 0; i < MAX_RECORD_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(CallRecordListBackgroundPage[i], true);
@@ -200,7 +252,17 @@ static void SetRecordShowInit(void)
 		ituWidgetSetVisible(CallRecordListSprite[i], true);
 		ituSetColor(&((ITUWidget*)CallRecordListDevTypeText[i])->color, 255, 255, 255, 255);
 		ituSetColor(&((ITUWidget*)CallRecordListTimeText[i])->color, 255, 255, 255, 255);
-	}	
+	}
+	// 初始化默认为首页
+	// 解决CallRecordListCoverFlow第一页是-1的情况
+	if (CallRecordListCoverFlow->frame == CallRecordListCoverFlow->totalframe)
+	{
+		ituCoverFlowGoto(CallRecordListCoverFlow, -1);
+	}
+	else
+	{
+		ituCoverFlowGoto(CallRecordListCoverFlow, 0);
+	}
 }
 
 /*************************************************
@@ -251,6 +313,100 @@ static void SetRecordShowNum(uint8 max)
 }
 
 /*************************************************
+Function:		ShowRecordWin
+Description: 	显示通话记录具体信息
+Input:			无
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+static void ShowRecordWin(CALL_TYPE Calltype)
+{
+	uint8 i, max = 0;
+	char devtype[50], timestr[50];
+	
+	if (g_CallRecord)
+	{
+		if (g_CallRecord->CallInfo)
+		{
+			free(g_CallRecord->CallInfo);
+			g_CallRecord->CallInfo = NULL;
+		}
+		free(g_CallRecord);
+		g_CallRecord = NULL;
+	}
+	SetRecordShowInit();
+	g_RecordType = Calltype;
+
+	g_CallRecord = storage_get_callrecord(Calltype);
+	if (g_CallRecord == NULL)
+	{
+		printf("g_CallRecord is NULL\n");
+		return;
+	}
+
+	if (g_CallRecord && g_CallRecord->CallCount > 0)
+	{
+		max = g_CallRecord->CallCount;
+		if (max > MAX_RECORD_NUM)
+		{
+			max = MAX_RECORD_NUM;
+		}
+		for (i = 0; i < max; i++)
+		{
+			memset(devtype, 0, sizeof(devtype));
+			memset(timestr, 0, sizeof(timestr));
+
+			get_dev_description(g_CallRecord->CallInfo[i].Type, g_CallRecord->CallInfo[i].devno, devtype, 50);
+			sprintf(timestr, "%04d-%02d-%02d %02d:%02d:%02d", g_CallRecord->CallInfo[i].Time.year, g_CallRecord->CallInfo[i].Time.month, g_CallRecord->CallInfo[i].Time.day,
+				g_CallRecord->CallInfo[i].Time.hour, g_CallRecord->CallInfo[i].Time.min, g_CallRecord->CallInfo[i].Time.sec);
+
+			// 如果是未接来电，且未读则字体颜色改为红色
+			if (Calltype == MISSED)
+			{
+				if (g_CallRecord->CallInfo[i].UnRead)
+				{
+					g_CallRecord->CallInfo[i].UnRead = 0;
+					ituSetColor(&((ITUWidget*)CallRecordListDevTypeText[i])->color, 255, 255, 0, 0);
+					ituSetColor(&((ITUWidget*)CallRecordListTimeText[i])->color, 255, 255, 0, 0);
+				}
+			}
+
+			ituTextSetString(CallRecordListDevTypeText[i], devtype);
+			ituTextSetString(CallRecordListTimeText[i], timestr);
+			// 如果处于编辑状态尾部小图标应改为未选中状态
+			if (g_CurPage == CallRecordPage)
+			{
+				if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_AREA || g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_STAIR
+					|| g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_DOOR_NET)
+				{
+					ituWidgetSetVisible(CallRecordListSprite[i], false);
+				}
+				else
+				{
+					ituSpriteGoto(CallRecordListSprite[i], CallCallIcon);
+				}
+			}
+			else if (g_CurPage == CallEditPage)
+			{
+				ituWidgetSetVisible(CallRecordListSprite[i], true);
+				ituSpriteGoto(CallRecordListSprite[i], CallUnChoseIcon);
+			}
+		}
+
+		if (Calltype == MISSED)
+		{
+			storage_set_callrecord_state(g_CallRecord);
+		}
+		SetRecordShowNum(max);
+	}
+	else
+	{
+		SetRecordShowNum(0);
+	}
+}
+
+/*************************************************
 Function:		SetCenterShowInit
 Description: 	显示页面初始化
 Input:			无
@@ -262,8 +418,6 @@ static void SetCenterShowInit(void)
 {
 	uint8 i;
 
-	// 初始化默认为首页
-	ituCoverFlowGoto(CallCeterListCoverFlow, 0);
 	for (i = 0; i < MAX_CENTER_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(CallCeterListBackgroundPage[i], true);
@@ -271,8 +425,17 @@ static void SetCenterShowInit(void)
 
 	for (i = 0; i < MAX_CENTER_NUM; i++)
 	{
-		ituWidgetSetVisible(CallCeterListIcon[i], true);
 		ituWidgetSetVisible(CallCeterListContainer[i], true);
+	}
+	// 初始化默认为首页
+	// 解决CallCeterListCoverFlow第一页是-1的情况
+	if (CallCeterListCoverFlow->frame == CallCeterListCoverFlow->totalframe)
+	{
+		ituCoverFlowGoto(CallCeterListCoverFlow, -1);
+	}
+	else
+	{
+		ituCoverFlowGoto(CallCeterListCoverFlow, 0);
 	}
 }
 
@@ -325,115 +488,83 @@ static void SetCenterShowNum(uint8 max)
 }
 
 /*************************************************
-Function:		ShowRecordWin
-Description: 	显示通话记录具体信息
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void ShowRecordWin(CALL_TYPE Calltype)
-{
-	uint8 i, max = 0;
-	char devtype[50], timestr[50];
-	
-	if (g_CallRecord)
-	{
-		if (g_CallRecord->CallInfo)
-		{
-			free(g_CallRecord->CallInfo);
-			g_CallRecord->CallInfo = NULL;
-		}
-		free(g_CallRecord);
-		g_CallRecord = NULL;
-	}
-	SetRecordShowInit();
-	g_RecordType = Calltype;
-
-	g_CallRecord = storage_get_callrecord(Calltype);
-	if (g_CallRecord == NULL)
-	{
-		printf("g_CallRecord is NULL\n");
-		return;
-	}
-	else
-	{
-		printf("g_CallRecord->CallCount .........:%d\n", g_CallRecord->CallCount);
-	}
-
-	if (g_CallRecord && g_CallRecord->CallCount > 0)
-	{
-		max = g_CallRecord->CallCount;
-		if (max > MAX_RECORD_NUM)
-		{
-			max = MAX_RECORD_NUM;
-		}
-		for (i = 0; i < max; i++)
-		{
-			memset(devtype, 0, sizeof(devtype));
-			memset(timestr, 0, sizeof(timestr));
-
-			get_dev_description(g_CallRecord->CallInfo[i].Type, g_CallRecord->CallInfo[i].devno, devtype, 50);
-			sprintf(timestr, "%04d-%02d-%02d %02d:%02d:%02d", g_CallRecord->CallInfo[i].Time.year, g_CallRecord->CallInfo[i].Time.month, g_CallRecord->CallInfo[i].Time.day,
-				g_CallRecord->CallInfo[i].Time.hour, g_CallRecord->CallInfo[i].Time.min, g_CallRecord->CallInfo[i].Time.sec);
-
-			// 如果是未接来电，且未读则字体颜色改为红色
-			if (Calltype == MISSED)
-			{
-				if (g_CallRecord->CallInfo[i].UnRead)
-				{
-					// 调试完记得开启
-					//g_CallRecord->CallInfo[i].ReadFlag = 0;
-					ituSetColor(&((ITUWidget*)CallRecordListDevTypeText[i])->color, 255, 255, 0, 0);
-					ituSetColor(&((ITUWidget*)CallRecordListTimeText[i])->color, 255, 255, 0, 0);
-				}
-			}
-
-			ituTextSetString(CallRecordListDevTypeText[i], devtype);
-			ituTextSetString(CallRecordListTimeText[i], timestr);
-			// 如果处于编辑状态尾部小图标应改为未选中状态
-			if (g_CurPage == CallRecordPage)
-			{
-				if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_AREA || g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_STAIR
-					|| g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_DOOR_NET)
-				{
-					ituWidgetSetVisible(CallRecordListSprite[i], false);
-				}
-				else
-				{
-					ituSpriteGoto(CallRecordListSprite[i], CallCallIcon);
-				}
-			}
-			else if (g_CurPage == CallEditPage)
-			{
-				ituWidgetSetVisible(CallRecordListSprite[i], true);
-				ituSpriteGoto(CallRecordListSprite[i], CallUnChoseIcon);
-			}
-		}
-
-		if (Calltype == MISSED)
-		{
-			storage_set_callrecord_state(g_CallRecord);
-		}
-		SetRecordShowNum(max);
-	}
-	else
-	{
-		SetRecordShowNum(0);
-	}
-}
-
-/*************************************************
 Function:		ShowCenterWin
 Description: 	显示管理员机或分机列表
-Input:			无
+Input:
+1.type			0 管理员机列表 1 分机列表
 Output:			无
 Return:			无
 Others:			无
 *************************************************/
 static void ShowCenterWin(uint8 type)
 {
+	uint8 i, count = 0;
+	char devtype[50], devno[5];
 
+	SetCenterShowInit();
+	g_CenterType = type;
+	memset(g_Index, 0, sizeof(g_Index));
+
+	if (type == 0)
+	{
+		for (i = 0; i < 3; i++)
+		{
+			if (storage_get_manager_ip(i+1))
+			{
+				g_Index[count] = i+ MANAGER_NUM + 1;
+				count++;
+			}
+		}
+
+		if (count)
+		{
+			for (i = 0; i < count; i++)
+			{
+				memset(devno, 0, sizeof(devno));
+				memset(devtype, 0, sizeof(devtype));
+
+				sprintf(devno, "%d", g_Index[i]);
+				printf("devno : %s g_Index[%d] : %d\n", devno, i, g_Index[i]);
+				get_dev_description(DEVICE_TYPE_MANAGER, devno, devtype, 50);
+				ituTextSetString(CallCeterListDevTypeText[i], devtype);
+			}
+			SetCenterShowNum(count);
+		}
+		else
+		{
+			g_Index[0] = 0xFF;
+			ituTextSetString(CallCeterListDevTypeText[0], get_str(SID_DevManager));
+			SetCenterShowNum(1);
+		}
+	}
+	else
+	{
+		for (i = 0; i < 8; i++)
+		{
+			if (storage_get_subdev_ip(i))
+			{
+				g_Index[count] = i;
+				count++;
+			}
+		}
+		if (count)
+		{
+			for (i = 0; i < count; i++)
+			{
+				memset(devno, 0, sizeof(devno));
+				memset(devtype, 0, sizeof(devtype));
+
+				sprintf(devno, "%d", g_Index[i]);
+				get_dev_description(DEVICE_TYPE_FENJI_NET, devno, devtype, 50);
+				ituTextSetString(CallCeterListDevTypeText[i], devtype);
+			}
+			SetCenterShowNum(count);
+		}
+		else
+		{
+			SetCenterShowNum(0);
+		}
+	}
 }
 
 /*************************************************
@@ -535,12 +666,14 @@ static uint8 CheckCallNOValid(char *CallNo)
 
 	if (CallNo == NULL)
 	{
+		dprintf("CallNo is null\n");
 		return FALSE;
 	}
 
 	len = strlen(CallNo);
 	if (len <= 0)
 	{
+		dprintf("CallNo is len : %d\n", len);
 		return FALSE;
 	}
 	else
@@ -559,9 +692,10 @@ Others:			无
 *************************************************/
 static void CalloutEventStart(void)
 {
-	uint8 ret = 0;
+	uint8 ret = FALSE;
 
 	ret = CheckCallNOValid(g_CallNo);
+
 	if (ret == FALSE)
 	{
 		g_HintStrID = SID_Inter_WrongNo;
@@ -575,9 +709,8 @@ static void CalloutEventStart(void)
 		}
 		else if (g_CallType == DEVICE_TYPE_FENJI_NET)
 		{
-			//ret = inter_call_sub_terminal(g_CallNo);
+			ret = inter_call_sub_terminal(g_CallNo);
 		}
-
 		if (ret == 0)
 		{
 			g_HintStrID = SID_Inter_Connecting;
@@ -619,6 +752,53 @@ static void CallDestroyProc(void)
 }
 
 /*************************************************
+Function:		CallCallRequestState
+Description: 	呼叫请求回调执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool CallCallRequestState(ITUWidget* widget, char* param)
+{
+	uint32 temp = 0;
+	INTER_INFO_S CallInfo = { 0 };
+	PINTER_CALLBACK pcallbak_data = (PINTER_CALLBACK)param;
+
+	dprintf("state : %d\n", pcallbak_data->InterState);
+	switch (pcallbak_data->InterState)
+	{
+		case CALL_STATE_REQUEST:
+			if (pcallbak_data->DataLen != 1)
+			{
+				CallInfo.InterType = INTER_CALLOUT_E;
+				CallInfo.DevType = DEVICE_TYPE_ROOM;
+				strcpy(CallInfo.DevStr, pcallbak_data->Buf);
+				BeCallWin(&CallInfo);
+			}
+			break;
+
+		case CALL_STATE_END:
+			temp = atoi(pcallbak_data->Buf);
+			if (temp == END_BY_REQUESET_ERR)
+			{
+				g_HintStrID = SID_Inter_NoNotFound;
+				ituTextSetString(CallKeyBordHitText, get_str(g_HintStrID));
+			}
+			else
+			{
+				g_HintStrID = 0;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+	return true;
+}
+
+/*************************************************
 Function:		CallLayerOnTimer
 Description: 	定时器
 Input:			无
@@ -650,6 +830,7 @@ bool CallLayerOnTimer(ITUWidget* widget, char* param)
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -714,6 +895,8 @@ bool CallKeyBordDelButtonOnMouseUp(ITUWidget* widget, char* param)
 		ituTextSetString(CallKeyBordHitText, get_str(g_MainStrID));
 	}
 	dprintf("del len...: %d g_CallNo...: %s\n", len, g_CallNo);
+
+	return true;
 }
 /*************************************************
 Function:		CallKeyBordDelButtonOnMouseLongPress
@@ -725,11 +908,12 @@ Others:			无
 *************************************************/
 bool CallKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param)
 {
-	printf("longpress..........\n");
 	memset(g_CallNo, 0, sizeof(g_CallNo));
 	ituTextBoxSetString(CallKeyBordTextBox, NULL);
 	// 删除号码完毕，显示输入提示
 	ituTextSetString(CallKeyBordHitText, get_str(g_MainStrID));
+
+	return true;
 }
 
 /*************************************************
@@ -745,6 +929,8 @@ bool CallKeyBordCalloutButtonOnMouseUp(ITUWidget* widget, char* param)
 	g_CallLastTick = SDL_GetTicks();
 	ituTextBoxSetString(CallKeyBordTextBox, NULL);
 	CalloutEventStart();
+
+	return true;
 }
 
 /*************************************************
@@ -771,6 +957,43 @@ bool CallRecordListButtonOnMouseUp(ITUWidget* widget, char* param)
 			ituSpriteGoto(CallRecordListSprite[index], CallChoseIcon);
 		}
 	}
+	else
+	{
+		if (g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_MANAGER || g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_ROOM ||
+			g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_FENJI_NET)
+		{
+			if (g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_ROOM)
+			{
+				PFULL_DEVICE_NO dev = storage_get_devparam();
+
+				g_TimerRuning = TRUE;
+				SetCalloutInfo(CallUserEvent);
+				CallLayerPage(CallUserPage);
+				strncpy(g_CallNo, g_CallRecord->CallInfo[index].devno, dev->DevNoLen - 1);
+				g_CallLastTick = SDL_GetTicks();
+				ituTextBoxSetString(CallKeyBordTextBox, NULL);
+				CalloutEventStart();
+			}
+			else
+			{	
+				INTER_INFO_S CallInfo = { 0 };
+
+				CallInfo.InterType = INTER_CALLOUT_E;
+				if (g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_MANAGER)
+				{
+					CallInfo.DevType = DEVICE_TYPE_MANAGER;
+				}
+				else
+				{
+					CallInfo.DevType = DEVICE_TYPE_FENJI_NET;
+				}
+				strcpy(CallInfo.DevStr, g_CallRecord->CallInfo[index].devno);
+				BeCallWin(&CallInfo);
+			}
+		}
+	}
+
+	return true;
 }
 
 /*************************************************
@@ -784,8 +1007,27 @@ Others:			无
 bool CallCeterListButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 index = atoi(param);
+	INTER_INFO_S CallInfo = { 0 };
 
-	dprintf("CenterList index......:%d\n", index);
+	int32 ret = ui_show_win_arbitration(SYS_OPER_CALLOUT);
+	if (ret == TRUE)
+	{
+		CallInfo.InterType = INTER_CALLOUT_E;
+		if (g_CenterType == 0)
+		{
+			CallInfo.DevType = DEVICE_TYPE_MANAGER;
+			sprintf(CallInfo.DevStr, "%d", g_Index[index]);
+			BeCallWin(&CallInfo);
+		}
+		else
+		{
+			CallInfo.DevType = DEVICE_TYPE_FENJI_NET;
+			sprintf(CallInfo.DevStr, "%d", g_Index[index]);
+			BeCallWin(&CallInfo);
+		}
+	}
+
+	return true;
 }
 
 /*************************************************
@@ -802,7 +1044,7 @@ bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param)
 	
 	if (index)
 	{
-		if (g_event == CallDelEvent)
+		if (g_Event == CallDelEvent)
 		{
 			uint8 i;
 			DEL_LIST DelList;
@@ -816,15 +1058,18 @@ bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param)
 					DelList.Counts++;
 				}
 			}
+			dprintf("DelList.Counts : %d\n", DelList.Counts);
 			storage_del_callrecord(g_RecordType, &DelList);
 		}
-		else if (g_event == CallCleanEvent)
+		else if (g_Event == CallCleanEvent)
 		{
 			storage_clear_callrecord(g_RecordType);
 		}
 		ShowRecordWin(g_RecordType);
 	}
 	SetCallRecordPageDisable(false);
+
+	return true;
 }
 
 /*************************************************
@@ -854,9 +1099,13 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 	switch (btn_event)
 	{
 		case CallCeterEvent:
-		case CallFenJiEvent:
-			printf(" Ceter Press.........\n");
 			CallLayerPage(CallCeterPage);
+			ShowCenterWin(0);
+			break;
+
+		case CallFenJiEvent:
+			CallLayerPage(CallCeterPage);
+			ShowCenterWin(1);
 			break;
 
 		case CallUserEvent:
@@ -893,7 +1142,7 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			if (res)
 			{
 				SetCallRecordPageDisable(true);
-				g_event = CallDelEvent;
+				g_Event = CallDelEvent;
 			}
 			break;
 
@@ -901,7 +1150,7 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			SetRecordChose();
 			ituTextSetString(CallRecordMSGHitText, get_str(SID_Bj_Query_Del_Rec_All));
 			SetCallRecordPageDisable(true);
-			g_event = CallCleanEvent;
+			g_Event = CallCleanEvent;
 			break;
 
 		case CallExitEvent:
@@ -940,14 +1189,23 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 		uint8 i;
 		char callname[50];
 
+		CallLayer = ituSceneFindWidget(&theScene, "CallLayer");
+		assert(CallLayer);
+
 		MainLayer = ituSceneFindWidget(&theScene, "mainLayer");
 		assert(MainLayer);
+
+		BeCallLayer = ituSceneFindWidget(&theScene, "BeCallLayer");
+		assert(BeCallLayer);
 
 		CallRightBackground = ituSceneFindWidget(&theScene, "CallRightBackground");
 		assert(CallRightBackground);
 
 		CallRightCeterRadioBox = ituSceneFindWidget(&theScene, "CallRightCeterRadioBox");
 		assert(CallRightCeterRadioBox);
+
+		CallRightRecordRadioBox = ituSceneFindWidget(&theScene, "CallRightRecordRadioBox");
+		assert(CallRightRecordRadioBox);
 		
 		CallBottomRecordMissRadioBox = ituSceneFindWidget(&theScene, "CallBottomRecordMissRadioBox");
 		assert(CallBottomRecordMissRadioBox);
@@ -1043,23 +1301,26 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 		}
 #if 0
 		storage_set_language(CHINESE);
-		FULL_DEVICE_NO g_devparam;
-		memset(&g_devparam, 0, sizeof(FULL_DEVICE_NO));
-		g_devparam.Rule.StairNoLen = 4;
-		g_devparam.Rule.RoomNoLen = 4;
-		g_devparam.Rule.CellNoLen = 2;
-		g_devparam.Rule.UseCellNo = 1;
-		g_devparam.Rule.Subsection = 224;
-		memcpy(g_devparam.DeviceNoStr, "010102050", 20);
-		storage_save_devno(TRUE, g_devparam.Rule, g_devparam.DeviceNoStr);
+		storage_set_subdev_ip(1, 0XC0A80C6D);
 #endif
 	}
-	g_event = 0;
+	g_Event = 0;
 	g_TimerRuning = FALSE;
 	g_RecordType = MISSED;
 	SetCallRecordPageDisable(false);
-	CallLayerPage(CallCeterPage);
-	ituRadioBoxSetChecked(CallRightCeterRadioBox, true);
+	if (WhetherMissUnRead() == TRUE)
+	{
+		CallLayerPage(CallRecordPage);
+		ituRadioBoxSetChecked(CallRightRecordRadioBox, true);
+		ituRadioBoxSetChecked(CallBottomRecordMissRadioBox, true);
+		ShowRecordWin(MISSED);
+	}
+	else
+	{
+		CallLayerPage(CallCeterPage);
+		ituRadioBoxSetChecked(CallRightCeterRadioBox, true);
+		ShowCenterWin(0);
+	}
 	CallKeyBordTextBox->text.layout = ITU_LAYOUT_MIDDLE_CENTER;
 
 	return true;

@@ -34,12 +34,13 @@
 /******* ite need ******/
 
 #include "comm/au_model_func.h"
-#include "cleanscreen\layer_cleanscreen.h"
-#include "elevator\layer_elevator.h"
-#include "information\layer_information.h"
-#include "mainmenu\layer_mainmenu.h"
-#include "photomsg\layer_photomsg.h"
-#include "recorder\layer_recorder.h"
+#include "cleanscreen/layer_cleanscreen.h"
+#include "elevator/layer_elevator.h"
+#include "information/layer_information.h"
+#include "mainmenu/layer_mainmenu.h"
+#include "photomsg/layer_photomsg.h"
+#include "recorder/layer_recorder.h"
+#include "picmanager/layer_picmanager.h"
 #include "call/layer_call.h"
 #include "set/layer_set.h"
 

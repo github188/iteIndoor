@@ -202,15 +202,15 @@ bool informationMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 
 bool setInformationIsReaded(uint8_t index, INFORMATION_MSGICON_STATUS_e status)
 {
-	char tmp_read[50] = { 0 };
-	char tmp_unread[50] = { 0 };
+	char tmpRead[50] = { 0 };
+	char tmpUnread[50] = { 0 };
 
-	sprintf(tmp_read, "%s%d", "informationMSGListReadIcon", index);
-	informationMSGListReadIcon = ituSceneFindWidget(&theScene, tmp_read);
+	sprintf(tmpRead, "%s%d", "informationMSGListReadIcon", index);
+	informationMSGListReadIcon = ituSceneFindWidget(&theScene, tmpRead);
 	assert(informationMSGListReadIcon);
 
-	sprintf(tmp_unread, "%s%d", "informationMSGListUnReadIcon", index);
-	informationMSGListUnReadIcon = ituSceneFindWidget(&theScene, tmp_unread);
+	sprintf(tmpUnread, "%s%d", "informationMSGListUnReadIcon", index);
+	informationMSGListUnReadIcon = ituSceneFindWidget(&theScene, tmpUnread);
 	assert(informationMSGListUnReadIcon);
 
 	switch (status)
@@ -354,6 +354,7 @@ void setInformationContent(uint8_t index)
 	setInformationContentImage(gInformationImageFilePath);
 }
 
+
 void setInformationContentTheme(char* themeStr)
 {
 	if (!informationMSGContentThemeText)
@@ -363,6 +364,7 @@ void setInformationContentTheme(char* themeStr)
 	}
 	ituTextSetString(informationMSGContentThemeText, themeStr);
 }
+
 
 void setInformationContentSender(char* senderStr)
 {
@@ -374,6 +376,7 @@ void setInformationContentSender(char* senderStr)
 	ituTextSetString(informationMSGContentSenderText, senderStr);
 }
 
+
 void setInformationContentTime(char* timeStr)
 {
 	if (!informationMSGContentTimeText)
@@ -383,6 +386,7 @@ void setInformationContentTime(char* timeStr)
 	}
 	ituTextSetString(informationMSGContentTimeText, timeStr);
 }
+
 
 bool setInformationContentImage(char* imageStr)
 {
@@ -429,6 +433,7 @@ bool setInformationContentImage(char* imageStr)
 	}
 }
 
+
 void setInformationContentDetail(char* detailStr)
 {
 	if (!informationMSGContentDetailTextBox)
@@ -438,6 +443,7 @@ void setInformationContentDetail(char* detailStr)
 	}
 	ituTextBoxSetString(informationMSGContentDetailTextBox, detailStr);
 }
+
 
 void informationReturnBtnOnClicked()
 {
@@ -461,6 +467,7 @@ void informationReturnBtnOnClicked()
 	//return true;
 }
 
+
 void informationNextMsgBtnOnClicked()
 {
 	printf("informationNextMsgBTNOnClicked 111111111111111111111111111111");
@@ -468,12 +475,14 @@ void informationNextMsgBtnOnClicked()
 	//return true;
 }
 
+
 void informationPreMsgBtnOnClicked()
 {
 	printf("informationPreMsgBTNOnClicked 111111111111111111111111111111");
 
 	//return true;
 }
+
 
 void informationMsgBoxShow(INFORMATION_BTN_e index)
 {
@@ -506,6 +515,7 @@ void informationMsgBoxShow(INFORMATION_BTN_e index)
 	ituWidgetDisable(informationBackground);
 	ituWidgetSetVisible(informationTipsTransparencyBackground, true);
 }
+
 
 void setInformationList()
 {
@@ -586,7 +596,14 @@ void setInformationList()
 		{
 			if ((i == (msgNum / INFORMATION_PER_PAGE)) && (msgNum % INFORMATION_PER_PAGE) == 0)
 			{
-				ituWidgetSetVisible(informationPageContainer, false);
+				if (msgNum == 0)
+				{	
+					ituWidgetSetVisible(informationPageContainer, true);
+				}
+				else
+				{
+					ituWidgetSetVisible(informationPageContainer, false);
+				}
 			}
 			else
 			{

@@ -104,7 +104,6 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	printf("444444444444444444444 = %d", tmpSize);
 
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
-
 	mainLayerCornerNumReload();
 	mainLayerScrollDataReload();
 
@@ -944,7 +943,13 @@ void setUnreadMissedCallScroll()
 
 uint8_t getUnsolvedSecurityAlarmNum()
 {
-	return storage_get_afbj_unread_record()->nCount;
+	uint8_t tmpNum = 0;
+	PALARM_TOUCH_INFO_LIST tmpList;
+	tmpList = storage_get_afbj_unread_record();
+	tmpNum = tmpList->nCount;
+	free(tmpList);
+
+	return tmpNum;
 }
 
 

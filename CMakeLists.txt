@@ -215,6 +215,8 @@ gui/recorder/layer_recorder.c
 gui/recorder/layer_recorder.h
 gui/elevator/layer_elevator.c
 gui/elevator/layer_elevator.h
+gui/picmanager/layer_picmanager.c
+gui/picmanager/layer_picmanager.h
 gui/call/layer_call.h
 gui/call/layer_call.c
 gui/call/layer_becall.c

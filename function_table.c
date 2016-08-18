@@ -37,6 +37,11 @@ ITUActionFunction actionFunctions[] =
 	"recorderVolTrackBarOnChanged", recorderVolTrackBarOnChanged,
 	"recorderRecordRadioBoxChanged", recorderRecordRadioBoxChanged,
 
+	//picmanager
+	"picManagerLayerOnEnter", picManagerLayerOnEnter,
+	"picManagerBtnOnClicked", picManagerBtnOnClicked,
+	"picManagerMsgBoxBtnOnClicked", picManagerMsgBoxBtnOnClicked,
+
 	// CallLayer
 	"CallLayerOnEnter", CallLayerOnEnter,
 	"CallLayerButtonOnMouseUp", CallLayerButtonOnMouseUp,

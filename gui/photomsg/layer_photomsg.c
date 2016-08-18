@@ -504,14 +504,14 @@ bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread)
 
 	ituTextSetString(photoMsgListTimeText, timeStr);
 
-	if (isUnread)
-	{
-		ituTextSetBackColor(photoMsgListTimeText, 255,255,0,0);
-	}
-	else
-	{
-		ituTextSetBackColor(photoMsgListTimeText, 255, 255, 255, 0);
-	}
+	//if (isUnread)
+	//{
+	//	ituTextSetBackColor(photoMsgListTimeText, 255,255,0,0);
+	//}
+	//else
+	//{
+	//	ituTextSetBackColor(photoMsgListTimeText, 255, 255, 255, 0);
+	//}
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
 	return true;

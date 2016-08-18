@@ -99,6 +99,7 @@ extern "C" {
 	bool SetLanguageSimplifiedButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetLanguageTraditionalButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetLanguageEnglishButtonOnMouseUp(ITUWidget* widget, char* param);
+	void SetSystemLanguageLayerOnReturn(void);
 
 	//Set_Link
 	bool SetLinkOnEnter(ITUWidget* widget, char* param);
@@ -199,6 +200,7 @@ extern "C" {
 	// Set_Project
 	bool SetProjectOnEnter(ITUWidget* widget, char* param);
 	bool SetPrjProjectPwdButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetPrjBackButtonOnMouseUp(ITUWidget* widget, char* param);
 
 	// Set_Rtsp
 	bool SetRtspOnEnter(ITUWidget* widget, char* param);

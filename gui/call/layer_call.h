@@ -31,12 +31,6 @@ bool CallCeterListButtonOnMouseUp(ITUWidget* widget, char* param);
 bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param);
 bool CallCallRequestState(ITUWidget* widget, char* param);
 
-// MonitorSearch
-bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param);
-bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param);
-bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param);
-bool MonitorSearchMSGButtonOnMouseUp(ITUWidget* widget, char* param);
-
 // BeCall
 bool BeCallLayerOnEnter(ITUWidget* widget, char* param);
 bool BeCallLayerButtonOnMouseUp(ITUWidget* widget, char* param);
@@ -46,7 +40,24 @@ bool BeCallButtomSoundOnChanged(ITUWidget* widget, char* param);
 bool BeCallLayerOnTimer(ITUWidget* widget, char* param);
 bool BeCallCallOutState(ITUWidget* widget, char* param);
 bool BeCallCallInState(ITUWidget* widget, char* param);
-uint8 BeCallWin(INTER_INFO_S* info);
+void BeCallWin(INTER_INFO_S* info);
+
+// MonitorSearch
+bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param);
+bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorSearchMSGButtonOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorSearchListState(ITUWidget* widget, char* param);
+
+// Monitor
+bool MonitorLayerOnEnter(ITUWidget* widget, char* param);
+bool MonitorLayerButtonOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorShowButtomBackgroundOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorButtomSoundButtonOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorButtomSoundOnChanged(ITUWidget* widget, char* param);
+bool MonitorLayerOnTimer(ITUWidget* widget, char* param);
+bool MonitorState(ITUWidget* widget, char* param);
+void MonitorWin(DEVICE_TYPE_E DevType, uint8 index);
 
 #ifdef __cplusplus
 }

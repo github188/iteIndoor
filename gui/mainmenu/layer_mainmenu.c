@@ -79,7 +79,6 @@ static ITUWidget*	page0InformationScrollTextContainer;
 
 static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
 
-
 static bool		gIsScrollingRecorder;
 static uint8_t	gRecorderTextIndex;
 static bool		gIsScrollingInformation;
@@ -96,13 +95,19 @@ static bool		gSOSBtnIsPress;
 static bool		gSOSIsAlarm;
 static uint8_t  gScrollTimeCount;
 
+static PJRLYLIST_INFO	gRecorderData = NULL;		//家人留言数据
+
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
 {
 	uint8_t tmpSize = get_size(MSG_MANAGE_PATH);
 	printf("444444444444444444444 = %d", tmpSize);
+
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
+
 	mainLayerCornerNumReload();
+	mainLayerScrollDataReload();
+
 	gSOSBtnIsPress = false;
 	gSOSIsAlarm = false;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
@@ -215,7 +220,11 @@ void mainLayerCornerNumReload()
 
 void mainLayerScrollDataReload()
 {
-
+	loadUnreadRecorderData();				//载入未读家人留言数据
+	loadUnreadInformationData();			//载入未读信息数据
+	loadUnreadMissedCallData();				//载入未接电话信息
+	loadUnreaPhotoMsgData();				//载入未读留影留言数据
+	loadUnsolvedSecurityAlarmData();		//载入为处理的报警数据
 }
 
 
@@ -457,7 +466,21 @@ void setUnreadRecorderNum(uint8_t num)
 
 void loadUnreadRecorderData()
 {
+	PJRLYLIST_INFO tmpListInfo = NULL;
+
 	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
+	if (gRecorderData == NULL)
+	{
+		gRecorderData = (PJRLYLIST_INFO)malloc(sizeof(JRLYLIST_INFO));
+	}
+	printf("2222222222222222  = %d", sizeof(JRLYLIST_INFO));
+
+	storage_get_jrlyrecord(&tmpListInfo);
+	memcpy(gRecorderData, tmpListInfo, sizeof(JRLYLIST_INFO));
+
+	free(tmpListInfo);
+
+	printf("1111111111111  = %d", gRecorderData->Count);
 }
 
 

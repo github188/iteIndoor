@@ -25,6 +25,50 @@ static EPHOTO_TIME g_time;
 static EPHOTO_PARAM g_param;
 
 /*************************************************
+Function:		SaveCloseLcdTimeText
+Description: 	时间text显示
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void SaveCloseLcdTimeText(uint8 save_lcd, uint8 close_lcd)
+{
+	uint8 temp[40] = { 0 };
+	int16 timeflag = 0;
+
+	if (TRUE == save_lcd)
+	{
+		if (g_param.used)
+		{
+			memset(temp, 0, sizeof(temp));
+			timeflag = storage_get_screen_intime();
+			if (timeflag >= 60)
+			{
+				sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
+			}
+			else
+			{
+				sprintf(temp, "%d%s", timeflag, get_str(SID_Time_Sec));
+			}
+			ituTextSetString(SetLcdSave2Text, temp);
+		}
+		else
+		{
+			ituTextSetString(SetLcdSave2Text, get_str(SID_Time_Never));
+		}
+	}
+	
+	if (TRUE == close_lcd)
+	{
+		memset(temp, 0, sizeof(temp));
+		timeflag = storage_get_closelcd_time();
+		sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
+		ituTextSetString(SetCloseLcd2Text, temp);
+	}
+}
+
+/*************************************************
 Function:		SetPersonalityPhotoFrameOnEnter
 Description: 	进入电子相框界面初始化函数
 Input:		无
@@ -61,28 +105,7 @@ bool SetPersonalityPhotoFrameOnEnter(ITUWidget* widget, char* param)
 	memset(&g_param, 0, sizeof(EPHOTO_PARAM));
 	memcpy(&g_param, (PEPHOTO_PARAM)storage_get_screenparam(), sizeof(EPHOTO_PARAM));
 
-	if (g_param.used)
-	{
-		memset(temp, 0, sizeof(temp));
-		timeflag = storage_get_screen_intime();
-		if (timeflag >= 60)
-		{
-			sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
-		}
-		else
-		{
-			sprintf(temp, "%d%s", timeflag, get_str(SID_Time_Sec));
-		}
-		ituTextSetString(SetLcdSave2Text, temp);
-	}
-	else
-	{
-		ituTextSetString(SetLcdSave2Text, get_str(SID_Time_Never));
-	}
-	memset(temp, 0, sizeof(temp));
-	timeflag = storage_get_closelcd_time();
-	sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
-	ituTextSetString(SetCloseLcd2Text, temp);
+	SaveCloseLcdTimeText(TRUE, TRUE);
 	
 	ituWidgetSetVisible(SetCloseLcdTimeMsgBackground, false);
 	ituWidgetSetVisible(SetSaveLcdTimeMsgBackground, false);
@@ -223,9 +246,6 @@ Others:
 bool SetCloseLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 ret = TRUE;
-	uint8 temp[40];
-	int16 timeflag = 0;
-
 	int index = atoi(param);
 
 	switch (index)
@@ -257,10 +277,7 @@ bool SetCloseLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 		//InitScreenTimer();
 	}
 
-	memset(temp, 0, sizeof(temp));
-	timeflag = storage_get_closelcd_time();
-	sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
-	ituTextSetString(SetCloseLcd2Text, temp);
+	SaveCloseLcdTimeText(FALSE, TRUE);
 
 	ituWidgetSetVisible(SetCloseLcdTimeMsgBackground, false);
 	ituWidgetEnable(SetPersonalityPhotoFrameBackground);
@@ -279,9 +296,6 @@ Others:
 bool SetSaveLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 ret;
-	uint8 temp[40];
-	int16 timeflag = 0;
-
 	int index = atoi(param);
 
 	switch (index)
@@ -323,24 +337,7 @@ bool SetSaveLcdTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 		//InitScreenTimer();
 	}
 
-	if (g_param.used)
-	{
-		memset(temp, 0, sizeof(temp));
-		timeflag = storage_get_screen_intime();
-		if (timeflag >= 60)
-		{
-			sprintf(temp, "%d%s", timeflag / 60, get_str(SID_Time_Min));
-		}
-		else
-		{
-			sprintf(temp, "%d%s", timeflag, get_str(SID_Time_Sec));
-		}
-		ituTextSetString(SetLcdSave2Text, temp);
-	}
-	else
-	{
-		ituTextSetString(SetLcdSave2Text, get_str(SID_Time_Never));
-	}
+	SaveCloseLcdTimeText(TRUE, FALSE);
 	
 	ituWidgetSetVisible(SetSaveLcdTimeMsgBackground, false);
 	ituWidgetEnable(SetPersonalityPhotoFrameBackground);

@@ -4,58 +4,35 @@ File name:  	layer_set_link.c
 Author:     	zxc
 Version:
 Date: 		2016-06-24
-Description:
+Description: 联动设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-static ITUSprite* SetAFLinkTikouChefangSprite;
-static ITUSprite* SetAFLinkDoorChefangSprite;
-static ITUSprite* SetAFLinkBafangquDoorRingSprite; 
-static ITUSprite* SetLinkEnableLylySprite;
-static ITUSprite* SetCallLinkWaichuSprite;
-static ITUSprite* SetCallLinkYejianSprite;
-static ITUSprite* SetCallLinkNoFaceSprite;
-static ITUSprite* SetJDLinkWaichuSprite;
-static ITUSprite* SetJDLinkZaijiaSprite;
-static ITUText* SetLinkLylyMode1Text;
-static ITUText* SetLinkLylyMode2Text;
-static ITUText* SetCallLinkWaichu1Text;
-static ITUText* SetCallLinkWaichu2Text;
-static ITUText* SetCallLinkYejian1Text;
-static ITUText* SetCallLinkYejian2Text;
-static ITUText* SetCallLinkNoFace1Text;
-static ITUText* SetCallLinkNoFace2Text;
-static ITUText* SetJDLinkWaichuMode1Text;
-static ITUText* SetJDLinkWaichuMode2Text;
-static ITUText* SetJDLinkZaijiaMode1Text;
-static ITUText* SetJDLinkZaijiaMode2Text;
-static ITUText* SetLinkTitleText;
-static ITUCalendar* SetLinkJDListContainer;
-static ITUCalendar* SetLinkAFListContainer;
-static ITUCalendar* SetLinkContainer;
-static ITUCalendar* SetLinkCallListContainer;
-static ITUBackground* SetLinkLylyModeBackground;
-static ITUBackground* SetLinkBackground;
-static ITUBackground* SetLinkJDModeMsgBackground;
-static ITULayer* SetMenuLayer;
-static ITUCalendar* SetLinkLylyModeContainer;
-static ITUCalendar* SetCallLinkWaichuContainer;
-static ITUCalendar* SetCallLinkYejianContainer;
-static ITUCalendar* SetCallLinkNoFaceContainer;
-static ITUCalendar* SetJDLinkWaichuModeContainer;
-static ITUCalendar* SetJDLinkZaijiaModeContainer;
-static ITURadioBox* SetLinkLylyModeMsg0RadioBox;
-static ITURadioBox* SetLinkLylyModeMsg1RadioBox;
-static ITURadioBox* SetLinkLylyModeMsg2RadioBox;
-static ITURadioBox* SetLinkJDModeMsgHKRadioBox;
-static ITURadioBox* SetLinkJDModeMsgJCRadioBox;
-static ITURadioBox* SetLinkJDModeMsgYJRadioBox;
-static ITURadioBox* SetLinkJDModeMsgJDRadioBox;
-static ITURadioBox* SetLinkJDModeMsgPURadioBox;
+static ITUCalendar* SetLinkContainer = NULL;
+static ITUCalendar* SetLinkAFListContainer = NULL;
+static ITUCalendar* SetLinkCallListContainer = NULL;
+static ITUCalendar* SetLinkJDListContainer = NULL;
+static ITUText* SetLinkTitleText = NULL;
+static ITUBackground* SetLinkLylyModeBackground = NULL;
+static ITUBackground* SetLinkBackground = NULL;
+static ITUBackground* SetLinkJDModeMsgBackground = NULL;
+static ITULayer* SetMenuLayer = NULL;
+static ITUSprite* SetAFLinkSprite[3] = { NULL };
+static ITUText* SetLinkCallContainer1Text[4] = { NULL };
+static ITUText* SetLinkCallContainer2Text[4] = { NULL };
+static ITUCalendar* SetLinkCallContainerEnable[4] = { NULL };
+static ITUSprite* SetLinkCallSprite[3] = { NULL };
+static ITUSprite* SetLinkEnableLylySprite = NULL;
+static ITURadioBox* SetLinkLylyModeMsgRadioBox[3] = { NULL };
+static ITUSprite* SetJDLinkSprite[2] = { NULL };
+static ITUCalendar* SetJDLinkContainer[2] = { NULL };
+static ITUText* SetJDLink1Text[2] = { NULL };
+static ITUText* SetJDLink2Text[2] = { NULL };
+static ITURadioBox* SetLinkJDModeMsgRadioBox[5] = { NULL };
 
 static uint8 g_link;
 static uint8 g_scenlink[2];
@@ -72,85 +49,22 @@ Others:
 *************************************************/
 bool SetLinkOnEnter(ITUWidget* widget, char* param)
 {
-	if (!SetAFLinkTikouChefangSprite)
+	if (!SetLinkContainer)
 	{
-		SetAFLinkTikouChefangSprite = ituSceneFindWidget(&theScene, "SetAFLinkTikouChefangSprite");
-		assert(SetAFLinkTikouChefangSprite);
-
-		SetAFLinkDoorChefangSprite = ituSceneFindWidget(&theScene, "SetAFLinkDoorChefangSprite");
-		assert(SetAFLinkDoorChefangSprite);
-
-		SetAFLinkBafangquDoorRingSprite = ituSceneFindWidget(&theScene, "SetAFLinkBafangquDoorRingSprite");
-		assert(SetAFLinkBafangquDoorRingSprite);
-
-		SetLinkEnableLylySprite = ituSceneFindWidget(&theScene, "SetLinkEnableLylySprite");
-		assert(SetLinkEnableLylySprite);
-
-		SetCallLinkWaichuSprite = ituSceneFindWidget(&theScene, "SetCallLinkWaichuSprite");
-		assert(SetCallLinkWaichuSprite);
-
-		SetCallLinkYejianSprite = ituSceneFindWidget(&theScene, "SetCallLinkYejianSprite");
-		assert(SetCallLinkYejianSprite);
-
-		SetCallLinkNoFaceSprite = ituSceneFindWidget(&theScene, "SetCallLinkNoFaceSprite");
-		assert(SetCallLinkNoFaceSprite);
-
-		SetJDLinkWaichuSprite = ituSceneFindWidget(&theScene, "SetJDLinkWaichuSprite");
-		assert(SetJDLinkWaichuSprite);
-
-		SetJDLinkZaijiaSprite = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaSprite");
-		assert(SetJDLinkZaijiaSprite);
-
-		SetLinkLylyMode1Text = ituSceneFindWidget(&theScene, "SetLinkLylyMode1Text");
-		assert(SetLinkLylyMode1Text);
-
-		SetLinkLylyMode2Text = ituSceneFindWidget(&theScene, "SetLinkLylyMode2Text");
-		assert(SetLinkLylyMode2Text);
-
-		SetCallLinkWaichu1Text = ituSceneFindWidget(&theScene, "SetCallLinkWaichu1Text");
-		assert(SetCallLinkWaichu1Text); 
-
-		SetCallLinkWaichu2Text = ituSceneFindWidget(&theScene, "SetCallLinkWaichu2Text");
-		assert(SetCallLinkWaichu2Text);
-
-		SetCallLinkYejian1Text = ituSceneFindWidget(&theScene, "SetCallLinkYejian1Text");
-		assert(SetCallLinkYejian1Text);
-
-		SetCallLinkYejian2Text = ituSceneFindWidget(&theScene, "SetCallLinkYejian2Text");
-		assert(SetCallLinkYejian2Text);
-
-		SetCallLinkNoFace1Text = ituSceneFindWidget(&theScene, "SetCallLinkNoFace1Text");
-		assert(SetCallLinkNoFace1Text);
-
-		SetCallLinkNoFace2Text = ituSceneFindWidget(&theScene, "SetCallLinkNoFace2Text");
-		assert(SetCallLinkNoFace2Text);
-
-		SetJDLinkWaichuMode1Text = ituSceneFindWidget(&theScene, "SetJDLinkWaichuMode1Text");
-		assert(SetJDLinkWaichuMode1Text);
-
-		SetJDLinkWaichuMode2Text = ituSceneFindWidget(&theScene, "SetJDLinkWaichuMode2Text");
-		assert(SetJDLinkWaichuMode2Text);
-
-		SetJDLinkZaijiaMode1Text = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaMode1Text");
-		assert(SetJDLinkZaijiaMode1Text);
-
-		SetJDLinkZaijiaMode2Text = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaMode2Text");
-		assert(SetJDLinkZaijiaMode2Text);
-
-		SetLinkTitleText = ituSceneFindWidget(&theScene, "SetLinkTitleText");
-		assert(SetLinkTitleText);
-
-		SetLinkJDListContainer = ituSceneFindWidget(&theScene, "SetLinkJDListContainer");
-		assert(SetLinkJDListContainer);
+		SetLinkContainer = ituSceneFindWidget(&theScene, "SetLinkContainer");
+		assert(SetLinkContainer);
 
 		SetLinkAFListContainer = ituSceneFindWidget(&theScene, "SetLinkAFListContainer");
 		assert(SetLinkAFListContainer);
 
-		SetLinkContainer = ituSceneFindWidget(&theScene, "SetLinkContainer");
-		assert(SetLinkContainer);
-
 		SetLinkCallListContainer = ituSceneFindWidget(&theScene, "SetLinkCallListContainer");
 		assert(SetLinkCallListContainer);
+
+		SetLinkJDListContainer = ituSceneFindWidget(&theScene, "SetLinkJDListContainer");
+		assert(SetLinkJDListContainer);
+
+		SetLinkTitleText = ituSceneFindWidget(&theScene, "SetLinkTitleText");
+		assert(SetLinkTitleText);
 
 		SetLinkLylyModeBackground = ituSceneFindWidget(&theScene, "SetLinkLylyModeBackground");
 		assert(SetLinkLylyModeBackground);
@@ -159,52 +73,10 @@ bool SetLinkOnEnter(ITUWidget* widget, char* param)
 		assert(SetLinkBackground);
 
 		SetLinkJDModeMsgBackground = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgBackground");
-		assert(SetLinkJDModeMsgBackground); 
+		assert(SetLinkJDModeMsgBackground);
 
 		SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
 		assert(SetMenuLayer);
-
-		SetLinkLylyModeContainer = ituSceneFindWidget(&theScene, "SetLinkLylyModeContainer");
-		assert(SetLinkLylyModeContainer);
-
-		SetCallLinkWaichuContainer = ituSceneFindWidget(&theScene, "SetCallLinkWaichuContainer");
-		assert(SetCallLinkWaichuContainer);
-
-		SetCallLinkYejianContainer = ituSceneFindWidget(&theScene, "SetCallLinkYejianContainer");
-		assert(SetCallLinkYejianContainer);
-
-		SetCallLinkNoFaceContainer = ituSceneFindWidget(&theScene, "SetCallLinkNoFaceContainer");
-		assert(SetCallLinkNoFaceContainer); 
-
-		SetLinkLylyModeMsg0RadioBox = ituSceneFindWidget(&theScene, "SetLinkLylyModeMsg0RadioBox");
-		assert(SetLinkLylyModeMsg0RadioBox);
-
-		SetLinkLylyModeMsg1RadioBox = ituSceneFindWidget(&theScene, "SetLinkLylyModeMsg1RadioBox");
-		assert(SetLinkLylyModeMsg1RadioBox);
-
-		SetLinkLylyModeMsg2RadioBox = ituSceneFindWidget(&theScene, "SetLinkLylyModeMsg2RadioBox");
-		assert(SetLinkLylyModeMsg2RadioBox); 
-
-		SetJDLinkWaichuModeContainer = ituSceneFindWidget(&theScene, "SetJDLinkWaichuModeContainer");
-		assert(SetJDLinkWaichuModeContainer); 
-
-		SetJDLinkZaijiaModeContainer = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaModeContainer");
-		assert(SetJDLinkZaijiaModeContainer);
-
-		SetLinkJDModeMsgHKRadioBox = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgHKRadioBox");
-		assert(SetLinkJDModeMsgHKRadioBox);
-
-		SetLinkJDModeMsgJCRadioBox = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgJCRadioBox");
-		assert(SetLinkJDModeMsgJCRadioBox);
-
-		SetLinkJDModeMsgYJRadioBox = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgYJRadioBox");
-		assert(SetLinkJDModeMsgYJRadioBox);
-
-		SetLinkJDModeMsgJDRadioBox = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgJDRadioBox");
-		assert(SetLinkJDModeMsgJDRadioBox);
-
-		SetLinkJDModeMsgPURadioBox = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgPURadioBox");
-		assert(SetLinkJDModeMsgPURadioBox);
 	}
 
 	g_link = storage_get_link_param();
@@ -223,6 +95,10 @@ bool SetLinkOnEnter(ITUWidget* widget, char* param)
 	ituWidgetSetVisible(SetLinkJDListContainer, false);
 	ituWidgetSetVisible(SetLinkAFListContainer, false); 
 	ituWidgetSetVisible(SetLinkCallListContainer, false);
+	if (!ituWidgetIsEnabled(SetLinkBackground))
+	{
+		ituWidgetEnable(SetLinkBackground);
+	}
 
 	return true;
 }
@@ -237,18 +113,29 @@ Others:
 *************************************************/
 bool SetLinkAFButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ITUSprite* AFSprite[3] = { SetAFLinkTikouChefangSprite, SetAFLinkDoorChefangSprite, SetAFLinkBafangquDoorRingSprite };
-	uint8 i;
+	uint8 i = 0;
+
+	if (!SetAFLinkSprite[0])
+	{
+		SetAFLinkSprite[0] = ituSceneFindWidget(&theScene, "SetAFLinkTikouChefangSprite");
+		assert(SetAFLinkSprite[0]);
+
+		SetAFLinkSprite[1] = ituSceneFindWidget(&theScene, "SetAFLinkDoorChefangSprite");
+		assert(SetAFLinkSprite[1]);
+
+		SetAFLinkSprite[2] = ituSceneFindWidget(&theScene, "SetAFLinkBafangquDoorRingSprite");
+		assert(SetAFLinkSprite[2]);
+	}
 
 	for (i = 0; i < 3; i++)
 	{
 		if (1 == ((g_link >> i) & 0x01))
 		{
-			ituSpriteGoto(AFSprite[i], 1);
+			ituSpriteGoto(SetAFLinkSprite[i], 1);
 		}
 		else
 		{
-			ituSpriteGoto(AFSprite[i], 0);
+			ituSpriteGoto(SetAFLinkSprite[i], 0);
 		}
 	}
 
@@ -269,17 +156,16 @@ Others:
 bool SetAFLinkDealSaveButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
-	ITUSprite* AFSprite[3] = { SetAFLinkTikouChefangSprite, SetAFLinkDoorChefangSprite, SetAFLinkBafangquDoorRingSprite };
 
 	if (1 == ((g_link >> index) & 0x01))
 	{
 		SET_ONE_VALUE(g_link, 0, index);
-		ituSpriteGoto(AFSprite[index], 0);
+		ituSpriteGoto(SetAFLinkSprite[index], 0);
 	}
 	else
 	{
 		SET_ONE_VALUE(g_link, 1, index);
-		ituSpriteGoto(AFSprite[index], 1);
+		ituSpriteGoto(SetAFLinkSprite[index], 1);
 	}
 	storage_set_link_param(g_link);
 
@@ -296,31 +182,78 @@ Others:
 *************************************************/
 bool SetLinkCallButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 i;
-	ITUText* enable_text1[4] = { SetLinkLylyMode1Text, SetCallLinkWaichu1Text, SetCallLinkYejian1Text, SetCallLinkNoFace1Text };
-	ITUText* enable_text2[4] = { SetLinkLylyMode2Text, SetCallLinkWaichu2Text, SetCallLinkYejian2Text, SetCallLinkNoFace2Text };
-	ITUCalendar* enable_Container[4] = { SetLinkLylyModeContainer, SetCallLinkWaichuContainer, SetCallLinkYejianContainer, SetCallLinkNoFaceContainer };
-	ITUSprite* CallSprite[3] = { SetCallLinkWaichuSprite, SetCallLinkYejianSprite, SetCallLinkNoFaceSprite };
+	uint8 i = 0;
+
+	if (!SetLinkCallContainer1Text[0])
+	{
+		SetLinkCallContainer1Text[0] = ituSceneFindWidget(&theScene, "SetLinkLylyMode1Text");
+		assert(SetLinkCallContainer1Text[0]);
+
+		SetLinkCallContainer1Text[1] = ituSceneFindWidget(&theScene, "SetCallLinkWaichu1Text");
+		assert(SetLinkCallContainer1Text[1]);
+
+		SetLinkCallContainer1Text[2] = ituSceneFindWidget(&theScene, "SetCallLinkYejian1Text");
+		assert(SetLinkCallContainer1Text[2]);
+
+		SetLinkCallContainer1Text[3] = ituSceneFindWidget(&theScene, "SetCallLinkNoFace1Text");
+		assert(SetLinkCallContainer1Text[3]);
+
+		SetLinkCallContainer2Text[0] = ituSceneFindWidget(&theScene, "SetLinkLylyMode2Text");
+		assert(SetLinkCallContainer2Text[0]);
+
+		SetLinkCallContainer2Text[1] = ituSceneFindWidget(&theScene, "SetCallLinkWaichu2Text");
+		assert(SetLinkCallContainer2Text[1]);
+
+		SetLinkCallContainer2Text[2] = ituSceneFindWidget(&theScene, "SetCallLinkYejian2Text");
+		assert(SetLinkCallContainer2Text[2]);
+
+		SetLinkCallContainer2Text[3] = ituSceneFindWidget(&theScene, "SetCallLinkNoFace2Text");
+		assert(SetLinkCallContainer2Text[3]);
+
+		SetLinkCallContainerEnable[0] = ituSceneFindWidget(&theScene, "SetLinkLylyModeContainer");
+		assert(SetLinkCallContainerEnable[0]);
+
+		SetLinkCallContainerEnable[1] = ituSceneFindWidget(&theScene, "SetCallLinkWaichuContainer");
+		assert(SetLinkCallContainerEnable[1]);
+
+		SetLinkCallContainerEnable[2] = ituSceneFindWidget(&theScene, "SetCallLinkYejianContainer");
+		assert(SetLinkCallContainerEnable[2]);
+
+		SetLinkCallContainerEnable[3] = ituSceneFindWidget(&theScene, "SetCallLinkNoFaceContainer");
+		assert(SetLinkCallContainerEnable[3]);
+
+		SetLinkCallSprite[0] = ituSceneFindWidget(&theScene, "SetCallLinkWaichuSprite");
+		assert(SetLinkCallSprite[0]);
+
+		SetLinkCallSprite[1] = ituSceneFindWidget(&theScene, "SetCallLinkYejianSprite");
+		assert(SetLinkCallSprite[1]);
+
+		SetLinkCallSprite[2] = ituSceneFindWidget(&theScene, "SetCallLinkNoFaceSprite");
+		assert(SetLinkCallSprite[2]);
+
+		SetLinkEnableLylySprite = ituSceneFindWidget(&theScene, "SetLinkEnableLylySprite");
+		assert(SetLinkEnableLylySprite);
+	}
 
 	if (g_lyly_param->Enable)
 	{
 		ituSpriteGoto(SetLinkEnableLylySprite, 1);
 		for (i = 0; i < 4; i++)
 		{
-			ituSetColor(&((ITUWidget*)enable_text1[i])->color, 255, 255, 255, 255);
-			ituSetColor(&((ITUWidget*)enable_text2[i])->color, 255, 255, 255, 255);
-			ituWidgetEnable(enable_Container[i]);
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 255, 255, 255);
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 255, 255, 255);
+			ituWidgetEnable(SetLinkCallContainerEnable[i]);
 		}
 
 		for (i = 0; i < 3; i++)
 		{
 			if (g_lyly_param->Link[i])
 			{
-				ituSpriteGoto(CallSprite[i], 1);
+				ituSpriteGoto(SetLinkCallSprite[i], 1);
 			}
 			else
 			{
-				ituSpriteGoto(CallSprite[i], 0);
+				ituSpriteGoto(SetLinkCallSprite[i], 0);
 			}
 		}
 	}
@@ -329,29 +262,30 @@ bool SetLinkCallButtonOnMouseUp(ITUWidget* widget, char* param)
 		ituSpriteGoto(SetLinkEnableLylySprite, 0);
 		for (i = 0; i < 4; i++)
 		{
-			ituSetColor(&((ITUWidget*)enable_text1[i])->color, 255, 128, 138, 135);//冷灰
-			ituSetColor(&((ITUWidget*)enable_text2[i])->color, 255, 192, 192, 192);//灰色
-			ituWidgetDisable(enable_Container[i]);
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 128, 138, 135);//冷灰
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 192, 192, 192);//灰色
+			ituWidgetDisable(SetLinkCallContainerEnable[i]);
 		}
 
 		for (i = 0; i < 3; i++)
 		{
 			if (g_lyly_param->Link[i])
 			{
-				ituSpriteGoto(CallSprite[i], 2);
+				ituSpriteGoto(SetLinkCallSprite[i], 2);
 			}
 			else
 			{
-				ituSpriteGoto(CallSprite[i], 0);
+				ituSpriteGoto(SetLinkCallSprite[i], 0);
 			}
 		}
 	}
 
-	ituTextSetString(SetLinkLylyMode2Text, get_str(SID_Set_Line_Lyly_Mode_Audio + g_lyly_param->Mode));
+	ituTextSetString(SetLinkCallContainer2Text[0], get_str(SID_Set_Line_Lyly_Mode_Audio + g_lyly_param->Mode));
 	
 	ituTextSetString(SetLinkTitleText, get_str(SID_Set_Link_CallLink));
 	ituWidgetSetVisible(SetLinkContainer, false);
 	ituWidgetSetVisible(SetLinkCallListContainer, true);
+
 	return true;
 }
 
@@ -365,11 +299,7 @@ Others:
 *************************************************/
 bool SetLinkEnableLylyButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 i;
-	ITUText* enable_text1[4] = { SetLinkLylyMode1Text, SetCallLinkWaichu1Text, SetCallLinkYejian1Text, SetCallLinkNoFace1Text };
-	ITUText* enable_text2[4] = { SetLinkLylyMode2Text, SetCallLinkWaichu2Text, SetCallLinkYejian2Text, SetCallLinkNoFace2Text };
-	ITUCalendar* enable_Container[4] = { SetLinkLylyModeContainer, SetCallLinkWaichuContainer, SetCallLinkYejianContainer, SetCallLinkNoFaceContainer };
-	ITUSprite* CallSprite[3] = { SetCallLinkWaichuSprite, SetCallLinkYejianSprite, SetCallLinkNoFaceSprite };
+	uint8 i = 0;
 
 	if (g_lyly_param->Enable)
 	{
@@ -378,20 +308,20 @@ bool SetLinkEnableLylyButtonOnMouseUp(ITUWidget* widget, char* param)
 		ituSpriteGoto(SetLinkEnableLylySprite, 0);
 		for (i = 0; i < 4; i++)
 		{
-			ituSetColor(&((ITUWidget*)enable_text1[i])->color, 255, 128, 138, 135);//冷灰
-			ituSetColor(&((ITUWidget*)enable_text2[i])->color, 255, 192, 192, 192);//灰色
-			ituWidgetDisable(enable_Container[i]);
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 128, 138, 135);//冷灰
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 192, 192, 192);//灰色
+			ituWidgetDisable(SetLinkCallContainerEnable[i]);
 		}
 
 		for (i = 0; i < 3; i++)
 		{
 			if (g_lyly_param->Link[i])
 			{
-				ituSpriteGoto(CallSprite[i], 2);
+				ituSpriteGoto(SetLinkCallSprite[i], 2);
 			}
 			else
 			{
-				ituSpriteGoto(CallSprite[i], 0);
+				ituSpriteGoto(SetLinkCallSprite[i], 0);
 			}
 		}
 	}
@@ -401,20 +331,20 @@ bool SetLinkEnableLylyButtonOnMouseUp(ITUWidget* widget, char* param)
 		ituSpriteGoto(SetLinkEnableLylySprite, 1);
 		for (i = 0; i < 4; i++)
 		{
-			ituSetColor(&((ITUWidget*)enable_text1[i])->color, 255, 255, 255, 255);
-			ituSetColor(&((ITUWidget*)enable_text2[i])->color, 255, 255, 255, 255);
-			ituWidgetEnable(enable_Container[i]);
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 255, 255, 255);
+			ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 255, 255, 255);
+			ituWidgetEnable(SetLinkCallContainerEnable[i]);
 		}
 
 		for (i = 0; i < 3; i++)
 		{
 			if (g_lyly_param->Link[i])
 			{
-				ituSpriteGoto(CallSprite[i], 1);
+				ituSpriteGoto(SetLinkCallSprite[i], 1);
 			}
 			else
 			{
-				ituSpriteGoto(CallSprite[i], 0);
+				ituSpriteGoto(SetLinkCallSprite[i], 0);
 			}
 		}
 	}
@@ -423,7 +353,7 @@ bool SetLinkEnableLylyButtonOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_lyly_param(g_lyly_param);
 	if (ret)
 	{
-		//sys_sync_hint_state();
+		sys_sync_hint_state();
 	}
 
 	return true;
@@ -439,24 +369,24 @@ Others:
 *************************************************/
 bool SetCallLinkLylyModeButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	switch (g_lyly_param->Mode)
+	if (!SetLinkLylyModeMsgRadioBox[0])
 	{
-	case LYLY_TYPE_AUDIO:
-		ituRadioBoxSetChecked(SetLinkLylyModeMsg0RadioBox, true);
-		break;
-
-	case LYLY_TYPE_PIC_AUDIO:
-		ituRadioBoxSetChecked(SetLinkLylyModeMsg1RadioBox, true);
-		break;
-
-	case LYLY_TYPE_VIDEO:
-		ituRadioBoxSetChecked(SetLinkLylyModeMsg2RadioBox, true);
-		break;
-
-	default:
-		ituRadioBoxSetChecked(SetLinkLylyModeMsg0RadioBox, true);
-		break;
+		uint8 i = 0;
+		char textname[50];
+		for (i = 0; i < 3; i++)
+		{
+			memset(textname, 0, sizeof(textname));
+			sprintf(textname, "%s%d%s", "SetLinkLylyModeMsg", i, "RadioBox");
+			SetLinkLylyModeMsgRadioBox[i] = ituSceneFindWidget(&theScene, textname);
+			assert(SetLinkLylyModeMsgRadioBox[i]);
+		}
 	}
+
+	if(g_lyly_param->Mode > LYLY_TYPE_MAX)
+	{
+		g_lyly_param->Mode = LYLY_TYPE_VIDEO;
+	}
+	ituRadioBoxSetChecked(SetLinkLylyModeMsgRadioBox[g_lyly_param->Mode], true);
 
 	ituWidgetDisable(SetLinkBackground);
 	ituWidgetSetVisible(SetLinkLylyModeBackground, true);
@@ -474,15 +404,15 @@ Others:
 *************************************************/
 bool SetLinkLylyModeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
-	if (ituRadioBoxIsChecked(SetLinkLylyModeMsg0RadioBox))
+	if (ituRadioBoxIsChecked(SetLinkLylyModeMsgRadioBox[0]))
 	{
 		g_lyly_param->Mode = LYLY_TYPE_AUDIO;
 	}
-	else if (ituRadioBoxIsChecked(SetLinkLylyModeMsg1RadioBox))
+	else if (ituRadioBoxIsChecked(SetLinkLylyModeMsgRadioBox[1]))
 	{
 		g_lyly_param->Mode = LYLY_TYPE_PIC_AUDIO;
 	}
-	else if (ituRadioBoxIsChecked(SetLinkLylyModeMsg2RadioBox))
+	else if (ituRadioBoxIsChecked(SetLinkLylyModeMsgRadioBox[2]))
 	{
 		g_lyly_param->Mode = LYLY_TYPE_VIDEO;
 	}
@@ -491,10 +421,10 @@ bool SetLinkLylyModeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_lyly_param(g_lyly_param);
 	if (ret)
 	{
-		//sys_sync_hint_state();
+		sys_sync_hint_state();
 	}
 
-	ituTextSetString(SetLinkLylyMode2Text, get_str(SID_Set_Line_Lyly_Mode_Audio + g_lyly_param->Mode));
+	ituTextSetString(SetLinkCallContainer2Text[0], get_str(SID_Set_Line_Lyly_Mode_Audio + g_lyly_param->Mode));
 	ituWidgetSetVisible(SetLinkLylyModeBackground, false);
 	ituWidgetEnable(SetLinkBackground);
 
@@ -528,24 +458,23 @@ Others:
 bool SetCallLinkDealSaveButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
-	ITUSprite* CallSprite[3] = { SetCallLinkWaichuSprite, SetCallLinkYejianSprite, SetCallLinkNoFaceSprite };
 
 	if (g_lyly_param->Link[index])
 	{
 		g_lyly_param->Link[index] = FALSE;
-		ituSpriteGoto(CallSprite[index], 0);
+		ituSpriteGoto(SetLinkCallSprite[index], 0);
 	}
 	else
 	{
 		g_lyly_param->Link[index] = TRUE;
-		ituSpriteGoto(CallSprite[index], 1);
+		ituSpriteGoto(SetLinkCallSprite[index], 1);
 	}
 
 	uint8 ret = FALSE;
 	ret = storage_set_lyly_param(g_lyly_param);
 	if (ret)
 	{
-		//sys_sync_hint_state();
+		sys_sync_hint_state();
 	}
 
 	return true;
@@ -561,33 +490,56 @@ Others:
 *************************************************/
 bool SetLinkJDButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 i;
-	ITUSprite* JDSprite[2] = { SetJDLinkWaichuSprite, SetJDLinkZaijiaSprite };
-	ITUCalendar* JDCalendar[2] = { SetJDLinkWaichuModeContainer, SetJDLinkZaijiaModeContainer };
-	ITUText* enable_text1[2] = { SetJDLinkWaichuMode1Text, SetJDLinkZaijiaMode1Text };
-	ITUText* enable_text2[2] = { SetJDLinkWaichuMode2Text, SetJDLinkZaijiaMode2Text };
+	uint8 i = 0;
 
+	if (!SetJDLinkSprite[0])
+	{
+		SetJDLinkSprite[0] = ituSceneFindWidget(&theScene, "SetJDLinkWaichuSprite");
+		assert(SetJDLinkSprite[0]);
+
+		SetJDLinkSprite[1] = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaSprite");
+		assert(SetJDLinkSprite[1]);
+		
+		SetJDLinkContainer[0] = ituSceneFindWidget(&theScene, "SetJDLinkWaichuModeContainer");
+		assert(SetJDLinkContainer[0]);
+
+		SetJDLinkContainer[1] = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaModeContainer");
+		assert(SetJDLinkContainer[1]);
+
+		SetJDLink1Text[0] = ituSceneFindWidget(&theScene, "SetJDLinkWaichuMode1Text");
+		assert(SetJDLink1Text[0]);
+
+		SetJDLink1Text[1] = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaMode1Text");
+		assert(SetJDLink1Text[1]);
+
+		SetJDLink2Text[0] = ituSceneFindWidget(&theScene, "SetJDLinkWaichuMode2Text");
+		assert(SetJDLink2Text[0]);
+
+		SetJDLink2Text[1] = ituSceneFindWidget(&theScene, "SetJDLinkZaijiaMode2Text");
+		assert(SetJDLink2Text[1]);
+
+	}
 
 	for (i = 3; i < 5; i++)
 	{
 		if (1 == ((g_link >> i) & 0x01))
 		{
-			ituSpriteGoto(JDSprite[i-3], 1);
-			ituWidgetEnable(JDCalendar[i-3]);
-			ituSetColor(&((ITUWidget*)enable_text1[i-3])->color, 255, 255, 255, 255);
-			ituSetColor(&((ITUWidget*)enable_text2[i-3])->color, 255, 255, 255, 255);
+			ituSpriteGoto(SetJDLinkSprite[i - 3], 1);
+			ituWidgetEnable(SetJDLinkContainer[i - 3]);
+			ituSetColor(&((ITUWidget*)SetJDLink1Text[i - 3])->color, 255, 255, 255, 255);
+			ituSetColor(&((ITUWidget*)SetJDLink2Text[i - 3])->color, 255, 255, 255, 255);
 		}
 		else
 		{
-			ituSpriteGoto(JDSprite[i-3], 0);
-			ituWidgetDisable(JDCalendar[i-3]);
-			ituSetColor(&((ITUWidget*)enable_text1[i-3])->color, 255, 128, 138, 135);//冷灰
-			ituSetColor(&((ITUWidget*)enable_text2[i-3])->color, 255, 192, 192, 192);//灰色
+			ituSpriteGoto(SetJDLinkSprite[i - 3], 0);
+			ituWidgetDisable(SetJDLinkContainer[i - 3]);
+			ituSetColor(&((ITUWidget*)SetJDLink1Text[i - 3])->color, 255, 128, 138, 135);//冷灰
+			ituSetColor(&((ITUWidget*)SetJDLink2Text[i - 3])->color, 255, 192, 192, 192);//灰色
 		}
 	}
 	
-	ituTextSetString(SetJDLinkWaichuMode2Text, get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[0]));
-	ituTextSetString(SetJDLinkZaijiaMode2Text, get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[1]));
+	ituTextSetString(SetJDLink2Text[0], get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[0]));
+	ituTextSetString(SetJDLink2Text[1], get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[1]));
 
 	ituTextSetString(SetLinkTitleText, get_str(SID_Set_Link_JDLink));
 	ituWidgetSetVisible(SetLinkContainer, false);
@@ -606,26 +558,22 @@ Others:
 bool SetJDLinkDealSaveButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
-	ITUSprite* JDSprite[2] = { SetJDLinkWaichuSprite, SetJDLinkZaijiaSprite };
-	ITUCalendar* JDCalendar[2] = { SetJDLinkWaichuModeContainer, SetJDLinkZaijiaModeContainer };
-	ITUText* enable_text1[2] = { SetJDLinkWaichuMode1Text, SetJDLinkZaijiaMode1Text };
-	ITUText* enable_text2[2] = { SetJDLinkWaichuMode2Text, SetJDLinkZaijiaMode2Text };
 
 	if (1 == ((g_link >> index) & 0x01))
 	{
 		SET_ONE_VALUE(g_link, 0, index);
-		ituSpriteGoto(JDSprite[index-3], 0);
-		ituWidgetDisable(JDCalendar[index - 3]);
-		ituSetColor(&((ITUWidget*)enable_text1[index - 3])->color, 255, 128, 138, 135);//冷灰
-		ituSetColor(&((ITUWidget*)enable_text2[index - 3])->color, 255, 192, 192, 192);//灰色
+		ituSpriteGoto(SetJDLinkSprite[index - 3], 0);
+		ituWidgetDisable(SetJDLinkContainer[index - 3]);
+		ituSetColor(&((ITUWidget*)SetJDLink1Text[index - 3])->color, 255, 128, 138, 135);//冷灰
+		ituSetColor(&((ITUWidget*)SetJDLink2Text[index - 3])->color, 255, 192, 192, 192);//灰色
 	}
 	else
 	{
 		SET_ONE_VALUE(g_link, 1, index);
-		ituSpriteGoto(JDSprite[index-3], 1);
-		ituWidgetEnable(JDCalendar[index - 3]);
-		ituSetColor(&((ITUWidget*)enable_text1[index - 3])->color, 255, 255, 255, 255);
-		ituSetColor(&((ITUWidget*)enable_text2[index - 3])->color, 255, 255, 255, 255);
+		ituSpriteGoto(SetJDLinkSprite[index - 3], 1);
+		ituWidgetEnable(SetJDLinkContainer[index - 3]);
+		ituSetColor(&((ITUWidget*)SetJDLink1Text[index - 3])->color, 255, 255, 255, 255);
+		ituSetColor(&((ITUWidget*)SetJDLink2Text[index - 3])->color, 255, 255, 255, 255);
 	}
 
 	storage_set_link_param(g_link);
@@ -643,34 +591,26 @@ Others:
 *************************************************/
 bool SetJDLinkModeSelectButtonOnMouseUp(ITUWidget* widget, char* param)
 {
+	if (!SetLinkJDModeMsgRadioBox[0])
+	{
+		SetLinkJDModeMsgRadioBox[0] = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgHKRadioBox");
+		assert(SetLinkJDModeMsgRadioBox[0]);
+
+		SetLinkJDModeMsgRadioBox[1] = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgJCRadioBox");
+		assert(SetLinkJDModeMsgRadioBox[1]);
+
+		SetLinkJDModeMsgRadioBox[2] = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgYJRadioBox");
+		assert(SetLinkJDModeMsgRadioBox[2]);
+
+		SetLinkJDModeMsgRadioBox[3] = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgJDRadioBox");
+		assert(SetLinkJDModeMsgRadioBox[3]);
+
+		SetLinkJDModeMsgRadioBox[4] = ituSceneFindWidget(&theScene, "SetLinkJDModeMsgPURadioBox");
+		assert(SetLinkJDModeMsgRadioBox[4]);
+	}
 	g_JD_mode_select_index = atoi(param);
 
-	switch (g_scenlink[g_JD_mode_select_index])
-	{
-	case JD_SCENE_RECEPTION:
-		ituRadioBoxSetChecked(SetLinkJDModeMsgHKRadioBox, true);
-		break;
-
-	case JD_SCENE_MEALS:
-		ituRadioBoxSetChecked(SetLinkJDModeMsgJCRadioBox, true);
-		break;
-
-	case JD_SCENE_NIGHT:
-		ituRadioBoxSetChecked(SetLinkJDModeMsgYJRadioBox, true);
-		break;
-
-
-	case JD_SCENE_POWERSAVING:
-		ituRadioBoxSetChecked(SetLinkJDModeMsgJDRadioBox, true);
-		break;
-
-	case JD_SCENE_GENERAL:
-		ituRadioBoxSetChecked(SetLinkJDModeMsgPURadioBox, true);
-		break;
-
-	default:
-		break;
-	}
+	ituRadioBoxSetChecked(SetLinkJDModeMsgRadioBox[g_scenlink[g_JD_mode_select_index]], true);
 
 	ituWidgetDisable(SetLinkBackground);
 	ituWidgetSetVisible(SetLinkJDModeMsgBackground, true);
@@ -688,23 +628,23 @@ Others:
 *************************************************/
 bool SetLinkJDModeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
-	if (ituRadioBoxIsChecked(SetLinkJDModeMsgHKRadioBox))
+	if (ituRadioBoxIsChecked(SetLinkJDModeMsgRadioBox[0]))
 	{
 		g_scenlink[g_JD_mode_select_index] = JD_SCENE_RECEPTION;
 	}
-	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgJCRadioBox))
+	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgRadioBox[1]))
 	{
 		g_scenlink[g_JD_mode_select_index] = JD_SCENE_MEALS;
 	}
-	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgYJRadioBox))
+	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgRadioBox[2]))
 	{
 		g_scenlink[g_JD_mode_select_index] = JD_SCENE_NIGHT;
 	}
-	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgJDRadioBox))
+	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgRadioBox[3]))
 	{
 		g_scenlink[g_JD_mode_select_index] = JD_SCENE_POWERSAVING;
 	}
-	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgPURadioBox))
+	else if (ituRadioBoxIsChecked(SetLinkJDModeMsgRadioBox[4]))
 	{
 		g_scenlink[g_JD_mode_select_index] = JD_SCENE_GENERAL;
 	}
@@ -713,11 +653,11 @@ bool SetLinkJDModeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 
 	if (0 == g_JD_mode_select_index)
 	{
-		ituTextSetString(SetJDLinkWaichuMode2Text, get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[0]));
+		ituTextSetString(SetJDLink2Text[0], get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[0]));
 	}
 	else if (1 == g_JD_mode_select_index)
 	{
-		ituTextSetString(SetJDLinkZaijiaMode2Text, get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[1]));
+		ituTextSetString(SetJDLink2Text[1], get_str(SID_Set_Line_Jd_Mode_Huike + g_scenlink[1]));
 	}
 	else
 	{
@@ -758,14 +698,12 @@ void SetLinkLayerOnReturn(void)
 	if (ituWidgetIsVisible(SetLinkJDModeMsgBackground))
 	{
 		ituWidgetSetVisible(SetLinkJDModeMsgBackground, false);
-		//ituWidgetSetVisible(SetLinkBackground, true);
 		ituWidgetEnable(SetLinkBackground);
 		return;
 	}
 	else if (ituWidgetIsVisible(SetLinkLylyModeBackground))
 	{
 		ituWidgetSetVisible(SetLinkLylyModeBackground, false);
-		//ituWidgetSetVisible(SetLinkBackground, true);
 		ituWidgetEnable(SetLinkBackground);
 		return;
 	}
@@ -797,7 +735,3 @@ void SetLinkLayerOnReturn(void)
 	}
 }
 
-void SetLinkReset(void)
-{
-	SetAFLinkTikouChefangSprite = NULL;
-}

@@ -43,6 +43,12 @@ Others:
 *************************************************/
 bool MsgLinkOutTimeLayerOnLeave(ITUWidget* widget, char* param)
 {
+	if (!MsgLinkOutTimeLayer)
+	{
+		MsgLinkOutTimeLayer = ituSceneFindWidget(&theScene, "MsgLinkOutTimeLayer");
+		assert(MsgLinkOutTimeLayer);
+	}
+
 	if (ituWidgetIsVisible(MsgLinkOutTimeLayer))	//解决提示连接超时的小消息框还没消失就按下界面跳到另一个界面，导致小消息框不能消息卡机问题
 	{
 		ituWidgetHide(MsgLinkOutTimeLayer, ITU_EFFECT_NONE, 0);

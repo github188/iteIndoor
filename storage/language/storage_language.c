@@ -320,6 +320,15 @@ const char * get_str(STRID_E id)
 	case SID_Msg_Format:
 		return ESID_Msg_Format;
 
+	case SID_Msg_Recover_OK:
+		return ESID_Msg_Recover_OK;
+
+	case SID_Msg_Return_FactorySet:
+		return ESID_Msg_Return_FactorySet;
+
+	case SID_Msg_Param_Suer_Save:
+		return ESID_Msg_Param_Suer_Save;
+
 // IP协议转换器
 	case SID_Set_Unbounded:
 		return ESID_Set_Unbounded;

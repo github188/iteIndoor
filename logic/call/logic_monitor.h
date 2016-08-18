@@ -90,7 +90,7 @@ int32 monitor_stop(void);
   Return:				
   Others:
 *************************************************/
-void monitor_ini(PFGuiNotify GuiProc);
+void monitor_ini(PFGuiNotify MonitorListProc, PFGuiNotify GuiProc);
 
 /*************************************************
   Function:			monitor_distribute

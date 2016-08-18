@@ -70,7 +70,7 @@ extern "C" {
 #define ESID_Set_Ring_Alarm             (g_China ? (g_Big5 ? "預警提示音" : "预警提示音") : "Exit Delay Alert")
 #define ESID_Set_Ring_RingSet           (g_China ? (g_Big5 ? "聲音設置" : "声音设置") : "Ringtone")
 #define ESID_Set_Ring_CallRing          (g_China ? (g_Big5 ? "來電鈴聲" : "来电铃声") : "Ring Tone")
-#define ESID_Set_Ring_Stair             (g_China ? (g_Big5 ? "梯口鈴聲" : "梯口铃声") : "Sec.Entry")
+#define ESID_Set_Ring_Stair             (g_China ? (g_Big5 ? "梯口鈴聲" : "梯口铃声") : "Public Entry")
 #define ESID_Set_Ring_Area              (g_China ? (g_Big5 ? "渠口鈴聲" : "区口铃声") : "Prim.Entry")
 #define ESID_Set_Ring_Door              (g_China ? (g_Big5 ? "門前鈴聲" : "门前铃声") : "Doorway")
 #define ESID_Set_Ring_Center            (g_China ? (g_Big5 ? "管理員機鈴聲" : "管理员机铃声") : "Admin")
@@ -121,6 +121,10 @@ extern "C" {
 #define ESID_Msg_Operat_OK				(g_China ? (g_Big5 ? "操作成功" : "操作成功") : "Operation successfully")
 #define ESID_Msg_Operat_Err				(g_China ? (g_Big5 ? "操作失敗" : "操作失败") : "Operation failed")
 #define ESID_Msg_Format                 (g_China ? (g_Big5 ? "確定是否清空" : "确定是否清空?") : "Sure to delete all?")
+#define ESID_Msg_Recover_OK             (g_China ? (g_Big5 ? "是否保存？保存系統將重啟！" : "是否保存？保存系统将重启!") : "Sure to save? Save system will restart!")
+#define ESID_Msg_Return_FactorySet      (g_China ? (g_Big5 ? "恢復出廠設置后系統將重啟！" : "恢复出厂后系统将重启！") : "Reboot after factory restored!")
+#define ESID_Msg_Param_Suer_Save		(g_China ? (g_Big5 ? "是否保存設置？" : "是否保存设置？") : "Sure to save settings?")
+
 
 // IP协议转换器
 #define ESID_Set_Unbounded				 (g_China ? (g_Big5 ? "ゼ竕﹚" : "未绑定") : "Unbounded")
@@ -345,6 +349,9 @@ typedef enum
 	SID_Msg_Operat_Err,
 	SID_Net_Door_Card_Delet_All,
 	SID_Msg_Format,
+	SID_Msg_Recover_OK,
+	SID_Msg_Return_FactorySet,
+	SID_Msg_Param_Suer_Save,
 
 	// IP协议转换器
 	SID_Set_Unbounded,

@@ -31,7 +31,9 @@ typedef enum
     CMD_CALLIN_CALLBAK,
 	CMD_CALLREQUEST_CALLBAK,
     CMD_CALLOUT_CALLBAK,
+	CMD_MONITOR_LIST_CALLBAK,
     CMD_MONITOR_CALLBAK,
+	CMD_RTSP_LIST_CALLBAK,
     CMD_RTSP_CALLBAK,
     CMD_GOTO_MAINMENU,
 	CMD_GOTO_BECALL,
@@ -78,9 +80,11 @@ int32 af_callback_gui(int32 Param1,int32 Param2)
 Function:		callrequest_state_callbak
 Description:	呼叫请求回调函数
 Input:
-Output:			
-Return:
-Others:
+ 1. param1		状态
+ 2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
 *************************************************/
 void callrequest_state_callbak(uint32 param1, uint32 param2)
 {
@@ -129,11 +133,13 @@ void callrequest_state_callbak(uint32 param1, uint32 param2)
 
 /*************************************************
   Function:			callout_state_callbak
-  Description: 		
-  Input:			
-  Output:			��
-  Return:			
-  Others:			
+  Description: 		主叫回调
+  Input:
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
 *************************************************/
 void callout_state_callbak(uint32 param1, uint32 param2)
 {
@@ -196,11 +202,13 @@ void callout_state_callbak(uint32 param1, uint32 param2)
 
 /*************************************************
   Function:			callin_state_callbak
-  Description: 		
-  Input:			
-  Output:			��
-  Return:			
-  Others:			
+  Description: 		被叫回调
+  Input:
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
 *************************************************/
 void callin_state_callbak(uint32 param1, uint32 param2)
 {
@@ -270,45 +278,100 @@ void callin_state_callbak(uint32 param1, uint32 param2)
 }
 
 /*************************************************
-  Function:			monitor_state_callbak
-  Description: 		
-  Input:			
-  Output:			��
-  Return:			
-  Others:			
+Function:		monitor_list_state_callbak
+Description:	获取监视列表回调函数
+Input:
+1. param1		状态
+2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
 *************************************************/
-void monitor_state_callbak(uint32 param1, uint32 param2)
+void monitor_list_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
-	uint16 callbak_cmd;
-	
+	INTER_CALLBACK monitorbak_data;
+
 	if (g_CommandQueue == -1)
 	{
 		return;
 	}
 
-    callbak_cmd = param1;
 	memset(&cmd, 0, sizeof(Command));
-	memcpy(cmd.strarg1, &callbak_cmd, sizeof(uint16));		// ǰ�������ֽڴ洢�ص����� ����Ϊ���Ĳ���
-	cmd.id = CMD_MONITOR_CALLBAK;
-	
-	switch (param1)
+	memset(&monitorbak_data, 0, sizeof(INTER_CALLBACK));
+	cmd.id = CMD_MONITOR_LIST_CALLBAK;
+	monitorbak_data.InterState = (uint8)param1;
+
+	if (MONITOR_GETLIST == param1)
 	{
-		default:
-			return;
+		monitorbak_data.DataLen = sizeof(uint32);
+		sprintf(monitorbak_data.Buf, "%d", param2);
 	}
+	else
+	{
+		return;
+	}
+	memcpy(cmd.strarg1, &monitorbak_data, sizeof(INTER_CALLBACK));
 	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 }
 
 /*************************************************
   Function:			monitor_state_callbak
-  Description: 		����״̬�ص�
-  Input:			
-  	1.param1		
-  	2.param2
-  Output:			��
-  Return:			
-  Others:			
+  Description: 		监视回调函数
+  Input:
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
+void monitor_state_callbak(uint32 param1, uint32 param2)
+{
+	Command cmd;
+	INTER_CALLBACK monitorbak_data;
+
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
+
+	memset(&cmd, 0, sizeof(Command));
+	memset(&monitorbak_data, 0, sizeof(INTER_CALLBACK));
+	cmd.id = CMD_MONITOR_CALLBAK;
+	monitorbak_data.InterState = (uint8)param1;
+
+	switch (param1)
+	{
+		case MONITOR_SEARCH:
+			break;
+	
+		case MONITOR_TALKING:
+			break;
+
+		case MONITOR_REQUEST:
+		case MONITOR_MONITORING:
+		case MONITOR_TIMER:
+		case MONITOR_END:
+			monitorbak_data.DataLen = sizeof(uint32);
+			sprintf(monitorbak_data.Buf, "%d", param2);
+			break;
+								
+		default:
+			return;
+	}
+	memcpy(cmd.strarg1, &monitorbak_data, sizeof(INTER_CALLBACK));
+	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+}
+
+/*************************************************
+  Function:			rtsp_monitor_state_callbak
+  Description: 		RTSP回调函数
+  Input:
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
 *************************************************/
 void rtsp_monitor_state_callbak(uint32 param1, uint32 param2)
 {	
@@ -338,21 +401,6 @@ void rtsp_monitor_state_callbak(uint32 param1, uint32 param2)
 			break;
 
 		case MONITOR_END:
-			/*
-			switch (param2)
-			{
-				case MONITOR_SEARCH_ERR:			// �����豸ʧ��
-					break;
-					
-				case MONITOR_REQUEST_TIMEOUT:		// ����ʧ��
-					break;
-					
-				case MONITOR_BUSY:					// �Է�æ
-					break;
-					
-				default:
-					break;
-			}*/
 			break;
 
 		case MONITOR_GETLIST:
@@ -524,12 +572,30 @@ static void ProcessCommand(void)
 				}
 				break;
 
+			case CMD_MONITOR_LIST_CALLBAK:
+				{
+					char buf[MAX_STRARG_LEN];
+					memset(buf, 0, sizeof(buf));
+					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM14_MONITOR_LIST, buf);
+				}
+				break;
+
 			case CMD_MONITOR_CALLBAK:
 				{	
 					char buf[MAX_STRARG_LEN];
 					memset(buf, 0, sizeof(buf));
 					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM14_MONITOR, buf);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM15_MONITOR, buf);
+				}
+				break;
+
+			case CMD_RTSP_LIST_CALLBAK:
+				{
+					char buf[MAX_STRARG_LEN];
+					memset(buf, 0, sizeof(buf));
+					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM16_RTSP_LIST, buf);
 				}
 				break;
 
@@ -538,7 +604,7 @@ static void ProcessCommand(void)
 					char buf[MAX_STRARG_LEN];
 					memset(buf, 0, sizeof(buf));
 					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
-					ituSceneSendEvent(&theScene, EVENT_CUSTOM15_RTSP_MONITOR, buf);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM17_RTSP_MONITOR, buf);
 				}
 				break;
 

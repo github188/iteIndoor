@@ -17,6 +17,7 @@ extern int32 af_callback_gui(int32 Param1,int32 Param2);
 extern void callrequest_state_callbak(uint32 param1, uint32 param2);
 extern void callout_state_callbak(uint32 param1, uint32 param2);
 extern void callin_state_callbak(uint32 param1, uint32 param2);
+extern void monitor_list_state_callbak(uint32 param1, uint32 param2);
 extern void monitor_state_callbak(uint32 param1, uint32 param2);
 
 extern void show_sys_event_hint(uint16 EventType);
@@ -76,7 +77,7 @@ void logic_init(void)
 	alarm_logic_init();
 	alarm_init_gui_callback((ALARMGUI_CALLBACK)af_callback_gui, (SHOW_SYSEVENHIT)show_sys_event_hint);
 	inter_call_ini(callrequest_state_callbak, callout_state_callbak, callin_state_callbak);
-	monitor_ini(monitor_state_callbak);
+	monitor_ini(monitor_list_state_callbak, monitor_state_callbak);
 
 	net_set_recivedata_func(SSC_INFO, msg_distribute, msg_responsion);
 	net_set_recivedata_func(SSC_ALARM, alarm_distribute, alarm_responsion);

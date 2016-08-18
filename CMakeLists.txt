@@ -217,8 +217,9 @@ gui/elevator/layer_elevator.c
 gui/elevator/layer_elevator.h
 gui/call/layer_call.h
 gui/call/layer_call.c
-gui/call/layer_monitor_search.c
 gui/call/layer_becall.c
+gui/call/layer_monitor_search.c
+gui/call/layer_monitor.c
 gui/comm/au_model_func.c	
 gui/set/layer_set_menu.c
 gui/set/layer_set_bottom_return.c   

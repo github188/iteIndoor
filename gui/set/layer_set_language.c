@@ -4,21 +4,21 @@ File name:  	layer_set_language.c
 Author:     	zxc
 Version:
 Date: 		2016-06-26
-Description:
+Description:	语言设置界面
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-//static ITULayer* SetMenuLayer;
-static ITUSprite* SetLanguageSimplifiedSprite; 
-static ITUSprite* SetLanguageTraditionalSprite;
-static ITUSprite* SetLanguageEnglishSprite;
+static ITUSprite* SetLanguageSimplifiedSprite = NULL; 
+static ITUSprite* SetLanguageTraditionalSprite = NULL;
+static ITUSprite* SetLanguageEnglishSprite = NULL;
+static ITURadioBox* MsgFailHintSuccess1RadioBox = NULL;
+static ITULayer* SetMenuLayer = NULL;
 
 static LANGUAGE_E g_language = CHINESE;
-
 
 /*************************************************
 Function:		SetSystemLanguageOnEnter
@@ -41,31 +41,49 @@ bool SetSystemLanguageOnEnter(ITUWidget* widget, char* param)
 		SetLanguageEnglishSprite = ituSceneFindWidget(&theScene, "SetLanguageEnglishSprite");
 		assert(SetLanguageEnglishSprite);
 
-		//SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
-		//assert(SetMenuLayer);	
+		MsgFailHintSuccess1RadioBox = ituSceneFindWidget(&theScene, "MsgFailHintSuccess1RadioBox");
+		assert(MsgFailHintSuccess1RadioBox);
+
+		SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
+		assert(SetMenuLayer);
 	}
 
-	g_language = storage_get_language();//存储获取系统语言
+	if (strcmp(param, "MsgFailHintSuccessLayer") == 0)
+	{
+		if (ituRadioBoxIsChecked(MsgFailHintSuccess1RadioBox))	//确认键
+		{
+			storage_set_language(g_language);
+			hw_stop_feet_dog();
+		}
+		else
+		{
+			ituLayerGoto(SetMenuLayer);
+		}
+	}
+	else
+	{
+		g_language = storage_get_language();//存储获取系统语言
 
-	if (CHINESE == g_language)
-	{
-		ituSpriteGoto(SetLanguageSimplifiedSprite, 1);
-		ituSpriteGoto(SetLanguageTraditionalSprite, 0);
-		ituSpriteGoto(SetLanguageEnglishSprite, 0);
+		if (CHINESE == g_language)
+		{
+			ituSpriteGoto(SetLanguageSimplifiedSprite, 1);
+			ituSpriteGoto(SetLanguageTraditionalSprite, 0);
+			ituSpriteGoto(SetLanguageEnglishSprite, 0);
+		}
+		else if (CHNBIG5 == g_language)
+		{
+			ituSpriteGoto(SetLanguageSimplifiedSprite, 0);
+			ituSpriteGoto(SetLanguageTraditionalSprite, 1);
+			ituSpriteGoto(SetLanguageEnglishSprite, 0);
+		}
+		else if (ENGLISH == g_language)
+		{
+			ituSpriteGoto(SetLanguageSimplifiedSprite, 0);
+			ituSpriteGoto(SetLanguageTraditionalSprite, 0);
+			ituSpriteGoto(SetLanguageEnglishSprite, 1);
+		}
 	}
-	else if (CHNBIG5 == g_language)
-	{
-		ituSpriteGoto(SetLanguageSimplifiedSprite, 0);
-		ituSpriteGoto(SetLanguageTraditionalSprite, 1);
-		ituSpriteGoto(SetLanguageEnglishSprite, 0);
-	}
-	else if (ENGLISH == g_language)
-	{
-		ituSpriteGoto(SetLanguageSimplifiedSprite, 0);
-		ituSpriteGoto(SetLanguageTraditionalSprite, 0);
-		ituSpriteGoto(SetLanguageEnglishSprite, 1);
-	}
-
+	
 	return true;
 }
 
@@ -83,11 +101,6 @@ bool SetLanguageSimplifiedButtonOnMouseUp(ITUWidget* widget, char* param)
 	ituSpriteGoto(SetLanguageSimplifiedSprite, 1);
 	ituSpriteGoto(SetLanguageTraditionalSprite, 0);
 	ituSpriteGoto(SetLanguageEnglishSprite, 0);
-
-	if (g_language != storage_get_language())
-	{
-		storage_set_language(g_language);
-	}
 
 	return true;
 }
@@ -108,11 +121,6 @@ bool SetLanguageTraditionalButtonOnMouseUp(ITUWidget* widget, char* param)
 	ituSpriteGoto(SetLanguageTraditionalSprite, 1);
 	ituSpriteGoto(SetLanguageEnglishSprite, 0);
 
-	if (g_language != storage_get_language())
-	{
-		storage_set_language(g_language);
-	}
-
 	return true;
 }
 
@@ -130,16 +138,15 @@ bool SetLanguageEnglishButtonOnMouseUp(ITUWidget* widget, char* param)
 	ituSpriteGoto(SetLanguageSimplifiedSprite, 0);
 	ituSpriteGoto(SetLanguageTraditionalSprite, 0);
 	ituSpriteGoto(SetLanguageEnglishSprite, 1);
-
+#if 0
 	if (g_language != storage_get_language())
 	{
 		storage_set_language(g_language);
 	}
-	
+#endif
 	return true;
 }
 
-#if 0
 /*************************************************
 Function:		SetSystemLanguageLayerOnReturn
 Description: 	底部退出键按下执行函数
@@ -150,14 +157,12 @@ Others:
 *************************************************/
 void SetSystemLanguageLayerOnReturn(void)
 {
-	if (!ituWidgetIsVisible(SetMenuLayer))
+	if (g_language != storage_get_language())
+	{
+		ShowMsgFailHintSuccessLayer(1, SID_Msg_Recover_OK, 1);
+	}
+	else
 	{
 		ituLayerGoto(SetMenuLayer);
 	}
-}
-#endif
-
-void SetSystemLanguageReset(void)
-{
-	SetLanguageSimplifiedSprite = NULL;
 }

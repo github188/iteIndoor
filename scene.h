@@ -55,8 +55,10 @@ typedef enum
 	EVENT_CUSTOM11_CALLREQUEST, 							// 呼叫请求命令
 	EVENT_CUSTOM12_CALLOUT, 								// ���лص���Ϣ						
 	EVENT_CUSTOM13_CALLIN, 									// ���лص���Ϣ
-	EVENT_CUSTOM14_MONITOR, 								// ���ӻص���Ϣ	
-	EVENT_CUSTOM15_RTSP_MONITOR, 							// RTSP���ӻص���Ϣ	
+	EVENT_CUSTOM14_MONITOR_LIST, 							// 获取监视列表	
+	EVENT_CUSTOM15_MONITOR, 								// ���ӻص���Ϣ
+	EVENT_CUSTOM16_RTSP_LIST, 								// 获取RTSP监视列表	
+	EVENT_CUSTOM17_RTSP_MONITOR, 							// RTSP���ӻص���Ϣ	
 
 } CustomEvent;
 

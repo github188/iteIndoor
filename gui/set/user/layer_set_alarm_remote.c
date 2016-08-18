@@ -4,21 +4,14 @@ File name:  	layer_set_alarm_remote.c
 Author:     	zxc
 Version:
 Date: 		2016-07-06
-Description:
+Description: 安防远程控制界面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
-#define SET_ONE_VALUE(val,state,pos) ((0==state)?(val&=(~(1<<pos))):(val|=(1<<pos)))
-
-static ITUSprite* SetAlarmRemoteHomeSprite;
-static ITUSprite* SetAlarmRemoteOutSprite;
-static ITUSprite* SetAlarmRemoteNightSprite;
-static ITUText* SetAlarmRemoteHome2Text;
-static ITUText* SetAlarmRemoteOut2Text;
-static ITUText* SetAlarmRemoteNight2Text;
+static ITUSprite* SetAlarmRemoteSprite[3] = { NULL };
+static ITUText* SetAlarmRemote2Text[3] = { NULL };
 
 static uint8 g_remote;
-
 
 /*************************************************
 Function:		SetAlarmRemoteOnEnterShow
@@ -31,8 +24,6 @@ Others:
 static void SetAlarmRemoteOnEnterShow()
 {
 	uint8 i = 0;
-	ITUSprite* sprite[3] = { SetAlarmRemoteHomeSprite, SetAlarmRemoteOutSprite, SetAlarmRemoteNightSprite };
-	ITUText* text[3] = { SetAlarmRemoteHome2Text, SetAlarmRemoteOut2Text, SetAlarmRemoteNight2Text };
 	uint16 text_id[3] = { SID_Bj_Remote_Home_Used, SID_Bj_Remote_Out_Used, SID_Bj_Remote_Night_Used };
 	uint16 text_id1[3] = { SID_Bj_Remote_Home_Unused, SID_Bj_Remote_Out_Unused, SID_Bj_Remote_Night_Unused };
 
@@ -42,13 +33,13 @@ static void SetAlarmRemoteOnEnterShow()
 	{
 		if (1 == (0x01 & (g_remote >> i)))
 		{
-			ituSpriteGoto(sprite[i], 1);
-			ituTextSetString(text[i], get_str(text_id[i]));
+			ituSpriteGoto(SetAlarmRemoteSprite[i], 1);
+			ituTextSetString(SetAlarmRemote2Text[i], get_str(text_id[i]));
 		}
 		else
 		{
-			ituSpriteGoto(sprite[i], 0);
-			ituTextSetString(text[i], get_str(text_id1[i]));
+			ituSpriteGoto(SetAlarmRemoteSprite[i], 0);
+			ituTextSetString(SetAlarmRemote2Text[i], get_str(text_id1[i]));
 		}
 	}
 }
@@ -63,25 +54,25 @@ Others:
 *************************************************/
 bool SetAlarmRemoteOnEnter(ITUWidget* widget, char* param)
 {
-	if (!SetAlarmRemoteHomeSprite)
+	if (!SetAlarmRemoteSprite[0])
 	{
-		SetAlarmRemoteHomeSprite = ituSceneFindWidget(&theScene, "SetAlarmRemoteHomeSprite");
-		assert(SetAlarmRemoteHomeSprite);
+		SetAlarmRemoteSprite[0] = ituSceneFindWidget(&theScene, "SetAlarmRemoteHomeSprite");
+		assert(SetAlarmRemoteSprite[0]);
 
-		SetAlarmRemoteOutSprite = ituSceneFindWidget(&theScene, "SetAlarmRemoteOutSprite");
-		assert(SetAlarmRemoteOutSprite);
+		SetAlarmRemoteSprite[1] = ituSceneFindWidget(&theScene, "SetAlarmRemoteOutSprite");
+		assert(SetAlarmRemoteSprite[1]);
 
-		SetAlarmRemoteNightSprite = ituSceneFindWidget(&theScene, "SetAlarmRemoteNightSprite");
-		assert(SetAlarmRemoteNightSprite);
+		SetAlarmRemoteSprite[2] = ituSceneFindWidget(&theScene, "SetAlarmRemoteNightSprite");
+		assert(SetAlarmRemoteSprite[2]);
 
-		SetAlarmRemoteHome2Text = ituSceneFindWidget(&theScene, "SetAlarmRemoteHome2Text");
-		assert(SetAlarmRemoteHome2Text);
+		SetAlarmRemote2Text[0] = ituSceneFindWidget(&theScene, "SetAlarmRemoteHome2Text");
+		assert(SetAlarmRemote2Text[0]);
 
-		SetAlarmRemoteOut2Text = ituSceneFindWidget(&theScene, "SetAlarmRemoteOut2Text");
-		assert(SetAlarmRemoteOut2Text);
+		SetAlarmRemote2Text[1] = ituSceneFindWidget(&theScene, "SetAlarmRemoteOut2Text");
+		assert(SetAlarmRemote2Text[1]);
 
-		SetAlarmRemoteNight2Text = ituSceneFindWidget(&theScene, "SetAlarmRemoteNight2Text");
-		assert(SetAlarmRemoteNight2Text);
+		SetAlarmRemote2Text[2] = ituSceneFindWidget(&theScene, "SetAlarmRemoteNight2Text");
+		assert(SetAlarmRemote2Text[2]);
 	}
 
 	SetAlarmRemoteOnEnterShow();
@@ -100,8 +91,6 @@ Others:
 bool SetAlarmRemoteHomeButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
-	ITUSprite* sprite[3] = { SetAlarmRemoteHomeSprite, SetAlarmRemoteOutSprite, SetAlarmRemoteNightSprite };
-	ITUText* text[3] = { SetAlarmRemoteHome2Text, SetAlarmRemoteOut2Text, SetAlarmRemoteNight2Text };
 	uint16 text_id[3] = { SID_Bj_Remote_Home_Used, SID_Bj_Remote_Out_Used, SID_Bj_Remote_Night_Used };
 	uint16 text_id1[3] = { SID_Bj_Remote_Home_Unused, SID_Bj_Remote_Out_Unused, SID_Bj_Remote_Night_Unused };
 
@@ -109,22 +98,17 @@ bool SetAlarmRemoteHomeButtonOnMouseUp(ITUWidget* widget, char* param)
 	{
 		SET_ONE_VALUE(g_remote, 0, index);
 		
-		ituSpriteGoto(sprite[index], 0);
-		ituTextSetString(text[index], get_str(text_id1[index]));
+		ituSpriteGoto(SetAlarmRemoteSprite[index], 0);
+		ituTextSetString(SetAlarmRemote2Text[index], get_str(text_id1[index]));
 	}
 	else
 	{
 		SET_ONE_VALUE(g_remote, 1, index);
 
-		ituSpriteGoto(sprite[index], 1);
-		ituTextSetString(text[index], get_str(text_id[index]));
+		ituSpriteGoto(SetAlarmRemoteSprite[index], 1);
+		ituTextSetString(SetAlarmRemote2Text[index], get_str(text_id[index]));
 	}
 	storage_set_remote_set(g_remote);
 
 	return true;
-}
-
-void SetAlarmRemoteLayerReset(void)
-{
-	SetAlarmRemoteHomeSprite = NULL;
 }

@@ -454,7 +454,15 @@ int IPIsCorrect(char* ip)
 	{
 		return FALSE;
 	}
-	return IPtoUlong(ip);
+
+	struct in_addr sin_addr;
+	if (!inet_aton(ip, &sin_addr))
+	{
+		err_log("bad ip addr !!!! \n");
+		return FALSE;
+	}
+	dprintf("111111111111ip = %x\n", sin_addr.s_addr);
+	return TRUE;
 }
 
 /*************************************************

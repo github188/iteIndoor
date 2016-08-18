@@ -4,21 +4,20 @@ File name:  	layer_set_alarm_num.c
 Author:     	zxc
 Version:
 Date: 		2016-06-17
-Description:
+Description: 设置安防号码
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUText* SetAlarmNum11Text = NULL;
-static ITUText* SetAlarmNum12Text;
-static ITUText* SetAlarmNum13Text;
-static ITUText* SetAlarmNum21Text;
-static ITUText* SetAlarmNum22Text;
-static ITUText* SetAlarmNum23Text;
-//static ITULayer* SetNumKeyBordLayer;
+static ITUText* SetAlarmNum12Text = NULL;
+static ITUText* SetAlarmNum13Text = NULL;
+static ITUText* SetAlarmNum21Text = NULL;
+static ITUText* SetAlarmNum22Text = NULL;
+static ITUText* SetAlarmNum23Text = NULL;
 static ITUTextBox* SetNumKeyBordTextBox = NULL;
 
 static uint8 g_button_flag = 0;
@@ -55,9 +54,6 @@ bool SetAlarmNumOnEnter(ITUWidget* widget, char* param)
 
 		SetAlarmNum23Text = ituSceneFindWidget(&theScene, "SetAlarmNum23Text");
 		assert(SetAlarmNum23Text);
-
-		//SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
-		//assert(SetNumKeyBordLayer);	
 
 		SetNumKeyBordTextBox = ituSceneFindWidget(&theScene, "SetNumKeyBordTextBox");
 		assert(SetNumKeyBordTextBox);
@@ -145,9 +141,4 @@ bool SetAlarmNumButtonOnMouseUp(ITUWidget* widget, char* param)
 	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, TELNUM_LEN, EXPRESS_CHAR, CANCEL_BTN, tmp);
 
 	return true;
-}
-
-void SetAlarmNumeReset(void)
-{
-	SetAlarmNum11Text = NULL;
 }

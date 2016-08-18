@@ -4,13 +4,13 @@ File name:  	layer_set_alarm_area_list.c
 Author:     	zxc
 Version:
 Date: 		2016-07-02
-Description:
+Description: 1:隔离 2:局防有效 3:防区属性 界面
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUSprite* AlarmAreaSprite[8] = { NULL };
 static ITUText* AlarmArea2Text[8] = { NULL };

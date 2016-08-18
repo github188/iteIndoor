@@ -4,19 +4,15 @@ File name:  	layer_set_alarm.c
 Author:     	zxc
 Version:
 Date: 		2016-07-09
-Description:
+Description: 安防设置界面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
-static ITUText* SetAlarmTime2Text;
-static ITURadioBox* SetAlarmTimeMsg0RadioBox;
-static ITURadioBox* SetAlarmTimeMsg1RadioBox;
-static ITURadioBox* SetAlarmTimeMsg2RadioBox;
-static ITURadioBox* SetAlarmTimeMsg3RadioBox;
-static ITURadioBox* SetAlarmTimeMsg4RadioBox;
-static ITUBackground* SetAlarmBackground;
-static ITUBackground* SetAlarmTimeMsgBackground;
-static ITULayer* SetProjectLayer;
+static ITUText* SetAlarmTime2Text = NULL;
+static ITURadioBox* SetAlarmTimeMsgRadioBox[5] = { NULL };
+static ITUBackground* SetAlarmBackground = NULL;
+static ITUBackground* SetAlarmTimeMsgBackground = NULL;
+static ITULayer* SetProjectLayer = NULL;
 
 static uint8 g_time_alarm_param[3] = { 0 };
 
@@ -70,21 +66,6 @@ bool SetAlarmOnEnter(ITUWidget* widget, char* param)
 
 		SetProjectLayer = ituSceneFindWidget(&theScene, "SetProjectLayer");
 		assert(SetProjectLayer);
-
-		SetAlarmTimeMsg0RadioBox = ituSceneFindWidget(&theScene, "SetAlarmTimeMsg0RadioBox");
-		assert(SetAlarmTimeMsg0RadioBox);
-
-		SetAlarmTimeMsg1RadioBox = ituSceneFindWidget(&theScene, "SetAlarmTimeMsg1RadioBox");
-		assert(SetAlarmTimeMsg1RadioBox);
-
-		SetAlarmTimeMsg2RadioBox = ituSceneFindWidget(&theScene, "SetAlarmTimeMsg2RadioBox");
-		assert(SetAlarmTimeMsg2RadioBox);
-
-		SetAlarmTimeMsg3RadioBox = ituSceneFindWidget(&theScene, "SetAlarmTimeMsg3RadioBox");
-		assert(SetAlarmTimeMsg3RadioBox);
-
-		SetAlarmTimeMsg4RadioBox = ituSceneFindWidget(&theScene, "SetAlarmTimeMsg4RadioBox");
-		assert(SetAlarmTimeMsg4RadioBox);
 	}
 
 	storage_get_time_param(g_time_alarm_param);
@@ -93,6 +74,10 @@ bool SetAlarmOnEnter(ITUWidget* widget, char* param)
 
 	ituWidgetSetVisible(SetAlarmTimeMsgBackground, false);
 	ituWidgetSetVisible(SetAlarmBackground, true);
+	if (!ituWidgetIsEnabled(SetAlarmBackground))
+	{
+		ituWidgetEnable(SetAlarmBackground);
+	}
 
 	return true;
 }
@@ -107,31 +92,26 @@ Others:
 *************************************************/
 bool SetAlarmTimeButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	switch (g_time_alarm_param[0])
+	if (!SetAlarmTimeMsgRadioBox[0])
 	{
-	case 0:
-		ituRadioBoxSetChecked(SetAlarmTimeMsg0RadioBox, true);
-		break;
+		uint8 textname[50];
+		uint8 i = 0;
+		for (i = 0; i < 5; i++)
+		{
+			memset(textname, 0, sizeof(textname));
+			sprintf(textname, "%s%d%s", "SetAlarmTimeMsg", i, "RadioBox");
+			SetAlarmTimeMsgRadioBox[i] = ituSceneFindWidget(&theScene, textname);
+			assert(SetAlarmTimeMsgRadioBox[i]);
+		}
+	}
 
-	case 1:
-		ituRadioBoxSetChecked(SetAlarmTimeMsg1RadioBox, true);
-		break;
-
-	case 2:
-		ituRadioBoxSetChecked(SetAlarmTimeMsg2RadioBox, true);
-		break;
-
-	case 3:
-		ituRadioBoxSetChecked(SetAlarmTimeMsg3RadioBox, true);
-		break;
-
-	case 4:
-		ituRadioBoxSetChecked(SetAlarmTimeMsg4RadioBox, true);
-		break;
-
-	default:
-		ituRadioBoxSetChecked(SetAlarmTimeMsg0RadioBox, true);
-		break;
+	if ((g_time_alarm_param[0] < 5) || (g_time_alarm_param[0] >= 0))
+	{
+		ituRadioBoxSetChecked(SetAlarmTimeMsgRadioBox[g_time_alarm_param[0]], true);
+	}
+	else
+	{
+		ituRadioBoxSetChecked(SetAlarmTimeMsgRadioBox[0], true);
 	}
 
 	ituWidgetDisable(SetAlarmBackground);
@@ -201,9 +181,4 @@ void SetAlarmLayerOnReturn(void)
 		ituLayerGoto(SetProjectLayer);
 		return;
 	}
-}
-
-void SetAlarmReset(void)
-{
-	SetAlarmTime2Text = NULL;
 }

@@ -1,28 +1,28 @@
 ﻿/*************************************************
 Copyright (C), 2006-2016, Aurine
-File name:  	layer_set_menu.c
+File name:  	layer_set_data_time.c
 Author:     	zxc
 Version:
 Date: 		2016-06-13
-Description:
+Description: 时间和日期设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
-static ITUBackground* SetDataTimeBackground;
-static ITUBackground* SetDataMsgBackground;
-static ITUBackground* SetTimeMsgBackground;
-static ITULayer* SetMenuLayer;
-static ITUWheel* SetDataYearWheel;
-static ITUWheel* SetDataMonthWheel;
-static ITUWheel* SetDataDayWheel;
-static ITUText* SetData2Text;
-static ITUText* SetTime2Text;
-static ITUWheel* SetTimeHourWheel;
-static ITUWheel* SetTimeMinWheel;
+static ITUBackground* SetDataTimeBackground = NULL;
+static ITUBackground* SetDataMsgBackground = NULL;
+static ITUBackground* SetTimeMsgBackground = NULL;
+static ITULayer* SetMenuLayer = NULL;
+static ITUWheel* SetDataYearWheel = NULL;
+static ITUWheel* SetDataMonthWheel = NULL;
+static ITUWheel* SetDataDayWheel = NULL;
+static ITUText* SetData2Text = NULL;
+static ITUText* SetTime2Text = NULL;
+static ITUWheel* SetTimeHourWheel = NULL;
+static ITUWheel* SetTimeMinWheel = NULL;
 
 static DATE_TIME g_time;
 
@@ -52,31 +52,14 @@ bool SetDataTimeOnEnter(ITUWidget* widget, char* param)
 		SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
 		assert(SetMenuLayer);
 
-		SetDataYearWheel = ituSceneFindWidget(&theScene, "SetDataYearWheel");
-		assert(SetDataYearWheel);
-
-		SetDataMonthWheel = ituSceneFindWidget(&theScene, "SetDataMonthWheel");
-		assert(SetDataMonthWheel);
-
-		SetDataDayWheel = ituSceneFindWidget(&theScene, "SetDataDayWheel");
-		assert(SetDataDayWheel);
-
 		SetData2Text = ituSceneFindWidget(&theScene, "SetData2Text");
 		assert(SetData2Text);
 
 		SetTime2Text = ituSceneFindWidget(&theScene, "SetTime2Text");
 		assert(SetTime2Text);
-
-		SetTimeHourWheel = ituSceneFindWidget(&theScene, "SetTimeHourWheel");
-		assert(SetTimeHourWheel);
-
-		SetTimeMinWheel = ituSceneFindWidget(&theScene, "SetTimeMinWheel");
-		assert(SetTimeMinWheel);
 	}
 
 	get_timer(&g_time);
-
-	printf("%4d-%02d-%02d %02d:%02d:%02d\n", (g_time.year), (g_time.month), g_time.day, g_time.hour, g_time.min, g_time.sec);
 
 	memset(str, 0, sizeof(str));
 	sprintf(str, "%4d-%02d-%02d", g_time.year, g_time.month, g_time.day);
@@ -88,6 +71,10 @@ bool SetDataTimeOnEnter(ITUWidget* widget, char* param)
 	ituWidgetSetVisible(SetDataMsgBackground, false); 
 	ituWidgetSetVisible(SetTimeMsgBackground, false);
 	ituWidgetSetVisible(SetDataTimeBackground, true);
+	if (!ituWidgetIsEnabled(SetDataTimeBackground))
+	{
+		ituWidgetEnable(SetDataTimeBackground);
+	}
 	
 	return true;
 }
@@ -102,6 +89,18 @@ Others:
 *************************************************/
 bool SetDataButtonOnMouseUp(ITUWidget* widget, char* param)
 {
+	if (!SetDataYearWheel)
+	{
+		SetDataYearWheel = ituSceneFindWidget(&theScene, "SetDataYearWheel");
+		assert(SetDataYearWheel);
+
+		SetDataMonthWheel = ituSceneFindWidget(&theScene, "SetDataMonthWheel");
+		assert(SetDataMonthWheel);
+
+		SetDataDayWheel = ituSceneFindWidget(&theScene, "SetDataDayWheel");
+		assert(SetDataDayWheel);
+	}
+
 	ituWheelGoto(SetDataDayWheel, g_time.day - 1);
 	ituWheelGoto(SetDataMonthWheel, g_time.month - 1);
 	ituWheelGoto(SetDataYearWheel, g_time.year - 2000);
@@ -149,6 +148,15 @@ Others:
 *************************************************/
 bool SetTimeButtonOnMouseUp(ITUWidget* widget, char* param)
 {
+	if (!SetTimeHourWheel)
+	{
+		SetTimeHourWheel = ituSceneFindWidget(&theScene, "SetTimeHourWheel");
+		assert(SetTimeHourWheel);
+
+		SetTimeMinWheel = ituSceneFindWidget(&theScene, "SetTimeMinWheel");
+		assert(SetTimeMinWheel);
+	}
+
 	ituWheelGoto(SetTimeHourWheel, g_time.hour);
 	ituWheelGoto(SetTimeMinWheel, g_time.min);
 
@@ -211,9 +219,4 @@ void SetDataTimeLayerOnReturn(void)
 		ituLayerGoto(SetMenuLayer);
 		return;
 	}
-}
-
-void SetDataTimeReset(void)
-{
-	SetDataTimeBackground = NULL;
 }

@@ -184,6 +184,8 @@ Others:
 *************************************************/
 bool SetBottonReturnOnReload(ITUWidget* widget, char* param)
 {
+	SetBottonReturnOnEnter(widget, param);
+
 	g_NowLayer = (ITULayer*)widget;
 	
 	return true;
@@ -254,10 +256,7 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 
 	if (g_NowLayer == SetSystemLanguageLayer)
 	{
-		if (!ituWidgetIsVisible(SetMenuLayer))
-		{
-			ituLayerGoto(SetMenuLayer);
-		}	
+		SetSystemLanguageLayerOnReturn();
 		return true;
 	}
 

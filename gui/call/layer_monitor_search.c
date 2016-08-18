@@ -64,8 +64,6 @@ static void SetMonitorShowInit(void)
 {
 	uint8 i;
 
-	// 初始化默认为首页
-	ituCoverFlowGoto(MonitorSearchListCoverFlow, 0);
 	for (i = 0; i < MAX_MONITOR_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(MonitorSearchListBackgroundPage[i], true);
@@ -76,6 +74,19 @@ static void SetMonitorShowInit(void)
 		ituWidgetSetVisible(MonitorSearchListContainer[i], true);
 		ituWidgetSetVisible(MonitorSearchListSprite[i], true);
 	}
+
+	// 初始化默认为首页
+	// 解决MonitorSearchListCoverFlow第一页是-1的情况
+#if 1
+	if (MonitorSearchListCoverFlow->frame == MonitorSearchListCoverFlow->totalframe)
+	{
+		ituCoverFlowGoto(MonitorSearchListCoverFlow, -1);
+	}
+	else
+	{
+		ituCoverFlowGoto(MonitorSearchListCoverFlow, 0);
+	}
+#endif
 }
 
 /*************************************************
@@ -208,6 +219,26 @@ static void MonitorSearchDestroyProc(void)
 }
 
 /*************************************************
+Function:		MonitorSearchListState
+Description: 	获取监视列表执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool MonitorSearchListState(ITUWidget* widget, char* param)
+{
+	PINTER_CALLBACK pmonitorbak_data = (PINTER_CALLBACK)param;
+
+	printf("pmonitorbak_data->InterState.......%d\n", pmonitorbak_data->InterState);
+	if (pmonitorbak_data->InterState == MONITOR_GETLIST)
+	{
+		dprintf("atoi(pmonitorbak_data->Buf) : %d\n", atoi(pmonitorbak_data->Buf));
+		ShowMonitorWin();
+	}
+}
+
+/*************************************************
 Function:		MonitorSearchListButtonOnMouseUp
 Description: 	监视列表按下执行函数
 Input:			无
@@ -222,7 +253,9 @@ bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param)
 	if (g_MonitorList && g_MonitorList->MonitorCount > 0)
 	{
 		g_DevType = g_MonitorList->pMonitorInfo[index].DeviceType;
-		//ui_monitor_appstart(g_DevType, index);		// 点击直接开始监视
+		printf("00focusIndex : %d\n", MonitorSearchListCoverFlow->focusIndex);
+		MonitorWin(g_DevType, index);		// 点击直接开始监视
+		printf("11focusIndex : %d\n", MonitorSearchListCoverFlow->focusIndex);
 	}
 	printf("MonitorSearchList g_DevType......:%x\n", g_DevType);
 	printf("MonitorSearchList index......:%d\n", index);
@@ -272,6 +305,8 @@ bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			break;
 
 		case MonitorSearchEvent:
+			storage_clear_monitorlist(g_DevType);
+			monitorlist_sync_devlist(g_DevType);
 			break;
 
 		case MonitorExitEvent:

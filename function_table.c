@@ -50,12 +50,6 @@ ITUActionFunction actionFunctions[] =
 	"CallRecordMSGButtonOnMouseUp", CallRecordMSGButtonOnMouseUp,
 	"CallCallRequestState", CallCallRequestState,
 	
-	// MonitorSearch
-	"MonitorSearchLayerOnEnter", MonitorSearchLayerOnEnter,
-	"MonitorSearchLayerButtonOnMouseUp", MonitorSearchLayerButtonOnMouseUp,
-	"MonitorSearchListButtonOnMouseUp", MonitorSearchListButtonOnMouseUp,
-	"MonitorSearchMSGButtonOnMouseUp", MonitorSearchMSGButtonOnMouseUp,
-
 	// BeCall
 	"BeCallLayerOnEnter", BeCallLayerOnEnter,
 	"BeCallLayerButtonOnMouseUp", BeCallLayerButtonOnMouseUp,
@@ -65,6 +59,22 @@ ITUActionFunction actionFunctions[] =
 	"BeCallLayerOnTimer", BeCallLayerOnTimer,
 	"BeCallCallOutState", BeCallCallOutState,
 	"BeCallCallInState", BeCallCallInState,
+
+	// MonitorSearch
+	"MonitorSearchLayerOnEnter", MonitorSearchLayerOnEnter,
+	"MonitorSearchLayerButtonOnMouseUp", MonitorSearchLayerButtonOnMouseUp,
+	"MonitorSearchListButtonOnMouseUp", MonitorSearchListButtonOnMouseUp,
+	"MonitorSearchMSGButtonOnMouseUp", MonitorSearchMSGButtonOnMouseUp,
+	"MonitorSearchListState", MonitorSearchListState,
+
+	// Monitor
+	"MonitorLayerOnEnter", MonitorLayerOnEnter,
+	"MonitorLayerButtonOnMouseUp", MonitorLayerButtonOnMouseUp,
+	"MonitorShowButtomBackgroundOnMouseUp", MonitorShowButtomBackgroundOnMouseUp,
+	"MonitorButtomSoundButtonOnMouseUp", MonitorButtomSoundButtonOnMouseUp,
+	"MonitorButtomSoundOnChanged", MonitorButtomSoundOnChanged,
+	"MonitorLayerOnTimer", MonitorLayerOnTimer,
+	"MonitorState", MonitorState,
 
 	//Set_Botton_Return_Layer
 	"SetBottonReturnOnEnter", SetBottonReturnOnEnter,
@@ -214,6 +224,7 @@ ITUActionFunction actionFunctions[] =
 	// Set_Project
 	"SetProjectOnEnter", SetProjectOnEnter,
 	"SetPrjProjectPwdButtonOnMouseUp", SetPrjProjectPwdButtonOnMouseUp,
+	"SetPrjBackButtonOnMouseUp", SetPrjBackButtonOnMouseUp,
 
 	// Set_Rtsp
 	"SetRtspOnEnter", SetRtspOnEnter,

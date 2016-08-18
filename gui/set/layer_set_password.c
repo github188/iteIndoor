@@ -4,13 +4,13 @@ File name:  	layer_set_password.c
 Author:     	zxc
 Version:
 Date: 		2016-06-21
-Description:
+Description:	密码设置界面
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
 typedef enum
 {
@@ -27,22 +27,21 @@ typedef enum
 	NONEBOTTON,
 }NEWORTUREBOTTON;
 
-static ITUBackground* SetPasswordBackground;
-static ITUBackground* SetPasswordMsgBackground;
-static ITUText* SetPasswordTitleText;
-static ITUText* SetUserPwd1Text;
-static ITUText* SetUserPwd2Text;
-static ITUText* SetServanPwd1Text;
-static ITUText* SetServanPwd2Text; 
-static ITUText* SetPasswordMsgTitleText;
-static ITULayer* SetMenuLayer;
-static ITUText* SetPasswordMsgNewPassBtnText;
-static ITUText* SetPasswordMsgTruePassBtnText;
-static ITUTextBox* SetNumKeyBordTextBox;
-static ITURadioBox* SetPasswordMsgNewPassBtnRadioBox;
-static ITURadioBox* SetPasswordMsgTruePassBtnRadioBox;
-static ITULayer* SetProjectLayer;
-//static ITULayer* MsgFailHintSuccessLayer;
+static ITUBackground* SetPasswordBackground = NULL;
+static ITUBackground* SetPasswordMsgBackground = NULL;
+static ITUText* SetPasswordTitleText = NULL;
+static ITUText* SetUserPwd1Text = NULL;
+static ITUText* SetUserPwd2Text = NULL;
+static ITUText* SetServanPwd1Text = NULL;
+static ITUText* SetServanPwd2Text = NULL;
+static ITUText* SetPasswordMsgTitleText = NULL;
+static ITULayer* SetMenuLayer = NULL;
+static ITUText* SetPasswordMsgNewPassBtnText = NULL;
+static ITUText* SetPasswordMsgTruePassBtnText = NULL;
+static ITUTextBox* SetNumKeyBordTextBox = NULL;
+static ITURadioBox* SetPasswordMsgNewPassBtnRadioBox = NULL;
+static ITURadioBox* SetPasswordMsgTruePassBtnRadioBox = NULL;
+static ITULayer* SetProjectLayer = NULL;
 
 static PASS_TYPE g_type_pass = PASS_TYPE_MAX;			//密码类型
 static PASSWOEDPAGE g_page_pass = NONESETPASSWORDPAGE;	//开门密码界面\安防密码界面\工程密码界面
@@ -51,6 +50,52 @@ static NEWORTUREBOTTON g_new_ture_btn = NONEBOTTON;		//确认密码\新密码按
 static uint8 g_new_pass[MAX_ADMIN_LEN + 1];
 static uint8 g_ture_pass[MAX_ADMIN_LEN + 1];
 static uint8 g_background_flag = 0;
+
+/*************************************************
+Function:		ShowPwdMsgText
+Description: 	显示密码框
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void ShowPwdMsgText()
+{
+	uint8 buf1[MAX_ADMIN_LEN + 1];
+	uint8 buf2[MAX_ADMIN_LEN + 1];
+
+	char* strbuf = ituTextGetString(SetNumKeyBordTextBox);
+	int count_str = strbuf ? strlen(strbuf) : 0;
+
+	memset(buf1, 0, sizeof(buf1));
+	memset(buf2, 0, sizeof(buf2));
+	memcpy(buf1, "......", strlen(g_new_pass));
+	memcpy(buf2, "......", strlen(g_ture_pass));
+
+	if (NEWPWDBOTTON == g_new_ture_btn)
+	{
+		ituRadioBoxSetChecked(SetPasswordMsgNewPassBtnRadioBox, true);
+		sprintf(g_new_pass, "%s", strbuf);
+		memset(buf1, 0, sizeof(buf1));
+		memcpy(buf1, "......", strlen(g_new_pass));
+	}
+	else if (TRUENEWPWDBOTTON == g_new_ture_btn)
+	{
+		ituRadioBoxSetChecked(SetPasswordMsgTruePassBtnRadioBox, true);
+		sprintf(g_ture_pass, "%s", strbuf);
+		memset(buf2, 0, sizeof(buf2));
+		memcpy(buf2, "......", strlen(g_ture_pass));
+	}
+	else
+	{
+		ituRadioBoxSetChecked(SetPasswordMsgNewPassBtnRadioBox, true);
+	}
+	g_new_ture_btn = NONEBOTTON;
+	ituTextSetString(SetPasswordMsgNewPassBtnText, buf1);
+	ituTextSetString(SetPasswordMsgTruePassBtnText, buf2);
+	ituWidgetDisable(SetPasswordBackground);
+	ituWidgetSetVisible(SetPasswordMsgBackground, true);
+}
 
 /*************************************************
 Function:		SetPasswordOnEnter
@@ -63,8 +108,6 @@ Others:
 bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 {
 	uint8 get_pass[10];
-	uint8 buf1[MAX_ADMIN_LEN + 1];
-	uint8 buf2[MAX_ADMIN_LEN + 1];
 
 	if (!SetPasswordBackground)
 	{
@@ -131,6 +174,10 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 
 			ituWidgetSetVisible(SetPasswordMsgBackground, false);
 			ituWidgetSetVisible(SetPasswordBackground, true);
+			if (!ituWidgetIsEnabled(SetPasswordBackground))
+			{
+				ituWidgetEnable(SetPasswordBackground);
+			}
 			break;
 
 		case ALARMPASSWORDPAGE:
@@ -143,6 +190,10 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 
 			ituWidgetSetVisible(SetPasswordMsgBackground, false);
 			ituWidgetSetVisible(SetPasswordBackground, true);
+			if (!ituWidgetIsEnabled(SetPasswordBackground))
+			{
+				ituWidgetEnable(SetPasswordBackground);
+			}
 			break;
 
 		case PRJPASSWORDPAGE:
@@ -163,37 +214,13 @@ bool SetPasswordOnEnter(ITUWidget* widget, char* param)
 	}
 	else
 	{
-		char* strbuf = ituTextGetString(SetNumKeyBordTextBox);
-		int count_str = strbuf ? strlen(strbuf) : 0;
+		ShowPwdMsgText();
 
-		memset(buf1, 0, sizeof(buf1));
-		memset(buf2, 0, sizeof(buf2));
-		memcpy(buf1, "......", strlen(g_new_pass));
-		memcpy(buf2, "......", strlen(g_ture_pass));
-
-		if (NEWPWDBOTTON == g_new_ture_btn)
+		if (PASS_TYPE_ADMIN == g_type_pass)
 		{
-			ituRadioBoxSetChecked(SetPasswordMsgNewPassBtnRadioBox, true);
-			sprintf(g_new_pass, "%s", strbuf);
-			memset(buf1, 0, sizeof(buf1));
-			memcpy(buf1, "......", strlen(g_new_pass));
+			ituWidgetDisable(SetProjectLayer);
+			ituWidgetShow(SetProjectLayer, ITU_EFFECT_NONE, 0);
 		}
-		else if (TRUENEWPWDBOTTON == g_new_ture_btn)
-		{
-			ituRadioBoxSetChecked(SetPasswordMsgTruePassBtnRadioBox, true);
-			sprintf(g_ture_pass, "%s", strbuf);
-			memset(buf2, 0, sizeof(buf2));
-			memcpy(buf2, "......", strlen(g_ture_pass));
-		}
-		else
-		{
-			ituRadioBoxSetChecked(SetPasswordMsgNewPassBtnRadioBox, true);
-		}
-		g_new_ture_btn = NONEBOTTON;
-		ituTextSetString(SetPasswordMsgNewPassBtnText, buf1);
-		ituTextSetString(SetPasswordMsgTruePassBtnText, buf2);
-		ituWidgetDisable(SetPasswordBackground);
-		ituWidgetSetVisible(SetPasswordMsgBackground, true);
 	}
 
 	return true;
@@ -318,9 +345,7 @@ Others:
 bool SetPasswordMsgTureButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	if (0 == strcmp(g_new_pass, g_ture_pass))
-	{	
-		printf("g_new_pass = %s\n", g_new_pass);
-	
+	{		
 		storage_set_pass(g_type_pass, g_new_pass);
 
 		if ((PASS_TYPE_SERVER == g_type_pass) || (PASS_TYPE_DOOR_SERVER == g_type_pass))
@@ -412,9 +437,4 @@ void UpdataPassType(int data)
 	g_background_flag = 1;
 	memset(g_new_pass, 0, sizeof(g_new_pass));
 	memset(g_ture_pass, 0, sizeof(g_ture_pass));
-}
-
-void SetPasswordReset(void)
-{
-	SetPasswordBackground = NULL;
 }

@@ -4,28 +4,59 @@ File name:  	layer_set_netparam.c
 Author:     	zxc
 Version:
 Date: 		2016-07-10
-Description:
+Description: 设置网络参数界面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
-static ITUText* SetNetParamTitleText;
-static ITUCalendar* SetNetParamContainer;
-static ITUCalendar* SetNetParamHostListContainer;
-static ITUCalendar* SetManageIPContainer;
-static ITUCalendar* SetServerIPContainer;
-static ITULayer* SetProjectLayer;
-static ITUText* SetHostIP2Text;
-static ITUText* SetHostGateWay2Text;
-static ITUText* SetHostNetMask2Text;
-static ITUText* SetCenterServerIP2Text;
-static ITUText* SetRtspIP2Text;
-static ITUText* SetManageIP12Text;
-static ITUText* SetManageIP22Text;
-static ITUText* SetManageIP32Text;
-static ITUTextBox* SetNumKeyBordTextBox;
+static ITUText* SetNetParamTitleText = NULL;
+static ITUCalendar* SetNetParamContainer = NULL;
+static ITUCalendar* SetNetParamHostListContainer = NULL;
+static ITUCalendar* SetManageIPContainer = NULL;
+static ITUCalendar* SetServerIPContainer = NULL;
+static ITULayer* SetProjectLayer = NULL;
+static ITUText* SetHostIP2Text = NULL;
+static ITUText* SetHostGateWay2Text = NULL;
+static ITUText* SetHostNetMask2Text = NULL;
+static ITUText* SetCenterServerIP2Text = NULL;
+static ITUText* SetRtspIP2Text = NULL;
+static ITUText* SetManageIP12Text = NULL;
+static ITUText* SetManageIP22Text = NULL;
+static ITUText* SetManageIP32Text = NULL;
+static ITUTextBox* SetNumKeyBordTextBox = NULL;
+static ITURadioBox* MsgFailHintSuccess1RadioBox = NULL;
+static ITURadioBox* MsgFailHintSuccess0RadioBox = NULL;
 
 static uint32 g_ip[IP_MAX];
 static IP_TYPE g_ipType = IP_MAX;
+static uint32 g_ip_host[CENTER_IPADDR] = { 0 };
+
+/*************************************************
+Function:		save_param
+Description: 	保存
+Input:
+1.hDlg
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void save_param(void)
+{
+	uint8 i;
+
+	if (g_ipType > HOST_GATEWAY)
+	{
+		storage_set_netparam(1, g_ipType, g_ip[g_ipType]);
+	}
+	else
+	{
+		for (i = 0; i < CENTER_IPADDR; i++)
+		{
+			storage_set_netparam(1, HOST_IPADDR+i, g_ip[i]);	
+		}
+		// 存入注册表
+		net_set_local_param();
+	}
+}
 
 /*************************************************
 Function:		SetNetParamOnEnter
@@ -47,23 +78,20 @@ static void KeyBordGotoSetNetParam()
 	}
 	else
 	{
-		uint32 ip_data = 0;
-		ip_data = ipaddr_addr(IP_data);
-		uint32 data = ntohl(ip_data);
+		uint32 data = IPtoUlong(IP_data);
+
 		if (data != g_ip[g_ipType])
 		{
-			if (HOST_IPADDR != g_ipType)
+			if (g_ipType > HOST_GATEWAY)
 			{
-				storage_set_netparam(0, g_ipType, data);
+				g_ip[g_ipType] = data;
+				save_param();
 			}
 			else
 			{
-				// 存入注册表
-				storage_set_netparam(1, HOST_IPADDR, data);
-				//net_set_local_param(storage_get_netparam());
+				g_ip_host[g_ipType] = data;
 			}
 			ituTextSetString(IPtext[g_ipType], IP_data);
-			g_ip[g_ipType] = data;
 		}
 	}
 }
@@ -126,24 +154,51 @@ bool SetNetParamOnEnter(ITUWidget* widget, char* param)
 
 		SetNumKeyBordTextBox = ituSceneFindWidget(&theScene, "SetNumKeyBordTextBox");
 		assert(SetNumKeyBordTextBox); 
+
+		MsgFailHintSuccess1RadioBox = ituSceneFindWidget(&theScene, "MsgFailHintSuccess1RadioBox");
+		assert(MsgFailHintSuccess1RadioBox);
+
+		MsgFailHintSuccess0RadioBox = ituSceneFindWidget(&theScene, "MsgFailHintSuccess0RadioBox");
+		assert(MsgFailHintSuccess0RadioBox);
 	}
 
 	if (strcmp(param, "SetNumKeyBordLayer") == 0)
 	{
 		KeyBordGotoSetNetParam();
 	}
+	else if (strcmp(param, "MsgFailHintSuccessLayer") == 0)
+	{
+		if (ituRadioBoxIsChecked(MsgFailHintSuccess1RadioBox))	//确认键
+		{
+			memcpy(g_ip, g_ip_host, sizeof(g_ip_host));
+			save_param();
+
+			ituWidgetSetVisible(SetNetParamHostListContainer, false);
+			ituWidgetSetVisible(SetNetParamContainer, true);
+		}
+		if (ituRadioBoxIsChecked(MsgFailHintSuccess0RadioBox))	//确认键
+		{
+			ituWidgetSetVisible(SetNetParamHostListContainer, false);
+			ituWidgetSetVisible(SetNetParamContainer, true);
+		}
+	}
 	else if (strcmp(param, "SetProjectLayer") == 0)
 	{
+		memset(g_ip, 0, sizeof(g_ip));
+		memset(g_ip_host, 0, sizeof(g_ip_host));
+
 		for (i = 0; i < IP_MAX; i++)
 		{
 			g_ip[i] = storage_get_netparam_bytype(HOST_IPADDR + i);
 		}
+		memcpy(g_ip_host, g_ip, sizeof(g_ip_host));
 
 		ituWidgetSetVisible(SetNetParamHostListContainer, false);
 		ituWidgetSetVisible(SetServerIPContainer, false);
 		ituWidgetSetVisible(SetManageIPContainer, false);
 		ituWidgetSetVisible(SetNetParamContainer, true);
 	}
+
 
 	return true;
 }
@@ -269,8 +324,16 @@ void SetNetParamLayerOnReturn(void)
 	}
 	else if (ituWidgetIsVisible(SetNetParamHostListContainer))
 	{
-		ituWidgetSetVisible(SetNetParamHostListContainer, false);
-		ituWidgetSetVisible(SetNetParamContainer, true);
+		if (0 != strncasecmp(g_ip, g_ip_host, sizeof(g_ip_host)))
+		{
+			ShowMsgFailHintSuccessLayer(1, SID_Msg_Param_Suer_Save, 1);
+		}
+		else
+		{
+			ituWidgetSetVisible(SetNetParamHostListContainer, false);
+			ituWidgetSetVisible(SetNetParamContainer, true);
+		}
+		
 		return;
 	}
 	else if (ituWidgetIsVisible(SetServerIPContainer))
@@ -285,9 +348,4 @@ void SetNetParamLayerOnReturn(void)
 		ituWidgetSetVisible(SetNetParamContainer, true);
 		return;
 	}
-}
-
-void SetNetParamReset(void)
-{
-	SetNetParamTitleText = NULL;
 }

@@ -435,7 +435,7 @@ void storage_clear_all_callrecord(void)
 uint8 storage_get_callrecord_state(void)
 {
 	uint8 i;
-	uint8 ret = 0;
+	uint8 ret = FALSE;
 	
 	PMCALLLISTINFO calllist = storage_get_callrecord(MISSED);
 	if (calllist && calllist->CallCount > 0)
@@ -444,7 +444,8 @@ uint8 storage_get_callrecord_state(void)
 		{
 			if (1 == calllist->CallInfo[i].UnRead)
 			{
-				ret++;
+				ret = TRUE;
+				break;
 			}
 		}
 		free_call_memory(&calllist);

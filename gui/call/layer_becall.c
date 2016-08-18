@@ -42,7 +42,6 @@ static uint8 g_SetVolume = FALSE;					// 是否处于设置音量状态
 static uint8 g_mute = FALSE;						// 是否静音状态
 static uint8 g_volume = 4;
 static uint8 g_volumeticks = 0;
-static uint8 g_ShowMSG = FALSE;						// 是否处于显示消息框状态
 static uint8 g_MSGTicks = 0;
 static uint32 g_BeCallLastTick = 0;					// 实时更新的tick
 static uint32 g_ErrHintTxtID = 0;					// 错误提示文字ID
@@ -193,7 +192,7 @@ static void DrawStringHint(void)
 	}
 
 	// 画时间提示: time
-	if (g_RemainTime > 0)
+	if (g_RemainTime)
 	{
 		sprintf(time, "%d", g_RemainTime);
 		ituTextSetString(BeCallTimeText, time);
@@ -251,7 +250,7 @@ Others:
 *************************************************/
 static void ChangeVolume(void)
 {
-	g_volumeticks = 0;
+	g_volumeticks = 4;
 	// 音量为0时，自动为静音
 	if (g_volume == 0)
 	{
@@ -271,16 +270,55 @@ static void ChangeVolume(void)
 }
 
 /*************************************************
-Function:		InitHitMSG
-Description: 	初始化消息框
+Function:		SetBeCallLockAndSnap
+Description: 	设置被叫开锁或抓拍
 Input:			无
 Output:			无
 Return:			无
-Others:
+Others:			无
 *************************************************/
-static void InitHitMSG(void)
+static void SetBeCallLockAndSnap(BeCallButtonEvent event)
 {
-	g_MSGTicks = 0;
+	int32 ret = FALSE;
+	if (event == BeCallLockEvent)
+	{
+		if (g_unlock == TRUE)
+		{
+			ret = inter_unlock();
+			if (ret == TRUE)
+			{
+				#ifdef _USE_ELEVATOR_			//被动招梯
+				if (g_DevType == DEVICE_TYPE_STAIR)
+				{
+					dianti_set_cmd(ELEVATOR_CALL);
+				}
+				#endif
+				dprintf("becall lock ok!\n");
+			}
+			else
+			{
+				// 提示开锁失败
+				dprintf("becall lock fail!\n");
+			}
+		}
+	}
+	else
+	{
+		//ret = inter_video_snap();
+		if (ret == TRUE)
+		{
+			// 抓拍成功提示
+			dprintf("becall snap ok!\n");
+		}
+		else
+		{
+			// 抓拍失败提示
+			dprintf("becall snap fail!\n");
+		}
+	}
+	ituWidgetSetVisible(BeCallHitBackground, true);
+	ituSpriteGoto(BeCallHitSprite, (event - BeCallLockEvent));
+	g_MSGTicks = 3;
 }
 
 /*************************************************
@@ -351,11 +389,10 @@ bool BeCallLayerOnTimer(ITUWidget* widget, char* param)
 
 		if (g_SetVolume == TRUE)
 		{
-			if (4 == g_volumeticks)
+			g_volumeticks--;
+			if (0 == g_volumeticks)
 			{
 				g_SetVolume = FALSE;
-				g_volumeticks = 0;
-
 				// 保存铃声或通话音量
 				if (g_InterState == CALL_STATE_CALLING)
 				{
@@ -367,18 +404,15 @@ bool BeCallLayerOnTimer(ITUWidget* widget, char* param)
 				}
 				ituWidgetSetVisible(BeCallBottomBackground, false);
 			}
-			g_volumeticks++;
 		}
 		
-		if (g_ShowMSG == TRUE)
+		if (g_MSGTicks)
 		{
-			if (3 == g_MSGTicks)
+			g_MSGTicks--;
+			if (0 == g_MSGTicks)
 			{
-				g_ShowMSG == FALSE;
-				g_MSGTicks = 0;
 				ituWidgetSetVisible(BeCallHitBackground, false);
 			}
-			g_MSGTicks++;
 		}
 
 		if (g_ErrHintTicks)
@@ -610,14 +644,9 @@ Others:			无
 *************************************************/
 bool BeCallShowButtomBackgroundOnMouseUp(ITUWidget* widget, char* param)
 {
-	if (g_SetVolume)
+	if (!g_SetVolume)
 	{
-		g_SetVolume = FALSE;
-		ituWidgetSetVisible(BeCallBottomBackground, false);
-	}
-	else
-	{
-		g_volumeticks = 0;
+		g_volumeticks = 4;
 		// 被叫响铃或通话时才可调音量
 		if ((g_OperType == INTER_CALLIN_E && g_InterState == CALL_STATE_CALLING)
 			|| g_InterState == CALL_STATE_TALK)
@@ -664,11 +693,22 @@ bool BeCallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 
 		case BeCallLockEvent:
 		case BeCallSnapEvent:
-			g_ShowMSG = TRUE;
-			g_MSGTicks = 0;
-			ituWidgetSetVisible(BeCallBottomBackground, false);
-			ituWidgetSetVisible(BeCallHitBackground, true);
-			ituSpriteGoto(BeCallHitSprite, (btn_event - BeCallLockEvent));
+			if (g_SetVolume)
+			{
+				g_volumeticks = 0;
+				g_SetVolume = FALSE;
+				// 保存铃声或通话音量
+				if (g_InterState == CALL_STATE_CALLING)
+				{
+					storage_set_volume(g_volume, storage_get_talkvolume(), storage_get_keykeep());
+				}
+				else
+				{
+					storage_set_volume(storage_get_ringvolume(), g_volume, storage_get_keykeep());
+				}
+				ituWidgetSetVisible(BeCallBottomBackground, false);
+			}
+			SetBeCallLockAndSnap(btn_event);
 			break;
 
 		case BeCallHandUpEvent:
@@ -819,7 +859,6 @@ static void SetInterInfo(INTER_OPER_TYPE OperType, DEVICE_TYPE_E DevType, char *
 
 	g_RemainTime = 0;
 	g_SetVolume = FALSE;
-	g_ShowMSG = FALSE;
 	g_mute = FALSE;
 	g_volume = storage_get_ringvolume();
 	g_volumeticks = 0;
@@ -830,7 +869,7 @@ static void SetInterInfo(INTER_OPER_TYPE OperType, DEVICE_TYPE_E DevType, char *
 }
 
 /*************************************************
-Function:		ui_becall_win
+Function:		BeCallWin
 Description: 	被叫界面
 Input:
 1.info			参数
@@ -838,7 +877,7 @@ Output:			无
 Return:			无
 Others:			无
 *************************************************/
-uint8 BeCallWin(INTER_INFO_S* info)
+void BeCallWin(INTER_INFO_S* info)
 {
 	INTER_INFO_S * pInterInfo = info;
 

@@ -4,20 +4,16 @@ File name:  	layer_set_user.c
 Author:     	zxc
 Version:
 Date: 		2016-07-06
-Description:
+Description: 用户设置界面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
-static ITUCoverFlow* SetUserCoverFlow;
-static ITUText* SetYujingTime2Text;
-static ITURadioBox* SetYujingTimeMsg0RadioBox;
-static ITURadioBox* SetYujingTimeMsg1RadioBox;
-static ITURadioBox* SetYujingTimeMsg2RadioBox;
-static ITURadioBox* SetYujingTimeMsg3RadioBox;
-static ITURadioBox* SetYujingTimeMsg4RadioBox;
-static ITUBackground* SetYujingTimeMsgBackground;
-static ITUBackground* SetUserBackground;
-static ITULayer* SetMenuLayer;
+static ITUCoverFlow* SetUserCoverFlow = NULL;
+static ITUText* SetYujingTime2Text = NULL;
+static ITURadioBox* SetYujingTimeMsgRadioBox[5] = { NULL };
+static ITUBackground* SetYujingTimeMsgBackground = NULL;
+static ITUBackground* SetUserBackground = NULL;
+static ITULayer* SetMenuLayer = NULL;
 //static ITULayer* SetAlarmAreaListLayer;
 
 static uint8 g_time_alarm_param[3] = { 0 };
@@ -85,21 +81,6 @@ bool SetUserOnEnter(ITUWidget* widget, char* param)
 		SetYujingTime2Text = ituSceneFindWidget(&theScene, "SetYujingTime2Text");
 		assert(SetYujingTime2Text);
 
-		SetYujingTimeMsg0RadioBox = ituSceneFindWidget(&theScene, "SetYujingTimeMsg0RadioBox");
-		assert(SetYujingTimeMsg0RadioBox);
-
-		SetYujingTimeMsg1RadioBox = ituSceneFindWidget(&theScene, "SetYujingTimeMsg1RadioBox");
-		assert(SetYujingTimeMsg1RadioBox);
-
-		SetYujingTimeMsg2RadioBox = ituSceneFindWidget(&theScene, "SetYujingTimeMsg2RadioBox");
-		assert(SetYujingTimeMsg2RadioBox);
-
-		SetYujingTimeMsg3RadioBox = ituSceneFindWidget(&theScene, "SetYujingTimeMsg3RadioBox");
-		assert(SetYujingTimeMsg3RadioBox);
-
-		SetYujingTimeMsg4RadioBox = ituSceneFindWidget(&theScene, "SetYujingTimeMsg4RadioBox");
-		assert(SetYujingTimeMsg4RadioBox);
-
 		SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
 		assert(SetMenuLayer); 
 
@@ -118,6 +99,10 @@ bool SetUserOnEnter(ITUWidget* widget, char* param)
 	
 	ituWidgetSetVisible(SetYujingTimeMsgBackground, false);
 	ituWidgetSetVisible(SetUserBackground, true);
+	if (!ituWidgetIsEnabled(SetUserBackground))
+	{
+		ituWidgetEnable(SetUserBackground);
+	}
 
 	return true;
 }
@@ -132,32 +117,21 @@ Others:
 *************************************************/
 bool SetYujingTimeButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	switch (g_time_alarm_param[1])
+	if (!SetYujingTimeMsgRadioBox[0])
 	{
-	case 0:
-		ituRadioBoxSetChecked(SetYujingTimeMsg0RadioBox, true);
-		break;
+		uint8 i = 0;
+		uint8 tmp[50] = { 0 };
 
-	case 1:
-		ituRadioBoxSetChecked(SetYujingTimeMsg1RadioBox, true);
-		break;
-
-	case 2:
-		ituRadioBoxSetChecked(SetYujingTimeMsg2RadioBox, true);
-		break;
-
-	case 3:
-		ituRadioBoxSetChecked(SetYujingTimeMsg3RadioBox, true);
-		break;
-
-	case 4:
-		ituRadioBoxSetChecked(SetYujingTimeMsg4RadioBox, true);
-		break;
-
-	default:
-		ituRadioBoxSetChecked(SetYujingTimeMsg0RadioBox, true);
-		break;
+		for (i = 0; i < 5; i++)
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d%s", "SetYujingTimeMsg", i, "RadioBox");
+			SetYujingTimeMsgRadioBox[i] = ituSceneFindWidget(&theScene, tmp);
+			assert(SetYujingTimeMsgRadioBox[i]);
+		}
 	}
+
+	ituRadioBoxSetChecked(SetYujingTimeMsgRadioBox[g_time_alarm_param[1]], true);
 
 	ituWidgetDisable(SetUserBackground);
 	ituWidgetSetVisible(SetYujingTimeMsgBackground, true);
@@ -227,9 +201,4 @@ void SetUserLayerOnReturn(void)
 		ituLayerGoto(SetMenuLayer);
 		return;
 	}
-}
-
-void SetUserReset(void)
-{
-	SetUserBackground = NULL;
 }

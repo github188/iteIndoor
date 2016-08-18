@@ -38,6 +38,7 @@ typedef struct
 
 static uint32 g_ErrType;
 static MONITOR_INFO g_MonitorInfo;
+static MONITOR_INFO g_MonitorlistInfo;
 static MONITOR_STATE_E g_PreMonitorState = MONITOR_END;   // 改变前的状态
 static DEVICE_NO	g_MoniDestDeviceNo;					  // 监视目标设备编号
 
@@ -51,6 +52,9 @@ unsigned char g_mac[6] = {0};
 
 #define GuiNotify(param1, param2)	if (g_MonitorInfo.gui_notify)\
 	g_MonitorInfo.gui_notify(param1, param2)
+
+#define MonitorListNotify(param1, param2)	if (g_MonitorlistInfo.gui_notify)\
+	g_MonitorlistInfo.gui_notify(param1, param2)
 
 /*************************************************
   Function:			InterSetThread
@@ -78,8 +82,9 @@ static void inter_SetThread(struct ThreadInfo *thread)
   Return:				
   Others:
 *************************************************/
-void monitor_ini(PFGuiNotify GuiProc)
+void monitor_ini(PFGuiNotify MonitorListProc, PFGuiNotify GuiProc)
 {
+	g_MonitorlistInfo.gui_notify = MonitorListProc;
 	g_MonitorInfo.gui_notify = GuiProc;
 	g_MonitorInfo.port = NETCMD_UDP_PORT;
 	g_MonitorInfo.LocalAudioPort = NETAUDIO_UDP_PORT;
@@ -490,7 +495,6 @@ LabChange:
 			{
 				// 剩余时间
 				g_RemainTime = g_MonitorInfo.TimeMax - g_MonitorInfo.TimeOut;
-				dprintf("g_RemainTime : %d\n ", g_RemainTime);
 				if (g_RemainTime <= 0)
 				{
 					set_nethead(g_MoniDestDeviceNo, PRIRY_DEFAULT);
@@ -501,7 +505,7 @@ LabChange:
 				}
 				else
 				{
-					//GuiNotify(MONITOR_TIMER, g_RemainTime);
+					GuiNotify(MONITOR_TIMER, g_RemainTime);
 					set_nethead(g_MoniDestDeviceNo, PRIRY_DEFAULT);
 					net_direct_send(CMD_MONITOR_HEART, g_buf, 2, g_MonitorInfo.address, g_MonitorInfo.port);
 				}
@@ -515,7 +519,7 @@ LabChange:
 				g_MonitorInfo.HeartTime++;
 
 				times = 10;
-				while ((times--) > 0 && MONITOR_MONITORING == g_MonitorInfo.state)
+				while ((times--) > 0 && (MONITOR_MONITORING == g_MonitorInfo.state))
 				{
 					usleep(100*1000);
 				}
@@ -546,6 +550,7 @@ LabChange:
 	{				
 		dprintf("MONITOR_TALKING == g_MonitorInfo.state \n");
 		GuiNotify(g_MonitorInfo.state, 0);
+		usleep(20*1000);
 		g_PreMonitorState = MONITOR_TALKING;
 		g_MonitorInfo.TimeMax = TALK_TIME_MAX;		
 		g_MonitorInfo.TimeOut = 0;
@@ -558,8 +563,8 @@ LabChange:
 				g_RemainTime = 0;
 				g_MonitorInfo.TimeOut = time(0) - t0;
 				// 剩余时间
-				g_RemainTime = g_MonitorInfo.TimeMax - g_MonitorInfo.TimeOut;					
-				if (g_RemainTime <= 0)
+				//g_RemainTime = g_MonitorInfo.TimeMax - g_MonitorInfo.TimeOut;					
+				if (g_MonitorInfo.TimeOut >= g_MonitorInfo.TimeMax)
 				{
 					dprintf("monitor timer proc : talking time out\n");
 					set_nethead(g_MoniDestDeviceNo, PRIRY_DEFAULT);
@@ -570,7 +575,8 @@ LabChange:
 				}
 				else
 				{
-					//GuiNotify(MONITOR_TIMER, g_RemainTime);
+					g_RemainTime = g_MonitorInfo.TimeMax - g_MonitorInfo.TimeOut;
+					GuiNotify(MONITOR_TIMER, g_RemainTime);
 					set_nethead(g_MoniDestDeviceNo, PRIRY_DEFAULT);
 					net_direct_send(CMD_MONITOR_HEART, g_buf, 2, g_MonitorInfo.address, g_MonitorInfo.port);
 				}
@@ -584,7 +590,7 @@ LabChange:
 				g_MonitorInfo.HeartTime++;
 				
 				times = 10;
-				while ((times--) > 0 && MONITOR_TALKING == g_MonitorInfo.state)
+				while ((times--) > 0 && (MONITOR_TALKING == g_MonitorInfo.state))
 				{
 					usleep(100*1000);
 				}
@@ -1363,18 +1369,18 @@ static uint32 get_monitor_sync_devlist (void)
 			ret = search_door_list();
 			break;
 		default:	
-			GuiNotify(MONITOR_GETLIST, FALSE);
+			MonitorListNotify(MONITOR_GETLIST, FALSE);
 			g_MonitorInfo.state = MONITOR_END;
 			return FALSE;
 	}
 
 	if (ret == TRUE)
 	{		
-		GuiNotify(MONITOR_GETLIST, TRUE);
+		MonitorListNotify(MONITOR_GETLIST, TRUE);
 	}
 	else
 	{
-		GuiNotify(MONITOR_GETLIST, FALSE);
+		MonitorListNotify(MONITOR_GETLIST, FALSE);
 	}
 	
 	g_MonitorInfo.state = MONITOR_END;
@@ -1461,7 +1467,8 @@ void monitor_responsion(const PRECIVE_PACKET recPacket, const PSEND_PACKET SendP
 				{
 					g_MonitorInfo.state = MONITOR_MONITORING;
 					g_PreMonitorState = MONITOR_MONITORING;
-					GuiNotify(g_MonitorInfo.state, 0);	
+					GuiNotify(g_MonitorInfo.state, 0);
+					usleep(20*1000);
 				}
 				else if(head->EchoValue == ECHO_BUSY)
 				{

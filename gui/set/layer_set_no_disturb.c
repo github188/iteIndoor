@@ -128,6 +128,10 @@ bool SetNoDisturbOnEnter(ITUWidget* widget, char* param)
 
 	ituWidgetSetVisible(SetNoDisturbTimeBackground, false);
 	ituWidgetSetVisible(SetNoDisturbBackground, true);
+	if (!ituWidgetIsEnabled(SetNoDisturbBackground))
+	{
+		ituWidgetEnable(SetNoDisturbBackground);
+	}
 	
 	return true;
 }

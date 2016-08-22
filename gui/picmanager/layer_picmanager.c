@@ -16,6 +16,8 @@ Modification:
 
 static ITULayer*		mainLayer;
 static ITUBackground*	picManagerTipsTransparencyBackground;
+static ITUBackground*	picManagerBackground;
+static ITUText*			picManagerTipsText;
 static ITUWidget*		picManagerEmptyContainer;
 static ITUWidget*		picManagerDeleteContainer;
 static ITUWidget*		picManagerPicEditContainer;
@@ -141,7 +143,7 @@ bool picManagerBtnOnClicked(ITUWidget* widget, char* param)
 		break;
 
 	case PICMANAGER_BTN_EMPTY:
-	case PICMANAGER_BTN_DELATE:
+	case PICMANAGER_BTN_DELETE:
 		picManagerMsgBoxShow(tmpBtn);
 		break;
 
@@ -191,7 +193,34 @@ void picManagerEditBtnOnClicked()
 
 void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId)
 {
+	if (!picManagerTipsText)
+	{
+		picManagerTipsText = ituSceneFindWidget(&theScene, "picManagerTipsText");
+		assert(picManagerTipsText);
+	}
 
+	if (!picManagerBackground)
+	{
+		picManagerBackground = ituSceneFindWidget(&theScene, "picManagerBackground");
+		assert(picManagerBackground);
+	}
+	//TODO:Ìí¼ÓÓïÑÔ·­Òë£¡
+	switch (btnId)
+	{
+	case PICMANAGER_BTN_EMPTY:
+		ituTextSetString(picManagerTipsText, "Empty Message");
+		break;
+
+	case PICMANAGER_BTN_DELETE:
+		ituTextSetString(picManagerTipsText, "Delete Message");
+		break;
+
+	default:
+		break;
+	}
+
+	ituWidgetDisable(picManagerBackground);
+	ituWidgetSetVisible(picManagerTipsTransparencyBackground, true);
 }
 
 
@@ -278,7 +307,7 @@ MINIPIC_ICON_STATUS_e getMiniPicIsChecked(uint8_t index)
 	if (index >= PICMANAGER_MINIPIC_MAX)
 	{
 		printf("index is too large!!!!!!!!!!");
-		return;
+		return MINIPIC_CORNER_ICON_NULL;
 	}
 
 	sprintf(tmpCheck, "%s%d", "picManagerMiniPicChenkIcon", index);

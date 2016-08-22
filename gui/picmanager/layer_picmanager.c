@@ -125,6 +125,13 @@ bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 }
 
 
+bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param)
+{
+
+	return true;
+}
+
+
 void setMiniPicIsChecked(uint8_t index, MINIPIC_CORNER_ICON_STATUS_e status)
 {
 	char tmpCheck[50] = { 0 };

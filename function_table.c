@@ -41,6 +41,7 @@ ITUActionFunction actionFunctions[] =
 	"picManagerLayerOnEnter", picManagerLayerOnEnter,
 	"picManagerBtnOnClicked", picManagerBtnOnClicked,
 	"picManagerMsgBoxBtnOnClicked", picManagerMsgBoxBtnOnClicked,
+	"picManagerMiniPicBtnClicked", picManagerMiniPicBtnClicked,
 
 	// CallLayer
 	"CallLayerOnEnter", CallLayerOnEnter,

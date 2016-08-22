@@ -20,7 +20,9 @@ static ITUWidget*		picManagerEmptyContainer;
 static ITUWidget*		picManagerDeleteContainer;
 static ITUWidget*		picManagerPicEditContainer;
 static ITUCoverFlow*	picManagerPictureCoverFlow;
+static ITUWidget*		picManagerMiniPicListContainer;
 static ITUWidget*		picManagerMiniPicContainer;
+static ITUWidget*		picManagerBottomBarContainer;
 static ITUWidget*		picManagerNullContainer3;
 static ITUIcon*			picManagerMiniPicIcon;
 	
@@ -33,7 +35,7 @@ static char		gPicManagerImageFilePath[PATH_MAX];
 
 bool picManagerLayerOnEnter(ITUWidget* widget, char* param)
 {
-	picManagerPageInit(PICMANAGER_MINIPIC_PAGE);
+	picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
 	setPicManagerMiniPicList();
 
 	return true;
@@ -62,15 +64,20 @@ void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 		picManagerPictureCoverFlow = ituSceneFindWidget(&theScene, "picManagerPictureCoverFlow");
 		assert(picManagerPictureCoverFlow);
 	}
-	if (!picManagerMiniPicContainer)
+	if (!picManagerMiniPicListContainer)
 	{
-		picManagerMiniPicContainer = ituSceneFindWidget(&theScene, "picManagerMiniPicContainer");
-		assert(picManagerMiniPicContainer);
+		picManagerMiniPicListContainer = ituSceneFindWidget(&theScene, "picManagerMiniPicListContainer");
+		assert(picManagerMiniPicListContainer);
 	}
 	if (!picManagerNullContainer3)
 	{
 		picManagerNullContainer3 = ituSceneFindWidget(&theScene, "picManagerNullContainer3");
 		assert(picManagerNullContainer3);
+	}
+	if (!picManagerBottomBarContainer)
+	{
+		picManagerBottomBarContainer = ituSceneFindWidget(&theScene, "picManagerBottomBarContainer");
+		assert(picManagerBottomBarContainer);
 	}
 	if (!picManagerTipsTransparencyBackground)
 	{
@@ -82,9 +89,11 @@ void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 
 	switch (pageId)
 	{
-	case PICMANAGER_MINIPIC_PAGE:
+	case PICMANAGER_PAGE_MINIPIC:
+		ituWidgetSetVisible(picManagerBottomBarContainer, true);
+
 		ituWidgetSetVisible(picManagerPictureCoverFlow, false);
-		ituWidgetSetVisible(picManagerMiniPicContainer, true);
+		ituWidgetSetVisible(picManagerMiniPicListContainer, true);
 
 		ituWidgetSetVisible(picManagerEmptyContainer, false);
 		ituWidgetSetVisible(picManagerPicEditContainer, true);
@@ -94,9 +103,19 @@ void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 
 		break;
 
-	case PICMANAGER_PICCONTENT_PAGE:
-		ituWidgetSetVisible(picManagerMiniPicContainer, false);
+	case PICMANAGER_PAGE_CONTENT:
+		ituWidgetSetVisible(picManagerBottomBarContainer, false);
+
+		ituWidgetSetVisible(picManagerMiniPicListContainer, false);
 		ituWidgetSetVisible(picManagerPictureCoverFlow, true);
+
+		break;
+
+	case PICMANAGER_PAGE_EDIT:
+		ituWidgetSetVisible(picManagerBottomBarContainer, true);
+
+		ituWidgetSetVisible(picManagerPictureCoverFlow, false);
+		ituWidgetSetVisible(picManagerMiniPicListContainer, true);
 
 		ituWidgetSetVisible(picManagerPicEditContainer, false);
 		ituWidgetSetVisible(picManagerEmptyContainer, true);
@@ -113,8 +132,66 @@ void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 
 bool picManagerBtnOnClicked(ITUWidget* widget, char* param)
 {
+	PICMANAGER_BTN_e tmpBtn = atoi(param);
+
+	switch (tmpBtn)
+	{
+	case PICMANAGER_BTN_RETURN:
+		picManagerRetutnBtnOnClicked();
+		break;
+
+	case PICMANAGER_BTN_EMPTY:
+	case PICMANAGER_BTN_DELATE:
+		picManagerMsgBoxShow(tmpBtn);
+		break;
+
+	case PICMANAGER_BTN_EDIT:
+		picManagerEditBtnOnClicked();
+		break;
+
+	default:
+		break;
+	}
 
 	return true;
+}
+
+
+void picManagerRetutnBtnOnClicked()
+{
+	printf("picManagerRetutnBtnOnClicked");
+
+	if (ituWidgetIsVisible(picManagerPictureCoverFlow))
+	{
+		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
+	}
+	else if (!ituWidgetIsVisible(picManagerPicEditContainer))
+	{
+		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
+		setMiniPicListIsChecked(MINIPIC_CORNER_ICON_NULL);
+	}
+	else
+	{
+		if (!mainLayer)
+		{
+			mainLayer = ituSceneFindWidget(&theScene, "mainLayer");
+			assert(mainLayer);
+		}
+		ituLayerGoto(mainLayer);
+	}
+}
+
+
+void picManagerEditBtnOnClicked()
+{
+	picManagerPageInit(PICMANAGER_PAGE_EDIT);
+	setMiniPicListIsChecked(MINIPIC_CORNER_ICON_UNCHECK);
+}
+
+
+void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId)
+{
+
 }
 
 
@@ -132,7 +209,7 @@ bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param)
 }
 
 
-void setMiniPicIsChecked(uint8_t index, MINIPIC_CORNER_ICON_STATUS_e status)
+void setMiniPicIsChecked(uint8_t index, MINIPIC_ICON_STATUS_e status)
 {
 	char tmpCheck[50] = { 0 };
 	char tmpUncheck[50] = { 0 };
@@ -171,6 +248,60 @@ void setMiniPicIsChecked(uint8_t index, MINIPIC_CORNER_ICON_STATUS_e status)
 	default:
 		break;
 	}
+}
+
+
+void setMiniPicListIsChecked(MINIPIC_ICON_STATUS_e status)
+{
+	uint8_t i = 0;
+	char tmpStr[50] = { 0 };
+
+	for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)
+	{
+		sprintf(tmpStr, "%s%d", "picManagerMiniPicContainer", i);
+		picManagerMiniPicContainer = ituSceneFindWidget(&theScene, tmpStr);
+		assert(picManagerMiniPicContainer);
+
+		if (ituWidgetIsVisible(picManagerMiniPicContainer))
+		{
+			setMiniPicIsChecked(i, status);
+		}
+	}
+}
+
+
+MINIPIC_ICON_STATUS_e getMiniPicIsChecked(uint8_t index)
+{
+	char tmpCheck[50] = { 0 };
+	char tmpUncheck[50] = { 0 };
+
+	if (index >= PICMANAGER_MINIPIC_MAX)
+	{
+		printf("index is too large!!!!!!!!!!");
+		return;
+	}
+
+	sprintf(tmpCheck, "%s%d", "picManagerMiniPicChenkIcon", index);
+	picManagerMiniPicChenkIcon = ituSceneFindWidget(&theScene, tmpCheck);
+	assert(picManagerMiniPicChenkIcon);
+
+	sprintf(tmpUncheck, "%s%d", "picManagerMiniPicUnChenkIcon", index);
+	picManagerMiniPicUnChenkIcon = ituSceneFindWidget(&theScene, tmpUncheck);
+	assert(picManagerMiniPicUnChenkIcon);
+
+	if (ituWidgetIsVisible(picManagerMiniPicChenkIcon))
+	{
+		return MINIPIC_CORNER_ICON_CHECK;
+	}
+	else if (ituWidgetIsVisible(picManagerMiniPicUnChenkIcon))
+	{
+		return MINIPIC_CORNER_ICON_UNCHECK;
+	}
+	else
+	{
+		return MINIPIC_CORNER_ICON_NULL;
+	}
+
 }
 
 
@@ -229,7 +360,7 @@ void setPicManagerMiniPicList()
 {
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
-	uint8_t miniPicNum = 15;
+	uint8_t miniPicNum = 10;
 
 	//TODO: 读取存储内容缩略图信息信息！！！！！！！
 	for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)

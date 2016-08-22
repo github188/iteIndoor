@@ -19,27 +19,44 @@ Modification:
 
 #define PICMANAGER_MINIPIC_MAX			16
 
+
 typedef enum
 {
-	PICMANAGER_MINIPIC_PAGE,
-	PICMANAGER_PICCONTENT_PAGE,
-}PICMANAGER_PAGE_e;
+	PICMANAGER_BTN_RETURN,
+	PICMANAGER_BTN_EMPTY,
+	PICMANAGER_BTN_DELATE,
+	PICMANAGER_BTN_EDIT,
+}PICMANAGER_BTN_e;
+
 
 typedef enum
 {
 	MINIPIC_CORNER_ICON_CHECK,
 	MINIPIC_CORNER_ICON_UNCHECK,
 	MINIPIC_CORNER_ICON_NULL,
-}MINIPIC_CORNER_ICON_STATUS_e;
+}MINIPIC_ICON_STATUS_e;
+
+
+typedef enum
+{
+	PICMANAGER_PAGE_MINIPIC,
+	PICMANAGER_PAGE_EDIT,
+	PICMANAGER_PAGE_CONTENT,
+}PICMANAGER_PAGE_e;
+
 
 bool picManagerLayerOnEnter(ITUWidget* widget, char* param);
 bool picManagerBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param);
-
+void picManagerRetutnBtnOnClicked();
+void picManagerEditBtnOnClicked();
+void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId);
 void picManagerPageInit(PICMANAGER_PAGE_e pageId);
 void setPicManagerMiniPicList();
+void setMiniPicListIsChecked(MINIPIC_ICON_STATUS_e status);
 bool setMiniPicContent(uint8_t index, char* addrStr);
-void setMiniPicIsChecked(uint8_t index, MINIPIC_CORNER_ICON_STATUS_e status);
+void setMiniPicIsChecked(uint8_t index, MINIPIC_ICON_STATUS_e status);
+MINIPIC_ICON_STATUS_e getMiniPicIsChecked(uint8_t index);
 
 #endif // LAYER_PICMANAGER_H

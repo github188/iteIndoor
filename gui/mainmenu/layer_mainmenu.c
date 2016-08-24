@@ -373,11 +373,15 @@ bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 	if (getDisturbStatus())
 	{
 		setDisturbStatus(false);
+		storage_set_noface_enable(false);
 	}
 	else
 	{
 		setDisturbStatus(true);
+		storage_set_noface_enable(true);
 	}
+
+	start_disturb_timer();
 
 	return true;
 }

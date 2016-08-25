@@ -209,6 +209,7 @@ void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId)
 	{
 	case PICMANAGER_BTN_EMPTY:
 		ituTextSetString(picManagerTipsText, "Empty Message");
+		setMiniPicListIsChecked(MINIPIC_CORNER_ICON_CHECK);
 		break;
 
 	case PICMANAGER_BTN_DELETE:
@@ -226,6 +227,28 @@ void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId)
 
 bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 {
+	uint16 i = 0;
+	uint16 tmpId = atoi(param);
+
+	switch (tmpId)
+	{
+	case PICMANAGER_MSG_BTN_CONFIRM:
+		for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)
+		{
+			if (getMiniPicIsChecked(i) == MINIPIC_CORNER_ICON_CHECK)
+			{
+				//TODO:这里写删除所选照片的操作，删除完重新绘制内容界面！！！！！！！
+			}
+		}
+		setPicManagerMiniPicList();
+		break;
+
+	default:
+		break;
+	}
+
+	ituWidgetEnable(picManagerBackground);
+	ituWidgetSetVisible(picManagerTipsTransparencyBackground, false);
 
 	return true;
 }
@@ -233,7 +256,27 @@ bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 
 bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param)
 {
+	uint16 tmpIndex  = atoi(param);
+	MINIPIC_ICON_STATUS_e tmpStatus = getMiniPicIsChecked(tmpIndex);
 
+	switch (tmpStatus)
+	{
+	case MINIPIC_CORNER_ICON_CHECK:
+		setMiniPicIsChecked(tmpIndex, MINIPIC_CORNER_ICON_UNCHECK);
+		break;
+
+	case MINIPIC_CORNER_ICON_UNCHECK:
+		setMiniPicIsChecked(tmpIndex, MINIPIC_CORNER_ICON_CHECK);
+		break;
+
+	case MINIPIC_CORNER_ICON_NULL:
+		//TODO:进入照片浏览界面！！！！！
+		picManagerPageInit(PICMANAGER_PAGE_CONTENT);
+		break;
+
+	default:
+		break;
+	}
 	return true;
 }
 

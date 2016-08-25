@@ -22,6 +22,13 @@ Modification:
 
 typedef enum
 {
+	PICMANAGER_MSG_BTN_CANCEL,
+	PICMANAGER_MSG_BTN_CONFIRM,
+}PICMANAGER_MSG_BTN_e;
+
+
+typedef enum
+{
 	PICMANAGER_BTN_RETURN,
 	PICMANAGER_BTN_EMPTY,
 	PICMANAGER_BTN_DELETE,
@@ -49,6 +56,7 @@ bool picManagerLayerOnEnter(ITUWidget* widget, char* param);
 bool picManagerBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param);
+
 void picManagerRetutnBtnOnClicked();
 void picManagerEditBtnOnClicked();
 void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId);

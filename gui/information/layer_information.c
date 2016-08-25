@@ -464,23 +464,18 @@ void informationReturnBtnOnClicked()
 		}
 		ituLayerGoto(mainLayer);
 	}
-	//return true;
 }
 
 
 void informationNextMsgBtnOnClicked()
 {
 	printf("informationNextMsgBTNOnClicked 111111111111111111111111111111");
-
-	//return true;
 }
 
 
 void informationPreMsgBtnOnClicked()
 {
 	printf("informationPreMsgBTNOnClicked 111111111111111111111111111111");
-
-	//return true;
 }
 
 
@@ -539,11 +534,13 @@ void setInformationList()
 				setInformationIsReaded(i, tmpList->pinfo_data[i].is_unread);		//设置已读未读
 				printf("unread = %d", tmpList->pinfo_data[i].is_unread);
 
-				setInformationListSender(i, tmpList->pinfo_data[i].des);			//设置信息发送者
-				printf("des = %s", tmpList->pinfo_data[i].des);
+				gb2312ToUtf8(tmpStr, strlen(tmpList->pinfo_data[i].des), tmpList->pinfo_data[i].des, strlen(tmpList->pinfo_data[i].des));
+				setInformationListSender(i, tmpStr);								//设置信息发送者
+				printf("des = %s", tmpStr);
 
-				setInformationListTheme(i, tmpList->pinfo_data[i].Head.title);		//设置信息主题
-				printf("tittle = %s", tmpList->pinfo_data[i].Head.title);
+				gb2312ToUtf8(tmpStr, strlen(tmpList->pinfo_data[i].Head.title), tmpList->pinfo_data[i].Head.title, strlen(tmpList->pinfo_data[i].Head.title));
+				setInformationListTheme(i, tmpStr);									//设置信息主题
+				printf("tittle = %s", tmpStr);
 
 				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);			
 				printf("time = %s", tmpStr);

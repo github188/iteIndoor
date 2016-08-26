@@ -25,6 +25,7 @@ static ITUIcon*		page1NoDisturbOnIcon;
 static ITUText*		page1NoDisturbOnText;
 static ITUIcon*		page1NoDisturbOffIcon;
 static ITUText*		page1NoDisturbOffText;
+static ITUIcon*		mainBackgroundImgIcon;
 
 static ITUIcon*		page1RecorderNumIcon;
 static ITUText*		page1RecorderNumText;
@@ -95,6 +96,8 @@ static bool		gSOSBtnIsPress;
 static bool		gSOSIsAlarm;
 static uint8_t  gScrollTimeCount;
 
+static uint8_t gMainBackgroundIndex;
+
 static PJRLYLIST_INFO	gRecorderData = NULL;		//家人留言数据
 
 
@@ -110,6 +113,8 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	gSOSBtnIsPress = false;
 	gSOSIsAlarm = false;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
+
+	gMainBackgroundIndex = 0;
 
 	return true;
 }
@@ -214,6 +219,7 @@ void mainLayerCornerNumReload()
 	setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
 	setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
 	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
+	setMainBackgroundImg();												//设置主界面背景图
 }
 
 
@@ -226,6 +232,63 @@ void mainLayerScrollDataReload()
 	loadUnsolvedSecurityAlarmData();		//载入为处理的报警数据
 }
 
+
+void setMainBackgroundImg()
+{
+	char		tmpAddr[50] = { 0 };
+	uint8_t		tmpIndex	= 0;
+	FILE*		tmpFile;
+	uint8_t*	gPicManagerImageData;
+	int			gPicManagerImageSize;
+	char		gPicManagerImageFilePath[PATH_MAX];
+
+	if (!mainBackgroundImgIcon)
+	{
+		mainBackgroundImgIcon = ituSceneFindWidget(&theScene, "mainBackgroundImgIcon");
+		assert(mainBackgroundImgIcon);
+	}
+
+	tmpIndex = storage_get_desk();
+	if (tmpIndex == gMainBackgroundIndex)
+	{
+		return;
+	}
+	gMainBackgroundIndex = tmpIndex;
+
+	sprintf(tmpAddr, "%s%s%d%s", WALL_PAPER_DIR_PATH, "bk_", gMainBackgroundIndex, ".jpg");
+
+	// try to load minipic jpeg file if exists
+	tmpFile = fopen(tmpAddr, "rb");
+	if (tmpFile)
+	{
+		struct stat sb;
+		if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
+		{
+			gPicManagerImageSize = (int)sb.st_size;
+			gPicManagerImageData = malloc(gPicManagerImageSize);
+			if (gPicManagerImageSize)
+			{
+				gPicManagerImageSize = fread(gPicManagerImageData, 1, gPicManagerImageSize, tmpFile);
+			}
+		}
+		fclose(tmpFile);
+	}
+	if (gPicManagerImageData)
+	{
+
+		ituIconLoadJpegData((ITUIcon*)mainBackgroundImgIcon, gPicManagerImageData, gPicManagerImageSize);
+	}
+
+}
+
+bool setMainBackgroundIconImg(char* addrStr)
+{
+
+
+	
+
+	return true;
+}
 
 bool getIpIconStatus()
 {

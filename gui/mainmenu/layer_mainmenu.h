@@ -40,7 +40,6 @@ void	mainLayerCornerNumReload();
 void	mainLayerScrollDataReload();
 void	mainMenuLayerReset();
 
-
 void 	zoneDateTimeToString(DATE_TIME time, char* tmpStr);
 
 //以下是需要定时器实时获取的状态值！！
@@ -57,6 +56,10 @@ MAIN_SECURITY_STATUS_e	getSecurityStatus();
 void	setSOSBtnType(bool status);
 
 //以下是在界面重新进入时候读取一次就行
+
+void	setMainBackgroundImg();
+bool	setMainBackgroundIconImg(char* addrStr);
+
 uint8_t	getUnreadRecorderNum();
 void	setUnreadRecorderNum(uint8_t num);
 void	loadUnreadRecorderData();

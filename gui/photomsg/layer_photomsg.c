@@ -482,6 +482,7 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	}
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
+	free(gPhotoMsgListIconData);
 	return true;
 
 }

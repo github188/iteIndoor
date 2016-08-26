@@ -416,7 +416,6 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 	}
 	if (gPicManagerImageData)
 	{
-		
 		ituIconLoadJpegData((ITUIcon*)picManagerMiniPicIcon, gPicManagerImageData, gPicManagerImageSize);
 	}
 	else
@@ -426,6 +425,7 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 		return false;
 	}
 
+	free(gPicManagerImageData);
 	return true;
 }
 

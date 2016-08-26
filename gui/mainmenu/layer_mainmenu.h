@@ -57,8 +57,7 @@ void	setSOSBtnType(bool status);
 
 //以下是在界面重新进入时候读取一次就行
 
-void	setMainBackgroundImg();
-bool	setMainBackgroundIconImg(char* addrStr);
+bool	setMainBackgroundImg();
 
 uint8_t	getUnreadRecorderNum();
 void	setUnreadRecorderNum(uint8_t num);

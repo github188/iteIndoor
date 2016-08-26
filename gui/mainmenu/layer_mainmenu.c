@@ -99,6 +99,9 @@ static uint8_t  gScrollTimeCount;
 static uint8_t gMainBackgroundIndex;
 
 static PJRLYLIST_INFO	gRecorderData = NULL;		//家人留言数据
+static uint8_t*			gPicManagerImageData;
+static int				gPicManagerImageSize;
+static char				gPicManagerImageFilePath[PATH_MAX];
 
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
@@ -233,14 +236,11 @@ void mainLayerScrollDataReload()
 }
 
 
-void setMainBackgroundImg()
+bool setMainBackgroundImg()
 {
 	char		tmpAddr[50] = { 0 };
 	uint8_t		tmpIndex	= 0;
 	FILE*		tmpFile;
-	uint8_t*	gPicManagerImageData;
-	int			gPicManagerImageSize;
-	char		gPicManagerImageFilePath[PATH_MAX];
 
 	if (!mainBackgroundImgIcon)
 	{
@@ -251,12 +251,13 @@ void setMainBackgroundImg()
 	tmpIndex = storage_get_desk();
 	if (tmpIndex == gMainBackgroundIndex)
 	{
-		return;
+		return false;
 	}
 	gMainBackgroundIndex = tmpIndex;
 
 	sprintf(tmpAddr, "%s%s%d%s", WALL_PAPER_DIR_PATH, "bk_", gMainBackgroundIndex, ".jpg");
 
+	printf("88888888888888888888888 = %s", tmpAddr);
 	// try to load minipic jpeg file if exists
 	tmpFile = fopen(tmpAddr, "rb");
 	if (tmpFile)
@@ -273,21 +274,25 @@ void setMainBackgroundImg()
 		}
 		fclose(tmpFile);
 	}
+	else
+	{
+		printf("open  minipic jepg icon icon failed!");
+		return false;
+	}
 	if (gPicManagerImageData)
 	{
-
 		ituIconLoadJpegData((ITUIcon*)mainBackgroundImgIcon, gPicManagerImageData, gPicManagerImageSize);
 	}
+	else
+	{
+		printf("load minipic jepg icon failed!");
+		return false;
+	}
 
-}
-
-bool setMainBackgroundIconImg(char* addrStr)
-{
-
-
-	
-
+	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
+	free(gPicManagerImageData);
 	return true;
+
 }
 
 bool getIpIconStatus()

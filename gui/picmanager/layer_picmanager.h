@@ -56,6 +56,7 @@ bool picManagerLayerOnEnter(ITUWidget* widget, char* param);
 bool picManagerBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param);
+bool picManagerPictureOnChanged(ITUWidget* widget, char* param);
 
 void picManagerRetutnBtnOnClicked();
 void picManagerEditBtnOnClicked();

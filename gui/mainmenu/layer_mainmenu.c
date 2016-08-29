@@ -15,6 +15,7 @@ Modification:
 #include "layer_mainmenu.h"
 
 static ITUText*		mainDigitalClockWeekText;
+static ITUCoverFlow*mainPageCoverFlow;
 static ITUSprite*	mainIPSprite;
 static ITUIcon*		mainNetStatusOffIcon;
 static ITUSprite*	mainNetStatusOnSprite;
@@ -190,6 +191,21 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 	return true;
 }
 
+
+bool mainCoverFlowOnChanged(ITUWidget* widget, char* param)
+{
+
+	if (!mainPageCoverFlow)
+	{
+		mainPageCoverFlow = ituSceneFindWidget(&theScene, "mainPageCoverFlow");
+		assert(mainPageCoverFlow);
+	}
+
+	printf("1111111111111111111111111111111111111 %d", mainPageCoverFlow->focusIndex);
+
+
+	return true;
+}
 
 bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 {

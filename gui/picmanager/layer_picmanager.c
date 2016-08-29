@@ -159,6 +159,11 @@ bool picManagerBtnOnClicked(ITUWidget* widget, char* param)
 }
 
 
+bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
+{
+
+}
+
 void picManagerRetutnBtnOnClicked()
 {
 	printf("picManagerRetutnBtnOnClicked");

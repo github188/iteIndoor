@@ -36,6 +36,7 @@ bool	mainLayerOnEnter(ITUWidget* widget, char* param);
 bool	mainDistrubStatusOnChange(ITUWidget* widget, char* param);
 bool    mainLayerTimeoutOnTimer(ITUWidget* widget, char* param);
 bool	mainSOSBtnOnPress(ITUWidget* widget, char* param);
+bool    mainCoverFlowOnChanged(ITUWidget* widget, char* param);
 void	mainLayerCornerNumReload();
 void	mainLayerScrollDataReload();
 void	mainMenuLayerReset();

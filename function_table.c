@@ -7,6 +7,7 @@ ITUActionFunction actionFunctions[] =
 	"mainLayerTimeoutOnTimer", mainLayerTimeoutOnTimer,
 	"mainDistrubStatusOnChange", mainDistrubStatusOnChange,
 	"mainSOSBtnOnPress", mainSOSBtnOnPress,
+	"mainCoverFlowOnChanged", mainCoverFlowOnChanged,
 
 	//elevatorCall
 	"elevatorCallBtnOnClicked", elevatorCallBtnOnClicked,
@@ -42,6 +43,7 @@ ITUActionFunction actionFunctions[] =
 	"picManagerBtnOnClicked", picManagerBtnOnClicked,
 	"picManagerMsgBoxBtnOnClicked", picManagerMsgBoxBtnOnClicked,
 	"picManagerMiniPicBtnClicked", picManagerMiniPicBtnClicked,
+	"picManagerPictureOnChanged", picManagerPictureOnChanged,
 
 	// CallLayer
 	"CallLayerOnEnter", CallLayerOnEnter,

@@ -203,7 +203,6 @@ bool mainCoverFlowOnChanged(ITUWidget* widget, char* param)
 
 	printf("1111111111111111111111111111111111111 %d", mainPageCoverFlow->focusIndex);
 
-
 	return true;
 }
 
@@ -271,6 +270,7 @@ bool setMainBackgroundImg()
 	}
 	gMainBackgroundIndex = tmpIndex;
 
+	memset(tmpAddr, 0, sizeof(tmpAddr));
 	sprintf(tmpAddr, "%s%s%d%s", WALL_PAPER_DIR_PATH, "bk_", gMainBackgroundIndex, ".jpg");
 
 	printf("88888888888888888888888 = %s", tmpAddr);
@@ -363,6 +363,7 @@ char* getDeviceNo()
 {
 	char* tmpStr = (char*)malloc(50);
 	PFULL_DEVICE_NO tmpDev = storage_get_devparam();
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%s", "NO:", tmpDev->DeviceNoStr);
 	//TODO:返回地址需要申请变量！！！！！！malloc！！！
 	return tmpStr;
@@ -518,6 +519,7 @@ void setUnreadRecorderNum(uint8_t num)
 		gRecorderTextIndex = -1;
 		gScrollTimeCount = 0;
 
+		memset(numstr, 0, sizeof(numstr));
 		if (num > MAIN_MAX_RECORDER_NUM)
 		{
 			sprintf(numstr, "%d", MAIN_MAX_RECORDER_NUM);
@@ -581,6 +583,7 @@ void setUnreadRecorderText(uint8_t index)
 		assert(page1RecorderScrollTimeText);
 	}
 	//TODO:读取存储设置文字内容！！
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "2016-08-03 08:11:1", index);
 	ituTextSetString(page1RecorderScrollTimeText, tmpStr);
 }
@@ -662,6 +665,7 @@ void setUnreadPhotoMsgNum(uint8_t num)
 		gPhotoMsgTextIndex = -1;
 		gScrollTimeCount = 0;
 
+		memset(numstr, 0, sizeof(numstr));
 		if (num > MAIN_MAX_MSG_NUM)
 		{
 			sprintf(numstr, "%d", MAIN_MAX_MSG_NUM);
@@ -712,6 +716,7 @@ void setUnreadPhotoMsgText(uint8_t index)
 		assert(page0PhotoMsgScrollTimeText);
 	}
 	//TODO:读取存储设置文字内容！！
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "2016-08-03 09:22:1", index);
 	ituTextSetString(page0PhotoMsgScrollTimeText, tmpStr);
 }
@@ -785,6 +790,7 @@ void setUnreadInformationNum(uint8_t num)
 		assert(page0InformationMiniIcon);
 	}
 
+	memset(numstr, 0, sizeof(numstr));
 	if (num > 0)
 	{
 		if (num > MAX_INFORMATION_NUM)
@@ -851,11 +857,15 @@ void setUnreadInformationText(uint8_t index)
 		assert(page0InformationScrollThemeText);
 	}
 	//TODO:读取存储设置文字内容！！
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "Theme", index);
 	ituTextSetString(page0InformationScrollThemeText, tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "01234567890", index);
 	ituTextSetString(page0InformationScrollContentText0, tmpStr);
+
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "01234567890", index);
 	ituTextSetString(page0InformationScrollContentText1, tmpStr);
 
@@ -931,6 +941,7 @@ void setUnreadMissedCallNum(uint8_t num)
 		assert(page0IntercomText);
 	}
 
+	memset(numstr, 0, sizeof(numstr));
 	if (num > 0)
 	{
 		if (num > MAIN_MAX_MISSCALL_NUM)
@@ -992,9 +1003,11 @@ void setUnreadMissedCallText(uint8_t index)
 	}
 
 	//TODO:读取存储设置文字内容！！
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "Admin", index);
 	ituTextSetString(page0IntercomScrollFromText, tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "2016-08-03 16:33:1", index);
 	ituTextSetString(page0IntercomScrollTimeText, tmpStr);
 
@@ -1081,6 +1094,7 @@ void setUnsolvedSecurityAlarmNum(uint8_t num)
 		assert(page0SecuritySprite);
 	}
 	
+	memset(numstr, 0, sizeof(numstr));
 	if (num > 0)
 	{
 		if (num > MAIN_MAX_SECURITY_NUM)
@@ -1148,12 +1162,15 @@ void setUnsolvedSecurityAlarmText(uint8_t index)
 	}
 
 	//TODO:读取存储设置文字内容！！
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "GAS", index);
 	ituTextSetString(page0SecurityScrollAlarmTypeText, tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "Triger", index);
 	ituTextSetString(page0SecurityScrollTriggerText, tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "2016-08-03 17:03:1", index);
 	ituTextSetString(page0SecurityScrollTimeText, tmpStr);
 }

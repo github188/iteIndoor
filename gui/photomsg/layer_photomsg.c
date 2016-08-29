@@ -350,6 +350,7 @@ bool setPhotoMsgListIsVisible(uint8_t index, bool status)
 	}
 	else
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		sprintf(tmpStr, "%s%d", "photoMsgListContainer", index);
 		photoMsgListContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(photoMsgListContainer);
@@ -376,7 +377,7 @@ void setPhotoMsgList()
 			{
 				strcpy(gPhotoMsgListIconFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_05.jpg");
 				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
-
+				memset(tmpStr, 0, sizeof(tmpStr));
 				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
 				setPhotoMsgListTime(i, tmpStr, true);
 			}
@@ -396,7 +397,7 @@ void setPhotoMsgList()
 			{
 				strcpy(gPhotoMsgListIconFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_02.jpg");
 				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
-
+				memset(tmpStr, 0, sizeof(tmpStr));
 				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
 				setPhotoMsgListTime(i, tmpStr, true);
 			}
@@ -410,6 +411,7 @@ void setPhotoMsgList()
 	//将没有内容的页面隐藏起来，达到不能滑动的效果！
 	for (i = 0; i < MAX_PHOTOMSG_PAGE_NUM; i++)
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		sprintf(tmpStr, "%s%d", "photoMsgPageContainer", i);
 		photoMsgPageContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(photoMsgPageContainer);
@@ -444,6 +446,7 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 		printf("photomsg list index overflow!!!!!!!!!!!!!");
 		return false;
 	}
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "photoMsgListMiniPicIcon", index);
 	photoMsgListMiniPicIcon = ituSceneFindWidget(&theScene, tmpStr);
 	assert(photoMsgListMiniPicIcon);
@@ -498,7 +501,7 @@ bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread)
 		return false;
 	}
 
-
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "photoMsgListTimeText", index);
 	photoMsgListTimeText = ituSceneFindWidget(&theScene, tmpStr);
 	assert(photoMsgListTimeText);

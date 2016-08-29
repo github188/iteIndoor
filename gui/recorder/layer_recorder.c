@@ -164,6 +164,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 
 				if (((int)gRecorderTimeCount) < MAX_RECORDER_TIME)
 				{
+					memset(buf, 0, sizeof(buf));
 					if (gRecorderTimeCount < 10)
 					{
 						sprintf(buf, "%s%d", "00:0", gRecorderTimeCount);
@@ -330,18 +331,22 @@ void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status)
 		return;
 	}
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "recorderRecordRadioBox", index);
 	recorderRecordRadioBox = ituSceneFindWidget(&theScene, tmpStr);
 	assert(recorderRecordRadioBox);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "recorderRecordText", index);
 	recorderRecordText = ituSceneFindWidget(&theScene, tmpStr);
 	assert(recorderRecordText);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "recorderRecordTopLeftIcon", index);
 	recorderRecordTopLeftIcon = ituSceneFindWidget(&theScene, tmpStr);
 	assert(recorderRecordTopLeftIcon);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "recorderRecordNullButton", index);
 	recorderRecordNullButton = ituSceneFindWidget(&theScene, tmpStr);
 	assert(recorderRecordNullButton);

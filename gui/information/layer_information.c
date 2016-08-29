@@ -205,10 +205,12 @@ bool setInformationIsReaded(uint8_t index, INFORMATION_MSGICON_STATUS_e status)
 	char tmpRead[50] = { 0 };
 	char tmpUnread[50] = { 0 };
 
+	memset(tmpRead, 0, sizeof(tmpRead));
 	sprintf(tmpRead, "%s%d", "informationMSGListReadIcon", index);
 	informationMSGListReadIcon = ituSceneFindWidget(&theScene, tmpRead);
 	assert(informationMSGListReadIcon);
 
+	memset(tmpUnread, 0, sizeof(tmpUnread));
 	sprintf(tmpUnread, "%s%d", "informationMSGListUnReadIcon", index);
 	informationMSGListUnReadIcon = ituSceneFindWidget(&theScene, tmpUnread);
 	assert(informationMSGListUnReadIcon);
@@ -241,6 +243,7 @@ bool setInformationListSender(uint8_t index, char* senderStr)
 {
 	char tmpStr[50] = { 0 };
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "informationMSGListSenderText", index);
 	informationMSGListSenderText = ituSceneFindWidget(&theScene, tmpStr);
 	assert(informationMSGListSenderText);
@@ -255,12 +258,15 @@ bool setInformationListTheme(uint8_t index, char* themeStr)
 {
 	char tmpStr[50] = { 0 };
 	char tmp_theme[50] = { 0 };
+
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "informationMSGListThemeText", index);
 	informationMSGListThemeText = ituSceneFindWidget(&theScene, tmpStr);
 	assert(informationMSGListThemeText);
 
 	if (strlen(themeStr) > MAX_INFORMATION_THEME_LEN)
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		strncpy(tmp_theme, themeStr, MAX_INFORMATION_THEME_LEN);
 		sprintf(tmpStr, "%s.", tmp_theme);
 		ituTextSetString(informationMSGListThemeText, tmpStr);
@@ -278,6 +284,7 @@ bool setInformationListTime(uint8_t index, char* timeStr)
 {
 	char tmpStr[50] = { 0 };
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "informationMSGListTimeText", index);
 	informationMSGListTimeText = ituSceneFindWidget(&theScene, tmpStr);
 	assert(informationMSGListTimeText);
@@ -299,6 +306,7 @@ bool setInformationListIsVisible(uint8_t index, bool status)
 	}
 	else
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		sprintf(tmpStr, "%s%d", "informationMSGListContainer", index);
 		informationMSGListContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(informationMSGListContainer);
@@ -323,15 +331,19 @@ void setInformationContent(uint8_t index)
 	//TODO: 按照index读取存储相应信息、并且将状态置成已读(置标志位要在进信息内容框才置位，可以统一和上下条操作一起执行！！！！！)
 	char tmpStr[500] = { 0 };
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "Center", index);
 	setInformationContentSender(tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s %d", "0123456789012345678901234567890123456", index);
 	setInformationContentTheme(tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "2016-07-06 12:34:", index);
 	setInformationContentTime(tmpStr);
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s", "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
 	setInformationContentDetail(tmpStr);
 
@@ -585,6 +597,7 @@ void setInformationList()
 	//将没有内容的页面隐藏起来，达到不能滑动的效果！
 	for (i = 0; i < NIFORMATION_PAGE_NUM; i++)
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		sprintf(tmpStr, "%s%d", "informationPageContainer", i);
 		informationPageContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(informationPageContainer);

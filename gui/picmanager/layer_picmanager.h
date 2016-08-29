@@ -18,6 +18,7 @@ Modification:
 #include "../gui_include.h"
 
 #define PICMANAGER_MINIPIC_MAX			16
+#define PICMANAGER_CONTENT_NUM			3
 
 
 typedef enum
@@ -62,6 +63,8 @@ void picManagerRetutnBtnOnClicked();
 void picManagerEditBtnOnClicked();
 void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId);
 void picManagerPageInit(PICMANAGER_PAGE_e pageId);
+void 
+bool setPicManagerPictureContent(uint8_t index, char* addrStr);
 void setPicManagerMiniPicList();
 void setMiniPicListIsChecked(MINIPIC_ICON_STATUS_e status);
 bool setMiniPicContent(uint8_t index, char* addrStr);

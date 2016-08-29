@@ -27,10 +27,11 @@ static ITUWidget*		picManagerMiniPicContainer;
 static ITUWidget*		picManagerBottomBarContainer;
 static ITUWidget*		picManagerNullContainer3;
 static ITUIcon*			picManagerMiniPicIcon;
-	
+static ITUIcon*			picManagerPicContentIcon;
 static ITUIcon*			picManagerMiniPicUnChenkIcon;
 static ITUIcon*			picManagerMiniPicChenkIcon;
 
+static uint8_t	gPicManagerBtnIndex;
 static uint8_t*	gPicManagerImageData;
 static int		gPicManagerImageSize;
 static char		gPicManagerImageFilePath[PATH_MAX];
@@ -111,6 +112,8 @@ void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 		ituWidgetSetVisible(picManagerMiniPicListContainer, false);
 		ituWidgetSetVisible(picManagerPictureCoverFlow, true);
 
+		ituCoverFlowGoto(picManagerPictureCoverFlow, 0);
+
 		break;
 
 	case PICMANAGER_PAGE_EDIT:
@@ -162,7 +165,63 @@ bool picManagerBtnOnClicked(ITUWidget* widget, char* param)
 bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 {
 
+	printf("222222222222222222222  %d ", picManagerPictureCoverFlow->focusIndex);
+
+	//setPicManagerPictureContent(picManagerPictureCoverFlow->focusIndex);
+
+	return true;
 }
+
+
+bool setPicManagerPictureContent(uint8_t index, char* addrStr)
+{
+	FILE* tmpFile;
+	char  tmpStr[50] = { 0 };
+
+	memset(tmpStr, 0, sizeof(tmpStr));
+	sprintf(tmpStr, "%s%d", "picManagerPicContentIcon", index);
+	picManagerPicContentIcon = ituSceneFindWidget(&theScene, tmpStr);
+	assert(picManagerPicContentIcon);
+
+	// try to load minipic jpeg file if exists
+	tmpFile = fopen(addrStr, "rb");
+	if (tmpFile)
+	{
+		struct stat sb;
+
+		if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
+		{
+			gPicManagerImageSize = (int)sb.st_size;
+			gPicManagerImageData = malloc(gPicManagerImageSize);
+			if (gPicManagerImageSize)
+			{
+				gPicManagerImageSize = fread(gPicManagerImageData, 1, gPicManagerImageSize, tmpFile);
+			}
+		}
+		fclose(tmpFile);
+	}
+	else
+	{
+		printf("open  minipic jepg icon icon failed!");
+		ituWidgetSetVisible(picManagerMiniPicIcon, false);
+		return false;
+	}
+	if (gPicManagerImageData)
+	{
+		ituIconLoadJpegData((ITUIcon*)picManagerPicContentIcon, gPicManagerImageData, gPicManagerImageSize);
+	}
+	else
+	{
+		printf("load minipic jepg icon failed!");
+		ituWidgetSetVisible(picManagerMiniPicIcon, false);
+		return false;
+	}
+
+	free(gPicManagerImageData);
+
+	return true;
+}
+
 
 void picManagerRetutnBtnOnClicked()
 {
@@ -277,6 +336,7 @@ bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param)
 	case MINIPIC_CORNER_ICON_NULL:
 		//TODO:进入照片浏览界面！！！！！
 		picManagerPageInit(PICMANAGER_PAGE_CONTENT);
+		gPicManagerBtnIndex = tmpIndex;
 		break;
 
 	default:
@@ -296,11 +356,12 @@ void setMiniPicIsChecked(uint8_t index, MINIPIC_ICON_STATUS_e status)
 		printf("index is too large!!!!!!!!!!");
 		return;
 	}
-
+	memset(tmpCheck, 0, sizeof(tmpCheck));
 	sprintf(tmpCheck, "%s%d", "picManagerMiniPicChenkIcon", index);
 	picManagerMiniPicChenkIcon = ituSceneFindWidget(&theScene, tmpCheck);
 	assert(picManagerMiniPicChenkIcon);
 
+	memset(tmpUncheck, 0, sizeof(tmpUncheck));
 	sprintf(tmpUncheck, "%s%d", "picManagerMiniPicUnChenkIcon", index);
 	picManagerMiniPicUnChenkIcon = ituSceneFindWidget(&theScene, tmpUncheck);
 	assert(picManagerMiniPicUnChenkIcon);
@@ -335,6 +396,7 @@ void setMiniPicListIsChecked(MINIPIC_ICON_STATUS_e status)
 
 	for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		sprintf(tmpStr, "%s%d", "picManagerMiniPicContainer", i);
 		picManagerMiniPicContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(picManagerMiniPicContainer);
@@ -358,10 +420,12 @@ MINIPIC_ICON_STATUS_e getMiniPicIsChecked(uint8_t index)
 		return MINIPIC_CORNER_ICON_NULL;
 	}
 
+	memset(tmpCheck, 0, sizeof(tmpCheck));
 	sprintf(tmpCheck, "%s%d", "picManagerMiniPicChenkIcon", index);
 	picManagerMiniPicChenkIcon = ituSceneFindWidget(&theScene, tmpCheck);
 	assert(picManagerMiniPicChenkIcon);
 
+	memset(tmpUncheck, 0, sizeof(tmpUncheck));
 	sprintf(tmpUncheck, "%s%d", "picManagerMiniPicUnChenkIcon", index);
 	picManagerMiniPicUnChenkIcon = ituSceneFindWidget(&theScene, tmpUncheck);
 	assert(picManagerMiniPicUnChenkIcon);
@@ -393,6 +457,7 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 		return false;
 	}
 
+	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "picManagerMiniPicIcon", index);
 	picManagerMiniPicIcon = ituSceneFindWidget(&theScene, tmpStr);
 	assert(picManagerMiniPicIcon);
@@ -402,6 +467,7 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 	if (tmpFile)
 	{
 		struct stat sb;
+
 		if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
 		{
 			gPicManagerImageSize = (int)sb.st_size;
@@ -443,6 +509,7 @@ void setPicManagerMiniPicList()
 	//TODO: 读取存储内容缩略图信息信息！！！！！！！
 	for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)
 	{
+		memset(tmpStr, 0, sizeof(tmpStr));
 		sprintf(tmpStr, "%s%d", "picManagerMiniPicContainer", i);
 		picManagerMiniPicContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(picManagerMiniPicContainer);

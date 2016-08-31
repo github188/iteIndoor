@@ -675,7 +675,6 @@ void setUnreadPhotoMsgNum(uint8_t num)
 		{
 			sprintf(numstr, "%d", num);
 		}
-
 		
 		ituTextSetString(page0PhotoMsgNumText, numstr);
 		ituWidgetSetVisible(page0PhotoMsgText, false);
@@ -1202,6 +1201,7 @@ void setUnsolvedSecurityAlarmScroll()
 		}
 	}
 }
+
 
 MAIN_SECURITY_STATUS_e	getSecurityStatus()
 {

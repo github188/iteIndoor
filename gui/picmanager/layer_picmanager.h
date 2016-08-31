@@ -63,7 +63,7 @@ void picManagerRetutnBtnOnClicked();
 void picManagerEditBtnOnClicked();
 void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId);
 void picManagerPageInit(PICMANAGER_PAGE_e pageId);
-void 
+void setPicManagerPicture();
 bool setPicManagerPictureContent(uint8_t index, char* addrStr);
 void setPicManagerMiniPicList();
 void setMiniPicListIsChecked(MINIPIC_ICON_STATUS_e status);

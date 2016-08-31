@@ -31,7 +31,8 @@ static ITUIcon*			picManagerPicContentIcon;
 static ITUIcon*			picManagerMiniPicUnChenkIcon;
 static ITUIcon*			picManagerMiniPicChenkIcon;
 
-static uint8_t	gPicManagerBtnIndex;
+static uint8_t	gPicManagerPhotoIndex;
+static uint8_t  gPicManagerLastIndex;
 static uint8_t*	gPicManagerImageData;
 static int		gPicManagerImageSize;
 static char		gPicManagerImageFilePath[PATH_MAX];
@@ -112,7 +113,7 @@ void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 		ituWidgetSetVisible(picManagerMiniPicListContainer, false);
 		ituWidgetSetVisible(picManagerPictureCoverFlow, true);
 
-		ituCoverFlowGoto(picManagerPictureCoverFlow, 0);
+		setPicManagerPicture();
 
 		break;
 
@@ -164,12 +165,106 @@ bool picManagerBtnOnClicked(ITUWidget* widget, char* param)
 
 bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 {
+	uint8_t tmpCurrentIndex = picManagerPictureCoverFlow->focusIndex;
+	bool  leftRightFlag = true;			//true  =  left
+	PPHOTOLIST_INFO photoList = NULL;
+	uint8_t	tmpCount = 0;
+	uint8_t i = 0;
+	char tmpFile[50] = { 0 };
 
-	printf("222222222222222222222  %d ", picManagerPictureCoverFlow->focusIndex);
+	storage_get_photo(&photoList);
+	tmpCount = photoList->Count;
 
-	//setPicManagerPictureContent(picManagerPictureCoverFlow->focusIndex);
+	if (tmpCount <= PICMANAGER_CONTENT_NUM)
+	{
+		return false;
+	}
+
+	if (gPicManagerLastIndex - tmpCurrentIndex == 1 || gPicManagerLastIndex - tmpCurrentIndex == -2)
+	{
+		leftRightFlag = false;
+	}
+	else
+	{
+		leftRightFlag = true;
+	}
+
+	printf("111111111111111111 picnum = %d direction = %d", tmpCount, leftRightFlag);
+
+	if (leftRightFlag)		//左滑动只要载入
+	{
+		for (i = 0; i < PICMANAGER_CONTENT_NUM; i++)
+		{
+			if (i != gPicManagerLastIndex && i != tmpCurrentIndex)
+			{
+				if ((tmpCurrentIndex + 1) > tmpCount)
+				{
+					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[0]).Time)));
+				}
+				else
+				{
+					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCurrentIndex + 1]).Time)));
+				}
+			}
+		}
+	}
+	else					//右滑动
+	{
+		for (i = 0; i < PICMANAGER_CONTENT_NUM; i++)
+		{
+			if (i != gPicManagerLastIndex && i != tmpCurrentIndex)
+			{
+				if ((tmpCurrentIndex - 1) >= 0)
+				{
+					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCurrentIndex - 1]).Time)));
+				}
+				else
+				{
+					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCount]).Time)));
+				}
+			}
+		}
+	}
+
+	gPicManagerLastIndex = tmpCurrentIndex;
+
 
 	return true;
+}
+
+
+void setPicManagerPicture()
+{
+	PPHOTOLIST_INFO photoList = NULL;
+	uint8_t	tmpCount  = 0;
+	uint8_t	i = 0;
+	char tmpFile[50] = { 0 };
+
+	ituCoverFlowGoto(picManagerPictureCoverFlow, 0);
+	gPicManagerLastIndex = 0;
+
+	storage_get_photo(&photoList);
+	tmpCount = photoList->Count;
+
+	/*setPicManagerPictureContent(0, get_photo_path(tmpFile, &((photoList->PhotoInfo[gPicManagerPhotoIndex]).Time)));
+
+	if ((gPicManagerPhotoIndex - 1) >= 0)
+	{
+		setPicManagerPictureContent(1, get_photo_path(tmpFile, &((photoList->PhotoInfo[gPicManagerPhotoIndex - 1]).Time)));
+	}
+	else
+	{
+		setPicManagerPictureContent(1, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCount]).Time)));
+	}
+
+	if ((gPicManagerPhotoIndex + 1) > tmpCount)
+	{
+		setPicManagerPictureContent(2, get_photo_path(tmpFile, &((photoList->PhotoInfo[0]).Time)));
+	}
+	else
+	{
+		setPicManagerPictureContent(2, get_photo_path(tmpFile, &((photoList->PhotoInfo[gPicManagerPhotoIndex + 1]).Time)));
+	}*/
 }
 
 
@@ -203,17 +298,21 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr)
 	else
 	{
 		printf("open  minipic jepg icon icon failed!");
-		ituWidgetSetVisible(picManagerMiniPicIcon, false);
+		ituWidgetSetVisible(picManagerPicContentIcon, false);
+		free(gPicManagerImageData);
+
 		return false;
 	}
 	if (gPicManagerImageData)
 	{
-		ituIconLoadJpegData((ITUIcon*)picManagerPicContentIcon, gPicManagerImageData, gPicManagerImageSize);
+		ituIconLoadJpegData(picManagerPicContentIcon, gPicManagerImageData, gPicManagerImageSize);
 	}
 	else
 	{
 		printf("load minipic jepg icon failed!");
-		ituWidgetSetVisible(picManagerMiniPicIcon, false);
+		ituWidgetSetVisible(picManagerPicContentIcon, false);
+		free(gPicManagerImageData);
+
 		return false;
 	}
 
@@ -336,7 +435,8 @@ bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param)
 	case MINIPIC_CORNER_ICON_NULL:
 		//TODO:进入照片浏览界面！！！！！
 		picManagerPageInit(PICMANAGER_PAGE_CONTENT);
-		gPicManagerBtnIndex = tmpIndex;
+		gPicManagerPhotoIndex = tmpIndex;
+		setPicManagerPicture();
 		break;
 
 	default:

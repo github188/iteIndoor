@@ -107,8 +107,12 @@ static char				gPicManagerImageFilePath[PATH_MAX];
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
 {
-	uint8_t tmpSize = get_size(MSG_MANAGE_PATH);
-	printf("444444444444444444444 = %d", tmpSize);
+	char tmpStr[50] = { 0 };
+
+	//char tmpLan[4] = {0xd2, 0xbb, 0x00, 0x00};
+
+	//char* tmpLan = "一二三";
+	char* tmpLan = "一二三";
 
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
 	mainLayerCornerNumReload();
@@ -119,6 +123,16 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
 	gMainBackgroundIndex = 0;
+
+	printf("111111111111111111111before  = %x %x %x \n", tmpLan[0], tmpLan[1], tmpLan[2]);
+	printf("before  = %s \n", tmpLan);
+
+	gb2312ToUtf8(tmpStr, strlen(tmpLan), tmpLan, strlen(tmpLan));
+
+	printf("22222222222222222after = %x %x %x \n", tmpStr[0], tmpStr[1], tmpStr[2]);
+	printf("after = %s \n", tmpStr);
+
+	//setDeviceNo(tmpLan);
 
 	return true;
 }
@@ -201,8 +215,6 @@ bool mainCoverFlowOnChanged(ITUWidget* widget, char* param)
 		assert(mainPageCoverFlow);
 	}
 
-	printf("1111111111111111111111111111111111111 %d", mainPageCoverFlow->focusIndex);
-
 	return true;
 }
 
@@ -273,7 +285,6 @@ bool setMainBackgroundImg()
 	memset(tmpAddr, 0, sizeof(tmpAddr));
 	sprintf(tmpAddr, "%s%s%d%s", WALL_PAPER_DIR_PATH, "bk_", gMainBackgroundIndex, ".jpg");
 
-	printf("88888888888888888888888 = %s", tmpAddr);
 	// try to load minipic jpeg file if exists
 	tmpFile = fopen(tmpAddr, "rb");
 	if (tmpFile)

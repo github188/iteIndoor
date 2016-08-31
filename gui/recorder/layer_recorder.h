@@ -21,6 +21,7 @@ Modification:
 #define DEFAULT_PLAY_VOL		40
 #define MAX_RECORDER_NUM		5
 #define MAX_RECORDER_TIME		60
+#define DEFAULT_PLAYVOL			5
 
 
 

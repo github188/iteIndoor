@@ -53,7 +53,8 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 	recorderLayerInit();
 
 	//TODO:获取系统当前音量
-	gRecorderPlayVol = 35;
+	gRecorderPlayVol = DEFAULT_PLAYVOL;
+	media_set_ring_volume(DEFAULT_PLAYVOL);
 	setRecorderPlayVol(gRecorderPlayVol);
 
 	return true;
@@ -74,19 +75,19 @@ void recorderLayerInit()
 		//TODO:读取存储设置界面记录内容！！并设置第一个非空录音为默认选项
 		gRecordNumCount = 3;
 
-		if (i == 1)
-			setRecorderRecordStatus(i, RECORDER_RECORD_NULL);
-		else
+		//if (i == 1)
+		//	setRecorderRecordStatus(i, RECORDER_RECORD_NULL);
+		//else
 			setRecorderRecordStatus(i, RECORDER_RECORD_UNREAD);
+
+		setRecordRadioBoxStatus(i, false);
 	}
 
-	setRecordRadioBoxStatus(3, true);
+	setRecorderRecordCreateTime("");
 
 	setRecorderDuration("00:00");
 
-
-	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
-
+	setRecorderAudioBtnStatus(RECORDER_STATUS_NULL);
 
 	ituWidgetSetVisible(recorderTipsTransparencyBackground, false);
 
@@ -193,6 +194,7 @@ bool recorderRecordRadioBoxChanged(ITUWidget* widget, char* param)
 	gCurrentRecordIndex = tmpIndex;
 	//TODO:读取存储填充录音录制时间！！！！！
 	setRecorderRecordCreateTime("2016-07-28 10:41:45");
+	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
 
 	return true;
 }
@@ -204,8 +206,8 @@ bool recorderVolTrackBarOnChanged(ITUWidget* widget, char* param)
 
 	uint8_t tmpVol = atoi(param);
 	gRecorderPlayVol = tmpVol;
+	media_set_ring_volume(gRecorderPlayVol);	//TODO:通知逻辑设置音量！！！！！！
 
-	//TODO:通知逻辑设置音量！！！！！！
 	if (tmpVol == 0)
 	{
 		ituWidgetSetVisible(recorderVoiceOnIcon, false);
@@ -592,7 +594,7 @@ void recorderVoiceBtnOnClicked()
 		gRecorderPlayVol = DEFAULT_PLAY_VOL;
 		setRecorderPlayVol(gRecorderPlayVol);
 	}
-
+	media_set_ring_volume(gRecorderPlayVol);	//TODO:通知逻辑设置音量！！！！！！
 }
 
 

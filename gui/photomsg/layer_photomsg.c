@@ -51,7 +51,7 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 	setPhotoMsgList();
 
 	//TODO:暂时的全局变量
-	gPhotoMsgPlayVol = 9;
+	gPhotoMsgPlayVol = PHOTOMSG_PLAY_VOL;
 
 	return true;
 }
@@ -186,6 +186,7 @@ bool photoMsgVolTrackBarOnChanged(ITUWidget* widget, char* param)
 {
 	uint8_t tmpVol = atoi(param);
 	gPhotoMsgPlayVol = tmpVol;
+	media_set_ring_volume(gPhotoMsgPlayVol);
 
 	printf("PhotoMsg play Vol  = %s", param);
 

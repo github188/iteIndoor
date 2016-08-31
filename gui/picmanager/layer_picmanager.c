@@ -401,6 +401,7 @@ bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 			if (getMiniPicIsChecked(i) == MINIPIC_CORNER_ICON_CHECK)
 			{
 				//TODO:这里写删除所选照片的操作，删除完重新绘制内容界面！！！！！！！
+				storage_del_photo(i);
 			}
 		}
 		setPicManagerMiniPicList();

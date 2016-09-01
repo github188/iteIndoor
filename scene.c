@@ -779,7 +779,8 @@ int SceneRun(void)
 
         tick = SDL_GetTicks();
 
-    #ifdef FPS_ENABLE
+	#define FPS_ENABLE		//打印帧数
+    #ifdef  FPS_ENABLE
         frames++;
         if (tick - lasttick >= 1000)
         {

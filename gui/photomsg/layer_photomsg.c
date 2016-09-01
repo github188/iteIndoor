@@ -380,7 +380,7 @@ void setPhotoMsgList()
 				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
 				memset(tmpStr, 0, sizeof(tmpStr));
 				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
-				setPhotoMsgListTime(i, tmpStr, true);
+				setPhotoMsgListTime(i, tmpStr, false);
 			}
 			else if (i >= msgNum && i < PHOTOMSG_NUM_PER_PAGE)
 			{
@@ -509,14 +509,14 @@ bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread)
 
 	ituTextSetString(photoMsgListTimeText, timeStr);
 
-	//if (isUnread)
-	//{
-	//	ituTextSetBackColor(photoMsgListTimeText, 255,255,0,0);
-	//}
-	//else
-	//{
-	//	ituTextSetBackColor(photoMsgListTimeText, 255, 255, 255, 0);
-	//}
+	if (isUnread)
+	{
+		ituSetColor((ITUColor*)&photoMsgListTimeText->color, 255,255,0,0);
+	}
+	else
+	{
+		ituSetColor((ITUColor*)&photoMsgListTimeText->color, 255, 255, 255, 255);
+	}
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
 	return true;

@@ -199,10 +199,11 @@ char * storage_read_msg_data(MSGDATA *pmsg_data, uint8 index)
 *************************************************/ 
 MSGLIST * storage_read_msg_list(void)
 {
+	MSGLIST * pinfolist = NULL;
 	FILE* fPListFile = NULL;
 	char path[50] = {0};
 	
-	MSGLIST * pinfolist = (MSGLIST *)malloc(sizeof(MSGLIST));
+	pinfolist = (MSGLIST *)malloc(sizeof(MSGLIST));
 	if (NULL == pinfolist)
 	{
 		dprintf("storage_read_msg_list NULL == pinfolist \n");
@@ -609,6 +610,7 @@ uint8 storage_get_msg_state(void)
 		}
 	}
 	free(pinfolist);
+	pinfolist = NULL;
 	return unread_num;
 }
 

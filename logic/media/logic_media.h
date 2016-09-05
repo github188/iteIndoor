@@ -22,39 +22,13 @@
 #define AUDIO_NET_BUF_LEN		16*1024
 
 typedef void (*PMEDIA_CALLBACK)(uint32 cmd, uint32 time, uint32 percent);
+typedef void (*PSNAP_CALLBACK)(uint8 state);
+
 
 #define MEDIA_AUDIO_PORT		NETAUDIO_UDP_PORT				// 音频端口
 #define MEDIA_VIDEO_PORT		NETVIDEO_UDP_PORT				// 视频端口
 #define MEDIA_VIDEOL_PORT		(MEDIA_AUDIO_PORT+1)
 
-/*
-typedef struct 
-{
-	MSMediaDesc* System;
-	MSMediaDesc* VideoEnc;
-	MSMediaDesc* VideoDec;
-	MSMediaDesc* VideoRtpSend;
-	MSMediaDesc* VideoRtpRecv;
-	MSMediaDesc* AudioDec;
-	MSMediaDesc* AudioAI;
-	MSMediaDesc* AudioAo;	
-	MSMediaDesc* AudioSfEnc;
-	MSMediaDesc* AudioRtpSend;
-	MSMediaDesc* AudioRtpRecv;
-	MSMediaDesc* FilePlayer;
-	MSMediaDesc* JpegDec;
-	MSMediaDesc* JpegEnc;
-	MSMediaDesc* AlawAgc;	
-    MSMediaDesc* Speex; 
-	MSMediaDesc* AviPlay; 
-	MSMediaDesc* AviRecord; 
-	MSMediaDesc* Mp3Play; 
-	MSMediaDesc* RtspPlay;
-	MSMediaDesc* LylyFilePlayer;
-}MediaStream, * PMediaStream;
-*/
-// 头文件里面不能有定义
-//extern MediaStream mMediaStream;
 
 // RTSP状态
 typedef enum
@@ -266,17 +240,17 @@ void media_stop_analog_video(void);
 uint32 media_set_analog_output_volume(uint32 vol);
 
 /*************************************************
-  Function:			media_play_lyly
+  Function:			media_play_video_lyly
   Description:		
   Input: 
   Output:			无
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-uint32 media_play_lyly (char *filename, void * proc);
+uint32 media_play_video_lyly (char *filename, void * proc);
 
 /*************************************************
-  Function:			media_stop_lyly
+  Function:			media_stop_video_lyly
   Description:		
   Input: 
   	vol				音量等级
@@ -284,7 +258,7 @@ uint32 media_play_lyly (char *filename, void * proc);
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-void media_stop_lyly (void);
+void media_stop_video_lyly (void);
 
 /*************************************************
   Function:			media_fill_video_data
@@ -309,32 +283,79 @@ uint32 media_fill_video_data(uint8 *data, uint32 len, uint32 time);
 uint32 media_full_dispaly_video(DEVICE_TYPE_E devtype, uint8 flg);
 
 /*************************************************
-  Function:			media_enable_audio_aec
+  Function:			media_enable_audio_send
   Description:		使能消回声接口
   Input: 			
   Output:			无
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-int media_enable_audio_aec(void);
+int media_enable_audio_send(void);
 
 /*************************************************
-  Function:			media_disable_audio_aec
+  Function:			media_disable_audio_send
   Description:		使能消回声接口
   Input: 			
   Output:			无
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-int media_disable_audio_aec(void);
+int media_disable_audio_send(void);
 
-// 抓拍
-uint32 media_snapshot(char *filename, uint32 dstW, uint32 dstH, DEVICE_TYPE_E DevType);
+/*************************************************
+  Function:			media_enable_audio_recv
+  Description:		接收接口开启
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+int media_enable_audio_recv(void);
 
-// 声音播放
+/*************************************************
+  Function:			media_disable_audio_recv
+  Description:		接收接口关闭
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+int media_disable_audio_recv(void);
+
+/*************************************************
+  Function:			media_snapshot
+  Description:		抓拍
+  Input: 			
+  	1.filename		图像保存的文件名
+	2.proc			抓拍回调
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_snapshot(char *filename, PSNAP_CALLBACK proc);
+
+/*************************************************
+  Function:			media_play_sound
+  Description:		播放音频文件
+  Input: 			
+  	1.type			播放类型
+  	2.filename		文件名
+  	3.isrepeat		是否重复播放	1重复 0不重复
+  	4.proc			回调
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
 uint32 media_play_sound(char *filename, uint8 IsRepeat, void * proc);
 
-// 停止播放
+/*************************************************
+  Function:			media_stop_sound
+  Description:		停止播放
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
 void media_stop_sound (void);
 
 /*************************************************
@@ -415,7 +436,7 @@ void media_stop_net_audio(void);
   Return:			成功或失败
   Others:
 *************************************************/
-uint32 meida_start_net_hint(PAYLOAD_TYPE_E tp, char *filename, void * proc);
+uint32 meida_start_net_hint(uint8 RemoteDeviceType, char *filename, void * proc);
 
 /*************************************************
   Function:			meida_stop_net_hint
@@ -438,8 +459,7 @@ uint32 meida_stop_net_hint(void);
   Return:			成功或失败
   Others:
 *************************************************/
-uint32 meida_start_net_leave_rec(LEAVE_WORD_MODE_E mode,
-						PAYLOAD_TYPE_E atp, PAYLOAD_TYPE_E vtp, char * filename);
+uint32 meida_start_net_leave_rec(LEAVE_WORD_MODE_E mode, uint32 ipaddress, char * filename);
 
 /*************************************************
   Function:			stop_leave_word_net
@@ -533,16 +553,6 @@ void media_play_video_test(void);
   Others:
 *************************************************/
 int32 media_start_show_pict(char *filename, uint16 pos_x, uint16 pos_y, uint16 with, uint16 heigh);
-
-/*************************************************
-  Function:			media_stop_show_pict
-  Description:		关闭图片显示
-  Input: 			
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-void media_stop_show_pict(void);
 
 /*************************************************
   Function:			media_get_wav_time

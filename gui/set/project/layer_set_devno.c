@@ -1,12 +1,12 @@
 /*************************************************
 Copyright (C), 2006-2016, Aurine
-File name:  	layer_set_extmodule.c
+File name:  	layer_set_devno.c
 Author:     	zxc
 Version:
 Date: 		2016-07-11
 Description:	设备编号界面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 typedef enum
 {
@@ -18,24 +18,19 @@ typedef enum
 	DEVICE_MAX,
 }DEVICE_BTN_PAGE;
 
-static ITUText* SetDevnoStr2Text;
-static ITUText* SetDevnoStairLen2Text;
-static ITUText* SetDevnoRoomLen2Text;
-static ITUText* SetDevnoUseCellLen2Text;
-static ITUText* SetDevnoCellLen2Text;
-static ITUText* SetDevnoCellLen1Text;
-static ITUSprite* SetDevnoUseCellLenSprite;
-static ITUCalendar* SetDevnoCellLenContainer;
-static ITULayer* SetProjectLayer;
-static ITUTextBox* SetNumKeyBordTextBox;
-//static ITULayer* SetNumKeyBordLayer;
-static ITUBackground* SetDevnoMsgErrBackground;
-static ITUBackground* SetDevnoBackground;
-static ITUText* SetDevnoMsgErrText;
+static ITUText* SetDevnoStr2Text = NULL;
+static ITUText* SetDevnoStairLen2Text = NULL;
+static ITUText* SetDevnoRoomLen2Text = NULL;
+static ITUText* SetDevnoUseCellLen2Text = NULL;
+static ITUText* SetDevnoCellLen2Text = NULL;
+static ITUText* SetDevnoCellLen1Text = NULL;
+static ITUSprite* SetDevnoUseCellLenSprite = NULL;
+static ITUCalendar* SetDevnoCellLenContainer = NULL;
+static ITULayer* SetProjectLayer = NULL;
+static ITUTextBox* SetNumKeyBordTextBox = NULL;
 
 static PFULL_DEVICE_NO g_devparam = NULL;
 static DEVICE_BTN_PAGE g_button_num = DEVICE_MAX;
-//static char * g_get_keybord_text = NULL;
 
 /*************************************************
 Function:    		comepare_devno_rule
@@ -114,17 +109,16 @@ static uint32 comepare_devno_len(char* DevNo)
 }
 
 /*************************************************
-Function:		save_devno_param
-Description: 	保存
+Function:		check_devno_param
+Description: 	判断是否合法
 Input:
 1.hDlg
 Output:		无
 Return:		TRUE 是 FALSE 否
 Others:
 *************************************************/
-static void save_devno_param(void)
+static uint8 check_devno_param(void)
 {
-	uint32 text_id[4] = { SID_Set_Prj_Rule_Riser_Err, SID_Set_Prj_Rule_Stair_Err, SID_Set_Prj_Rule_Room_Err, SID_Set_Prj_Rule_RuleAll_Err };
 	uint8 ret1, ret = TRUE;
 	ret1 = FALSE;
 
@@ -132,19 +126,22 @@ static void save_devno_param(void)
 	switch (ret)
 	{
 	case 0:										// 成功
-		//memcpy(&g_devparam->Rule, storage_get_devrule(),sizeof(DEVICENO_RULE));
 		break;
 
 	case 1:										// 单元长度非法
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Riser_Err, 0);
 		break;
 
 	case 2:										// 梯号长度非法
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Stair_Err, 0);
 		break;
 
 	case 3:										// 房号长度非法
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Room_Err, 0);
 		break;
 
 	case 4:										// 总长度不能大于18
+		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_RuleAll_Err, 0);
 		break;
 	}
 
@@ -154,31 +151,35 @@ static void save_devno_param(void)
 		switch (ret1)
 		{
 		case 0:
-			g_devparam->Rule.Subsection = (g_devparam->Rule.StairNoLen - g_devparam->Rule.CellNoLen) * 100 + g_devparam->Rule.CellNoLen * 10 + g_devparam->Rule.RoomNoLen;
-			storage_save_devno(TRUE, g_devparam->Rule, g_devparam->DeviceNoStr);
-			memcpy(g_devparam, storage_get_devparam(), sizeof(FULL_DEVICE_NO));
-			//net_change_comm_deviceno();
-			break;
+			return TRUE;
 
 		case 1:
-			ituTextSetString(SetDevnoMsgErrText, get_str(SID_Set_Prj_Rule_Len_Err));
-			ituWidgetDisable(SetDevnoBackground);
-			ituWidgetSetVisible(SetDevnoMsgErrBackground, true);
+			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Len_Err, 0);
 			break;
 
 		case 2:
-			ituTextSetString(SetDevnoMsgErrText, get_str(SID_Set_Prj_Rule_RoomNo_Err));
-			ituWidgetDisable(SetDevnoBackground);
-			ituWidgetSetVisible(SetDevnoMsgErrBackground, true);
+			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_RoomNo_Err, 0);
 			break;
 		}
 	}
-	else
-	{
-		ituTextSetString(SetDevnoMsgErrText, get_str(text_id[ret-1]));
-		ituWidgetDisable(SetDevnoBackground);
-		ituWidgetSetVisible(SetDevnoMsgErrBackground, true);
-	}
+	return FALSE;
+}
+
+/*************************************************
+Function:		save_devno_param
+Description: 	保存参数
+Input:
+1.hDlg
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void save_devno_param(void)
+{
+	g_devparam->Rule.Subsection = (g_devparam->Rule.StairNoLen - g_devparam->Rule.CellNoLen) * 100 + g_devparam->Rule.CellNoLen * 10 + g_devparam->Rule.RoomNoLen;
+	storage_save_devno(TRUE, g_devparam->Rule, g_devparam->DeviceNoStr);
+	memcpy(g_devparam, storage_get_devparam(), sizeof(FULL_DEVICE_NO));
+	net_change_comm_deviceno();
 }
 
 /*************************************************
@@ -224,9 +225,6 @@ static void PrjGotoSetDevnoOnEnterShow()
 		ituSetColor(&((ITUWidget*)SetDevnoCellLen1Text)->color, 255, 192, 192, 192);//灰色
 		ituWidgetDisable(SetDevnoCellLenContainer);
 	}
-
-	ituWidgetSetVisible(SetDevnoMsgErrBackground, false);
-	ituWidgetSetVisible(SetDevnoBackground, true);
 }
 
 /*************************************************
@@ -297,14 +295,9 @@ static void KeyBordGotoSetDevnoOnEnterShow()
 		break;
 	}
 
-	if (nlen > 0)
+	if (0 >= nlen)
 	{
-	}
-	else
-	{
-		ituTextSetString(SetDevnoMsgErrText, get_str(text_id[g_button_num]));
-		ituWidgetDisable(SetDevnoBackground);
-		ituWidgetSetVisible(SetDevnoMsgErrBackground, true);
+		ShowMsgFailHintSuccessLayer(0, text_id[g_button_num], 0);
 	}
 }
 
@@ -348,28 +341,16 @@ bool SetDevnoOnEnter(ITUWidget* widget, char* param)
 		assert(SetProjectLayer); 
 
 		SetNumKeyBordTextBox = ituSceneFindWidget(&theScene, "SetNumKeyBordTextBox");
-		assert(SetNumKeyBordTextBox); 
-
-		//SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
-		//assert(SetNumKeyBordLayer); 
-
-		SetDevnoMsgErrBackground = ituSceneFindWidget(&theScene, "SetDevnoMsgErrBackground");
-		assert(SetDevnoMsgErrBackground);
-
-		SetDevnoBackground = ituSceneFindWidget(&theScene, "SetDevnoBackground");
-		assert(SetDevnoBackground); 
-
-		SetDevnoMsgErrText = ituSceneFindWidget(&theScene, "SetDevnoMsgErrText");
-		assert(SetDevnoMsgErrText);
+		assert(SetNumKeyBordTextBox);  
 	}
 
 	if (strcmp(param, "SetNumKeyBordLayer") == 0)
 	{
 		KeyBordGotoSetDevnoOnEnterShow();
 
-		save_devno_param();
+		check_devno_param();
 	}
-	else
+	else if(strcmp(param, "SetProjectLayer") == 0)
 	{
 		g_button_num = DEVICE_MAX;
 
@@ -470,27 +451,17 @@ Others:
 *************************************************/
 void SetDevnoLayerOnReturn(void)
 {
-	if (ituWidgetIsVisible(SetDevnoMsgErrBackground))
+	uint8 ret = FALSE;
+
+	if (!ituWidgetIsVisible(SetProjectLayer))
 	{
-		ituWidgetEnable(SetDevnoBackground);
-		ituWidgetSetVisible(SetDevnoMsgErrBackground, false);
-		return;
-	}
-	else if (ituWidgetIsVisible(SetDevnoBackground))
-	{
-		if (!ituWidgetIsVisible(SetProjectLayer))
+		ret = check_devno_param();
+		if (TRUE == ret)
 		{
 			save_devno_param();
-			if (ituWidgetIsVisible(SetDevnoBackground))
-			{
-				ituLayerGoto(SetProjectLayer);
-			}
+
+			ituLayerGoto(SetProjectLayer);
 			return;
 		}
 	}
-}
-
-void SetDevnoLayerReset(void)
-{
-	SetDevnoStr2Text = NULL;
 }

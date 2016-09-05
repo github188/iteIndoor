@@ -130,7 +130,7 @@ bool SetAlarmAreaListOnEnter(ITUWidget* widget, char* param)
 	if (!AlarmAreaListTitleText)
 	{
 		uint8 i;
-		char tmp[30];
+		char tmp[50];
 		for (i = 0; i < 8; i++)
 		{
 			memset(tmp, 0, sizeof(tmp));

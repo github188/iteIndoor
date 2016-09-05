@@ -4,15 +4,12 @@ File name:  	layer_set_diantiIP.c
 Author:     	zxc
 Version:
 Date: 		2016-07-12
-Description:	
+Description:	设置电梯控制器参数
 *************************************************/
-#include "../../gui_include.h"
+#include "../layer_set.h"
 
-static ITUText* SetDiantiParamIP2Text;
-//static ITULayer* SetNumKeyBordLayer;
-static ITUTextBox* SetNumKeyBordTextBox;
-static ITUBackground* SetDiantiParamMsgErrBackground;
-static ITUBackground* SetDiantiParamBackground;
+static ITUText* SetDiantiParamIP2Text = NULL;
+static ITUTextBox* SetNumKeyBordTextBox = NULL;
 
 static uint32 g_dianti_ip = 0;
 
@@ -33,51 +30,35 @@ bool SetDiantiParamOnEnter(ITUWidget* widget, char* param)
 		SetDiantiParamIP2Text = ituSceneFindWidget(&theScene, "SetDiantiParamIP2Text");
 		assert(SetDiantiParamIP2Text);
 
-		//SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
-		//assert(SetNumKeyBordLayer); 
-
 		SetNumKeyBordTextBox = ituSceneFindWidget(&theScene, "SetNumKeyBordTextBox");
 		assert(SetNumKeyBordTextBox); 
-
-		SetDiantiParamMsgErrBackground = ituSceneFindWidget(&theScene, "SetDiantiParamMsgErrBackground");
-		assert(SetDiantiParamMsgErrBackground);
-
-		SetDiantiParamBackground = ituSceneFindWidget(&theScene, "SetDiantiParamBackground");
-		assert(SetDiantiParamBackground);
 	}
 
 	if (strcmp(param, "SetProjectLayer") == 0)
 	{
 		g_dianti_ip = storage_get_netparam_bytype(DIANTI_IPADDR);
 
-		change_ip_to_str(g_dianti_ip, tmp);
+		sprintf(tmp, "%s", UlongtoIP(g_dianti_ip));
 		ituTextSetString(SetDiantiParamIP2Text, tmp);
-
-		ituWidgetSetVisible(SetDiantiParamMsgErrBackground, false);
-		ituWidgetSetVisible(SetDiantiParamBackground, true);
 	}
-	else
+	else if (strcmp(param, "SetNumKeyBordLayer") == 0)
 	{
 		char* IP_data = ituTextGetString(SetNumKeyBordTextBox);
-		uint8 ret = check_ip_to_true(IP_data);
+		int ret = IPIsCorrect(IP_data);
 		if (FALSE == ret)
 		{
-			ituWidgetDisable(SetDiantiParamBackground);
-			ituWidgetSetVisible(SetDiantiParamMsgErrBackground, true);
+			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
 		}
 		else
 		{
-			uint32 ip_data = 0;
-			ip_data = ipaddr_addr(IP_data);
-			uint32 data = ntohl(ip_data);
+			uint32 data = IPtoUlong(IP_data);
 			if (data != g_dianti_ip)
 			{
 				storage_set_netparam(0, DIANTI_IPADDR, data);
 
 				ituTextSetString(SetDiantiParamIP2Text, IP_data);
 				g_dianti_ip = data;
-			}
-			
+			}	
 		}
 	}
 	
@@ -96,13 +77,8 @@ bool SetDiantiParamIPButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	char tmp[40];
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_dianti_ip, tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_dianti_ip));
 	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
 
 	return true;
-}
-
-void SetDiantiParamLayerReset(void)
-{
-	SetDiantiParamIP2Text = NULL;
 }

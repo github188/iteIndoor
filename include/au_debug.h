@@ -17,7 +17,7 @@
 
 
 #define AU_DEBUG_PRINT			1
-#define MEDIA_DEBUG_PRINT		1
+#define MEDIA_DEBUG_PRINT		0		// ø™∆Ù∫Û “Ù∆µª·—”≥Ÿ
 
 
 #define CLR_RED       	 		"\033[0;31m"    // "\033[0;31;40m"
@@ -61,6 +61,7 @@
 									}while(0)
 #else
 #define dprintf(...)
+#define debug_log(...)
 #endif
 
 #endif

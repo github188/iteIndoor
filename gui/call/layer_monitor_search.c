@@ -28,10 +28,14 @@ static ITUBackground* MonitorSearchListBackgroundPage[MAX_MONITOR_PAGE_NUM] = { 
 static ITUContainer* MonitorSearchListContainer[MAX_MONITOR_NUM] = { NULL };
 static ITUSprite* MonitorSearchListSprite[MAX_MONITOR_NUM] = { NULL };
 static ITUText* MonitorSearchListDevTypeText[MAX_MONITOR_NUM] = { NULL };
+static ITUBackground* MonitorSearchMSGHitGrayBackground = NULL;
+static ITUAnimation* MonitorSearchMSGHitAnimation = NULL;
 
 /*****************常量定义***********************/
 static PMONITORLISTINFO  g_MonitorList = NULL;
 static DEVICE_TYPE_E g_DevType = DEVICE_TYPE_NONE;
+static uint32 g_MonitorSearchLastTick = 0;					// 实时更新的tick
+static uint8 g_ShowLoadTick = 0;
 
 typedef enum
 {
@@ -219,6 +223,35 @@ static void MonitorSearchDestroyProc(void)
 }
 
 /*************************************************
+Function:		MonitorSearchLayerOnTimer
+Description: 	定时器
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool MonitorSearchLayerOnTimer(ITUWidget* widget, char* param)
+{
+	uint32 tick = SDL_GetTicks();
+	uint32 diff = tick - g_MonitorSearchLastTick;
+	if (diff >= 1000)
+	{
+		g_MonitorSearchLastTick = tick;
+		// 搜索列表
+		if (g_ShowLoadTick)
+		{
+			g_ShowLoadTick--;
+			if (0 == g_ShowLoadTick)
+			{
+				storage_clear_monitorlist(g_DevType);
+				monitorlist_sync_devlist(g_DevType);
+			}
+		}
+	}
+
+}
+
+/*************************************************
 Function:		MonitorSearchListState
 Description: 	获取监视列表执行函数
 Input:			无
@@ -233,8 +266,9 @@ bool MonitorSearchListState(ITUWidget* widget, char* param)
 	printf("pmonitorbak_data->InterState.......%d\n", pmonitorbak_data->InterState);
 	if (pmonitorbak_data->InterState == MONITOR_GETLIST)
 	{
-		dprintf("atoi(pmonitorbak_data->Buf) : %d\n", atoi(pmonitorbak_data->Buf));
+		//ituAnimationStop(MonitorSearchMSGHitAnimation);
 		ShowMonitorWin();
+		ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
 	}
 }
 
@@ -305,8 +339,9 @@ bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			break;
 
 		case MonitorSearchEvent:
-			storage_clear_monitorlist(g_DevType);
-			monitorlist_sync_devlist(g_DevType);
+			//ituAnimationPlay(MonitorSearchMSGHitAnimation);
+			g_ShowLoadTick = 1;
+			ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, true);
 			break;
 
 		case MonitorExitEvent:
@@ -353,6 +388,12 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 		MonitorSearchListCoverFlow = ituSceneFindWidget(&theScene, "MonitorSearchListCoverFlow");
 		assert(MonitorSearchListCoverFlow);
 
+		MonitorSearchMSGHitGrayBackground = ituSceneFindWidget(&theScene, "MonitorSearchMSGHitGrayBackground");
+		assert(MonitorSearchMSGHitGrayBackground);
+
+		MonitorSearchMSGHitAnimation = ituSceneFindWidget(&theScene, "MonitorSearchMSGHitAnimation");
+		assert(MonitorSearchMSGHitAnimation);
+
 		for (i = 0; i < MAX_MONITOR_PAGE_NUM; i++)
 		{
 			memset(callname, 0, sizeof(callname));
@@ -379,9 +420,12 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 			assert(MonitorSearchListSprite[i]);
 		}
 	}
+	g_ShowLoadTick = 0;
 	g_DevType = DEVICE_TYPE_STAIR;
 	ShowMonitorWin();
 	ituRadioBoxSetChecked(MonitorSearchRightStairRadioBox, true);
+	ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
+	g_MonitorSearchLastTick = SDL_GetTicks();
 
 	return true;
 }

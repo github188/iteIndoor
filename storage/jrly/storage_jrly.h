@@ -17,7 +17,6 @@
 #include "storage_include.h"
 //#include "storage_types.h"
 
-#define MAX_JRLY_NUM  		5						// ×î´ó¼ÇÂ¼
 
 typedef struct
 {

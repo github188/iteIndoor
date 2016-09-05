@@ -4,13 +4,13 @@ File name:  	layer_set_netdoor_lock.c
 Author:     	zxc
 Version:    	
 Date: 		2016-07-27
-Description:
+Description: 网络门前机锁类型设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUText* SetNetDoorLockType2Text = NULL;
 static ITUText* SetNetDoorLockTime2Text = NULL;

@@ -15,14 +15,35 @@
 #define SCREEN_CAPTURE			0					// 屏幕截图,按下开锁键拍一张保存在D盘中。
 
 // ====定义提示音音量========================================
-#define MSG_HIT_VOL				4
-#define AF_HIT_VOL				4
-#define LYLY_VIEW_VOL			8
-#define MSG_VIEW_VOL			4
-#define AVI_PLAY_VOL			60
-#define MP3_PLAY_VOL			60
-#define JRLY_VOLUME				8
-#define RING_OUT_VOL			8
+#define MIC_VOLUME				4					// 咪头输入音量
+#define MSG_HIT_VOL				4					// 信息通知提示音大小
+#define AF_HIT_VOL				4					// 安防报警提示音大小
+#define LYLY_VIEW_VOL			8					// 留影留言播放声
+#define MSG_VIEW_VOL			4					// 信息查看声音大小
+#define JRLY_VOLUME				8					// 家人留言播放音量大小
+#define RING_OUT_VOL			8					// 回铃声大小
+
+// ====定义记录存储条数======================================
+#define AF_REC_MAX 	  			20					// 安防事件最大记录数
+#define MAX_RECORD_NUM  		20					// 通话记录最大条数
+#define MAX_JRLY_NUM  			5					// 家人留言最大记录数
+#define MAX_LYLY_NUM  			5					// 留影留言最大记录
+#define MAX_MSG_NUM				10					// 信息最大接收条数
+#define MAX_PHOTO_NUM  			10					// 最大抓拍记录数
+#define MAX_YUYUE_NUM			20					// 家电预约最大数
+
+// ====定义执行时间最大值====================================
+#define MONITOR_TIME_MAX		90					// 监视最长时间
+#define	MONITOR_TALK_TIME_MAX	90					// 通话最长时间
+#define	HEART_TIMEOUT			5					// 心跳超时
+#define	CALLOUT_TIMEOUT			60					// 呼叫超时
+#define LEAVEWORD_TIMEOUT		60					// 超时进入留言的时间
+#define	RECORDHINT_TIME			30					// 留言提示音时间
+#define LEAVEWORD_TIME			30					// 留言最长时间
+#define PHONE_TALK_TIMEOUT		60					// 模拟门口机通话时长
+#define FENJI_TALK_TIMEOUT		300					// 户户通通话时长
+
+#define RECORD_TIME_MAX			30					// 留言最大时间(家人留言、留影留言、留言录制音)
 
 // ====定义结构件============================================
 #define ML8_V1					1

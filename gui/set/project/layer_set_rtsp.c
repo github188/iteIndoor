@@ -4,43 +4,27 @@ File name:		layer_set_rtsp.c
 Author:     	zxc
 Version:    	
 Date: 			2016-07-19
-Description:
-History:
-1. Date:
-Author:
-Modification:
+Description: 监控设置界面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUCoverFlow* SetRtspCoverFlow = NULL;
 static ITUCoverFlow* SetRtspParamCoverFlow = NULL;
 static ITUText* SetCamera2Text[MAX_HOME_NUM] = { NULL };
-static ITUText* SetCameraEnable2Text = NULL;
-static ITUText* CameraDevName2Text = NULL;
-static ITUText* CameraIP2Text = NULL;
-static ITUText* CameraPort2Text = NULL;
-static ITUText* CameraVideo2Text = NULL;
-static ITUText* CameraFactoryName2Text = NULL;
-static ITUText* CameraUserName2Text = NULL;
-static ITUText* CameraPwd2Text = NULL;
-static ITUText* CameraFactoryName1Text = NULL;
-static ITUText* CameraUserName1Text = NULL;
-static ITUText* CameraPwd1Text = NULL;
 static ITUSprite* SetCameraEnableSprite = NULL;
 static ITULayer* SetProjectLayer = NULL;
-//static ITULayer* SetNumKeyBordLayer = NULL;
 static ITUTextBox* SetNumKeyBordTextBox = NULL;
 static ITUCalendar* CameraDevNameContainer = NULL;
 static ITURadioBox* SetRtspFactoryMsg0RadioBox = NULL;
 static ITURadioBox* SetRtspFactoryMsg1RadioBox = NULL;
 static ITUBackground* SetRtspFactoryMsgBackground = NULL;
 static ITUBackground* SetRtspBackground = NULL;
+static ITUText* SetRtspParamList[8] = { NULL };
 
 static uint32 g_camera_index = -1;							//设置第几个摄像头
 static PMonitorDeviceList g_list;
 static HOMEDEVICE g_homedev;
 static int g_camera_param_index = -1;						//设置参数界面按下第几个
-
 
 /*************************************************
 Function:		save_param
@@ -86,6 +70,152 @@ static void save_rtsp_param()
 }
 
 /*************************************************
+Function:		KeyBordGotoRtspParam
+Description: 	键盘进入本页面
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void ShowRtspEnable()
+{
+	uint8 i;
+	for (i = 0; i < MAX_HOME_NUM; i++)
+	{
+		int used = 0;
+		if (i < g_list->Homenum)
+		{
+			used = g_list->Homedev[i].EnableOpen;
+		}
+		ituTextSetString(SetCamera2Text[i], get_str(SID_Set_UnUsed + used));
+	}
+}
+
+/*************************************************
+Function:		ShowSetCameraParamList
+Description: 	室内摄像头设置列表显示函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void ShowSetCameraParamList(int index)
+{
+	char text_tmp[50];
+	memset(text_tmp, 0, sizeof(text_tmp));
+
+	switch (index)
+	{
+	case 0:
+		if (g_homedev.EnableOpen)
+		{
+			ituSpriteGoto(SetCameraEnableSprite, 1);
+			sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_Camera_Used));
+		}
+		else
+		{
+			ituSpriteGoto(SetCameraEnableSprite, 0);
+			sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_Camera_Unused));
+		}
+		break;
+
+	case 1:
+		strcat(text_tmp, g_homedev.DeviceName);
+		break;
+
+	case 2:
+		sprintf(text_tmp, "%s", UlongtoIP(g_homedev.DeviceIP));
+		break;
+
+	case 3:
+		sprintf(text_tmp, "%d", g_homedev.DevPort);
+		break;
+
+	case 4:
+		sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
+		break;
+
+	case 5:
+		sprintf(text_tmp, "%s", g_homedev.FactoryName);
+		break;
+
+	case 6:
+		sprintf(text_tmp, "%s", g_homedev.UserName);
+		break;
+
+	case 7:
+		sprintf(text_tmp, "%s", g_homedev.Password);
+		break;
+
+	default:
+		break;
+	}
+
+	ituTextSetString(SetRtspParamList[index], text_tmp);
+}
+
+/*************************************************
+Function:		KeyBordGotoRtspParam
+Description: 	键盘进入本页面
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void KeyBordGotoRtspParam()
+{
+	char* TextBox_data = ituTextGetString(SetNumKeyBordTextBox);
+	int ret = FALSE;
+	int count_textbox = 0;
+
+	switch (g_camera_param_index)
+	{
+	case 2:
+		ret = IPIsCorrect(TextBox_data);
+		if (FALSE == ret)
+		{
+			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
+		}
+		else
+		{
+			uint32 data = IPtoUlong(TextBox_data);
+			g_homedev.DeviceIP = data;
+		}
+		break;
+
+	case 3:
+		count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
+		if (0 == count_textbox)
+		{
+			ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Port_Null, 0);
+			return false;
+		}
+		g_homedev.DevPort = atoi(TextBox_data);
+		break;
+
+	case 4:
+		count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
+		if (0 == count_textbox)
+		{
+			ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Channel_Null, 0);
+			return false;
+		}
+		g_homedev.ChannelNumber = atoi(TextBox_data);
+		break;
+
+	case 6:
+		strcpy(g_homedev.UserName, TextBox_data);
+		break;
+
+	case 7:
+		strcpy(g_homedev.Password, TextBox_data);
+		break;
+	}
+	save_rtsp_param();
+	ShowSetCameraParamList(g_camera_param_index);
+}
+
+/*************************************************
 Function:		SetRtspOnEnter
 Description: 	监视设置界面初始化处理函数
 Input:			无
@@ -107,53 +237,11 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 		SetRtspParamCoverFlow = ituSceneFindWidget(&theScene, "SetRtspParamCoverFlow");
 		assert(SetRtspParamCoverFlow);
 
-		SetCameraEnable2Text = ituSceneFindWidget(&theScene, "SetCameraEnable2Text");
-		assert(SetCameraEnable2Text);
-
-		CameraDevName2Text = ituSceneFindWidget(&theScene, "CameraDevName2Text");
-		assert(CameraDevName2Text);
-
-		CameraIP2Text = ituSceneFindWidget(&theScene, "CameraIP2Text");
-		assert(CameraIP2Text);
-
-		CameraPort2Text = ituSceneFindWidget(&theScene, "CameraPort2Text");
-		assert(CameraPort2Text);
-
-		CameraVideo2Text = ituSceneFindWidget(&theScene, "CameraVideo2Text");
-		assert(CameraVideo2Text);
-
-		CameraFactoryName2Text = ituSceneFindWidget(&theScene, "CameraFactoryName2Text");
-		assert(CameraFactoryName2Text);
-
-		CameraUserName2Text = ituSceneFindWidget(&theScene, "CameraUserName2Text");
-		assert(CameraUserName2Text);
-
-		CameraPwd2Text = ituSceneFindWidget(&theScene, "CameraPwd2Text");
-		assert(CameraPwd2Text);
-
-		CameraFactoryName1Text = ituSceneFindWidget(&theScene, "CameraFactoryName1Text");
-		assert(CameraFactoryName1Text);
-
-		CameraUserName1Text = ituSceneFindWidget(&theScene, "CameraUserName1Text");
-		assert(CameraUserName1Text);
-
-		CameraPwd1Text = ituSceneFindWidget(&theScene, "CameraPwd1Text");
-		assert(CameraPwd1Text); 
-
-		SetCameraEnableSprite = ituSceneFindWidget(&theScene, "SetCameraEnableSprite");
-		assert(SetCameraEnableSprite);
-
 		SetProjectLayer = ituSceneFindWidget(&theScene, "SetProjectLayer");
 		assert(SetProjectLayer);
 
-		//SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
-		//assert(SetNumKeyBordLayer); 
-
 		SetNumKeyBordTextBox = ituSceneFindWidget(&theScene, "SetNumKeyBordTextBox");
 		assert(SetNumKeyBordTextBox);
-
-		CameraDevNameContainer = ituSceneFindWidget(&theScene, "CameraDevNameContainer");
-		assert(CameraDevNameContainer);
 
 		SetRtspFactoryMsg0RadioBox = ituSceneFindWidget(&theScene, "SetRtspFactoryMsg0RadioBox");
 		assert(SetRtspFactoryMsg0RadioBox);
@@ -167,6 +255,33 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 		SetRtspBackground = ituSceneFindWidget(&theScene, "SetRtspBackground");
 		assert(SetRtspBackground);
 
+		SetCameraEnableSprite = ituSceneFindWidget(&theScene, "SetCameraEnableSprite");
+		assert(SetCameraEnableSprite);
+
+		SetRtspParamList[0] = ituSceneFindWidget(&theScene, "SetCameraEnable2Text");
+		assert(SetRtspParamList[0]);
+
+		SetRtspParamList[1] = ituSceneFindWidget(&theScene, "CameraDevName2Text");
+		assert(SetRtspParamList[1]);
+
+		SetRtspParamList[2] = ituSceneFindWidget(&theScene, "CameraIP2Text");
+		assert(SetRtspParamList[2]);
+
+		SetRtspParamList[3] = ituSceneFindWidget(&theScene, "CameraPort2Text");
+		assert(SetRtspParamList[3]);
+
+		SetRtspParamList[4] = ituSceneFindWidget(&theScene, "CameraVideo2Text");
+		assert(SetRtspParamList[4]);
+
+		SetRtspParamList[5] = ituSceneFindWidget(&theScene, "CameraFactoryName2Text");
+		assert(SetRtspParamList[5]);
+
+		SetRtspParamList[6] = ituSceneFindWidget(&theScene, "CameraUserName2Text");
+		assert(SetRtspParamList[6]);
+
+		SetRtspParamList[7] = ituSceneFindWidget(&theScene, "CameraPwd2Text");
+		assert(SetRtspParamList[7]);
+
 		for (i = 0; i < MAX_HOME_NUM; i++)
 		{
 			memset(textname, 0, sizeof(textname));
@@ -174,6 +289,11 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 			SetCamera2Text[i] = ituSceneFindWidget(&theScene, textname);
 			assert(SetCamera2Text[i]);
 		}
+
+		CameraDevNameContainer = ituSceneFindWidget(&theScene, "CameraDevNameContainer");
+		assert(CameraDevNameContainer);
+
+		ituWidgetDisable(CameraDevNameContainer);
 	}
 
 	if (strcmp(param, "SetProjectLayer") == 0)
@@ -186,19 +306,10 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 		}
 		else
 		{
-			for (i = 0; i < MAX_HOME_NUM; i++)
-			{
-				int used = 0;
-				if (i < g_list->Homenum)
-				{
-					used = g_list->Homedev[i].EnableOpen;
-				}
-				ituTextSetString(SetCamera2Text[i], get_str(SID_Set_UnUsed - used));
-			}
+			ShowRtspEnable();
 		}
 
 		ituCoverFlowGoto(SetRtspCoverFlow, 0);
-		ituWidgetDisable(CameraDevNameContainer);
 		ituWidgetSetVisible(SetRtspParamCoverFlow, false);
 		ituWidgetSetVisible(SetRtspFactoryMsgBackground, false);
 		ituWidgetSetVisible(SetRtspBackground, true);
@@ -206,91 +317,25 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 	}
 	else if (strcmp(param, "SetNumKeyBordLayer") == 0)
 	{
-		char* TextBox_data = ituTextGetString(SetNumKeyBordTextBox);
-		uint8 ret = FALSE;
-		int count_textbox = 0;
-
-		switch (g_camera_param_index)
-		{
-		case 2:
-			ret = check_ip_to_true(TextBox_data);
-			if (FALSE == ret)
-			{
-				ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
-			}
-			else
-			{
-				uint32 ip_data = 0;
-				ip_data = ipaddr_addr(TextBox_data);
-				uint32 data = ntohl(ip_data);
-				g_homedev.DeviceIP = data;
-
-				ituTextSetString(CameraIP2Text, TextBox_data);
-			}
-			break;
-
-		case 3:
-			count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
-			if (0 == count_textbox)
-			{
-				ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Port_Null, 0);
-				return false;
-			}
-			g_homedev.DevPort = atoi(TextBox_data);
-
-			char tmp[10] = { 0 };
-			sprintf(tmp, "%d", g_homedev.DevPort);
-			ituTextSetString(CameraPort2Text, tmp);
-			//ituTextSetString(CameraPort2Text, TextBox_data);
-			
-			break;
-
-		case 4:
-			count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
-			if (0 == count_textbox)
-			{
-				ShowMsgFailHintSuccessLayer(0, SID_Set_Rtsp_Channel_Null, 0);
-				return false;
-			}
-			g_homedev.ChannelNumber = atoi(TextBox_data);
-
-			char text_tmp[10] = {0};
-			sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
-			ituTextSetString(CameraVideo2Text, text_tmp);
-			//ituTextSetString(CameraVideo2Text, TextBox_data);
-			break;
-
-		case 6:
-			strcpy(g_homedev.UserName, TextBox_data);
-
-			ituTextSetString(CameraUserName2Text, TextBox_data);
-			
-			break;
-
-		case 7:
-			strcpy(g_homedev.Password, TextBox_data);
-
-			ituTextSetString(CameraPwd2Text, TextBox_data);
-			break;
-		}
-		save_rtsp_param();
+		KeyBordGotoRtspParam();
 	}
 	
 	return true;
 }
 
 /*************************************************
-Function:		ShowSetCameraParamList
+Function:		ShowSetCameraParam
 Description: 	室内摄像头设置显示函数
 Input:		无
 Output:		无
 Return:		TRUE 是 FALSE 否
 Others:
 *************************************************/
-static void ShowSetCameraParamList()
+static void ShowSetCameraParam()
 {
 	char text_tmp[50] = { 0 };
 	char tmp[32] = { 0 };
+	int i = 0;
 
 	// 设备名称
 	memset(text_tmp, 0, sizeof(text_tmp));
@@ -306,7 +351,7 @@ static void ShowSetCameraParamList()
 		storage_get_monitordev(&g_list);
 	}
 
-#if 0
+#if 0 // 926没启用后，数据都清空保存，3066是没启用也可以设置保存，现在做的跟3066一样
 	if (g_camera_index < g_list->Homenum && g_list->Homedev[g_camera_index].EnableOpen)
 	{
 		memcpy(&g_homedev, &g_list->Homedev[g_camera_index], sizeof(HOMEDEVICE));
@@ -336,46 +381,10 @@ static void ShowSetCameraParamList()
 	sprintf(g_homedev.DeviceName, "%s", text_tmp);
 #endif
 
-	memset(text_tmp, 0, sizeof(text_tmp));
-	if (g_homedev.EnableOpen)
+	for (i = 0; i < 8; i++)
 	{
-		ituSpriteGoto(SetCameraEnableSprite, 1);
-		sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_Camera_Used));
+		ShowSetCameraParamList(i);
 	}
-	else
-	{
-		ituSpriteGoto(SetCameraEnableSprite, 0);
-		sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_Camera_Unused));
-	}
-	ituTextSetString(SetCameraEnable2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	strcat(text_tmp, g_homedev.DeviceName);
-	ituTextSetString(CameraDevName2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%s", UlongtoIP(g_homedev.DeviceIP));
-	ituTextSetString(CameraIP2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%d", g_homedev.DevPort);
-	ituTextSetString(CameraPort2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
-	ituTextSetString(CameraVideo2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%s", g_homedev.FactoryName);
-	ituTextSetString(CameraFactoryName2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%s", g_homedev.UserName);
-	ituTextSetString(CameraUserName2Text, text_tmp);
-
-	memset((char *)text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%s", g_homedev.Password);
-	ituTextSetString(CameraPwd2Text, text_tmp);
 }
 
 /*************************************************
@@ -390,7 +399,7 @@ bool SetCameraButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	g_camera_index = atoi(param);
 
-	ShowSetCameraParamList();
+	ShowSetCameraParam();
 
 	ituCoverFlowGoto(SetRtspParamCoverFlow, 0);
 	ituWidgetSetVisible(SetRtspCoverFlow, false);
@@ -420,18 +429,14 @@ bool SetRtspParamListButtonOnMouseUp(ITUWidget* widget, char* param)
 		if (g_homedev.EnableOpen)
 		{
 			g_homedev.EnableOpen = 0;
-			ituSpriteGoto(SetCameraEnableSprite, 0);
-			sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_Camera_Unused));
 		}
 		else
 		{
 			g_homedev.EnableOpen = 1;
-			ituSpriteGoto(SetCameraEnableSprite, 1);
-			sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_Camera_Used));
 		}
 
 		save_rtsp_param();
-		ituTextSetString(SetCameraEnable2Text, text_tmp);
+		ShowSetCameraParamList(0);
 		break;
 
 	case 1:
@@ -489,7 +494,6 @@ Others:
 *************************************************/
 bool SetRtspFactoryMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 {
-	char text_tmp[12] = { 0 };
 	int index = atoi(param);
 
 	memset(g_homedev.FactoryName, 0, sizeof(g_homedev.FactoryName));
@@ -505,10 +509,7 @@ bool SetRtspFactoryMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 		break;
 	}
 
-	memset(text_tmp, 0, sizeof(text_tmp));
-	sprintf(text_tmp, "%s", g_homedev.FactoryName);
-	ituTextSetString(CameraFactoryName2Text, text_tmp);
-
+	ShowSetCameraParamList(5);
 	save_rtsp_param();
 
 	ituWidgetSetVisible(SetRtspFactoryMsgBackground, false);
@@ -536,6 +537,7 @@ void SetRtspLayerOnReturn(void)
 	else if (ituWidgetIsVisible(SetRtspParamCoverFlow))
 	{
 		ituWidgetSetVisible(SetRtspParamCoverFlow, false);
+		ShowRtspEnable();
 		ituWidgetSetVisible(SetRtspCoverFlow, true);
 		return;
 	}
@@ -547,17 +549,4 @@ void SetRtspLayerOnReturn(void)
 			return;
 		}
 	}
-}
-
-/*************************************************
-Function:		SetRtspReset
-Description: 	
-Input:			无
-Output:			无
-Return:			TRUE 是 FALSE 否
-Others:			无
-*************************************************/
-void SetRtspReset(void)
-{
-	SetRtspCoverFlow = NULL;
 }

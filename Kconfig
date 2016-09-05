@@ -120,7 +120,7 @@ config AUDIO_CODEC_MP3DEC
 config AUDIO_CODEC_WAV
     def_bool y
 
-config  AUDIO_CODEC_G711_ULAW
+config  AUDIO_CODEC_G711_ALAW
     def_bool y
 
 config VIDEO_ENABLE
@@ -416,17 +416,17 @@ config UPGRADE_DATA
 
 if UPGRADE_DATA
 config UPGRADE_PUBLIC
-    def_bool y
+    def_bool n
 
 config UPGRADE_TEMP
-    def_bool y
+    def_bool n
 endif
 
 config UPGRADE_OPEN_FILE
     def_bool y
 
 config UPGRADE_PARTITION
-    def_bool y
+    def_bool n
 
 config UPGRADE_DELETE_PKGFILE_AFTER_FINISH
     def_bool y

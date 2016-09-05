@@ -583,6 +583,7 @@ ECHO_STORAGE storage_add_jddev (PJD_DEV_INFO info)
 				jddevlist->pjd_dev_info[info->Index].TextIDPos= 0;
 				jddevlist->pjd_dev_info[info->Index].IsGroup = 0;
 				jddevlist->pjd_dev_info[info->Index].IsTune = 0;
+				jddevlist->pjd_dev_info[info->Index].TextID = 0;
 				for (j = 0; j < JD_SCENE_MAX; j++)
 				{
 					jddevlist->pjd_dev_info[info->Index].Commond[j] = 0;

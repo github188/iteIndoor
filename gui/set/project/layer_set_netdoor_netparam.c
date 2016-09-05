@@ -1,16 +1,16 @@
 ﻿/*************************************************
 Copyright (C), 2006-2016, Aurine
-File name:  	layer_set_netdoor.c
+File name:  	layer_set_netdoor_netparam.c
 Author:     	zxc
 Version:    	
 Date: 		2016-07-24
-Description:
+Description: 网络门前机网络参数设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 /************************常量定义************************/
 #define NETDOOR_LOCAL_IP		0x0A640101 			// 10.100.1.1
@@ -47,20 +47,18 @@ Others:
 *************************************************/
 static void KeyBordGotoSetNetDoorParam()
 {
-	char tmp[50];
+	//char tmp[50];
 	uint32 ip_data = 0;
 	ITUText* IPtext[3] = { SetNetDoorNetParamIP2Text, SetNetDoorNetParamMask2Text, SetNetDoorNetParamGateWay2Text };
 	char* IP_data = ituTextGetString(SetNumKeyBordTextBox);
-	uint8 ret = check_ip_to_true(IP_data);
+	int ret = IPIsCorrect(IP_data);
 	if (FALSE == ret)
 	{
 		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
 	}
 	else
 	{
-		ip_data = ipaddr_addr(IP_data);
-		uint32 data = ntohl(ip_data);
-
+		uint32 data = IPtoUlong(IP_data);
 		switch (g_nd_ip_flag)
 		{
 		case 0:
@@ -75,9 +73,9 @@ static void KeyBordGotoSetNetDoorParam()
 			g_ndparam.DefaultGateway = data;
 			break;
 		}
-		memset(tmp, 0, sizeof(tmp));
-		change_ip_to_str(data, tmp);
-		ituTextSetString(IPtext[g_nd_ip_flag], tmp);
+		//memset(tmp, 0, sizeof(tmp));
+		//change_ip_to_str(data, tmp);
+		ituTextSetString(IPtext[g_nd_ip_flag], IP_data);
 	}
 }
 
@@ -323,7 +321,7 @@ bool SetNetDoorNetParamButtonOnMouseUp(ITUWidget* widget, char* param)
 	}
 
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(ip_flag, tmp);
+	sprintf(tmp, "%s", UlongtoIP(ip_flag));
 	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
 
 	return true;

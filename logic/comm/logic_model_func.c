@@ -14,13 +14,10 @@
 *************************************************/
 #include "logic_include.h"
 
-#define MAXLENGTH					256
 #define NODISTURB_TIME				1				// 没秒检测一次
 
 static int g_NofaceTime	= 100;						// 免打扰超时时间
 static uint32 g_NofaceTimer = 0;					// 免打扰定时器
-
-static MMP_WCHAR  gpDestText[MAXLENGTH];
 
 /*************************************************
   Function:		disturb_timer_proc
@@ -98,52 +95,3 @@ void stop_disturb_timer(void)
 }
 
 
-/*************************************************
-Function:		gb2312ToUtf8
-Description:	字符编码转换
-Input:
-1.ptDestText	目标字符串
-2.nDestLength	长度
-3.ptSrcText		源字符串
-4.nSrcLength	长度
-
-Output:			无
-Return:			无
-Others:
-*************************************************/
-void gb2312ToUtf8(char*  ptDestText, int  nDestLength, char*  ptSrcText, int  nSrcLength)
-{
-	int  nResult = 0;
-	int  i;
-	int  nTemp, nTemp1;
-
-	if (!ptDestText
-		|| !ptSrcText
-		|| nDestLength <= 0
-		|| nSrcLength <= 0
-		)
-		return -1;
-
-	nTemp = 0;
-	nTemp1 = 0;
-	memset(gpDestText, 0, sizeof(gpDestText));
-
-	for (i = 0; i<(nSrcLength); i++, nTemp1++)
-	{
-		//nResult = gb2312_mbtowc(0, &gpDestText[nTemp1], &ptSrcText[i], 2);
-		if ((ptSrcText[i] >= 0x20) && (ptSrcText[i] <= 0x80))
-		{
-			gpDestText[nTemp1] = ptSrcText[i];
-		}
-		else  if (gb2312_mbtowc(0, &gpDestText[nTemp1], &ptSrcText[i], 2) == 2)
-		{
-			i++;
-			nTemp++;
-		}
-
-	}
-	gpDestText[(nSrcLength)-nTemp] = 0;
-	nResult = 0;
-	Unicode32ToUtf8(gpDestText, sizeof(gpDestText), ptDestText, nDestLength);
-
-}

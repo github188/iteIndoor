@@ -4,13 +4,13 @@ File name:  	layer_set_netdoor.c
 Author:     	zxc
 Version:    	
 Date: 		2016-07-24
-Description:
+Description: 网络门前机设置界面
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUText* SetNetDoorTitleText = NULL;
 static ITUText* SetNetDoorNum2Text[2] = { NULL };

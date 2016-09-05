@@ -71,7 +71,7 @@ static void KeyBordGotoSetNetParam()
 	ITUText* IPtext[IP_MAX] = { SetHostIP2Text, SetHostNetMask2Text, SetHostGateWay2Text, SetCenterServerIP2Text, 
 								SetManageIP12Text, SetManageIP22Text, SetManageIP32Text, 0, 0, SetRtspIP2Text };
 	char* IP_data = ituTextGetString(SetNumKeyBordTextBox);
-	uint8 ret = check_ip_to_true(IP_data);
+	int ret = IPIsCorrect(IP_data);
 	if (FALSE == ret)
 	{
 		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
@@ -272,7 +272,7 @@ bool SetNetParamManageButtonOnMouseUp(ITUWidget* widget, char* param)
 	for (i = 0; i < 3; i++)
 	{
 		memset(tmp, 0, sizeof(tmp));
-		change_ip_to_str(g_ip[MANAGER1_IPADDR + i], tmp);
+		sprintf(tmp, "%s", UlongtoIP(g_ip[MANAGER1_IPADDR + i]));
 		ituTextSetString(text[i], tmp);
 	}
 

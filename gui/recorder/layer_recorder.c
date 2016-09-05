@@ -144,7 +144,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 
 	if (gRecorderStatus == RECORDER_STATUS_PLAYING || gRecorderStatus == RECORDER_STATUS_RECORDING)
 	{
-		if (gRecorderTimeCount < MAX_RECORDER_TIME)
+		if (gRecorderTimeCount < RECORD_TIME_MAX)
 		{
 			uint32_t duration;
 			uint32_t curtime = SDL_GetTicks();
@@ -163,7 +163,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 				gRecorderTimeCount += (uint32_t)duration / 1000;
 				gRecorderLastTimeTick = curtime;
 
-				if (((int)gRecorderTimeCount) < MAX_RECORDER_TIME)
+				if (((int)gRecorderTimeCount) < RECORD_TIME_MAX)
 				{
 					memset(buf, 0, sizeof(buf));
 					if (gRecorderTimeCount < 10)
@@ -179,6 +179,9 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 				else
 				{
 					//TODO:超时停止录音，设置界面状态
+					sys_stop_family_record();
+					setRecorderRecordStatus(gNewRecordIndex, RECORDER_RECORD_UNREAD);
+					setRecordRadioBoxStatus(gNewRecordIndex, true);
 				}
 			}
 		}	
@@ -192,6 +195,7 @@ bool recorderRecordRadioBoxChanged(ITUWidget* widget, char* param)
 {
 	char tmpIndex = atoi(param);
 	gCurrentRecordIndex = tmpIndex;
+
 	//TODO:读取存储填充录音录制时间！！！！！
 	setRecorderRecordCreateTime("2016-07-28 10:41:45");
 	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
@@ -382,14 +386,14 @@ void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status)
 
 }
 
-RECORDER_STATUS_e getRecorderRecordStatus(uint8_t index)
+RECORDER_RECORD_STATUS_e getRecorderRecordStatus(uint8_t index)
 {
 	char tmpStr[50] = { 0 };
 
 	if (index >= MAX_RECORDER_NUM)
 	{
 		printf("recorder index is overFlow!!!!");
-		return (RECORDER_STATUS_e)0;
+		return (RECORDER_RECORD_STATUS_e)0;
 	}
 
 	sprintf(tmpStr, "%s%d", "recorderRecordRadioBox", index);
@@ -419,13 +423,15 @@ RECORDER_STATUS_e getRecorderRecordStatus(uint8_t index)
 		return RECORDER_RECORD_UNREAD;
 
 	else
-		return (RECORDER_STATUS_e)0;
+		return (RECORDER_RECORD_STATUS_e)0;
 }
 
 
 void recorderRecordingBtnOnClicked()
 {
 	uint8_t i = 0;
+	char tmpFileName[50] = { 0 };
+	PDATE_TIME tmpTime;
 	bool recordFlag = false;
 
 	for (i = 0; i < MAX_RECORDER_NUM; i++)
@@ -443,6 +449,10 @@ void recorderRecordingBtnOnClicked()
 		gRecorderLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
 		//TODO:开始录音存储
+		get_timer(tmpTime);
+		memset(tmpFileName, 0, sizeof(tmpFileName));
+		sprintf(tmpFileName, "%s/%04d%02d%02d%02d%02d%02d.WAV", JRLY_DIR_PATH, tmpTime->year, tmpTime->month, tmpTime->day, tmpTime->hour, tmpTime->min, tmpTime->sec);
+		sys_start_family_record(tmpFileName, NULL, NULL);
 
 		setRecorderAudioBtnStatus(RECORDER_STATUS_RECORDING);
 	}
@@ -493,6 +503,7 @@ void recorderStopBtnOnClicked()
 	else if (gRecorderStatus == RECORDER_STATUS_RECORDING)
 	{
 		//TODO:录音停止
+		sys_stop_family_record();
 		setRecorderRecordStatus(gNewRecordIndex, RECORDER_RECORD_UNREAD);
 		setRecordRadioBoxStatus(gNewRecordIndex, true);
 	}

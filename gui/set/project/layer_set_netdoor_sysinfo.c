@@ -4,13 +4,13 @@ File name:  	layer_set_netdoor_sysinfo.c
 Author:     	zxc
 Version:    	
 Date: 		2016-07-28
-Description:
+Description: 网络门前机系统信息
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUText* SetNetDoorSysInfo2Text[14] = { NULL };
 static ITUCoverFlow* SetNetDoorSysInfoCoverFlow = NULL;
@@ -69,29 +69,29 @@ static void show_updata()
 
 		case 1:
 		{
-				  sprintf(devno, "%s", g_devno.DeviceNoStr);
-				  DevLen = strlen(devno);
+			sprintf(devno, "%s", g_devno.DeviceNoStr);
+			DevLen = strlen(devno);
 
-				  if (DevLen != 0)
-				  {
-					  if (devno[DevLen - 1] == '0')
-					  {
-						  get_dev_description(DEVICE_TYPE_GATEWAY, devno, value, 30);
-					  }
-					  else
-					  {
-						  if (devno[DevLen - 1] == '8')
-						  {
-							  devno[DevLen - 1] = '1';
-						  }
-						  else if (devno[DevLen - 1] == '9')
-						  {
-							  devno[DevLen - 1] = '2';
-						  }
-						  get_dev_description(DEVICE_TYPE_DOOR_NET, devno, value, 30);
-					  }
-				  }
-				  break;
+			if (DevLen != 0)
+			{
+				if (devno[DevLen - 1] == '0')
+				{
+					get_dev_description(DEVICE_TYPE_GATEWAY, devno, value, 30);
+				}
+				else
+				{
+					if (devno[DevLen - 1] == '8')
+					{
+						devno[DevLen - 1] = '1';
+					}
+					else if (devno[DevLen - 1] == '9')
+					{
+						devno[DevLen - 1] = '2';
+					}
+					get_dev_description(DEVICE_TYPE_DOOR_NET, devno, value, 30);
+				}
+			}
+			break;
 		}
 
 		case 2:

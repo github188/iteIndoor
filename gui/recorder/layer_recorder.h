@@ -20,7 +20,6 @@ Modification:
 #define MS_PER_SECOND			1000
 #define DEFAULT_PLAY_VOL		40
 #define MAX_RECORDER_NUM		5
-#define MAX_RECORDER_TIME		60
 #define DEFAULT_PLAYVOL			5
 
 
@@ -68,7 +67,7 @@ bool recorderRecordRadioBoxChanged(ITUWidget* widget, char* param);
 void recorderLayerInit();
 void setRecorderPlayVol(uint8_t volNum);
 void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status);
-RECORDER_STATUS_e getRecorderRecordStatus(uint8_t index);
+RECORDER_RECORD_STATUS_e getRecorderRecordStatus(uint8_t index);
 void setRecorderAudioBtnStatus(RECORDER_STATUS_e status);
 void setRecorderDuration(char* timeStr);
 void setRecorderRecordCreateTime(char* timeStr);

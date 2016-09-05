@@ -16,7 +16,6 @@
 
 #include "storage_include.h"
 
-#define MAX_RECORD_NUM  		20					// ×î´ó¼ÇÂ¼
 #define MAX_DEVNO_NUM			30
 typedef enum
 {

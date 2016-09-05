@@ -221,6 +221,7 @@ gui/call/layer_call.h
 gui/call/layer_call.c
 gui/call/layer_becall.c
 gui/call/layer_monitor_search.c
+gui/call/layer_video.c
 gui/call/layer_monitor.c
 gui/comm/au_model_func.c	
 gui/set/layer_set_menu.c
@@ -243,6 +244,8 @@ gui/set/user/layer_set_user.c
 gui/set/user/layer_set_alarm_num.c
 gui/set/user/layer_set_alarm_area_list.c
 gui/set/user/layer_set_alarm_remote.c
+gui/set/user/layer_set_jd_scence.c
+gui/set/user/layer_set_jd_scence_param.c
 gui/set/project/layer_set_alarm.c
 gui/set/project/layer_set_netparam.c
 gui/set/project/layer_set_extmodule.c
@@ -257,6 +260,9 @@ gui/set/project/layer_set_netdoor_card.c
 gui/set/project/layer_set_netdoor_lock.c
 gui/set/project/layer_set_netdoor_other.c
 gui/set/project/layer_set_netdoor_sysinfo.c
+gui/set/project/layer_set_jd.c
+gui/set/project/layer_set_jd_param.c
+gui/set/project/layer_set_jd_learn_ir.c
 gui/set/msg/layer_msg_fail_hint_success.c
 gui/set/msg/layer_msg_link_out_time.c
 gui/set/layer_set.h

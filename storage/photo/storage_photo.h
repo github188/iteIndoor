@@ -15,9 +15,6 @@
 #define __STORAGE_PHOTO_H__
 
 #include "storage_include.h"
-//#include "storage_types.h"
-
-#define MAX_PHOTO_NUM  			10					// 最大自动抓拍记录
 
 typedef struct
 {

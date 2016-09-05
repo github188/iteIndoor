@@ -31,9 +31,11 @@
 #define LEAVE_PIC_TYPE			".jpg"
 #define LEAVE_AVI_TYPE			".avi"
 #define LEAVE_WAV_TYPE			".wav"
+#define LEAVE_SVM_TYPE			".wav"//".svm"
+#define LEAVE_MKV_TYPE			".mkv"
 
 static LeafCall *g_LeafCall = NULL;
-
+static PSNAP_CALLBACK g_snap_callback = NULL;
 
 MEDIA_LYLY_CTRL g_LylyRecordCtrl = 
 {
@@ -73,7 +75,7 @@ static struct ThreadInfo VideoPreviewThread;		// 模拟门前机视频预览线程
 *************************************************/
 void media_Ad_set_audio_PackMode(uint8 packmode)
 {
-	//set_audio_packmode(packmode);
+	leaf_set_audio_packmode(packmode);
 }
 
 /*************************************************
@@ -199,7 +201,7 @@ int media_get_wav_time(char *filename)
 	int ret = 0;
 	if (filename)
 	{
-		//ret = leaf_get_wav_file_play_time(filename);
+		ret = leaf_get_wav_file_play_time(filename);
 	}
 	return ret;
 }
@@ -215,7 +217,16 @@ int media_get_wav_time(char *filename)
   Others:
 *************************************************/
 uint32 media_start_net_video(uint32 address, uint8 mode)
-{
+{	
+	dprintf("mode : 0X%x\n", mode);
+    if (mode != _RECVONLY)
+    {
+        return FALSE;
+    }
+    
+	g_LeafCall->dir = CallIncoming;
+    leaf_init_video_streams(g_LeafCall, NETVIDEO_UDP_PORT);
+    leaf_start_video_stream(g_LeafCall, address, NETVIDEO_UDP_PORT, PAYLOAD_H264);
 	return TRUE;
 }
 
@@ -229,6 +240,7 @@ uint32 media_start_net_video(uint32 address, uint8 mode)
 *************************************************/
 void media_stop_net_video(uint8 mode)
 {	
+	leaf_stop_media_streams(g_LeafCall);
 	return;
 }
 
@@ -244,6 +256,9 @@ void media_stop_net_video(uint8 mode)
 *************************************************/
 uint32 media_start_net_audio(int address)
 {
+	dprintf("start !!!\n");
+	leaf_init_audio_streams(g_LeafCall, NETAUDIO_UDP_PORT);
+	leaf_start_audio_stream(g_LeafCall, address, NETAUDIO_UDP_PORT, PAYLOAD_G711A);
 	return TRUE;
 }
 
@@ -257,7 +272,8 @@ uint32 media_start_net_audio(int address)
 *************************************************/
 void media_stop_net_audio(void)
 {
-	dprintf("net_stop_audio\n");
+	dprintf("stop !!!\n");
+	leaf_stop_media_streams(g_LeafCall);
 	return;
 }
 
@@ -271,8 +287,29 @@ void media_stop_net_audio(void)
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-uint32 meida_start_net_hint(PAYLOAD_TYPE_E tp, char *filename, void * proc)
+uint32 meida_start_net_hint(uint8 RemoteDeviceType, char *filename, void * proc)
 {
+	int IsPack, PackNum;
+	if ((media_stream_FileExtCmp((const uint8*)filename, ".wav") != 0)
+		&& (media_stream_FileExtCmp((const uint8*)filename, ".WAV")) != 0)
+	{
+		return FALSE;
+	}
+	
+
+	if (DEVICE_TYPE_STAIR == RemoteDeviceType)
+	{
+		IsPack = FALSE;
+		PackNum = 1;
+	}
+	else
+	{
+		IsPack = TRUE;
+		PackNum = 6;
+	}
+		
+	
+	leaf_start_lyly_hit(g_LeafCall, NETAUDIO_UDP_PORT, PAYLOAD_G711A, filename, IsPack, PackNum, proc);
 	return TRUE;
 }
 
@@ -286,6 +323,7 @@ uint32 meida_start_net_hint(PAYLOAD_TYPE_E tp, char *filename, void * proc)
 *************************************************/
 uint32 meida_stop_net_hint(void)
 {
+	leaf_stop_lyly_hit(g_LeafCall);
 	return TRUE;
 }
 
@@ -301,7 +339,7 @@ uint32 meida_stop_net_hint(void)
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-static void media_fill_LylyRecordCtrl(LEAVE_WORD_MODE_E mode, PAYLOAD_TYPE_E atp, PAYLOAD_TYPE_E vtp, char * filename)
+static void media_fill_LylyRecordCtrl(LEAVE_WORD_MODE_E mode, char * filename)
 {
 	memset(g_LylyRecordCtrl.FileName, 0, sizeof(g_LylyRecordCtrl.FileName));
 	strcpy(g_LylyRecordCtrl.FileName, filename);
@@ -334,10 +372,33 @@ static void media_clean_LylyRecordCtrl(void)
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-uint32 meida_start_net_leave_rec(LEAVE_WORD_MODE_E mode,
-						PAYLOAD_TYPE_E atp, PAYLOAD_TYPE_E vtp, char * filename)
+uint32 meida_start_net_leave_rec(LEAVE_WORD_MODE_E mode, uint32 ipaddress, char * filename)
 {	
-	return TRUE;	
+	int ret = FALSE;
+	char RecordName[100] = {0};
+	media_fill_LylyRecordCtrl(mode, filename);
+	
+	if (mode == LWM_AUDIO_PIC)
+	{
+		char picname[100] = {0};
+		memset(picname, 0, sizeof(picname));
+		sprintf(picname, "%s%s", filename, LEAVE_PIC_TYPE);
+		dprintf("snap name ; %s\n ", picname);
+		media_snapshot(picname, NULL);
+	}
+
+	memset(RecordName, 0, sizeof(RecordName));
+	if (mode == LWM_AUDIO || mode == LWM_AUDIO_PIC)
+	{
+		sprintf(RecordName, "%s%s", filename, LEAVE_SVM_TYPE);
+		ret = leaf_start_net_voice_memo_record(g_LeafCall, RecordName, ipaddress, NETAUDIO_UDP_PORT, PAYLOAD_G711A);		
+	}
+	else
+	{
+		sprintf(RecordName, "%s%s", filename, LEAVE_MKV_TYPE);
+	}
+	
+	return ret;	
 }
 
 /*************************************************
@@ -351,19 +412,17 @@ uint32 meida_start_net_leave_rec(LEAVE_WORD_MODE_E mode,
 *************************************************/
 uint32 media_stop_net_leave_rec(uint8 issave)
 {
-	dprintf("  1111111111111111 \n");
 	char filename[100] = {0};
-	/*
-	stop_lyly_audio_recv();
-	
-	lyly_record_stop();
-	
-	ms_media_unlink(mMediaStream.AudioRtpRecv, mMediaStream.AviRecord);
-	if (g_LylyRecordCtrl.mode == LWM_AUDIO_VIDEO)
+
+	if (g_LylyRecordCtrl.mode == LWM_AUDIO || g_LylyRecordCtrl.mode == LWM_AUDIO_PIC)
 	{
-		ms_media_unlink(mMediaStream.VideoRtpRecv, mMediaStream.AviRecord);
+		leaf_stop_net_voice_memo_record(g_LeafCall);
 	}
-*/
+	else
+	{
+
+	}
+	
 	if (issave == FALSE)
 	{
 		if (g_LylyRecordCtrl.mode == LWM_AUDIO_PIC)
@@ -375,31 +434,16 @@ uint32 media_stop_net_leave_rec(uint8 issave)
 
 		if (g_LylyRecordCtrl.mode == LWM_AUDIO_VIDEO)
 		{			
-			sprintf(filename, "%s%s", g_LylyRecordCtrl.FileName, LEAVE_AVI_TYPE);
+			sprintf(filename, "%s%s", g_LylyRecordCtrl.FileName, LEAVE_MKV_TYPE);
 		}
 		else
 		{
-			sprintf(filename, "%s%s", g_LylyRecordCtrl.FileName, LEAVE_WAV_TYPE);
+			sprintf(filename, "%s%s", g_LylyRecordCtrl.FileName, LEAVE_SVM_TYPE);
 		}
 		FSFileDelete(filename);	
 	}
 	media_clean_LylyRecordCtrl();
 	
-	return TRUE;
-}
-
-/*************************************************
-  Function:    		media_add_audio_sendaddr
-  Description: 		增加音频发送地址
-  Input: 			
-  	1.IP			IP地址
-  	2.AudioPort		音频端口
-  Output:			无
-  Return:			成功与否true/false
-  Others:
-*************************************************/
-int32 media_add_audio_sendaddr(uint32 IP, uint16 AudioPort)
-{
 	return TRUE;
 }
 
@@ -416,7 +460,7 @@ int32 media_add_audio_sendaddr(uint32 IP, uint16 AudioPort)
 *************************************************/
 uint32 media_start_local_record(char *filename)
 {
-	return TRUE;
+	return leaf_start_voice_memo_record(g_LeafCall, filename);
 }
 
 /*************************************************
@@ -430,6 +474,23 @@ uint32 media_start_local_record(char *filename)
 *************************************************/
 void media_stop_local_record(void)
 {
+	leaf_stop_voice_memo_record(g_LeafCall);
+}
+
+/*************************************************
+  Function:    		media_add_audio_sendaddr
+  Description: 		增加音频发送地址
+  Input: 			
+  	1.IP			IP地址
+  	2.AudioPort		音频端口
+  Output:			无
+  Return:			成功与否true/false
+  Others:
+*************************************************/
+int32 media_add_audio_sendaddr(uint32 IP, uint16 AudioPort)
+{
+	leaf_add_audio_send_address(g_LeafCall, IP, AudioPort);
+	return TRUE;
 }
 
 /*************************************************
@@ -442,6 +503,7 @@ void media_stop_local_record(void)
 *************************************************/
 void media_del_audio_send_addr(uint32 IP, uint16 AudioPort)
 {	
+	leaf_del_audio_send_address(g_LeafCall, IP, AudioPort);
 	return;
 }
 
@@ -456,7 +518,15 @@ void media_del_audio_send_addr(uint32 IP, uint16 AudioPort)
 *************************************************/
 uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 {
-	int level = (vol%9)*12;
+	int level;
+	if (vol == 0)
+	{
+		level = 0;
+	}
+	else
+	{
+		level = 20+10*vol;
+	}
 	leaf_set_play_level(g_LeafCall, level);
 	return TRUE;
 }
@@ -472,7 +542,15 @@ uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 *************************************************/
 uint32 media_set_ring_volume(uint32 vol)
 {
-	int level = (vol%9)*12;
+	int level;
+	if (vol == 0)
+	{
+		level = 0;
+	}
+	else
+	{
+		level = 20+10*vol;
+	}
    	leaf_set_ring_level(g_LeafCall, level);	
 	return TRUE;
 }
@@ -488,6 +566,18 @@ uint32 media_set_ring_volume(uint32 vol)
 *************************************************/
 uint32 media_set_mic_volume(uint8 vol)
 {
+	//vol = MIC_VOLUME;		// 目前固定设置一个音量值
+	
+	int level;
+	if (vol == 0)
+	{
+		level = 0;
+	}
+	else
+	{
+		level = 20+10*vol;
+	}
+	leaf_set_rec_level(g_LeafCall, level);
 	return TRUE;
 }
 
@@ -592,103 +682,102 @@ void media_beep(void)
 }
 
 /*************************************************
+  Function:			media_Snap_Callback
+  Description:		抓拍回调
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+static void media_snapshot_callback(void *arg)
+{
+	char *GetSaveSuccessFilename = NULL;
+	GetSaveSuccessFilename = (char*)arg;
+	dprintf("SnapShotSuccessCallback filename: %s\n", GetSaveSuccessFilename);
+	if (g_snap_callback)
+	{
+		g_snap_callback(TRUE);
+	}
+}
+
+/*************************************************
   Function:			media_snapshot
   Description:		抓拍
   Input: 			
   	1.filename		图像保存的文件名
-  					如果>1时文件名自动加上编号
-	2.dstW			目标图片的宽
-	3.dstH			目标图片的高
+	2.proc			抓拍回调
   Output:			无
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-uint32 media_snapshot(char *filename, uint32 dstW, uint32 dstH, DEVICE_TYPE_E DevType)
+uint32 media_snapshot(char *filename, PSNAP_CALLBACK proc)
 {
-#if 0
-	// 模拟状态下 视频未开启，抓拍直接返回错误
-	if (DEVICE_TYPE_DOOR_PHONE == DevType && g_start_video == 0)
+	if (filename == NULL)
 	{
 		return FALSE;
 	}
-	set_jpg_enc_param(filename, dstW, dstH, DevType);
-	int32 ret =  open_jpeg_enc();
-	if (ret == 0)
-	{
-		close_jpeg_enc();
-		return TRUE;
-	}
-	return FALSE;
-#endif
-}
 
-/*************************************************
-  Function:			media_start_show_pict
-  Description:		JPG图片显示
-  Input: 			
-  	1.filename		图像保存的文件名
-  					如果>1时文件名自动加上编号
-	2.pos_x			目标图片显示X 坐标
-	3.pos_y			目标图片显示Y 坐标
-	4.with			目标图片显示宽度
-	5.heigh			目标图片显示长度
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-int32 media_start_show_pict(char *filename, uint16 pos_x, uint16 pos_y, uint16 with, uint16 heigh)
-{
-	int32 ret = FALSE;
-	
-	//set_jpg_dec_param(filename, pos_x, pos_y, with, heigh);
-	//ret = open_jpeg_dec();
-	if (ret == 0)
-	{
-		sys_set_view_picture_state(TRUE);
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-/*************************************************
-  Function:			media_stop_show_pict
-  Description:		关闭图片显示
-  Input: 			
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-void media_stop_show_pict(void)
-{
-	sys_set_view_picture_state(FALSE);	
-}
-
-/*************************************************
-  Function:			media_enable_audio_aec
-  Description:		使能消回声接口
-  Input: 			
-  Output:			无
-  Return:			TRUE/FALSE
-  Others:
-*************************************************/
-int media_enable_audio_aec(void)
-{
+	g_snap_callback = proc;
+	leaf_take_video_snapshot(g_LeafCall, filename, media_snapshot_callback);
 	return TRUE;
 }
 
 /*************************************************
-  Function:			media_disable_audio_aec
-  Description:		使能消回声接口
+  Function:			media_enable_audio_send
+  Description:		发送接口开启
   Input: 			
   Output:			无
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-int media_disable_audio_aec(void)
+int media_enable_audio_send(void)
 {
+	leaf_enable_audio_send(g_LeafCall);
 	return TRUE;
 }
+
+/*************************************************
+  Function:			media_disable_audio_send
+  Description:		发送接口关闭
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+int media_disable_audio_send(void)
+{
+	leaf_disable_audio_send(g_LeafCall);
+	return TRUE;
+}
+
+/*************************************************
+  Function:			media_enable_audio_recv
+  Description:		接收接口开启
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+int media_enable_audio_recv(void)
+{
+	leaf_enable_audio_recv(g_LeafCall);
+	return TRUE;
+}
+
+/*************************************************
+  Function:			media_disable_audio_recv
+  Description:		接收接口关闭
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+int media_disable_audio_recv(void)
+{
+	leaf_disable_audio_recv(g_LeafCall);
+	return TRUE;
+}
+
 
 /*************************************************
   Function:			media_play_sound
@@ -750,7 +839,7 @@ int media_stop_rtsp(void)
 }	
 
 /*************************************************
-  Function:			media_play_lyly
+  Function:			media_play_video_lyly
   Description:		播放留影留言文件
   Input: 			
   	1.filename		文件名
@@ -759,23 +848,54 @@ int media_stop_rtsp(void)
   Return:			TRUE/FALSE
   Others:
 *************************************************/
-uint32 media_play_lyly (char *filename, void * proc)
+uint32 media_play_video_lyly (char *filename, void * proc)
 {
 	leaf_start_video_memo_playback(g_LeafCall, filename);
 	return TRUE;
 }
 
 /*************************************************
-  Function:			media_stop_lyly
+  Function:			media_stop_video_lyly
   Description:		停止留影留言播放
   Input: 			无
   Output:			无
   Return:			
   Others:
 *************************************************/
-void media_stop_lyly (void)
+void media_stop_video_lyly (void)
 {
 	leaf_stop_video_memo_playback(g_LeafCall);
+}
+
+/*************************************************
+  Function:			media_play_sound_lyly
+  Description:		播放音频录制文件
+  Input: 			
+  	1.type			播放类型
+  	2.filename		文件名
+  	3.isrepeat		是否重复播放	1重复 0不重复
+  	4.proc			回调
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_play_sound_lyly(char *filename, uint8 IsRepeat, void * proc)
+{
+	leaf_start_voice_memo_playback(g_LeafCall, filename);
+	return TRUE;	
+}
+
+/*************************************************
+  Function:			media_stop_sound_lyly
+  Description:		停止播放音频录制文件
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+void media_stop_sound_lyly (void)
+{
+	leaf_stop_voice_memo_playback(g_LeafCall);
 }
 
 /*************************************************
@@ -810,6 +930,9 @@ void media_init(void)
 	if (g_LeafCall == NULL)
 	{
 		g_LeafCall = leaf_init();
+		media_set_talk_volume(DEVICE_TYPE_NONE, storage_get_talkvolume());
+    	media_set_ring_volume(storage_get_ringvolume());
+    	media_set_mic_volume(storage_get_micvolume());
 	}
 }
 

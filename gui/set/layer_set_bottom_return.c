@@ -49,6 +49,11 @@ static ITULayer* SetSysInfoLayer = NULL;				// 系统信息
 static ITULayer* SetStorageLayer = NULL;				// 存储管理
 static ITULayer* SetIpProtocolHostLayer = NULL;			// IP协议转换器主机
 static ITULayer* SetIpProtocolFenjiLayer = NULL;		// IP协议转换器分机
+static ITULayer* SetJdParamLayer = NULL;				// 家电参数设置
+static ITULayer* SetJDLearnIRLayer = NULL;				// 空调红外学习
+static ITULayer* SetJdScenceLayer = NULL;				// 情景设置
+static ITULayer* SetJdScenceParamLayer = NULL;			// 情景参数设置
+
 
 /*************************************************
 Function:		SetBottonReturnOnEnter
@@ -169,6 +174,18 @@ bool SetBottonReturnOnEnter(ITUWidget* widget, char* param)
 
 		SetIpProtocolFenjiLayer = ituSceneFindWidget(&theScene, "SetIpProtocolFenjiLayer");
 		assert(SetIpProtocolFenjiLayer);
+
+		SetJdParamLayer = ituSceneFindWidget(&theScene, "SetJdParamLayer");
+		assert(SetJdParamLayer);
+
+		SetJDLearnIRLayer = ituSceneFindWidget(&theScene, "SetJDLearnIRLayer");
+		assert(SetJDLearnIRLayer);
+
+		SetJdScenceLayer = ituSceneFindWidget(&theScene, "SetJdScenceLayer");
+		assert(SetJdScenceLayer);
+
+		SetJdScenceParamLayer = ituSceneFindWidget(&theScene, "SetJdScenceParamLayer");
+		assert(SetJdScenceParamLayer);
 	}
 
 	return true;
@@ -272,7 +289,7 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		return true;
 	}
 
-	if (g_NowLayer == SetAlarmNumLayer)
+	if ((g_NowLayer == SetAlarmNumLayer) || (g_NowLayer == SetJdScenceLayer))
 	{
 		if (!ituWidgetIsVisible(SetUserLayer))
 		{
@@ -313,15 +330,6 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		if (!ituWidgetIsVisible(SetUserLayer))
 		{
 			ituLayerGoto(SetUserLayer);
-		}
-		return true;
-	}
-
-	if (g_NowLayer == SetJDLayer)
-	{
-		if (!ituWidgetIsVisible(SetProjectLayer))
-		{
-			ituLayerGoto(SetProjectLayer);
 		}
 		return true;
 	}
@@ -421,6 +429,31 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		}
 		return true;
 	}
+
+	if (g_NowLayer == SetJDLayer)
+	{
+		SetJDLayerOnReturn();
+		return true;
+	}
+
+	if (g_NowLayer == SetJdParamLayer)
+	{
+		SetJDParamLayerOnReturn();
+		return true;
+	}
+
+	if (g_NowLayer == SetJDLearnIRLayer)
+	{
+		SetJDLearnIRLayerOnReturn();
+		return true;
+	}
+
+	if (g_NowLayer == SetJdScenceParamLayer)
+	{
+		SetJDSceneParamLayerOnReturn();
+		return true;
+	}
+	
 
 	return false;
 }

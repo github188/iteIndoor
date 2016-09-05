@@ -6,16 +6,16 @@ Version:
 Date: 		2016-07-06
 Description:	外部模块界面
 *************************************************/
-#include "../../gui_include.h"
+#include "../layer_set.h"
 
-static ITUSprite* SetExtJDSprite;
-static ITUSprite* SetExtDoor1Sprite;
-static ITUSprite* SetExtDoor2Sprite;
-static ITUSprite* SetExtStairSprite;
-static ITUText* SetExtJD2Text;
-static ITUText* SetExtDoor12Text;
-static ITUText* SetExtDoor22Text;
-static ITUText* SetExtStair2Text;
+static ITUSprite* SetExtJDSprite = NULL;
+static ITUSprite* SetExtDoor1Sprite = NULL;
+static ITUSprite* SetExtDoor2Sprite = NULL;
+static ITUSprite* SetExtStairSprite = NULL;
+static ITUText* SetExtJD2Text = NULL;
+static ITUText* SetExtDoor12Text = NULL;
+static ITUText* SetExtDoor22Text = NULL;
+static ITUText* SetExtStair2Text = NULL;
 
 static uint32 g_ext[EXT_MODE_MAX];
 
@@ -233,9 +233,4 @@ bool SetExtModuleListButtonOnMouseUp(ITUWidget* widget, char* param)
 	}
 
 	return true;
-}
-
-void SetExtModuleLayerReset(void)
-{
-	SetExtJDSprite = NULL;
 }

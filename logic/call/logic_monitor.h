@@ -42,6 +42,7 @@ typedef enum
 }MONITOR_STATE_E;
 
 #define MONITOR_TIMER		(MONITOR_END+10) 		// 监视计时
+#define MONITOR_SNAP		(MONITOR_END+11) 		// 监视抓拍
 
 /*************************************************
   Function:			monitor_request

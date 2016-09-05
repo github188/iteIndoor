@@ -4,13 +4,13 @@ File name:  	layer_set_storage.c
 Author:     	zxc
 Version:
 Date: 		2016-07-28
-Description:
+Description: 存储管理界面
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
 static ITUText* SetStorageMessage2Text = NULL;
 static ITUText* SetStoragePic2Text = NULL;

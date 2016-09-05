@@ -273,6 +273,54 @@ extern "C" {
 	bool SetIpProtocolBingFenjiButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetIpProtocolGetFJFenjiButtonOnMouseUp(ITUWidget* widget, char* param);
 
+	// Set_Jd
+	bool SetJDOnEnter(ITUWidget* widget, char* param);
+	bool SetJDCoverFlowButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDListCoverFlowButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDFactoryButtonOnMouseUp(ITUWidget* widget, char* param);
+	void SetJDLayerOnReturn(void);
+
+	//Set_JD_param
+	bool SetJDParamOnEnter(ITUWidget* widget, char* param);
+	bool SetJdParamEnableButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdParamDeviceNameButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdParamAddressButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdParamAdjustButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdParamIRLearnButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDDevNameSelectPageButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdDeviceNameMsgTureButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdDeviceNameMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdDeviNameAddrMsgButtonOnMouseUp(ITUWidget* widget, char* param);
+	uint32 SetJDParam(PJD_DEV_LIST_INFO devlist, AU_JD_DEV_TYPE devtype, int index);
+	void SetJDParamLayerOnReturn(void);
+
+	//Set_JD_KongTiao_Learn_IR
+	bool SetJDLearnIROnEnter(ITUWidget* widget, char* param);
+	bool SetJDLearnIRTypeButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDLearnIRTypeMsgListButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDLearnIRProgramButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDLearnIRProgramMsgTempListButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDLearnIRProgramMsgModeListButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDLearnIRStartButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJDLearnIRTestButtonOnMouseUp(ITUWidget* widget, char* param);
+	uint32 SetJDLearnIRParam(JD_DEV_INFO devinfo);
+	void SetJDLearnIRLayerOnReturn(void);
+
+	//Set_Jd_Scence
+	bool SetJdScenceOnEnter(ITUWidget* widget, char* param);
+	bool SetJDSceneListCoverFlowButtonOnMouseUp(ITUWidget* widget, char* param);
+
+	//Set_Jd_Scence_Param
+	bool SetJdScenceParamOnEnter(ITUWidget* widget, char* param);
+	bool SetJdScenceParamEnableButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdScenceParamNameButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdSceneNameMsgTureButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdSceneNameMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdSceneNameMsgButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdSceneAddrMsgButtonOnMouseUp(ITUWidget* widget, char* param);
+	uint32 SetAurinJDSceneList(uint8 Index, PJD_SCENE_INFO_LIST sencelist);
+	void SetJDSceneParamLayerOnReturn(void);
+
 
 #ifdef __cplusplus
 }

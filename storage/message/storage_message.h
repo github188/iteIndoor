@@ -15,16 +15,7 @@
 #ifndef _STORAGE_MESSAGE_H_
 #define _STORAGE_MESSAGE_H_
 
-//#include "include.h"
-//#include "storage_types.h"
 #include "storage_include.h"
-//#include "logic_include.h"
-//#include "logic_timer.h"
-
-#define MAX_MSG_NUM				10					// 信息最大接收10条
-
-
-
 
 
 // 信息结构体

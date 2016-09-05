@@ -16,9 +16,6 @@
 #define _SYS_ARBITRATION_H_
 #include "logic_include.h"
 
-
-#define	SYS_FAMILY_RECORD_MAXTIME		30
-
 // 时间、进度、状态:TRUE-正常/FALSE-出错
 typedef int32 (*MediaPlayCallback)(int32 param1,int32 param2,int32 state);
 typedef void (*MediaStopedCallback)(void);
@@ -134,28 +131,6 @@ int32 sys_start_family_record(char *FileName, MediaPlayCallback ProcessProc, Med
   Others:			
 *************************************************/
 int32 sys_stop_family_record(void);
-
-/*************************************************
-  Function:			sys_start_family_audition
-  Description: 		开始家人留言试听
-  Input: 			
-  	1.ProcessProc	进度回调
-	2.StoppedProc	被强制终止后回调函数  	
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_start_family_audition(MediaPlayCallback ProcessProc, MediaStopedCallback StoppedProc);
-
-/*************************************************
-  Function:			sys_stop_family_audition
-  Description: 		停止家人留言试听
-  Input: 			无
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_stop_family_audition(void);
 
 /*************************************************
   Function:			sys_set_intercomm_state
@@ -282,28 +257,6 @@ void sys_close_lcd(void);
   Others:			
 *************************************************/
 void sys_init_hint_state(void);
-
-/*************************************************
-  Function:			sys_set_view_picture_state
-  Description: 		设置图片查看状态
-  Input: 			
-  	1.state			TRUE-处于图片查看中 FALSE-不处于图片查看中
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_set_view_picture_state(uint8 state);
-
-/*************************************************
-  Function:			sys_get_view_picture_state
-  Description: 		获取图片查看状态
-  Input: 			
-  	1.state			TRUE-处于图片查看中 FALSE-不处于图片查看中
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_get_view_picture_state(void);
 
 /*************************************************
   Function:			sys_key_beep

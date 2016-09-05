@@ -19,20 +19,8 @@
 #include "logic_include.h"
 
 
-/*************************************************
-Function:		gb2312ToUtf8
-Description:	字符编码转换
-Input:
-1.ptDestText	目标字符串
-2.nDestLength	长度
-3.ptSrcText		源字符串
-4.nSrcLength	长度
 
-Output:			无
-Return:			无
-Others:
-*************************************************/
-void gb2312ToUtf8(char*  ptDestText, int  nDestLength, char*  ptSrcText, int  nSrcLength);
+
 
 
 

@@ -124,7 +124,7 @@ typedef struct
 	uint8 TimeOut;									// 超时时间, 单位秒
 }MULT_RECIVE;
 
-#define	REC_MAX_DATA_NUM			1				// 同时接收多包任务数
+#define	REC_MAX_DATA_NUM			5				// 同时接收多包任务数
 #define	MULT_SEND_PACKET_SIZE		1024			// 多包发送时,没一包大小
 #define	MULT_SEND_MAX_PACKET		(1024*20)		// 最大包数
 #define DEFAULT_MULT_RECIVE_TIMEOUT	60				// 默认多包接收超时时间	

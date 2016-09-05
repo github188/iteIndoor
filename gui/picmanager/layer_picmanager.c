@@ -601,6 +601,7 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 	return true;
 }
 
+
 void setPicManagerMiniPicList()
 {
 	uint8_t i = 0;

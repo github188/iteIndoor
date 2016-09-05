@@ -14,15 +14,6 @@
 *************************************************/
 #include "logic_include.h"
 
-
-#define	CALLOUT_TIMEOUT			60					// 呼叫超时
-#define LEAVEWORD_TIMEOUT		60					// 启动留言时间
-#define	RECORDHINT_TIME			10					// 留言提示音时间
-#define LEAVEWORD_TIME			30					// 留言最长时间
-#define HEART_TIMEOUT			5					// 心跳超时时间 
-#define PHONE_TALK_TIMEOUT		60					// 门口机通话时长
-#define FENJI_TALK_TIMEOUT		300					// 分机和户户通话时长
-
 #define	MOVE_TEMP_TIMES			3					// 最多转呼的次数
 #ifdef _IP_MODULE_DJ_
 #define MAX_ROOM_NUM			(8+10)
@@ -110,10 +101,11 @@ static CALL_INFO g_BeCallInfo;
 static CALL_INFO g_NewBeCallInfo;
 static HEART_PARAM HeartParam;
 static DATE_TIME g_LylyDateTime = {0};
+static DATE_TIME g_SnapDateTime = {0};
 
 static int16 g_RemainTime;									// 剩余时间	
 static uint8 g_ErrType;
-static uint8 g_LylyFlg;
+static uint8 g_LylyFlg = FALSE;
 static uint8 g_ElevtorAuthorize = FALSE;
 static uint8 g_MoveTempTimes = 0;
 static uint8 g_AnalogDoor = FALSE;							// 模拟门前呼入
@@ -423,10 +415,8 @@ static void add_inter_record(CALL_TYPE RecordType, DEVICE_TYPE_E DevType, char *
   Return:			
   Others:	
 *************************************************/
-static void add_inter_lyly(void)
+static void add_inter_lyly(LYLY_TYPE LylyType)
 {
-	//LYLY_TYPE LylyType = storage_get_lyly_mode();
-	LYLY_TYPE LylyType = g_BeCallInfo.LeaveWordMode;
 	dprintf(" ##############  LylyType : %x \n ", LylyType);
 	if (g_BeCallInfo.RemoteDeviceType == DEVICE_TYPE_MANAGER)
 	{
@@ -508,8 +498,7 @@ static void play_recordhint_callback(int32 cmd, int32 time, int32 percent)
 	{	
 		if (percent == 100)
 		{
-			dprintf("play_recordhint_callback : record hint play over!\n");
-			meida_stop_net_hint();
+			dprintf("play_recordhint_callback : record hint play over!\n");			
 			g_BeCallInfo.state = CALL_STATE_RECORDING;
 		}
 	}
@@ -855,15 +844,15 @@ static void * callout_proc(void *arg)
 		ret = FALSE;
 		dprintf("call out proc : AS_INTER_RECORD_HINT\n");
 		CallGuiNotify(g_CallInfo.state, 0);
-		media_disable_audio_aec();
 		uint8 RingVolume = storage_get_ringvolume();		
 		
 		// 停止播放回铃音
 		media_stop_sound();
 					
 		// 开启网络音频
-		//media_start_net_audio(g_CallInfo.address);
 		media_start_net_audio(g_CallInfo.address);
+		media_disable_audio_send();
+		media_enable_audio_recv();
 		
 		t0 = time(0);
 		g_CallInfo.TimeOut = 0;
@@ -902,7 +891,8 @@ static void * callout_proc(void *arg)
 		dprintf("call out proc : AS_INTER_RECORDING\n");
 		CallGuiNotify(g_CallInfo.state, 0);
 
-		media_disable_audio_aec();
+		media_disable_audio_recv();
+		media_enable_audio_send();
 		media_add_audio_sendaddr(g_CallInfo.address, g_CallInfo.RemoteAudioPort);
 
 		t0 = time(0);		
@@ -944,7 +934,6 @@ static void * callout_proc(void *arg)
 		ret = FALSE;
 		CallGuiNotify(g_CallInfo.state, 0);
 		usleep(20*1000);
-		media_enable_audio_aec();
 		uint8 TalkVolume = storage_get_talkvolume();
 		
 		dprintf("callout proc : AS_INTER_TALK\n");
@@ -953,12 +942,15 @@ static void * callout_proc(void *arg)
 		if (g_PreCallOutState != CALL_STATE_RECORDHINT && g_PreCallOutState != CALL_STATE_RECORDING)
 		{
 			media_stop_sound();					
-			//ret = media_start_net_audio(g_CallInfo.address);
+
+			// 设置通话音量
+			media_set_talk_volume(g_CallInfo.RemoteDeviceType, TalkVolume);
+			media_set_mic_volume(storage_get_micvolume());
 			ret = media_start_net_audio(g_CallInfo.address);
 			if (ret == TRUE)
 			{
 				g_CallInfo.IsStartAudio = TRUE;
-				media_add_audio_sendaddr(g_CallInfo.address, g_CallInfo.RemoteAudioPort);
+				media_add_audio_sendaddr(g_CallInfo.address, g_CallInfo.RemoteAudioPort);				
 			}
 			else
 			{
@@ -971,8 +963,9 @@ static void * callout_proc(void *arg)
 			media_add_audio_sendaddr(g_CallInfo.address, g_CallInfo.RemoteAudioPort);
 		}
 
-		// 设置通话音量
-		media_set_talk_volume(g_CallInfo.RemoteDeviceType, TalkVolume);
+		// add by chenbh 2016-08-22
+		media_enable_audio_send();
+		media_enable_audio_recv();
 		
 		// 开启视频
 		if (g_CallInfo.LocalVideoSendrecv != _NONE)
@@ -1113,6 +1106,7 @@ static void * becall_proc(void *arg)
 	static int32 times = 10;
 	LVEWORD_STATE_TYPE LvdWordState = LVEWORD_TYPE_NONE;	
 
+	g_LylyFlg = FALSE;
 	g_BeCallInfo.IsStartAudio = FALSE;
 	HeartParam.ID = g_BeCallInfo.ID;
 	memcpy(data, (char *)&g_BeCallInfo.ID, 4);
@@ -1265,18 +1259,14 @@ static void * becall_proc(void *arg)
 		if (HintFile != NULL)
 		{
 			dprintf("becall proc : hint file is %s\n", HintFile);
-			meida_start_net_hint(CALL_AUDIO_PT, HintFile, (void *)play_recordhint_callback);
+			meida_start_net_hint(g_BeCallInfo.RemoteDeviceType, HintFile, (void *)play_recordhint_callback);
 			media_add_audio_sendaddr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
+			media_enable_audio_send();
 		}
 		else
 		{
 			dprintf("becall proc : hint file is NULL\n");
 		}
-
-		/*
-		data[4] = CALL_STATE_RECORDHINT;
-		net_direct_send(CMD_CALL_ANSWER, data, 5, g_BeCallInfo.address, g_BeCallInfo.port);
-		memset(data + 4, 0xFF, 4);*/
 
 		t0 = time(0);
 		g_BeCallInfo.TimeOut = 0;
@@ -1292,7 +1282,7 @@ static void * becall_proc(void *arg)
 			set_nethead(g_CallDestNo, PRIRY_DEFAULT);
 			net_direct_send(CMD_CALL_HEART, (char*)&HeartParam, 8, g_BeCallInfo.address, g_BeCallInfo.port);
 
-			if (g_BeCallInfo.TimeOut >= SYS_FAMILY_RECORD_MAXTIME)
+			if (g_BeCallInfo.TimeOut >= RECORDHINT_TIME)
 			{					
 				g_BeCallInfo.state = CALL_STATE_RECORDING;
 			}
@@ -1317,16 +1307,18 @@ static void * becall_proc(void *arg)
 		char lvdFile[50] = {0};		
 		dprintf("becall_proc : AS_INTER_RECORDING \n");
 		BeCallGuiNotify(g_BeCallInfo.state, 0);
-		
+							
+		// 关闭留言提示音接口
+		usleep(50*1000);
+		media_del_audio_send_addr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
+		meida_stop_net_hint();		
+
 		// 获取留影留言路径文件名
 		get_timer(&g_LylyDateTime);
 		get_lylyrecord_path(lvdFile, &g_LylyDateTime);
-			
-		// 关闭留言提示音接口
-		meida_stop_net_hint();		
 		
 		// 开启留言录制接口
-		int32 ret = meida_start_net_leave_rec(g_BeCallInfo.LeaveWordMode, CALL_AUDIO_PT, CALL_VIDEO_PT, lvdFile);
+		int32 ret = meida_start_net_leave_rec(g_BeCallInfo.LeaveWordMode, g_BeCallInfo.address, lvdFile);
 		if (ret == FALSE)
 		{
 			dprintf(" meida_start_net_leave_rec return error \n");
@@ -1336,6 +1328,8 @@ static void * becall_proc(void *arg)
 		}
 		else
 		{		
+			media_enable_audio_recv();
+			
 			data[4] = CALL_STATE_RECORDING; 
 			set_nethead(g_CallDestNo, PRIRY_DEFAULT);
 			net_direct_send(CMD_CALL_ANSWER, data, 5, g_BeCallInfo.address, g_BeCallInfo.port);
@@ -1403,6 +1397,8 @@ static void * becall_proc(void *arg)
 		if (g_PreBeCallState == CALL_STATE_RECORDHINT)
 		{
 			// 关闭留言提示音接口
+			media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
+			usleep(10*1000);
 			meida_stop_net_hint();
 		}
 
@@ -1410,6 +1406,7 @@ static void * becall_proc(void *arg)
 		{
 			// 取消留言录制
 			media_stop_net_leave_rec(FALSE);
+			usleep(20*1000);
 		}
 
 		// 设置通话音量
@@ -1421,9 +1418,7 @@ static void * becall_proc(void *arg)
 		{
 			media_set_talk_volume(g_BeCallInfo.RemoteDeviceType, storage_get_talkvolume());
 		}
-
-		// add by luofl 2011-12-07 增加咪头输入设置
-		//media_set_mic_volume(storage_get_micvolume());
+		media_set_mic_volume(storage_get_micvolume());
 
 		data[4] = CALL_STATE_TALK; 
 		set_nethead(g_CallDestNo, PRIRY_DEFAULT);
@@ -1432,16 +1427,19 @@ static void * becall_proc(void *arg)
 
 		// 开启通话接口
 		hw_switch_digit(); 		// 切换到数字对讲 
-		//media_start_net_audio(g_BeCallInfo.address);
 		if (media_start_net_audio(g_BeCallInfo.address) == TRUE)
 		{
 			g_BeCallInfo.IsStartAudio = TRUE;
-		}
-		media_add_audio_sendaddr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
+			media_add_audio_sendaddr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
 
+			// add by chenbh 2016-08-22
+			media_enable_audio_send();
+			media_enable_audio_recv();
+		}
+		
 		// 已接记录
 		add_inter_record(INCOMING, g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1);
-
+		
 		t0 = time(0);		
 		g_BeCallInfo.TimeOut = 0;
 		g_BeCallInfo.HeartTime = 0;		
@@ -1517,6 +1515,17 @@ static void * becall_proc(void *arg)
 	{
 		media_stop_net_video(g_BeCallInfo.LocalVideoSendrecv);
 	}
+
+	// 未接记录
+	if (g_PreBeCallState != CALL_STATE_TALK)
+	{
+		add_inter_record(MISSED, g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1);
+	}
+	
+	if (g_LylyFlg)
+	{
+		add_inter_lyly(g_BeCallInfo.LeaveWordMode);
+	}
 	
 	sys_set_intercomm_state(FALSE);
 	g_BeCallInfo.state = CALL_STATE_END;
@@ -1527,17 +1536,6 @@ static void * becall_proc(void *arg)
 	memset(&g_NewBeCallInfo, 0, sizeof(g_NewBeCallInfo)); 
 	g_ElevtorAuthorize = FALSE;
 
-	// 存储比较耗时，等界面退出在存储
-	// 未接记录
-	if (g_PreBeCallState != CALL_STATE_TALK)
-	{
-		add_inter_record(MISSED, g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1);
-	}
-	
-	if (g_LylyFlg)
-	{
-		add_inter_lyly();
-	}
 	g_LylyFlg = FALSE;
 	g_PreBeCallState = CALL_STATE_NONE;
 	g_BeCallInfo.LeaveWordMode = LWM_NONE;
@@ -3179,6 +3177,24 @@ void inter_call_ini(PFGuiNotify CallRequestGuiNotify, PFGuiNotify CallGuiNotify,
 }
 
 /*************************************************
+  Function:			inter_video_snap_callback
+  Description:		抓拍回调处理
+  Input: 	
+  Output:			无
+  Return:			成功与否, TRUE/FALSE
+  Others:	
+*************************************************/
+static void inter_video_snap_callback(uint8 state)
+{
+	if (state == TRUE)
+	{
+		storage_add_photo(g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1, g_SnapDateTime);
+	}
+
+	BeCallGuiNotify(CALL_SNAP_CALLBACK, state);
+}
+
+/*************************************************
   Function:			inter_video_snap
   Description:		抓拍
   Input: 	
@@ -3190,9 +3206,8 @@ int32 inter_video_snap(void)
 {
 	uint32 ret;
 	char FileName[50] = {0};
-	DATE_TIME DateTime;	
-	get_timer(&DateTime);
-	get_photo_path(FileName, &DateTime);
+	get_timer(&g_SnapDateTime);
+	get_photo_path(FileName, &g_SnapDateTime);
 	
 	if (g_BeCallInfo.state != CALL_STATE_NONE && g_BeCallInfo.state != CALL_STATE_END)
 	{
@@ -3208,11 +3223,7 @@ int32 inter_video_snap(void)
 				return FALSE;
 					
 		}
-		ret = media_snapshot(FileName, SNAP_PIC_WIDTH, SNAP_PIC_HEIGHT, g_BeCallInfo.RemoteDeviceType);
-		if (ret == TRUE)
-		{
-			storage_add_photo(g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1, DateTime);
-		}	
+		ret = media_snapshot(FileName, inter_video_snap_callback);			
 	}	
 	else
 	{

@@ -298,6 +298,8 @@ typedef enum
 #define CALL_STATE_REQUEST		(CALL_STATE_END+11) 	// 对讲请求
 #define CALL_NEW_CALLING		(CALL_STATE_END+12) 	// 对讲新呼入
 #define CALL_FORMSHOW_CALLING	(CALL_STATE_END+13) 	// 对讲呼入显示界面提醒
+#define CALL_SNAP_CALLBACK		(CALL_STATE_END+14) 	// 抓拍图片回调
+
 
 // 家电类型
 typedef enum

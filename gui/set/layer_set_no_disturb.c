@@ -167,7 +167,7 @@ bool SetEnableNoDisturButtonOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_noface(g_enable_no_disturb, g_no_disturb_time);
 	if (ret)
 	{
-		//init_distrub();
+		start_disturb_timer();
 	}
 	
 	return true;
@@ -266,7 +266,7 @@ bool SetNoDisturbTimeRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_noface(g_enable_no_disturb, g_no_disturb_time);
 	if (ret)
 	{
-		//init_distrub();
+		start_disturb_timer();
 	}
 
 	ShowListTime();

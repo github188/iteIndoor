@@ -19,7 +19,6 @@
 
 #define AREA_AMOUNT 			8
 #define TELNUM_LEN          	15
-#define AF_REC_MAX 	  			20					// 安防事件最大记录数
 
 #if 0
 // 存储在注册表中的数据

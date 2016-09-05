@@ -435,7 +435,7 @@ int IPIsCorrect(char* ip)
 	{
 		return FALSE;
 	}
-
+#if 0
 	int i = 0, num = 0;
 	char *q = NULL;
 	char *p = ip;
@@ -461,7 +461,59 @@ int IPIsCorrect(char* ip)
 		err_log("bad ip addr !!!! \n");
 		return FALSE;
 	}
-	dprintf("111111111111ip = %x\n", sin_addr.s_addr);
+#else
+	uint32 ipaddr[4] = { 0, 0, 0, 0 };
+	char* p[4] = { NULL };
+	uint8 tmp[10] = { 0 };
+	uint8 i = 0;
+	uint8 len = 0;
+	char ip_str[16] = { 0 };
+	uint32 size = 0;
+
+	strcpy(ip_str, ip);
+	len = strlen(ip_str);
+
+	for (i = 0; i < 4; i++)
+	{
+		p[i] = strchr(ip_str + size, '.');
+		if (NULL != p[i])
+		{
+			if (((p[i] - (ip_str + size)) > 3) || (0 == (p[i] - (ip_str + size))) || (3 == i))
+			{
+				return FALSE;
+			}
+			memset(tmp, 0, sizeof(tmp));
+			memcpy(tmp, ip_str + size, (p[i] - (ip_str + size)));
+			ipaddr[i] = atoi(tmp);
+			if (ipaddr[i] > 255)
+			{
+				return FALSE;
+			}
+
+			size = p[i] - ip_str + 1;
+			if (len == size)
+			{
+				return FALSE;
+			}
+		}
+		else
+		{
+			if (i != 3)
+			{
+				return FALSE;
+			}
+		}
+	}
+
+	memset(tmp, 0, sizeof(tmp));
+	memcpy(tmp, ip_str + size, (len - size));
+	ipaddr[3] = atoi(tmp);
+	if (ipaddr[3] > 255)
+	{
+		return FALSE;
+	}
+#endif
+	
 	return TRUE;
 }
 

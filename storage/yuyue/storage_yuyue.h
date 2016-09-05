@@ -22,7 +22,6 @@
 #define SM_COUNT				20					// 情景预约总数
 #define BJ_COUNT				20					// 报警预约总数
 
-#define MAX_YUYUE_NUM			20
 
 // 预约类型
 typedef enum

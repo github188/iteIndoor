@@ -113,12 +113,14 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 			
 		case SYS_MEDIA_FAMILY_RECORD:
 			{
+				#if 0
 				// add by chenbh 删除定时器
 				if (0 != g_RecordTimer)
 				{
 					cancel_aurine_timer(&g_RecordTimer, NULL);
 					g_RecordTimer = 0;
 				}
+				#endif
 				// 停止家人留言录制
 				media_stop_local_record();
 			}
@@ -132,7 +134,7 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 			// 停止播放留影留言
 			if (LYLY_TYPE_VIDEO == g_LylyMode)
 			{
-				media_stop_lyly();	
+				media_stop_video_lyly();	
 			}
 			else
 			{
@@ -196,12 +198,6 @@ static int32 arbi_play_alarm(void)
 			return SYS_MEDIA_ECHO_ERR;
 	}
 
-	// 查看照片中需要关闭
-	if (sys_get_view_picture_state())
-	{
-		media_stop_show_pict();
-	}
-	
 	return SYS_MEDIA_ECHO_OK;
 }
 
@@ -235,12 +231,6 @@ static int32 arbi_oper_intercomm(void)
 			break;
 		default:
 			return SYS_MEDIA_ECHO_ERR;
-	}
-
-	// 查看照片中需要关闭
-	if (sys_get_view_picture_state())
-	{
-		media_stop_show_pict();
 	}
 	
 	return SYS_MEDIA_ECHO_OK;
@@ -278,12 +268,6 @@ static int32 arbi_oper_monitor(void)
 			return SYS_MEDIA_ECHO_ERR;
 	}	
 
-	// 查看照片中需要关闭
-	if (sys_get_view_picture_state())
-	{
-		media_stop_show_pict();
-	}
-	
 	return SYS_MEDIA_ECHO_OK;
 }
 
@@ -424,12 +408,6 @@ static int32 arbi_play_leaveword(void)
 			return SYS_MEDIA_ECHO_ERR;
 	}	
 
-	// 查看照片中需要关闭
-	if (sys_get_view_picture_state())
-	{
-		media_stop_show_pict();
-	}
-	
 	return SYS_MEDIA_ECHO_OK;
 }
 
@@ -527,11 +505,11 @@ static void* on_record_timer(uint32 ID, void * arg)
 	{
 		// 定时器里面处理家电部分 耗时太多导致时间不准 不用自加计算时间
 		g_RecordTimeOut = time(NULL) - g_RecordStartTime;
-		if (SYS_FAMILY_RECORD_MAXTIME <= g_RecordTimeOut)
+		if (RECORD_TIME_MAX <= g_RecordTimeOut)
 		{			
 			if (g_ProgressProc)
 			{
-				g_ProgressProc(SYS_FAMILY_RECORD_MAXTIME, 100, TRUE);
+				g_ProgressProc(RECORD_TIME_MAX, 100, TRUE);
 			}
 			sys_stop_family_record();
 		}
@@ -539,7 +517,7 @@ static void* on_record_timer(uint32 ID, void * arg)
 		{
 			if (g_ProgressProc)
 			{
-				g_ProgressProc(SYS_FAMILY_RECORD_MAXTIME, ((g_RecordTimeOut*100)/SYS_FAMILY_RECORD_MAXTIME), TRUE);
+				g_ProgressProc(RECORD_TIME_MAX, ((g_RecordTimeOut*100)/RECORD_TIME_MAX), TRUE);
 			}
 		}
 	}
@@ -654,13 +632,9 @@ int32 sys_start_play_audio(const SYS_MEDIA_TYPE MediaType, char *FileName, uint8
 	set_curplay_state(MediaType, ProgressProc, StoppedProc, isRepeat);
 
 	// 开始播放音频文件
+	media_set_ring_volume(volume);
 	ret = media_play_sound(FileName, isRepeat, (void*)play_media_callback);
-	if (ret == TRUE)
-	{
-		// 设置音量
-		media_set_ring_volume(volume);
-	}
-	else
+	if (ret == FALSE)	
 	{
 		set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 		pthread_mutex_unlock(&g_MediaLock);
@@ -682,7 +656,6 @@ int32 sys_start_play_audio(const SYS_MEDIA_TYPE MediaType, char *FileName, uint8
   Return:			0-成功 非0-失败
   Others:			
 *************************************************/
-//int32 sys_start_play_leaveword(char *FileName, MediaPlayCallback ProcessProc, MediaStopedCallback StoppedProc)
 int32 sys_start_play_leaveword(char *FileName, LYLY_TYPE type, uint8 volume, MediaPlayCallback ProcessProc, MediaStopedCallback StoppedProc)
 {
 	int32 ret = arbi_play_leaveword();
@@ -692,22 +665,14 @@ int32 sys_start_play_leaveword(char *FileName, LYLY_TYPE type, uint8 volume, Med
 	}
 	set_curplay_state(SYS_MEDIA_LEAVEWORD_PLAY, ProcessProc, StoppedProc, FALSE);
 
+	// add by chenbh 2016-08-18 先做音量设置
+	media_set_ring_volume(volume);
+	
 	// 开始播放留影留言
 	if (LYLY_TYPE_VIDEO == type)
 	{
-		ret = media_play_lyly(FileName, (void*)play_media_callback);
-		if (ret == TRUE)
-		{
-			// modi by luofl 2011-08-26 留影留言播放音量固定为6级
-			#if 0
-			// 获取音量
-			uint32 volume = storage_get_ringvolume();
-			media_set_ring_volume(volume);
-			#else
-			//media_set_ring_volume(6); // 播放avi音频和此操作可能冲突
-			#endif
-		}
-		else
+		ret = media_play_video_lyly(FileName, (void*)play_media_callback);
+		if (ret == FALSE)		
 		{
 			set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 			return SYS_MEDIA_ECHO_ERR;
@@ -715,13 +680,8 @@ int32 sys_start_play_leaveword(char *FileName, LYLY_TYPE type, uint8 volume, Med
 	}
 	else	// 播放纯声音
 	{
-		ret = media_play_sound(FileName, 0, (void*)play_media_callback);
-		if (ret == TRUE)
-		{
-			// 设置音量
-			media_set_ring_volume(volume);
-		}
-		else
+		ret = media_play_sound_lyly(FileName, 0, (void*)play_media_callback);
+		if (ret == FALSE)
 		{
 			set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 			return SYS_MEDIA_ECHO_ERR;
@@ -751,11 +711,11 @@ int32 sys_stop_play_leaveword(void)
 	// 停止播放留影留言
 	if (LYLY_TYPE_VIDEO == g_LylyMode)
 	{
-		media_stop_lyly();	
+		media_stop_video_lyly();	
 	}
 	else
 	{
-		media_stop_sound();
+		media_stop_sound_lyly();
 	}
 	set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 	g_LylyMode = LYLY_TYPE_MAX;
@@ -783,25 +743,29 @@ int32 sys_start_family_record(char *FileName, MediaPlayCallback ProcessProc, Med
 	set_curplay_state(SYS_MEDIA_FAMILY_RECORD, ProcessProc, StoppedProc, FALSE);
 
 	// 开始家人留言录制
-	//ret = media_start_local_record(FileName, SYS_FAMILY_RECORD_MAXTIME, (void*)play_media_callback);
+	//ret = media_start_local_record(FileName, RECORD_TIME_MAX, (void*)play_media_callback);
 	ret = media_start_local_record(FileName);
 	if (ret == FALSE)
 	{
 		set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 		return SYS_MEDIA_ECHO_ERR;
 	}
+	#if 0
 	else	// add by chenbh 增加定时器
 	{
+		// modi by chenbh UI层做定时 逻辑就不处理定时了
+		#if 1	
 		if (0 != g_RecordTimer)
 		{
-			cancel_aurine_timer(&g_RecordTimer, NULL);
-			g_RecordTimer = 0;
+			cancel_aurine_timer(g_RecordTimer, NULL);
 		}
 		g_RecordStartTime = time(NULL);
 		g_RecordTimer = 0;
-		g_RecordTimer = add_aurine_realtimer(1000, on_record_timer, NULL);				
+		g_RecordTimer = add_aurine_realtimer(1000, on_record_timer, NULL);
+		#endif				
 	}
-		
+	#endif
+	
 	return SYS_MEDIA_ECHO_OK;
 }
 
@@ -820,65 +784,21 @@ int32 sys_stop_family_record(void)
 	{
 		return SYS_MEDIA_ECHO_ERR;
 	}
+
+	// modi by chenbh 20160822 定时器在UI层处理
+	#if 0
 	// add by chenbh 删除定时器
 	if (0 != g_RecordTimer)
 	{
 		cancel_aurine_timer(&g_RecordTimer, NULL);
 		g_RecordTimer = 0;
 	}
+	#endif
 	
 	// 停止家人留言录制
 	media_stop_local_record();
 	set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 	return SYS_MEDIA_ECHO_OK;
-}
-
-/*************************************************
-  Function:			sys_start_family_audition
-  Description: 		开始家人留言试听
-  Input: 			
-  	1.ProcessProc	进度回调
-	2.StoppedProc	被强制终止后回调函数  	
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			暂不使用
-*************************************************/
-int32 sys_start_family_audition(MediaPlayCallback ProcessProc, MediaStopedCallback StoppedProc)
-{
-	int32 ret = arbi_oper_family_audition();
-	if (SYS_MEDIA_ECHO_OK != ret)
-	{
-		return ret;
-	}
-	set_curplay_state(SYS_MEDIA_FAMILY_AUDITION, ProcessProc, NULL, FALSE);
-
-	// 开始家人留言试听
-
-	// 音量设置
-	
-	return SYS_MEDIA_ECHO_OK;
-}
-
-/*************************************************
-  Function:			sys_stop_family_audition
-  Description: 		停止家人留言试听
-  Input: 			无
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_stop_family_audition(void)
-{
-	SYS_MEDIA_TYPE MediaType = sys_get_media_state();
-	if (MediaType != SYS_MEDIA_FAMILY_AUDITION)
-	{
-		return SYS_MEDIA_ECHO_ERR;
-	}
-	
-	// 停止家人留言试听
-	
-	set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
-	return SYS_MEDIA_ECHO_OK;	
 }
 
 /*************************************************
@@ -970,35 +890,6 @@ int32 sys_set_monitor_state(uint8 state)
 			return SYS_MEDIA_ECHO_OK;
 		}
 	}
-}
-
-/*************************************************
-  Function:			sys_set_view_picture_state
-  Description: 		设置图片查看状态
-  Input: 			
-  	1.state			TRUE-处于图片查看中 FALSE-不处于图片查看中
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_set_view_picture_state(uint8 state)
-{
-	g_ViewPict_State = state;
-	return state;
-}
-
-/*************************************************
-  Function:			sys_get_view_picture_state
-  Description: 		获取图片查看状态
-  Input: 			
-  	1.state			TRUE-处于图片查看中 FALSE-不处于图片查看中
-  Output:			无
-  Return:			0-成功 非0-失败
-  Others:			
-*************************************************/
-int32 sys_get_view_picture_state(void)
-{
-	return g_ViewPict_State;
 }
 
 /*************************************************

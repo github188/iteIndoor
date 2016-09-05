@@ -4,13 +4,13 @@ File name:  	layer_set_alarm_single_attr.c
 Author:     	zxc
 Version:
 Date: 		2016-07-20
-Description:
+Description: 安防设置单个属性窗口
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 typedef enum										// 属性设置界面选项
 {

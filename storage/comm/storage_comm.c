@@ -336,7 +336,7 @@ ECHO_STORAGE Fwrite_common (char * Filename, void * Data, int DataSize, int Data
 			ret = ECHO_STORAGE_OK;
 		}
 		dprintf("Write Size  %d\n", size);
-		fflush(fPListFile);
+		//fflush(fPListFile);
 		#endif
 		fclose(fPListFile);
 	   	fPListFile = NULL;

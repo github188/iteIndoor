@@ -1,16 +1,16 @@
 ﻿/*************************************************
 Copyright (C), 2006-2016, Aurine
-File name:  	layer_set_netdoor.c
+File name:  	layer_set_netdoor_other.c
 Author:     	zxc
 Version:    	
 Date: 		2016-07-28
-Description:
+Description:  网络门前机其他设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITUSprite* SetNetDoorRemoteMoniterSprite = NULL;
 static ITULayer* SetNetDoorLayer = NULL;

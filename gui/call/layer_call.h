@@ -48,6 +48,7 @@ bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorSearchMSGButtonOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorSearchListState(ITUWidget* widget, char* param);
+bool MonitorSearchLayerOnTimer(ITUWidget* widget, char* param);
 
 // Monitor
 bool MonitorLayerOnEnter(ITUWidget* widget, char* param);
@@ -58,6 +59,9 @@ bool MonitorButtomSoundOnChanged(ITUWidget* widget, char* param);
 bool MonitorLayerOnTimer(ITUWidget* widget, char* param);
 bool MonitorState(ITUWidget* widget, char* param);
 void MonitorWin(DEVICE_TYPE_E DevType, uint8 index);
+
+// video
+int BackgroundDrawVideo(char *background);
 
 #ifdef __cplusplus
 }

@@ -29,6 +29,8 @@ static ITUText* BecallNewCallNoText = NULL;
 static ITUSprite* BeCallHitSprite = NULL;
 static ITUSprite* BeCallSoundSprite = NULL;
 static ITUContainer* BeCallShowButtomContainer = NULL;
+static ITUBackground* BeCallRightSnapGrayBackground = NULL;
+static ITUButton* BeCallRightSnapButton = NULL;
 
 /*****************常量定义***********************/
 static DEVICE_TYPE_E g_DevType;
@@ -42,7 +44,8 @@ static uint8 g_SetVolume = FALSE;					// 是否处于设置音量状态
 static uint8 g_mute = FALSE;						// 是否静音状态
 static uint8 g_volume = 4;
 static uint8 g_volumeticks = 0;
-static uint8 g_MSGTicks = 0;
+static uint8 g_MSGLockTicks = 0;
+static uint8 g_MSGSnapTicks = 0;
 static uint32 g_BeCallLastTick = 0;					// 实时更新的tick
 static uint32 g_ErrHintTxtID = 0;					// 错误提示文字ID
 static uint8 g_ErrHintTicks = 0;					// 错误提示计时
@@ -93,6 +96,8 @@ static void InitRightButton(void)
 		{
 			ituWidgetSetVisible(BeCallRightLockContainer, true);
 			ituWidgetSetVisible(BeCallRightSnapContainer, true);
+			ituWidgetSetVisible(BeCallRightSnapGrayBackground, false);
+			ituWidgetEnable(BeCallRightSnapButton);
 		}
 		else
 		{
@@ -301,24 +306,17 @@ static void SetBeCallLockAndSnap(BeCallButtonEvent event)
 				dprintf("becall lock fail!\n");
 			}
 		}
+		ituWidgetSetVisible(BeCallHitBackground, true);
+		ituSpriteGoto(BeCallHitSprite, BeCallLockMSGIcon);
+		g_MSGLockTicks = 3;
 	}
 	else
 	{
-		//ret = inter_video_snap();
-		if (ret == TRUE)
-		{
-			// 抓拍成功提示
-			dprintf("becall snap ok!\n");
-		}
-		else
-		{
-			// 抓拍失败提示
-			dprintf("becall snap fail!\n");
-		}
+		ituWidgetDisable(BeCallRightSnapButton);
+		ituWidgetSetVisible(BeCallRightSnapGrayBackground, true);
+		inter_video_snap();
+		g_MSGSnapTicks = 3;
 	}
-	ituWidgetSetVisible(BeCallHitBackground, true);
-	ituSpriteGoto(BeCallHitSprite, (event - BeCallLockEvent));
-	g_MSGTicks = 3;
 }
 
 /*************************************************
@@ -406,12 +404,23 @@ bool BeCallLayerOnTimer(ITUWidget* widget, char* param)
 			}
 		}
 		
-		if (g_MSGTicks)
+		if (g_MSGLockTicks)
 		{
-			g_MSGTicks--;
-			if (0 == g_MSGTicks)
+			g_MSGLockTicks--;
+			if (0 == g_MSGLockTicks)
 			{
 				ituWidgetSetVisible(BeCallHitBackground, false);
+			}
+		}
+
+		if (g_MSGSnapTicks)
+		{
+			g_MSGSnapTicks--;
+			if (0 == g_MSGSnapTicks)
+			{
+				ituWidgetSetVisible(BeCallHitBackground, false);
+				ituWidgetSetVisible(BeCallRightSnapGrayBackground, false);
+				ituWidgetEnable(BeCallRightSnapButton);
 			}
 		}
 
@@ -514,6 +523,16 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 			temp = atoi(pcallbak_data->Buf);
 			g_RemainTime = temp >> 16;
 			break;
+
+#if 0
+		case CALL_SNAP_CALLBACK:
+			if (1 == atoi(pcallbak_data->Buf))
+			{
+				ituWidgetSetVisible(BeCallHitBackground, true);
+				ituSpriteGoto(BeCallHitSprite, BeCallSnapMSGIcon);
+			}
+			break;
+#endif
 
 		default:
 			break;
@@ -754,6 +773,8 @@ bool BeCallLayerOnEnter(ITUWidget* widget, char* param)
 		}
 	}
 
+	
+	BackgroundDrawVideo("BeCallBackground");
 	return true;
 }
 
@@ -810,6 +831,12 @@ static void InitBeCallLayer(void)
 		
 		BeCallShowButtomContainer = ituSceneFindWidget(&theScene, "BeCallShowButtomContainer");
 		assert(BeCallShowButtomContainer);
+
+		BeCallRightSnapGrayBackground = ituSceneFindWidget(&theScene, "BeCallRightSnapGrayBackground");
+		assert(BeCallRightSnapGrayBackground);
+
+		BeCallRightSnapButton = ituSceneFindWidget(&theScene, "BeCallRightSnapButton");
+		assert(BeCallRightSnapButton);
 	}
 }
 
@@ -862,7 +889,8 @@ static void SetInterInfo(INTER_OPER_TYPE OperType, DEVICE_TYPE_E DevType, char *
 	g_mute = FALSE;
 	g_volume = storage_get_ringvolume();
 	g_volumeticks = 0;
-	g_MSGTicks = 0;
+	g_MSGLockTicks = 0;
+	g_MSGSnapTicks = 0;
 	g_ErrHintTxtID = 0;
 	g_ErrHintTicks = 0;
 	g_StartCalloutTick = 0;

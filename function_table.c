@@ -74,6 +74,7 @@ ITUActionFunction actionFunctions[] =
 	"MonitorSearchListButtonOnMouseUp", MonitorSearchListButtonOnMouseUp,
 	"MonitorSearchMSGButtonOnMouseUp", MonitorSearchMSGButtonOnMouseUp,
 	"MonitorSearchListState", MonitorSearchListState,
+	"MonitorSearchLayerOnTimer", MonitorSearchLayerOnTimer,
 
 	// Monitor
 	"MonitorLayerOnEnter", MonitorLayerOnEnter,
@@ -295,6 +296,47 @@ ITUActionFunction actionFunctions[] =
 	"SetIpProtocolIPFenjiButtonOnMouseUp", SetIpProtocolIPFenjiButtonOnMouseUp,
 	"SetIpProtocolBingFenjiButtonOnMouseUp", SetIpProtocolBingFenjiButtonOnMouseUp,
 	"SetIpProtocolGetFJFenjiButtonOnMouseUp", SetIpProtocolGetFJFenjiButtonOnMouseUp,
+
+	// Set_Jd
+	"SetJDOnEnter", SetJDOnEnter,
+	"SetJDCoverFlowButtonOnMouseUp", SetJDCoverFlowButtonOnMouseUp,
+	"SetJDListCoverFlowButtonOnMouseUp", SetJDListCoverFlowButtonOnMouseUp,
+	"SetJDFactoryButtonOnMouseUp", SetJDFactoryButtonOnMouseUp,
+
+	//	Set_Jd_Param
+	"SetJDParamOnEnter", SetJDParamOnEnter,
+	"SetJdParamEnableButtonOnMouseUp", SetJdParamEnableButtonOnMouseUp,
+	"SetJdParamDeviceNameButtonOnMouseUp", SetJdParamDeviceNameButtonOnMouseUp,
+	"SetJdParamAddressButtonOnMouseUp", SetJdParamAddressButtonOnMouseUp,
+	"SetJdParamAdjustButtonOnMouseUp", SetJdParamAdjustButtonOnMouseUp,
+	"SetJdParamIRLearnButtonOnMouseUp", SetJdParamIRLearnButtonOnMouseUp,
+	"SetJDDevNameSelectPageButtonOnMouseUp", SetJDDevNameSelectPageButtonOnMouseUp,
+	"SetJdDeviceNameMsgTureButtonOnMouseUp", SetJdDeviceNameMsgTureButtonOnMouseUp,
+	"SetJdDeviceNameMsgFalseButtonOnMouseUp", SetJdDeviceNameMsgFalseButtonOnMouseUp,
+	"SetJdDeviNameAddrMsgButtonOnMouseUp", SetJdDeviNameAddrMsgButtonOnMouseUp,
+
+	//Set_JD_KongTiao_Learn_IR
+	"SetJDLearnIROnEnter", SetJDLearnIROnEnter,
+	"SetJDLearnIRTypeButtonOnMouseUp", SetJDLearnIRTypeButtonOnMouseUp,
+	"SetJDLearnIRTypeMsgListButtonOnMouseUp", SetJDLearnIRTypeMsgListButtonOnMouseUp,
+	"SetJDLearnIRProgramButtonOnMouseUp", SetJDLearnIRProgramButtonOnMouseUp,
+	"SetJDLearnIRProgramMsgTempListButtonOnMouseUp", SetJDLearnIRProgramMsgTempListButtonOnMouseUp,
+	"SetJDLearnIRProgramMsgModeListButtonOnMouseUp", SetJDLearnIRProgramMsgModeListButtonOnMouseUp,
+	"SetJDLearnIRStartButtonOnMouseUp", SetJDLearnIRStartButtonOnMouseUp,
+	"SetJDLearnIRTestButtonOnMouseUp", SetJDLearnIRTestButtonOnMouseUp,
+
+	//Set_Jd_Scence
+	"SetJdScenceOnEnter", SetJdScenceOnEnter,
+	"SetJDSceneListCoverFlowButtonOnMouseUp", SetJDSceneListCoverFlowButtonOnMouseUp,
+
+	//Set_Jd_Scence_Param
+	"SetJdScenceParamOnEnter", SetJdScenceParamOnEnter,
+	"SetJdScenceParamEnableButtonOnMouseUp", SetJdScenceParamEnableButtonOnMouseUp,
+	"SetJdScenceParamNameButtonOnMouseUp", SetJdScenceParamNameButtonOnMouseUp,
+	"SetJdSceneNameMsgTureButtonOnMouseUp", SetJdSceneNameMsgTureButtonOnMouseUp,
+	"SetJdSceneNameMsgFalseButtonOnMouseUp", SetJdSceneNameMsgFalseButtonOnMouseUp,
+	"SetJdSceneNameMsgButtonOnMouseUp", SetJdSceneNameMsgButtonOnMouseUp,
+	"SetJdSceneAddrMsgButtonOnMouseUp", SetJdSceneAddrMsgButtonOnMouseUp,
 
 
     NULL, NULL

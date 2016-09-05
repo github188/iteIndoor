@@ -4,13 +4,13 @@ File name:  	layer_set_sysinfo.c
 Author:     	zxc
 Version:
 Date: 		2016-07-28
-Description:
+Description: 系统信息
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
 typedef enum
 {
@@ -112,15 +112,15 @@ static void init_data()
 			break;
 
 		case SYS_INFO_HOSTIP:
-			change_ip_to_str((storage_get_netparam_bytype(HOST_IPADDR)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(HOST_IPADDR)));
 			break;
 
 		case SYS_INFO_MASK:
-			change_ip_to_str((storage_get_netparam_bytype(HOST_NETMASK)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(HOST_NETMASK)));
 			break;
 
 		case SYS_INFO_GATEWAY:
-			change_ip_to_str((storage_get_netparam_bytype(HOST_GATEWAY)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(HOST_GATEWAY)));
 			break;
 
 		case SYS_INFO_MAC:
@@ -129,7 +129,7 @@ static void init_data()
 			break;
 
 		case SYS_INFO_CENTERIP:
-			change_ip_to_str((storage_get_netparam_bytype(CENTER_IPADDR)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(CENTER_IPADDR)));
 #ifdef _USE_NEW_CENTER_
 			uint32 ret = logic_reg_center_state();
 			memset(tmp2, 0, sizeof(tmp2));
@@ -147,20 +147,20 @@ static void init_data()
 			break;
 
 		case SYS_INFO_MANAGE1:
-			change_ip_to_str((storage_get_netparam_bytype(MANAGER1_IPADDR)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(MANAGER1_IPADDR)));
 			break;
 
 		case SYS_INFO_MANAGE2:
-			change_ip_to_str((storage_get_netparam_bytype(MANAGER2_IPADDR)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(MANAGER2_IPADDR)));
 			break;
 
 		case SYS_INFO_MANAGE3:
-			change_ip_to_str((storage_get_netparam_bytype(MANAGER3_IPADDR)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(MANAGER3_IPADDR)));
 			break;
 
 #ifdef _USE_ELEVATOR_
 		case SYS_INFO_DIANTI:
-			change_ip_to_str((storage_get_netparam_bytype(DIANTI_IPADDR)), tmp);
+			sprintf(tmp, "%s", UlongtoIP(storage_get_netparam_bytype(DIANTI_IPADDR)));
 			break;
 #endif
 
@@ -180,7 +180,7 @@ static void init_data()
 
 #ifdef _IP_MODULE_
 		case SYS_INFO_IP_MODILE:
-			change_ip_to_str((get_ipmodule_addr()), tmp);
+			sprintf(tmp, "%s", UlongtoIP(get_ipmodule_addr()));
 			break;
 #endif
 		}

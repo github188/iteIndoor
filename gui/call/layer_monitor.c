@@ -28,6 +28,8 @@ static ITUText* MonitorCallNoText = NULL;
 static ITUSprite* MonitorHitSprite = NULL;
 static ITUSprite* MonitorSoundSprite = NULL;
 static ITUContainer* MonitorShowButtomContainer = NULL;
+static ITUBackground* MonitorRightSnapGrayBackground = NULL;
+static ITUButton* MonitorRightSnapButton = NULL;
 
 /*****************常量定义***********************/
 static DEVICE_TYPE_E g_DevType;
@@ -39,7 +41,8 @@ static uint8 g_SetVolume = FALSE;					// 是否处于设置音量状态
 static uint8 g_mute = FALSE;						// 是否静音状态
 static uint8 g_volume = 4;
 static uint8 g_volumeticks = 0;
-static uint8 g_MSGTicks = 0;
+static uint8 g_MSGLockTicks = 0;
+static uint8 g_MSGSnapTicks = 0;
 static uint32 g_MonitorLastTick = 0;					// 实时更新的tick
 static uint32 g_ErrHintTxtID = 0;					// 错误提示文字ID
 static uint8 g_ErrHintTicks = 0;					// 错误提示计时
@@ -85,6 +88,8 @@ static void InitRightButton(void)
 	ituWidgetSetVisible(MonitorRightHandUpContainer, false);
 	ituWidgetSetVisible(MonitorRightLockContainer, true);
 	ituWidgetSetVisible(MonitorRightSnapContainer, true);
+	ituWidgetSetVisible(MonitorRightSnapGrayBackground, false);
+	ituWidgetEnable(MonitorRightSnapButton);
 }
 
 /*************************************************
@@ -104,7 +109,8 @@ static void SetMonitorInfo(void)
 	g_mute = FALSE;
 	g_volume = storage_get_ringvolume();
 	g_volumeticks = 0;
-	g_MSGTicks = 0;
+	g_MSGLockTicks = 0;
+	g_MSGSnapTicks = 0;
 	g_ErrHintTxtID = 0;
 	g_ErrHintTicks = 0;
 }
@@ -269,24 +275,17 @@ static void SetMonitorLockAndSnap(MonitorButtonEvent event)
 				dprintf("monitor lock fail!\n");
 			}
 		}
+		ituWidgetSetVisible(MonitorHitBackground, true);
+		ituSpriteGoto(MonitorHitSprite, MonitorLockMSGIcon);
+		g_MSGLockTicks = 3;
 	}
 	else
 	{
-		//ret = monitor_video_snap();
-		if (ret == TRUE)
-		{
-			// 抓拍成功提示
-			dprintf("monitor snap ok!\n");
-		}
-		else
-		{
-			// 抓拍失败提示
-			dprintf("monitor snap fail!\n");
-		}
+		ituWidgetDisable(MonitorRightSnapButton);
+		ituWidgetSetVisible(MonitorRightSnapGrayBackground, true);
+		monitor_video_snap();
+		g_MSGSnapTicks = 3;
 	}
-	ituWidgetSetVisible(MonitorHitBackground, true);
-	ituSpriteGoto(MonitorHitSprite, (event - MonitorLockEvent));
-	g_MSGTicks = 3;
 }
 
 /*************************************************
@@ -345,12 +344,22 @@ bool MonitorLayerOnTimer(ITUWidget* widget, char* param)
 			}
 		}
 		
-		if (g_MSGTicks)
+		if (g_MSGLockTicks)
 		{
-			g_MSGTicks--;
-			if (0 == g_MSGTicks)
+			g_MSGLockTicks--;
+			if (0 == g_MSGLockTicks)
 			{
 				ituWidgetSetVisible(MonitorHitBackground, false);
+			}
+		}
+		if (g_MSGSnapTicks)
+		{
+			g_MSGSnapTicks--;
+			if (0 == g_MSGSnapTicks)
+			{
+				ituWidgetSetVisible(MonitorHitBackground, false);
+				ituWidgetSetVisible(MonitorRightSnapGrayBackground, false);
+				ituWidgetEnable(MonitorRightSnapButton);
 			}
 		}
 
@@ -484,6 +493,16 @@ bool MonitorState(ITUWidget* widget, char* param)
 			temp = atoi(pmonitorbak_data->Buf);
 			g_RemainTime = temp;
 			break;
+#if 0
+		case MONITOR_SNAP:
+			if (1 == atoi(pmonitorbak_data->Buf))
+			{
+				ituWidgetSetVisible(MonitorHitBackground, true);
+				ituSpriteGoto(MonitorHitSprite, MonitorSnapMSGIcon);
+			}
+			break;
+#endif
+
 
 		default:
 			break;
@@ -681,6 +700,12 @@ static void InitMonitorLayer(void)
 		
 		MonitorShowButtomContainer = ituSceneFindWidget(&theScene, "MonitorShowButtomContainer");
 		assert(MonitorShowButtomContainer);
+
+		MonitorRightSnapGrayBackground = ituSceneFindWidget(&theScene, "MonitorRightSnapGrayBackground");
+		assert(MonitorRightSnapGrayBackground);
+
+		MonitorRightSnapButton = ituSceneFindWidget(&theScene, "MonitorRightSnapButton");
+		assert(MonitorRightSnapButton);
 	}
 }
 

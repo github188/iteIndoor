@@ -4,13 +4,13 @@ File name:  	layer_set_ip_protocol.c
 Author:     	zxc
 Version:
 Date: 		2016-07-28
-Description:
+Description: 分机IP协议转换器设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
 #define MAX_SHOW_FENJI_NUM			9					// UI最大支持显示几个分机
 
@@ -62,7 +62,7 @@ static void show_win_bind()
 	ituTextSetString(SetIpProtocolBindNumFenji2Text, tmp);
 
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ip, tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ip));
 	ituTextSetString(SetIpProtocolIPFenji2Text, tmp);
 }
 
@@ -89,7 +89,7 @@ static void show_win_fenji()
 	{
 		extenNo = g_IpadList.ipadData[j].devno;
 		memset(pExtIp, 0, sizeof(pExtIp));
-		change_ip_to_str(g_IpadList.ipadData[j].ipAddr, pExtIp);
+		sprintf(pExtIp, "%s", UlongtoIP(g_IpadList.ipadData[j].ipAddr));
 		if (g_IpadList.ipadData[j].state == 1)
 		{
 			cOnlineID = get_str(SID_Set_Online);
@@ -141,11 +141,10 @@ Others:
 *************************************************/
 static void KeyBordGotoSetIpProtocol()
 {
-	char tmp[50];
+	//char tmp[50];
 	uint32 ip_data = 0;
 
 	char* text_data = ituTextGetString(SetNumKeyBordTextBox);
-	dprintf("%s\n", text_data);
 	if (0 == buttonflag)
 	{
 		g_extcode = atoi(text_data);
@@ -153,19 +152,18 @@ static void KeyBordGotoSetIpProtocol()
 	}
 	else
 	{
-		uint8 ret = check_ip_to_true(text_data);
+		int ret = IPIsCorrect(text_data);
 		if (FALSE == ret)
 		{
 			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
 		}
 		else
 		{
-			ip_data = ipaddr_addr(text_data);
-			g_ip = ntohl(ip_data);
+			g_ip = IPtoUlong(text_data);
 
-			memset(tmp, 0, sizeof(tmp));
-			change_ip_to_str(g_ip, tmp);
-			ituTextSetString(SetIpProtocolIPFenji2Text, tmp);
+			//memset(tmp, 0, sizeof(tmp));
+			//sprintf(tmp, "%s", UlongtoIP(g_ip));
+			ituTextSetString(SetIpProtocolIPFenji2Text, text_data);
 		}
 	}		
 }
@@ -279,7 +277,7 @@ bool SetIpProtocolIPFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 	buttonflag = 1;
 
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ip, tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ip));
 	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
 
 	return true;

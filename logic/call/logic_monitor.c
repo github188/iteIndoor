@@ -14,11 +14,6 @@
 *************************************************/
 #include "logic_include.h"
 
-
-#define MONITOR_TIME_MAX		90					// 监视最长时间
-#define	TALK_TIME_MAX			90					// 通话最长时间
-#define	HEART_TIMEOUT			5					// 心跳超时
-
 typedef struct
 {
 	int32 index;									// 监视设备ID
@@ -41,6 +36,7 @@ static MONITOR_INFO g_MonitorInfo;
 static MONITOR_INFO g_MonitorlistInfo;
 static MONITOR_STATE_E g_PreMonitorState = MONITOR_END;   // 改变前的状态
 static DEVICE_NO	g_MoniDestDeviceNo;					  // 监视目标设备编号
+static DATE_TIME g_SnapDateTime = {0};
 
 char g_buf[3];
 char g_data[66];
@@ -288,7 +284,7 @@ LabChange:
 		g_PreMonitorState = MONITOR_TALKING;
 		GuiNotify(g_MonitorInfo.state, 0);
 		
-		g_MonitorInfo.TimeMax = TALK_TIME_MAX;		
+		g_MonitorInfo.TimeMax = MONITOR_TALK_TIME_MAX;		
 		g_MonitorInfo.TimeOut = 0;
 		g_MonitorInfo.HeartTime = 0;
 		
@@ -530,13 +526,16 @@ LabChange:
 	if (MONITOR_TALKING == g_MonitorInfo.state)
 	{
 		hw_switch_digit(); 				// 切换到数字对讲 				
+		media_set_talk_volume(g_MonitorInfo.DevType, storage_get_talkvolume());
+		media_set_mic_volume(storage_get_micvolume());
 		if (media_start_net_audio(g_MonitorInfo.address))
 		{						
 			dprintf("media_start_net_audio return ok\n ");
-			g_Audio_Start = 1;
-			uint8 volume = storage_get_talkvolume();
-			media_set_talk_volume(g_MonitorInfo.DevType, volume);			
+			g_Audio_Start = 1;			
 			media_add_audio_sendaddr(g_MonitorInfo.address, g_MonitorInfo.RemoteAudioPort);
+			// add by chenbh 2016-08-22
+			media_enable_audio_send();
+			media_enable_audio_recv();
 		}	
 		else
 		{						
@@ -552,7 +551,7 @@ LabChange:
 		GuiNotify(g_MonitorInfo.state, 0);
 		usleep(20*1000);
 		g_PreMonitorState = MONITOR_TALKING;
-		g_MonitorInfo.TimeMax = TALK_TIME_MAX;		
+		g_MonitorInfo.TimeMax = MONITOR_TALK_TIME_MAX;		
 		g_MonitorInfo.TimeOut = 0;
 		g_MonitorInfo.HeartTime = 0;
 		
@@ -1210,6 +1209,36 @@ int32 monitor_stop(void)
 	return TRUE;
 }
 
+
+/*************************************************
+  Function:			monitor_video_snap_callback
+  Description:		抓拍回调处理
+  Input: 	
+  Output:			无
+  Return:			成功与否, TRUE/FALSE
+  Others:	
+*************************************************/
+static void monitor_video_snap_callback(uint8 state)
+{
+	if (state == TRUE)
+	{
+		char DevStr[20] = {0};
+		if (g_MonitorInfo.DevType == DEVICE_TYPE_STAIR)
+		{
+			char StairNo[5] = {0};
+			sprintf(StairNo, "%d", g_MonitorInfo.index);
+			get_stair_fullno(DevStr, StairNo[0]);
+		}
+		else
+		{
+			sprintf(DevStr, "%d", g_MonitorInfo.index);
+		}	
+		storage_add_photo(g_MonitorInfo.DevType, DevStr, g_SnapDateTime);
+	}
+
+	GuiNotify(MONITOR_SNAP, state);
+}
+
 /*************************************************
   Function:			monitor_video_snap
   Description:		抓拍
@@ -1222,29 +1251,13 @@ int32 monitor_video_snap(void)
 {
 	uint32 ret;
 	char FileName[50] = {0};
-	DATE_TIME DateTime;
 	
 	dprintf("[%d]\n", __LINE__);	
-	get_timer(&DateTime);
-	get_photo_path(FileName, &DateTime);
+	get_timer(&g_SnapDateTime);
+	get_photo_path(FileName, &g_SnapDateTime);
 	if (g_MonitorInfo.state == MONITOR_MONITORING || g_MonitorInfo.state == MONITOR_TALKING)
 	{
-		ret = media_snapshot(FileName, SNAP_PIC_WIDTH, SNAP_PIC_HEIGHT, g_MonitorInfo.DevType);
-		if (ret == TRUE)
-		{
-			char DevStr[20] = {0};
-			if (g_MonitorInfo.DevType == DEVICE_TYPE_STAIR)
-			{
-				char StairNo[5] = {0};
-				sprintf(StairNo, "%d", g_MonitorInfo.index);
-				get_stair_fullno(DevStr, StairNo[0]);
-			}
-			else
-			{
-				sprintf(DevStr, "%d", g_MonitorInfo.index);
-			}	
-			storage_add_photo(g_MonitorInfo.DevType, DevStr, DateTime);
-		}	
+		ret = media_snapshot(FileName, monitor_video_snap_callback);			
 	}	
 	else
 	{
@@ -1511,7 +1524,7 @@ void monitor_responsion(const PRECIVE_PACKET recPacket, const PSEND_PACKET SendP
 							//media_set_talk_volume(volume);
 							media_set_talk_volume(g_MonitorInfo.DevType, volume);
 							// add by luofl 2011-12-07 增加咪头输入设置
-							//media_set_mic_volume(storage_get_micvolume());
+							media_set_mic_volume(storage_get_micvolume());
 							g_MonitorInfo.RemoteAudioPort = *((uint16 *)(recPacket->data + NET_HEAD_SIZE));
 							media_add_audio_sendaddr(g_MonitorInfo.address, g_MonitorInfo.RemoteAudioPort);
 						}

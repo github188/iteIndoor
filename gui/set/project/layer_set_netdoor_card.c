@@ -4,19 +4,18 @@ File name:  	layer_set_netdoor_card.c
 Author:     	zxc
 Version:    	
 Date: 		2016-07-27
-Description:
+Description:	网络门前机卡管理
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITULayer* SetNetDoorLayer = NULL;
 static ITURadioBox* MsgFailHintSuccess1RadioBox = NULL;
 
 static uint8 g_OperType = 0;						// 1 增加卡 2 删除卡
-
 
 /*************************************************
 Function:			OnNetDoorDeal

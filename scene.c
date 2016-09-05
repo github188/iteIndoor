@@ -269,6 +269,11 @@ void callin_state_callbak(uint32 param1, uint32 param2)
 			sprintf(callbak_data.Buf, "%d", param2);
 			break;
 
+		case CALL_SNAP_CALLBACK:
+			callbak_data.DataLen = 1;
+			sprintf(callbak_data.Buf, "%d", param2);
+			break;
+			
 		default:
 			return;
 			
@@ -355,7 +360,12 @@ void monitor_state_callbak(uint32 param1, uint32 param2)
 			monitorbak_data.DataLen = sizeof(uint32);
 			sprintf(monitorbak_data.Buf, "%d", param2);
 			break;
-								
+
+		case MONITOR_SNAP:
+			monitorbak_data.DataLen = 1;
+			sprintf(monitorbak_data.Buf, "%d", param2);
+			break;
+			
 		default:
 			return;
 	}

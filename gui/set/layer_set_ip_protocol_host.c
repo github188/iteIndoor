@@ -4,13 +4,13 @@ File name:  	layer_set_ip_protocol.c
 Author:     	zxc
 Version:
 Date: 		2016-07-28
-Description:
+Description: 主机IP协议转换器设置
 History:
 1. Date:
 Author:
 Modification:
 *************************************************/
-#include "gui_include.h"
+#include "layer_set.h"
 
 #define MAX_SHOW_FENJI_NUM			10					// UI最大支持显示几个分机
 
@@ -58,13 +58,13 @@ static void show_win_bind()
 		text_id = SID_Set_Bounded;
 		g_maincode = get_ipmodule_bindcode();
 		sprintf(bind_tmp, "%d", g_maincode);
-		change_ip_to_str((get_ipmodule_addr()), ip_tmp);
+		sprintf(ip_tmp, "%s", UlongtoIP(get_ipmodule_addr()));
 	}
 	else
 	{
 		text_id = SID_Set_Unbounded;
 		sprintf(bind_tmp, "%d", g_maincode);
-		change_ip_to_str(g_ip, ip_tmp);
+		sprintf(ip_tmp, "%s", UlongtoIP(g_ip));
 	}
 	
 	ituTextSetString(SetIpProtocolBinding2Text, get_str(text_id));
@@ -95,7 +95,7 @@ static void show_win_fenji()
 	{
 		extenNo = g_IpadList.ipadData[j].devno;
 		memset(pExtIp, 0, sizeof(pExtIp));
-		change_ip_to_str(g_IpadList.ipadData[j].ipAddr, pExtIp);
+		sprintf(pExtIp, "%s", UlongtoIP(g_IpadList.ipadData[j].ipAddr));
 		if (g_IpadList.ipadData[j].state == 1)
 		{
 			cOnlineID = get_str(SID_Set_Online);

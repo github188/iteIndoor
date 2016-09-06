@@ -43,6 +43,7 @@
 
 #define	MK_CALL_DOWN		0x01
 
+#if 0
 typedef enum
 {
 	LED_ALARM = 0x00,			// °²·À¼ü±³¹âµÆ
@@ -59,6 +60,7 @@ typedef enum
 	LED_OFF,					// Ãð
 	LED_FLASH					// ÉÁ
 }LED_STATE;
+#endif
 
 typedef	void (*IO_HOOK)(uint8 event);
 

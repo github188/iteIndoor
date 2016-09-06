@@ -95,6 +95,33 @@ int32 Uart0_send(char * data, int32 datalen)
 }
 
 /*************************************************
+  Function:		Uart0_send
+  Description: 	串口0发送
+  Input: 
+	1.			待发送数据
+	2.			数据长度
+  Output:		无
+  Return:		-1: 失败 成功: 实际发送长度
+  Others:
+*************************************************/
+int32 Rs485_0_send(char * data, int32 datalen)
+{
+	int32 len = 0;
+
+	len = write(ITP_DEVICE_RS485_0, data, datalen);		// 实际写入的长度
+	
+	if (len == datalen)
+	{
+		usleep(5);									// 等待FIFO中的数据发送完毕
+		return(len);
+	}
+	else
+	{
+		return(-1);
+	}
+}
+
+/*************************************************
   Function:		alarm_recv
   Description: 	串口1接收
   Input: 
@@ -131,17 +158,16 @@ static int32 jd_recv(char * data)
 	uint8 len = 0;
 	char getstr[256];
 	
-	len = read(UART_DEVICE, data, 3);		
+	len = read(ITP_DEVICE_RS485_0, data, 3);
 	if (data[0] == 0xAA && data[1] == 0x02 && data[2] < 50)
 	{
 		for (i = 0; i < data[2]; i++)
 		{
-			read(UART_DEVICE, data+3+i, 1);
+			read(ITP_DEVICE_RS485_0, data+3+i, 1);
 			usleep(200);
 		}
 		len = data[2] + 3;
 	}
-
 	return len;
 }
 
@@ -374,8 +400,11 @@ int8 send_485_pack(char * data, uint8 len)
 		sum += *(data+i);
 	}
 	* (data + len-1) = 0 - sum;
-	ret = Uart0_send(data, len);
+	 //ret = Uart0_send(data, len);
+	 ret = Rs485_0_send(data, len);	// modi by linp 2016-08-17 置485处于接收状态
 
+	// 发送控制延时时间放到Rs485write里面做 modi by linp 2016-08-17
+	#if 0
 	if ((JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY)))
 	{
 		usleep(20*1000);
@@ -384,6 +413,8 @@ int8 send_485_pack(char * data, uint8 len)
 	{
 		usleep(30*1000);
 	}
+	#endif 
+	
 	hw_485_recv();
 	
 	return ret;
@@ -473,7 +504,7 @@ static void * jd_receive_thread(void* data)
 	uint8 len = 0;
 	static char buf[51] = {""};
 
-	dprintf("Ready receive data form com1!!!\n");
+	printf("Ready receive data form com1!!!\n");
 	
 	for (;;)
 	{
@@ -493,7 +524,7 @@ static void * jd_receive_thread(void* data)
 		
 		if (JdCallBackFunc)
 		{
-			JdCallBackFunc(buf);
+			//JdCallBackFunc(buf);
 		}
 	}
 }
@@ -517,16 +548,26 @@ static void* test_receive_thread(void* data)
     {
        memset(getstr, 0, 256);
 	   memset(sendtr, 0, 256);
-	   len = read(UART_DEVICE,getstr,256);
+	   	len = read(ITP_DEVICE_RS485_0,getstr,256);
 
 	   if(len)
 	   {
-		   printf("uart read len[%d]: %s\n",len, getstr);
-		   sprintf(sendtr,"%s%s\n","uart0 read : ", getstr);		   
-           write(UART_DEVICE, sendtr, 256);
-		   len = 0;
-	   }
+	  		for (i=0;i<len;i++)
+		   	printf("uart read getstr[%d]: %02x\n",i, getstr[i]);
 
+			if (getstr[1] == 0x02)
+			{
+				hw_lcd_power_on();
+				hw_lcd_back_on();
+			}
+			else
+			{
+				hw_lcd_power_off();
+				hw_lcd_back_off();
+			}
+           		// write(UART_DEVICE, sendtr, 256);
+		   	len = 0;
+	   	}
 	   sleep(1);
 	}
 }
@@ -582,8 +623,8 @@ int hw_start_com_dog(void)
 		InitFeetDogFlag = 1;
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-		pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
-		pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+		//pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+		//pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 		//pthread_attr_setstacksize(&attr, 48*1024);
 		pthread_create(&task, &attr, feetdog_thread, NULL);
 
@@ -657,8 +698,8 @@ int32 init_jd_callbackt(JdCallBack func)
 		pthread_attr_init(&attr);
 		attr.stacksize = UART_STACK_SIZE;
 		pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
-		//pthread_create(&task, &attr, jd_receive_thread, NULL);	
-		//pthread_create(&task, &attr, test_receive_thread, NULL);	
+		pthread_create(&task, &attr, jd_receive_thread, NULL);	
+		// pthread_create(&task, &attr, test_receive_thread, NULL);	
 	}
 #endif
 	return 0;

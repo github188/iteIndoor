@@ -63,7 +63,7 @@ void logic_init(void)
 	
 	#ifdef _JD_MODE_
 	jd_logic_init();								// 如有家电模块可以不启动看门狗,家电轮巡命令可以喂狗	
-	#else	
+	//#else	
 	hw_start_com_dog();								// 启动串口看门狗
 	#endif
 	

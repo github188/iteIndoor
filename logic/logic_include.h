@@ -25,6 +25,7 @@
 #include "ite/itp.h"
 #include "SDL/SDL.h"
 #include "ite/itv.h"
+#include "gb2312.h"
 
 #include "timer/logic_timer.h"
 #include "timer/logic_time.h"

@@ -23,7 +23,6 @@ Modification:
 #define DEFAULT_PLAYVOL			5
 
 
-
 typedef enum
 {
 	RECORDER_STATUS_RECORDING,

@@ -83,6 +83,8 @@ void recorderLayerInit()
 		setRecordRadioBoxStatus(i, false);
 	}
 
+	gCurrentRecordIndex = MAX_RECORDER_NUM;		//初始化时候当前无选中赋值一个大于个数的值就行
+
 	setRecorderRecordCreateTime("");
 
 	setRecorderDuration("00:00");
@@ -615,6 +617,11 @@ bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	{
 	case RECORDER_MSG_BTN_COMFIRM:
 		//TODO:删除本条留言信息，刷新存储，刷新界面！！！！！！
+		if (gCurrentRecordIndex < MAX_RECORDER_NUM)
+		{
+			storage_del_jrlyrecord(gCurrentRecordIndex);
+			recorderLayerInit();
+		}
 		break;
 
 	default:

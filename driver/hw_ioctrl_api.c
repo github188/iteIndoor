@@ -516,7 +516,7 @@ void hw_key_led_on(void)
 		return ;
 	}
 	
-	//ioctl(Fd, KEY_LED, 0);
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_KEY_LED_ON, NULL);
 }
 
 /*************************************************
@@ -534,7 +534,7 @@ void hw_key_led_off(void)
 		return ;
 	}
 	
-	//ioctl(Fd, KEY_LED, 1);
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_KEY_LED_OFF, NULL);
 }
 
 /*************************************************
@@ -552,7 +552,7 @@ void hw_key_led_flash(void)
 		return ;
 	}
 	
-	//ioctl(Fd, KEY_LED, 2);
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_KEY_LED_FLASH, NULL);
 }
 
 /*************************************************
@@ -659,7 +659,7 @@ int32 hw_lcd_power_on(void)
 		return -1;
 	}
 	//ioctl(Fd, LCD_PWR, 0);
-
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_LCD_POWER_ON, NULL);
 	return 0;
 }
 
@@ -678,7 +678,7 @@ int32 hw_lcd_power_off(void)
 		return -1;
 	}
 	//ioctl(Fd, LCD_PWR, 1);
-
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_LCD_POWER_OFF, NULL);
 	return 0;
 }
 
@@ -697,7 +697,7 @@ int32 hw_lcd_back_on(void)
 		return -1;
 	}
 	//ioctl(Fd, LCD_BACK, 0);
-
+	ioctl(ITP_DEVICE_BACKLIGHT, ITP_IOCTL_ON, NULL);
 	return 0;
 }
 
@@ -716,7 +716,7 @@ int32 hw_lcd_back_off(void)
 		return -1;
 	}
 	//ioctl(Fd, LCD_BACK, 1);
-
+	ioctl(ITP_DEVICE_BACKLIGHT, ITP_IOCTL_OFF, NULL);
 	return 0;
 }
 
@@ -736,7 +736,7 @@ int32 hw_speak_on(void)
 		return -1;
 	}
 	//ioctl(Fd, SPK_CTRL, 0);
-
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_386SPK_ON, NULL);
 	return 0;
 }
 
@@ -756,7 +756,7 @@ int32 hw_speak_off(void)
 		return -1;
 	}
 	//ioctl(Fd, SPK_CTRL, 1);
-
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_386SPK_OFF, NULL);
 	return 0;
 }
 
@@ -776,7 +776,7 @@ int32 hw_key_beep(void)
 	}
 	//ioctl(Fd, KEY_BEEP, 0);
 	//dprintf("key beep!\n");
-	
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_BEEP_PLAY, NULL);
 	return 0;
 }
 
@@ -880,15 +880,16 @@ int32 hw_get_zone_status(void)
 *************************************************/
 static void * check_ioctrl(void* data)
 {
-	int32 ret;
+	int32_t ret;
 	
 	while (1)
 	{
-		ret = read(Fd, &ReadBuf, sizeof(ReadBuf));
+		ret = read(ITP_DEVICE_IOCTRL, &ReadBuf, sizeof(ReadBuf));
 		if (ret == sizeof(ReadBuf))
 		{
 			if (IoEventFunc)
 			{
+				
 				#ifdef _DOOR_PHONE_					// 模拟门前机呼叫处理,一直按住驱动那边只发一次
 				if (GetBit(ReadBuf, 0))
 				{
@@ -901,9 +902,10 @@ static void * check_ioctrl(void* data)
 				#elif defined _NET_DOOR_			// 网络门前机输入事件检测
 				IoEventFunc(ReadBuf&0x0F);
 				#endif
+				
 			}
 		}
-		//sleep(1);
+		// sleep(1);
 	}
 }
 
@@ -918,30 +920,30 @@ static void * check_ioctrl(void* data)
 *************************************************/
 int32 init_ioctrl_callback(IO_HOOK func)
 {
-#if 0
+
 	pthread_t th;
 	pthread_attr_t new_attr;
 
 	if (!InitFlag)
 	{
-		Fd = open("/dev/w55fa92_ioctrl", O_RDONLY);
-		if (Fd == -1)
-		{
-			perror("IOCTRL");
-			return -1;
-		}
+		// modi by linp 2016-08-17
+		//Fd = open("/dev/w55fa92_ioctrl", O_RDONLY);
+		//if (Fd == -1)
+		//{
+		//	perror("IOCTRL");
+		//	return -1;
+		//}
 		InitFlag = 1;
 	}
-
 	if (func != NULL)
 	{
+		printf("pthread_create check_ioctrl!!!\n");
 		IoEventFunc = func;
 		pthread_attr_init (&new_attr);
 		pthread_attr_setdetachstate (&new_attr, PTHREAD_CREATE_DETACHED);
 		//pthread_attr_setstacksize (&new_attr, 48*1024);
 		pthread_create(&th, &new_attr, check_ioctrl, NULL);
 	}
-#endif
 	return 0;
 }
 

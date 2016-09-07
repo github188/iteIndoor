@@ -54,6 +54,7 @@ typedef enum
 
 
 bool picManagerLayerOnEnter(ITUWidget* widget, char* param);
+bool picManagerLayerOnLeave(ITUWidget* widget, char* param);
 bool picManagerBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param);
 bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param);

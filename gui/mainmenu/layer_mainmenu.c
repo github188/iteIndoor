@@ -138,6 +138,12 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 }
 
 
+bool mainLayerOnLeave(ITUWidget* widget, char* param)
+{
+	return true;
+}
+
+
 bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 {
 	char buf[10] = { 0 };

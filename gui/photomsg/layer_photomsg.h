@@ -55,6 +55,7 @@ typedef enum
 
 
 bool photoMsgLayerOnEnter(ITUWidget* widget, char* param);
+bool photoMsgLayerOnLeave(ITUWidget* widget, char* param);
 bool photoMsgListOnClicked(ITUWidget* widget, char* param);
 bool photoMsgBtnOnClicked(ITUWidget* widget, char* param);
 bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param);

@@ -53,6 +53,7 @@ typedef enum
 
 
 bool informationLayerOnEnter(ITUWidget* widget, char* param);
+bool informationLayerOnLeave(ITUWidget* widget, char* param);
 bool informationMSGListClicked(ITUWidget* widget, char* param);
 bool informationBtnOnClicked(ITUWidget* widget, char* param);
 bool informationMsgBoxBtnOnClicked(ITUWidget* widget, char* param);

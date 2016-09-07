@@ -46,6 +46,13 @@ bool picManagerLayerOnEnter(ITUWidget* widget, char* param)
 }
 
 
+bool picManagerLayerOnLeave(ITUWidget* widget, char* param)
+{
+
+	return true;
+}
+
+
 void picManagerPageInit(PICMANAGER_PAGE_e pageId)
 {
 	if (!picManagerEmptyContainer)

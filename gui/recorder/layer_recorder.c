@@ -42,6 +42,7 @@ static uint8_t		gRecordNumCount;			//用来记录录音数量
 static uint8_t		gCurrentRecordIndex;		//用来记录当前选中的录音
 static uint8_t		gNewRecordIndex;			//用来记录新录音的存放位置
 static RECORDER_STATUS_e	gRecorderStatus;	//用来保存界面当前状态（播放、录音、暂停、停止）
+static PJRLYLIST_INFO gRecorderList = NULL;
 
 
 bool recorderLayerOnEnter(ITUWidget* widget, char* param)
@@ -60,9 +61,23 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 	return true;
 }
 
+
+bool recorderLayerOnLeave(ITUWidget* widget, char* param)
+{
+	
+	return true;
+}
+
+
 void recorderLayerInit()
 {
 	uint8_t i = 0;
+
+	if (gRecorderList != NULL)
+	{
+		free(gRecorderList);
+		gRecorderList = NULL;
+	}
 
 	if (!recorderTipsTransparencyBackground)
 	{
@@ -70,16 +85,27 @@ void recorderLayerInit()
 		assert(recorderTipsTransparencyBackground);
 	}
 
+	storage_get_jrlyrecord(&gRecorderList);
+	gRecordNumCount = gRecorderList->Count;
+
 	for (i = 0; i < MAX_RECORDER_NUM; i++)
 	{
-		//TODO:读取存储设置界面记录内容！！并设置第一个非空录音为默认选项
-		gRecordNumCount = 3;
-
-		//if (i == 1)
-		//	setRecorderRecordStatus(i, RECORDER_RECORD_NULL);
-		//else
-			setRecorderRecordStatus(i, RECORDER_RECORD_UNREAD);
-
+		//TODO:读取存储设置界面记录内容！！并设置无默认选项（删除完也是无默认选项）
+		if (i < gRecordNumCount)
+		{
+			if ((gRecorderList->JrlyInfo[i]).UnRead)
+			{
+				setRecorderRecordStatus(i, RECORDER_RECORD_UNREAD);
+			}
+			else
+			{
+				setRecorderRecordStatus(i, RECORDER_RECORD_READ);
+			}
+		}
+		else
+		{
+			setRecorderRecordStatus(i, RECORDER_RECORD_NULL);
+		}
 		setRecordRadioBoxStatus(i, false);
 	}
 
@@ -433,7 +459,7 @@ void recorderRecordingBtnOnClicked()
 {
 	uint8_t i = 0;
 	char tmpFileName[50] = { 0 };
-	PDATE_TIME tmpTime;
+	DATE_TIME tmpTime;
 	bool recordFlag = false;
 
 	for (i = 0; i < MAX_RECORDER_NUM; i++)
@@ -451,11 +477,10 @@ void recorderRecordingBtnOnClicked()
 		gRecorderLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
 		//TODO:开始录音存储
-		get_timer(tmpTime);
+		get_timer(&tmpTime);
 		memset(tmpFileName, 0, sizeof(tmpFileName));
-		sprintf(tmpFileName, "%s/%04d%02d%02d%02d%02d%02d.WAV", JRLY_DIR_PATH, tmpTime->year, tmpTime->month, tmpTime->day, tmpTime->hour, tmpTime->min, tmpTime->sec);
+		get_jrlyrecord_path(tmpFileName, &tmpTime);
 		sys_start_family_record(tmpFileName, NULL, NULL);
-
 		setRecorderAudioBtnStatus(RECORDER_STATUS_RECORDING);
 	}
 }
@@ -478,11 +503,12 @@ void recorderPlayingBtnOnClicked()
 		if (gRecorderTimeCount > 0)
 		{
 			//TODO:继续播放录音、并继续计时（失能上面的RadioBox按键）
+
 		}
 		else
 		{
 			//TODO:重头开始播放录音、并重头开始计时（失能上面的RadioBox按键）
-
+			//sys_start_play_audio(SYS_MEDIA_FAMILY_AUDITION, );
 		}
 
 		setRecorderAudioBtnStatus(RECORDER_STATUS_PLAYING);
@@ -501,6 +527,7 @@ void recorderStopBtnOnClicked()
 	if (gRecorderStatus == RECORDER_STATUS_PLAYING)
 	{
 		//TODO:播放停止
+		sys_stop_play_audio(SYS_MEDIA_FAMILY_AUDITION);
 	}
 	else if (gRecorderStatus == RECORDER_STATUS_RECORDING)
 	{

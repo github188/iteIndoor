@@ -4,6 +4,7 @@ ITUActionFunction actionFunctions[] =
 {
     //mainMenu
 	"mainLayerOnEnter", mainLayerOnEnter,
+	"mainLayerOnLeave", mainLayerOnLeave,
 	"mainLayerTimeoutOnTimer", mainLayerTimeoutOnTimer,
 	"mainDistrubStatusOnChange", mainDistrubStatusOnChange,
 	"mainSOSBtnOnPress", mainSOSBtnOnPress,
@@ -14,12 +15,14 @@ ITUActionFunction actionFunctions[] =
 
 	//information
 	"informationLayerOnEnter", informationLayerOnEnter,
+	"informationLayerOnLeave", informationLayerOnLeave,
 	"informationMSGListClicked", informationMSGListClicked,
 	"informationBtnOnClicked", informationBtnOnClicked,
 	"informationMsgBoxBtnOnClicked", informationMsgBoxBtnOnClicked,
 
 	//photoMsg
 	"photoMsgLayerOnEnter", photoMsgLayerOnEnter,
+	"photoMsgLayerOnLeave", photoMsgLayerOnLeave,
 	"photoMsgListOnClicked", photoMsgListOnClicked,
 	"photoMsgBtnOnClicked", photoMsgBtnOnClicked,
 	"photoMsgMsgBoxBtnOnClicked", photoMsgMsgBoxBtnOnClicked,
@@ -27,11 +30,13 @@ ITUActionFunction actionFunctions[] =
 	"photoMsgVolTrackBarOnChanged", photoMsgVolTrackBarOnChanged,
 
 	//cleanScreen
-	"cleanScreenOnEnter", cleanScreenOnEnter,
+	"cleanScreenLayerOnEnter", cleanScreenLayerOnEnter,
+	"cleanScreenLayerOnLeave", cleanScreenLayerOnLeave,
 	"cleanScreenTimeoutOnTimer", cleanScreenTimeoutOnTimer,
 
 	//recorder
 	"recorderLayerOnEnter", recorderLayerOnEnter,
+	"recorderLayerOnLeave", recorderLayerOnLeave,
 	"recorderTimingOnTimer", recorderTimingOnTimer,
 	"recorderMsgBoxBtnOnClicked", recorderMsgBoxBtnOnClicked,
 	"recorderBtnOnClicked", recorderBtnOnClicked,
@@ -40,6 +45,7 @@ ITUActionFunction actionFunctions[] =
 
 	//picmanager
 	"picManagerLayerOnEnter", picManagerLayerOnEnter,
+	"picManagerLayerOnLeave", picManagerLayerOnLeave,
 	"picManagerBtnOnClicked", picManagerBtnOnClicked,
 	"picManagerMsgBoxBtnOnClicked", picManagerMsgBoxBtnOnClicked,
 	"picManagerMiniPicBtnClicked", picManagerMiniPicBtnClicked,

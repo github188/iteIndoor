@@ -19,7 +19,8 @@ Modification:
 
 #define CLEANSCREEN_TIMEOUT		10
 
-bool cleanScreenOnEnter(ITUWidget* widget, char* param);
+bool cleanScreenLayerOnEnter(ITUWidget* widget, char* param);
+bool cleanScreenLayerOnLeave(ITUWidget* widget, char* param);
 bool cleanScreenTimeoutOnTimer(ITUWidget* widget, char* param);
 void cleanScreenReset(void);
 

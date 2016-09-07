@@ -33,6 +33,7 @@ typedef enum
 #define MAIN_SCROLL_STEP_COUNT		15
 
 bool	mainLayerOnEnter(ITUWidget* widget, char* param);
+bool	mainLayerOnLeave(ITUWidget* widget, char* param);
 bool	mainDistrubStatusOnChange(ITUWidget* widget, char* param);
 bool    mainLayerTimeoutOnTimer(ITUWidget* widget, char* param);
 bool	mainSOSBtnOnPress(ITUWidget* widget, char* param);

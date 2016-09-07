@@ -58,6 +58,14 @@ bool informationLayerOnEnter(ITUWidget* widget, char* param)
 	return true;
 }
 
+
+bool informationLayerOnLeave(ITUWidget* widget, char* param)
+{
+
+	return true;
+}
+
+
 void informationLayerInit(INFORMATION_PAGE_e page)
 {
 	if (!informationMSGContentContainer)

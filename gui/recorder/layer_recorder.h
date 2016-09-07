@@ -52,11 +52,12 @@ typedef enum
 
 typedef enum
 {	
-	RECORDER_MSG_BTN_COMFIRM,
 	RECORDER_MSG_BTN_CANCEL,
+	RECORDER_MSG_BTN_COMFIRM,
 }RECORDER_MSG_BTN_e;
 
 bool recorderLayerOnEnter(ITUWidget* widget, char* param);
+bool recorderLayerOnLeave(ITUWidget* widget, char* param);
 bool recorderBtnOnClicked(ITUWidget* widget, char* param);
 bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param);
 bool recorderVolTrackBarOnChanged(ITUWidget* widget, char* param);

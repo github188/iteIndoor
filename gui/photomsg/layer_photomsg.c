@@ -56,6 +56,14 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 	return true;
 }
 
+
+bool photoMsgLayerOnLeave(ITUWidget* widget, char* param)
+{
+
+	return true;
+}
+
+
 void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
 {
 	if (!photoMsgListCoverFlow)

@@ -24,7 +24,7 @@ static uint8_t		gCleanScreenTimeoutCount;	//超时时间
 static uint32_t		gCleanScreenLastTimeTick;	//用来记录定时器上个时刻的时间
 
 
-bool cleanScreenOnEnter(ITUWidget* widget, char* param)
+bool cleanScreenLayerOnEnter(ITUWidget* widget, char* param)
 {
 	//TODO:在进入这个界面时候，启动定时器。
 	printf("33333333333333333333333333");
@@ -40,6 +40,16 @@ bool cleanScreenOnEnter(ITUWidget* widget, char* param)
 
 	return true;
 }
+
+
+bool cleanScreenLayerOnLeave(ITUWidget* widget, char* param)
+{
+	//TODO:在离开这个界面时候，关闭定时器。
+	printf("4444444444444444444444444");
+
+	return true;
+}
+
 
 bool cleanScreenTimeoutOnTimer(ITUWidget* widget, char* param)
 {

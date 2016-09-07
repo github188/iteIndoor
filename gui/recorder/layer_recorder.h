@@ -79,5 +79,7 @@ void recorderRecordingBtnOnClicked();
 void recorderPlayingBtnOnClicked();
 void recorderPauseBtnOnClicked();
 void recorderStopBtnOnClicked();
+void recorderPlayingStopCallback();
+int32 recorderPlayingCallback(int32 playTime, int32 playPrecent, int32 state);
 
 #endif // GUI_RECORDER_H

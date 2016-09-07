@@ -48,6 +48,7 @@ bool picManagerLayerOnEnter(ITUWidget* widget, char* param)
 
 bool picManagerLayerOnLeave(ITUWidget* widget, char* param)
 {
+	printf("\picManagerLayerOnLeave!!!!!!!!!\n");
 
 	return true;
 }

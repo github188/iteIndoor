@@ -61,6 +61,7 @@ bool informationLayerOnEnter(ITUWidget* widget, char* param)
 
 bool informationLayerOnLeave(ITUWidget* widget, char* param)
 {
+	printf("\informationLayerOnLeave!!!!!!!!!\n");
 
 	return true;
 }

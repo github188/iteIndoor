@@ -124,12 +124,12 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 
 	gMainBackgroundIndex = 0;
 
-	printf("111111111111111111111before  = %x %x %x \n", tmpLan[0], tmpLan[1], tmpLan[2]);
+	//printf("111111111111111111111before  = %x %x %x \n", tmpLan[0], tmpLan[1], tmpLan[2]);
 	printf("before  = %s \n", tmpLan);
 
 	gb2312ToUtf8(tmpStr, strlen(tmpLan), tmpLan, strlen(tmpLan));
 
-	printf("22222222222222222after = %x %x %x \n", tmpStr[0], tmpStr[1], tmpStr[2]);
+	//printf("22222222222222222after = %x %x %x \n", tmpStr[0], tmpStr[1], tmpStr[2]);
 	printf("after = %s \n", tmpStr);
 
 	//setDeviceNo(tmpLan);
@@ -140,6 +140,8 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 
 bool mainLayerOnLeave(ITUWidget* widget, char* param)
 {
+	printf("\mainLayerOnLeave!!!!!!!!!\n");
+
 	return true;
 }
 
@@ -195,7 +197,7 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 				if (gSOSIsAlarm == false)
 				{
 					gSOSIsAlarm = true;
-					printf("11111111111111111 gSOSIsAlarm!!! ");
+					printf("\ngSOSIsAlarm!!!\n");
 					sos_alarm_report();
 				}
 			}
@@ -214,7 +216,6 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 
 bool mainCoverFlowOnChanged(ITUWidget* widget, char* param)
 {
-
 	if (!mainPageCoverFlow)
 	{
 		mainPageCoverFlow = ituSceneFindWidget(&theScene, "mainPageCoverFlow");
@@ -579,14 +580,12 @@ void loadUnreadRecorderData()
 	{
 		gRecorderData = (PJRLYLIST_INFO)malloc(sizeof(JRLYLIST_INFO));
 	}
-	printf("2222222222222222  = %d", sizeof(JRLYLIST_INFO));
-
 	storage_get_jrlyrecord(&tmpListInfo);
 	memcpy(gRecorderData, tmpListInfo, sizeof(JRLYLIST_INFO));
 
 	free(tmpListInfo);
 
-	printf("1111111111111  = %d", gRecorderData->Count);
+	printf("\n unread recorder count  = %d", gRecorderData->Count);
 }
 
 

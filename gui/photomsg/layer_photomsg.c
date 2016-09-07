@@ -59,6 +59,7 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 
 bool photoMsgLayerOnLeave(ITUWidget* widget, char* param)
 {
+	printf("\photoMsgLayerOnLeave!!!!!!!!!\n");
 
 	return true;
 }

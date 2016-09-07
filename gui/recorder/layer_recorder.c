@@ -43,7 +43,7 @@ static uint8_t		gCurrentRecordIndex;		//用来记录当前选中的录音
 static uint8_t		gNewRecordIndex;			//用来记录新录音的存放位置
 static RECORDER_STATUS_e	gRecorderStatus;	//用来保存界面当前状态（播放、录音、暂停、停止）
 static PJRLYLIST_INFO gRecorderList = NULL;
-
+static DATE_TIME	gNewRecorderTime;
 
 bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 {
@@ -64,7 +64,8 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 
 bool recorderLayerOnLeave(ITUWidget* widget, char* param)
 {
-	
+	printf("\nrecorderLayerOnLeave!!!!!!!!!\n");
+
 	return true;
 }
 
@@ -207,9 +208,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 				else
 				{
 					//TODO:超时停止录音，设置界面状态
-					sys_stop_family_record();
-					setRecorderRecordStatus(gNewRecordIndex, RECORDER_RECORD_UNREAD);
-					setRecordRadioBoxStatus(gNewRecordIndex, true);
+					recorderStopBtnOnClicked();
 				}
 			}
 		}	
@@ -223,10 +222,7 @@ bool recorderRecordRadioBoxChanged(ITUWidget* widget, char* param)
 {
 	char tmpIndex = atoi(param);
 	gCurrentRecordIndex = tmpIndex;
-
-	//TODO:读取存储填充录音录制时间！！！！！
-	setRecorderRecordCreateTime("2016-07-28 10:41:45");
-	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
+	setRecordRadioBoxStatus(gCurrentRecordIndex, true);
 
 	return true;
 }
@@ -355,6 +351,7 @@ void setRecorderAudioBtnStatus(RECORDER_STATUS_e status)
 	gRecorderStatus = status;
 }
 
+
 void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status)
 {
 	char tmpStr[50] = { 0 };
@@ -414,6 +411,7 @@ void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status)
 
 }
 
+
 RECORDER_RECORD_STATUS_e getRecorderRecordStatus(uint8_t index)
 {
 	char tmpStr[50] = { 0 };
@@ -459,7 +457,6 @@ void recorderRecordingBtnOnClicked()
 {
 	uint8_t i = 0;
 	char tmpFileName[50] = { 0 };
-	DATE_TIME tmpTime;
 	bool recordFlag = false;
 
 	for (i = 0; i < MAX_RECORDER_NUM; i++)
@@ -467,7 +464,7 @@ void recorderRecordingBtnOnClicked()
 		//顺序找到第一个空录音位置即可！！！
 		if (getRecorderRecordStatus(i) == RECORDER_RECORD_NULL)
 		{
-			gNewRecordIndex = i;
+			//gNewRecordIndex = i;
 			recordFlag = true;
 			break;				
 		}
@@ -477,20 +474,34 @@ void recorderRecordingBtnOnClicked()
 		gRecorderLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
 		//TODO:开始录音存储
-		get_timer(&tmpTime);
+		get_timer(&gNewRecorderTime);
 		memset(tmpFileName, 0, sizeof(tmpFileName));
-		get_jrlyrecord_path(tmpFileName, &tmpTime);
+		get_jrlyrecord_path(tmpFileName, &gNewRecorderTime);
 		sys_start_family_record(tmpFileName, NULL, NULL);
 		setRecorderAudioBtnStatus(RECORDER_STATUS_RECORDING);
 	}
 }
 
+void recorderPlayingStopCallback()
+{
+	printf("\n 11111111111111111111recorderPlayingStopCallback!!!!!!\n");
+}
+
+
+int32 recorderPlayingCallback(int32 playTime, int32 playPrecent, int32 state)
+{
+	printf("\n 22222222222222222222222recorderPlayingcallback  time = %d  percent = %d state = %d \n", playTime, playPrecent, state);
+	recorderStopBtnOnClicked();
+
+	return 0;
+}
+
 
 void recorderPlayingBtnOnClicked()
 {
-	char tmpStr[50] = { 0 };
+	char tmpFileName[50] = { 0 };
 
-	if (gRecordNumCount > 0)
+	if (gRecordNumCount > 0 && gCurrentRecordIndex < MAX_RECORDER_NUM)
 	{
 		gRecorderLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
@@ -498,6 +509,7 @@ void recorderPlayingBtnOnClicked()
 		{
 			//TODO:设置存储为已读
 			setRecorderRecordStatus(gCurrentRecordIndex, RECORDER_RECORD_READ);
+			storage_set_jrlyrecord_flag(gCurrentRecordIndex, false);
 		}
 
 		if (gRecorderTimeCount > 0)
@@ -508,7 +520,8 @@ void recorderPlayingBtnOnClicked()
 		else
 		{
 			//TODO:重头开始播放录音、并重头开始计时（失能上面的RadioBox按键）
-			//sys_start_play_audio(SYS_MEDIA_FAMILY_AUDITION, );
+			get_jrlyrecord_path(tmpFileName, &(gRecorderList->JrlyInfo[gCurrentRecordIndex].Time));
+			sys_start_play_audio(SYS_MEDIA_MUSIC, tmpFileName, false, storage_get_ringvolume(), recorderPlayingCallback, recorderPlayingStopCallback);
 		}
 
 		setRecorderAudioBtnStatus(RECORDER_STATUS_PLAYING);
@@ -527,19 +540,30 @@ void recorderStopBtnOnClicked()
 	if (gRecorderStatus == RECORDER_STATUS_PLAYING)
 	{
 		//TODO:播放停止
-		sys_stop_play_audio(SYS_MEDIA_FAMILY_AUDITION);
+		sys_stop_play_audio(SYS_MEDIA_MUSIC);
 	}
 	else if (gRecorderStatus == RECORDER_STATUS_RECORDING)
 	{
 		//TODO:录音停止
 		sys_stop_family_record();
-		setRecorderRecordStatus(gNewRecordIndex, RECORDER_RECORD_UNREAD);
+		storage_add_jrlyrecord(gNewRecorderTime);
+
+		recorderLayerInit();
+
+		//if (gRecorderList != NULL)
+		//{
+		//	free(gRecorderList);
+		//	gRecorderList = NULL;
+		//}
+		//storage_get_jrlyrecord(&gRecorderList);
+		//gRecordNumCount = gRecorderList->Count;
+
+		gNewRecordIndex = 0;
 		setRecordRadioBoxStatus(gNewRecordIndex, true);
 	}
 	gRecorderTimeCount = 0;
 	setRecorderDuration("00:00");
 	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
-
 }
 
 
@@ -568,6 +592,7 @@ void setRecorderRecordCreateTime(char* timeStr)
 void setRecordRadioBoxStatus(uint8_t index, bool status)
 {
 	char tmpStr[50] = { 0 };
+	char tmpTime[50] = { 0 };
 
 	sprintf(tmpStr, "%s%d", "recorderRecordRadioBox", index);
 	recorderRecordRadioBox = ituSceneFindWidget(&theScene, tmpStr);
@@ -576,6 +601,10 @@ void setRecordRadioBoxStatus(uint8_t index, bool status)
 	if (status == true)
 	{
 		gCurrentRecordIndex = index;
+		//TODO:读取存储填充录音录制时间！！！！！
+		zoneDateTimeToString(gRecorderList->JrlyInfo[index].Time, tmpTime);
+		setRecorderRecordCreateTime(tmpTime);
+		setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
 	}
 
 	ituRadioBoxSetChecked(recorderRecordRadioBox, status);

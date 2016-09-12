@@ -114,16 +114,6 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	//char* tmpLan = "一二三";
 	char* tmpLan = "一二三";
 
-	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
-	mainLayerCornerNumReload();
-	mainLayerScrollDataReload();
-
-	gSOSBtnIsPress = false;
-	gSOSIsAlarm = false;
-	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
-
-	gMainBackgroundIndex = 0;
-
 	//printf("111111111111111111111before  = %x %x %x \n", tmpLan[0], tmpLan[1], tmpLan[2]);
 	printf("before  = %s \n", tmpLan);
 
@@ -133,6 +123,17 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	printf("after = %s \n", tmpStr);
 
 	//setDeviceNo(tmpLan);
+
+	gSOSBtnIsPress = false;
+	gSOSIsAlarm = false;
+	gMainBackgroundIndex = 0;
+	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
+
+	setSOSBtnType(false);
+
+	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
+	mainLayerCornerNumReload();
+	mainLayerScrollDataReload();
 
 	return true;
 }

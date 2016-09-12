@@ -91,7 +91,7 @@ void recorderLayerInit()
 
 	for (i = 0; i < MAX_RECORDER_NUM; i++)
 	{
-		//TODO:读取存储设置界面记录内容！！并设置无默认选项（删除完也是无默认选项）
+		//TODO:读取存储设置界面记录内容！！并设置无默认选项（删除完默认选项第一个）
 		if (i < gRecordNumCount)
 		{
 			if ((gRecorderList->JrlyInfo[i]).UnRead)

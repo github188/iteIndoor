@@ -34,6 +34,10 @@ ITUActionFunction actionFunctions[] =
 	"cleanScreenLayerOnLeave", cleanScreenLayerOnLeave,
 	"cleanScreenTimeoutOnTimer", cleanScreenTimeoutOnTimer,
 
+	// screen saver
+	"ScreenSaverLayerOnEnter", ScreenSaverLayerOnEnter,
+	"ScreenSaverLayerOnTimer", ScreenSaverLayerOnTimer,
+
 	//recorder
 	"recorderLayerOnEnter", recorderLayerOnEnter,
 	"recorderLayerOnLeave", recorderLayerOnLeave,
@@ -63,7 +67,8 @@ ITUActionFunction actionFunctions[] =
 	"CallCeterListButtonOnMouseUp", CallCeterListButtonOnMouseUp,
 	"CallRecordMSGButtonOnMouseUp", CallRecordMSGButtonOnMouseUp,
 	"CallCallRequestState", CallCallRequestState,
-	
+	"CalloutManager", CalloutManager,
+
 	// BeCall
 	"BeCallLayerOnEnter", BeCallLayerOnEnter,
 	"BeCallLayerButtonOnMouseUp", BeCallLayerButtonOnMouseUp,
@@ -90,6 +95,24 @@ ITUActionFunction actionFunctions[] =
 	"MonitorButtomSoundOnChanged", MonitorButtomSoundOnChanged,
 	"MonitorLayerOnTimer", MonitorLayerOnTimer,
 	"MonitorState", MonitorState,
+	// RTSPSearch
+	"RTSPSearchLayerStart", RTSPSearchLayerStart,
+	"RTSPSearchLayerOnEnter", RTSPSearchLayerOnEnter,
+	"RTSPSearchLayerButtonOnMouseUp", RTSPSearchLayerButtonOnMouseUp,
+	"RTSPSearchListButtonOnMouseUp", RTSPSearchListButtonOnMouseUp,
+	"RTSPSearchListState", RTSPSearchListState,
+	"RTSPSearchLayerOnTimer", RTSPSearchLayerOnTimer,
+
+	// RTSPMonitorLayer
+	"RTSPMonitorLayerOnEnter", RTSPMonitorLayerOnEnter,
+	"RTSPMonitorLayerButtonOnMouseUp", RTSPMonitorLayerButtonOnMouseUp,
+	"RTSPMonitorLayerOnTimer", RTSPMonitorLayerOnTimer,
+	"RTSPMonitorState", RTSPMonitorState,
+	"RTSPMonitorLayerShowBottomButtonOnMouseUp", RTSPMonitorLayerShowBottomButtonOnMouseUp,
+
+	//Alarm
+	"AlarmOnEnter", AlarmOnEnter,
+	"AlarmLayerTimeoutOnTimer", AlarmLayerTimeoutOnTimer,
 
 	//Set_Botton_Return_Layer
 	"SetBottonReturnOnEnter", SetBottonReturnOnEnter,
@@ -194,6 +217,11 @@ ITUActionFunction actionFunctions[] =
 	"SetRingtonePromptMsgTureButtonOnMouseUp", SetRingtonePromptMsgTureButtonOnMouseUp,
 	"SetRingtonePromptMsgFalseButtonOnMouseUp", SetRingtonePromptMsgFalseButtonOnMouseUp,
 	"SetLylyRingtoneButtonOnMouseUp", SetLylyRingtoneButtonOnMouseUp,
+	"SetLylyRingRecMsgNoButtonOnMouseUp", SetLylyRingRecMsgNoButtonOnMouseUp,
+	"SetLylyRingRecMsgYesButtonOnMouseUp", SetLylyRingRecMsgYesButtonOnMouseUp,
+	"SetLylyRingRecMsgButtonOnMouseUp", SetLylyRingRecMsgButtonOnMouseUp,
+	"SetLylyRingRecMsgRecStateButtonOnMouseUp", SetLylyRingRecMsgRecStateButtonOnMouseUp,
+	"SetRingLylyRecTipTimeoutOnTimer", SetRingLylyRecTipTimeoutOnTimer,
 	"SetRingtoneOnLeave", SetRingtoneOnLeave,
 
 	//Set_User

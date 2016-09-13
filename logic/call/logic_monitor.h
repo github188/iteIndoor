@@ -16,6 +16,7 @@
 #define _LOGIC_MONITOR_H_
 #include "logic_include.h"
 
+#define MONITOR_TEMP			0XFF
 // 监视返回值
 typedef enum
 {	 
@@ -156,6 +157,16 @@ int32 monitor_next(int32 direct);
   Others:	
 *************************************************/
 int32 monitor_video_snap(void);
+
+/*************************************************
+Function:			ui_monitor_stop
+Description:		结束监视或通话 UI按挂机调用该接口
+Input:
+Output:			无
+Return:			成功与否, TRUE / FALSE
+Others:
+*************************************************/
+int32 ui_monitor_stop(void);
 
 /*************************************************
   Function:		rtsp_monitor_sync_devlist

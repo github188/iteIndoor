@@ -149,6 +149,11 @@ extern "C" {
 	bool SetRingtonePromptMsgTureButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetRingtonePromptMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetLylyRingtoneButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetLylyRingRecMsgNoButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetLylyRingRecMsgYesButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetLylyRingRecMsgButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetLylyRingRecMsgRecStateButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetRingLylyRecTipTimeoutOnTimer(ITUWidget* widget, char* param);
 	bool SetRingtoneOnLeave(ITUWidget* widget, char* param);
 	void SetRingtoneOnReturn(void);
 

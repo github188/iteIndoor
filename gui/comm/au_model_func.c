@@ -29,9 +29,7 @@ int32 ui_show_win_arbitration(SYS_ASYN_OPER_TYPE OperType)
 	SYS_MEDIA_TYPE CurState;
 	CurState = sys_get_media_state();
 	
-	//ui_back_main_page();							// 退回到主界面
-	//SetScreenTimer();								// 开屏
-	//sys_open_lcd();
+	ScreenSaverRefresh();
 	
 	dprintf("ui_show_win_arbitration : CurState : %d\n", CurState);
 	switch (OperType)
@@ -130,6 +128,7 @@ char * get_houseno_desc(char * numtext, char * temp)
     uint32 sub, subLen;
     char strsub[10];
     char des[100] = {0};
+	char des_tmp[100] = { 0 };
 
 	char num1[10], des1[11];
     char num[10] = {0};
@@ -154,7 +153,22 @@ char * get_houseno_desc(char * numtext, char * temp)
     
     nsub = 0;
 
-    memcpy(des, storage_get_dev_desc(), 70);		// 分段描述符
+	memcpy(des_tmp, storage_get_dev_desc(), 70);		// 分段描述符
+	for (i = 0; i < subLen; i++)
+	{
+		// 分段描述转码才可显示
+		if (CHINESE == storage_get_language())
+		{
+			gb2312ToUtf8(des + i * 10, 10, des_tmp + i * 10, 10);
+		}
+		else if (CHNBIG5 == storage_get_language())
+		{
+
+		}
+		else
+		{
+		}
+	}
 
     sprintf(devno, "%s", numtext);
     numTextLen = strlen(devno);

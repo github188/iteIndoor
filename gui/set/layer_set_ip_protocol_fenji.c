@@ -31,7 +31,6 @@ static IPAD_EXTENSION_LIST g_IpadList;
 static uint32 g_ip = 0;
 static uint8 buttonflag = 3;
 
-
 /*************************************************
 Function:		show_win_bind
 Description: 	显示绑定的具体信息
@@ -169,7 +168,7 @@ static void KeyBordGotoSetIpProtocol()
 }
 
 /*************************************************
-Function:		boolSetIpProtocolFenjiOnEnter
+Function:		SetIpProtocolFenjiOnEnter
 Description: 	
 Input:		无
 Output:		无
@@ -322,6 +321,8 @@ bool SetIpProtocolGetFJFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 
 
+
+	show_win_fenji();
 
 	return true;
 }

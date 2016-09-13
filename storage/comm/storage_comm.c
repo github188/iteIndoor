@@ -163,39 +163,129 @@ int get_size (char* srcname)
 	#endif
 }
 
-#if 0
 /*************************************************
-  Function:     	is_fileexist
-  Description:  	判断指定路径文件是否存在
-  Input:       	
-   	1.path			指定文件的路径
-  Output:           无
-  Return:
-					文件存在:TRUE
-					文件不存在:FALSE
+  Function:    		get_filenum
+  Description: 		获得指定路径下的文件数
+  Input: 
+	1.path			文件路径名
+  Ontput:
+  Return:			文件数
   Others:
 *************************************************/
-int32 is_fileexist(uint8 *path)
+int32 get_filenum(char *path)
 {
-	struct stat buf;
-	int32 ret;
-	
-	if (NULL == path)
+	DIR *dir;
+	struct dirent *ptr = NULL;
+	int g_filenum = 0;
+
+	if(path == NULL)
 	{
-		return FALSE;
+		return 0;
 	}
-	ret = stat(path,&buf);
-	if (-1 == ret)
+	dir = opendir(path);
+	if(NULL == dir)
 	{
-		if (errno == ENOENT)
-		{
-			return FALSE;
+		return 0;
+	}
+	while ((ptr = readdir(dir)) != NULL)
+	{
+		if ((strcmp(ptr->d_name,".") != 0) && (strcmp(ptr->d_name,"..") != 0))
+		{		
+			printf("ptr->d_name: %s\n", ptr->d_name);
+			g_filenum++;
 		}
 	}
 		
-	return TRUE;	
+	closedir(dir);
+	return g_filenum;
 }
-#endif
+
+/*************************************************
+  Function:    		get_filelist
+  Description: 		获得指定路径下的文件列表
+  Input: 
+	1.path			文件路径名
+  Ontput:
+  Return:			文件数
+  Others:
+*************************************************/
+int32 get_filelist(char *path, FileList **list)
+{
+	DIR *dir;
+	struct dirent *ptr = NULL;
+	int g_filenum = 0;
+
+	if(path == NULL)
+	{
+		return 0;
+	}
+
+	FileList *temp = (*list);
+	while ((*list) != NULL)
+	{	
+		temp = (*list)->next;
+		free(*list);		
+		(*list) = temp;			
+	}
+	(*list) = NULL;
+	
+	dir = opendir(path);
+	if(NULL == dir)
+	{
+		return 0;
+	}
+	while ((ptr = readdir(dir)) != NULL)
+	{
+		if ((strcmp(ptr->d_name,".") != 0) && (strcmp(ptr->d_name,"..") != 0))
+		{		
+			if ((*list) == NULL)
+			{
+				(*list) = (FileList *)malloc(sizeof(FileList));
+				sprintf((*list)->filename, "%s%s", path, ptr->d_name);
+				(*list)->next = NULL;				
+			}
+			else
+			{
+				temp = NULL;
+				temp = (FileList *)malloc(sizeof(FileList));
+				temp->next = (*list);	
+				sprintf(temp->filename, "%s%s", path, ptr->d_name);
+				(*list) = temp;				
+			}
+			g_filenum++;
+		}
+	}
+		
+	closedir(dir);
+	return g_filenum;
+}
+
+/*************************************************
+  Function:    		get_filelist_node
+  Description: 		按索引号获取列表中节点
+  Input: 
+	1.path			文件路径名
+  Ontput:
+  Return:			文件数
+  Others:
+*************************************************/
+FileList* get_filelist_node(FileList *list, uint8 index)
+{
+	int i = 0;
+	FileList *node;
+	node = list;
+	while (node)
+	{
+		if (i == index)
+		{
+			return node;
+		}
+		i++;
+		node = node->next;
+	}
+
+	return NULL;
+}
 
 /*************************************************
   Function:    		FSFileDelete
@@ -347,37 +437,6 @@ ECHO_STORAGE Fwrite_common (char * Filename, void * Data, int DataSize, int Data
 	return ret;
 }
 
-#if 0
-/*************************************************
-  Function:    		get_filesize
-  Description: 		获得指定路径文件的大小
-  Input:                  
-  	1.filepath		文件路径
-  Output:			无
-  Return:			成功:指定文件的大小(单位字节)
-					不成功:FALSE
-  Others:
-*************************************************/
-int32 get_filesize(int8 *filepath)
-{
-	struct stat buf;
-	int32 ret;
-	
-	if (NULL == filepath)
-	{
-	   	printf(" not find \n");
-	   	return -1;
-	}
-
-	ret = stat(filepath,&buf);
-	if (ret == -1)
-	{
-		return -1;
-	}
-    printf("buf.st_size: %d \n", (int)buf.st_size);
-	return buf.st_size;
-}
-#endif
 
 /*************************************************
   Function:		Fread_common

@@ -48,6 +48,40 @@
 #define VGA_STR				"VGA"
 #define _720P_STR			"720P"
 
+#define PTZ_START 			0						// 开始控制
+#define PTZ_END				1						// 结束控制
+#define ZOOM_IN				11						// 焦距以速度SS 变大(倍率变大)
+#define ZOOM_OUT			12						// 焦距以速度SS 变小(倍率变小)
+#define TILT_UP				21						// 云台以SS 的速度上仰
+#define TILT_DOWN			22						// 云台以SS 的速度下俯
+#define PAN_LEFT			23						// 云台以SS 的速度左转
+#define TILT_RIGHT			24						// 云台以SS 的速度右转
+#define GOTO_PRESET 		39 						// 快球转到预置点
+
+
+/*************************************************
+  Function:		rtsp_monitor_sync_devlist
+  Description: 	获取RTSP设备列表
+  Input: 		无
+  Output:		无
+  Return:		PMonitorDeviceList 设备列表
+  Others:		
+*************************************************/
+uint32 rtsp_monitor_sync_devlist (void);
+
+/*************************************************
+  Function:			monitor_start
+  Description:		开始监视
+  Input: 	
+  	1.ID			应用ID
+  	2.DevType		设备类型
+  	3.index			设备索引
+  Output:			无
+  Return:			成功与否, TRUE / FALSE
+  Others:
+*************************************************/
+int32 rtsp_monitor_start(uint32 index, uint32 type);
+
 /*************************************************
   Function:		rtsp_monitor_state
   Description: 	
@@ -112,6 +146,42 @@ void set_ipc_online(uint8 index, uint32 IP);
 *************************************************/
 void set_ipc_outline(uint8 index);
 #endif
+
+/*************************************************
+  Function:			set_control_ptz
+  Description:		云台方向和焦距控制
+  Input:			
+  	1.cmd			云台控制命令
+  	2.action 		0 启动控制 1 停止控制
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
+void set_control_ptz(uint8 cmd, uint8 action);
+
+/*************************************************
+  Function:			preset_control_ptz
+  Description:		云台预置点控制
+  Input:			
+  	1.index			预置点索引
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
+void preset_control_ptz(uint8 index);
+
+/*************************************************
+  Function:				rtsp_ini
+  Description:			rtsp初始化
+  Input:
+  	1.RtspListProc		list回调函数
+  	1.GuiProc			GUI回调函数
+  Output:				无
+  Return:				
+  Others:
+*************************************************/
+void rtsp_ini(PFGuiNotify RtspListProc, PFGuiNotify GuiProc);
+
 
 /*************************************************
   Function:			rtsp_distribute

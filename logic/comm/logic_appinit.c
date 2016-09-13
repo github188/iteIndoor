@@ -19,6 +19,8 @@ extern void callout_state_callbak(uint32 param1, uint32 param2);
 extern void callin_state_callbak(uint32 param1, uint32 param2);
 extern void monitor_list_state_callbak(uint32 param1, uint32 param2);
 extern void monitor_state_callbak(uint32 param1, uint32 param2);
+extern void rtsp_list_state_callbak(uint32 param1, uint32 param2);
+extern void rtsp_state_callbak(uint32 param1, uint32 param2);
 
 extern void show_sys_event_hint(uint16 EventType);
 extern int32 rtsp_distribute(const PRECIVE_PACKET recPacket);
@@ -59,6 +61,7 @@ void logic_init(void)
 	init_timer();
 	storage_init();									// 初始化存储模块
 	init_list_address();							// 初始化监视列表
+	ScreenInit();
 	NetworkInit();
 	
 	#ifdef _JD_MODE_
@@ -78,6 +81,7 @@ void logic_init(void)
 	alarm_init_gui_callback((ALARMGUI_CALLBACK)af_callback_gui, (SHOW_SYSEVENHIT)show_sys_event_hint);
 	inter_call_ini(callrequest_state_callbak, callout_state_callbak, callin_state_callbak);
 	monitor_ini(monitor_list_state_callbak, monitor_state_callbak);
+	rtsp_ini(rtsp_list_state_callbak, rtsp_state_callbak);
 
 	net_set_recivedata_func(SSC_INFO, msg_distribute, msg_responsion);
 	net_set_recivedata_func(SSC_ALARM, alarm_distribute, alarm_responsion);
@@ -124,8 +128,5 @@ void logic_init(void)
 	// 测试校验数据是否正确
 	check_sysconfig_ifcorrect(); 					
 	dprintf("devno: %s \n", pDevNo->DeviceNoStr);
-
-	dprintf("MSGDATA: %d\n", sizeof(MSGDATA));
-	dprintf("MSGLIST: %d\n", sizeof(MSGLIST));
 }
 

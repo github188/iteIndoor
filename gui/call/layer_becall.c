@@ -37,7 +37,8 @@ static DEVICE_TYPE_E g_DevType;
 static INTER_OPER_TYPE g_OperType;
 static char g_DevNo[50];
 static char g_NewCallNo[50];
-static uint8 g_unlock;
+static uint8 g_unlock = FALSE;
+static uint8 g_DrawVideo = 0;
 static CALL_STATE_E g_InterState = CALL_STATE_NONE;
 static int16 g_RemainTime = 0;
 static uint8 g_SetVolume = FALSE;					// 是否处于设置音量状态
@@ -524,7 +525,6 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 			g_RemainTime = temp >> 16;
 			break;
 
-#if 0
 		case CALL_SNAP_CALLBACK:
 			if (1 == atoi(pcallbak_data->Buf))
 			{
@@ -532,7 +532,6 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 				ituSpriteGoto(BeCallHitSprite, BeCallSnapMSGIcon);
 			}
 			break;
-#endif
 
 		default:
 			break;
@@ -773,8 +772,11 @@ bool BeCallLayerOnEnter(ITUWidget* widget, char* param)
 		}
 	}
 
+	if (TRUE == g_DrawVideo)
+	{
+		BackgroundDrawVideo("BeCallBackground");
+	}
 	
-	BackgroundDrawVideo("BeCallBackground");
 	return true;
 }
 
@@ -861,10 +863,12 @@ static void SetInterInfo(INTER_OPER_TYPE OperType, DEVICE_TYPE_E DevType, char *
 	if (g_DevType == DEVICE_TYPE_STAIR || g_DevType == DEVICE_TYPE_AREA
 		|| g_DevType == DEVICE_TYPE_DOOR_NET || g_DevType == DEVICE_TYPE_DOOR_PHONE)
 	{
+		g_DrawVideo = TRUE;
 		g_unlock = TRUE;
 	}
 	else
 	{
+		g_DrawVideo = FALSE;
 		g_unlock = FALSE;
 	}
 	
@@ -916,14 +920,14 @@ void BeCallWin(INTER_INFO_S* info)
 			int32 ret = ui_show_win_arbitration(SYS_OPER_CALLIN);
 			if (ret == FALSE)
 			{
-				return FALSE;
+				return;
 			}
 		}
 		SetInterInfo(pInterInfo->InterType, pInterInfo->DevType, pInterInfo->DevStr);
 	}
 	else
 	{
-		return FALSE;
+		return;
 	}
 	InitBeCallLayer();
 	ituLayerGoto(BeCallLayer);

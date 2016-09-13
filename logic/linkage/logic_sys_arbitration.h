@@ -51,11 +51,25 @@ typedef enum
 	SYS_HINT_MAX_NUM
 }SYS_HINT_TYPE;
 
-typedef enum
-{
-	SYS_LCD_CLOSE,									// 关屏
-	SYS_LCD_OPEN									// 开屏
-}SYS_LCD_STATE;
+/*************************************************
+  Function:			sys_continue_play_file
+  Description: 		继续播放
+  Input: 			
+  Output:			无
+  Return:			无
+  Others:			
+*************************************************/
+int sys_continue_play_file(void);
+
+/*************************************************
+  Function:			sys_pause_play_file
+  Description: 		暂停播放媒体文件
+  Input: 			
+  Output:			无
+  Return:			无
+  Others:			
+*************************************************/
+int sys_pause_play_file(void);
 
 /*************************************************
   Function:			sys_stop_play_audio
@@ -217,36 +231,6 @@ uint8 sys_get_hint_num(SYS_HINT_TYPE HintType);
   Others:			
 *************************************************/
 void sys_sync_hint_state(void);
-
-/*************************************************
-  Function:			sys_get_lcd_state
-  Description: 		屏幕状态
-  Input: 		
-  Output:			无
-  Return:			无
-  Others:			
-*************************************************/
-SYS_LCD_STATE sys_get_lcd_state(void);
-
-/*************************************************
-  Function:			sys_open_lcd
-  Description: 		开屏操作
-  Input: 		
-  Output:			无
-  Return:			无
-  Others:			
-*************************************************/
-uint8 sys_open_lcd(void);
-
-/*************************************************
-  Function:			sys_close_lcd
-  Description: 		关屏操作
-  Input: 		
-  Output:			无
-  Return:			无
-  Others:			
-*************************************************/
-void sys_close_lcd(void);
 
 /*************************************************
   Function:			sys_init_hint_state

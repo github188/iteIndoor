@@ -118,7 +118,8 @@
 // 留言提示音
 #define LYLY_HIT_CN_PATH		CFG_PRIVATE_DRIVE":/res/rings/Hit/LYLYCN.WAV"			// 默认中文留言提示音
 #define LYLY_HIT_EN_PATH		CFG_PRIVATE_DRIVE":/res/rings/Hit/LYLYEN.WAV"			// 默认英文留言提示音
-#define LYLY_HIT_RE_PATH		CFG_PRIVATE_DRIVE":/LYLY/LYLY.WAV"						// 录制留言提示音
+#define LYLY_HIT_RE_PATH		CFG_PUBLIC_DRIVE":/LYLY"								// 录制留言提示音
+#define LYLY_HIT_RE_FILE_PATH	CFG_PUBLIC_DRIVE":/LYLY/LYLY.WAV"						// 录制留言提示音
 
 /**************************************************************************/
 /*								  家人留言								  */	

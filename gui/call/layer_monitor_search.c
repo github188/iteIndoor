@@ -14,7 +14,7 @@ Modification:
 
 /*****************常量定义***********************/
 #define MAX_PAGE_NUM					6					// 每页最大条数
-#define MAX_MONITOR_NUM  				8					// 最大管理员机数
+#define MAX_MONITOR_LIST_NUM  				8					// 最大管理员机数
 #define MAX_MONITOR_PAGE_NUM  			2					// 管理员机最大页数
 
 /*****************变量定义***********************/
@@ -25,9 +25,9 @@ static ITURadioBox* MonitorSearchRightStairRadioBox = NULL;
 static ITUBackground* MonitorSearchBottomBackground = NULL;
 static ITUCoverFlow* MonitorSearchListCoverFlow = NULL;
 static ITUBackground* MonitorSearchListBackgroundPage[MAX_MONITOR_PAGE_NUM] = { NULL };
-static ITUContainer* MonitorSearchListContainer[MAX_MONITOR_NUM] = { NULL };
-static ITUSprite* MonitorSearchListSprite[MAX_MONITOR_NUM] = { NULL };
-static ITUText* MonitorSearchListDevTypeText[MAX_MONITOR_NUM] = { NULL };
+static ITUContainer* MonitorSearchListContainer[MAX_MONITOR_LIST_NUM] = { NULL };
+static ITUSprite* MonitorSearchListSprite[MAX_MONITOR_LIST_NUM] = { NULL };
+static ITUText* MonitorSearchListDevTypeText[MAX_MONITOR_LIST_NUM] = { NULL };
 static ITUBackground* MonitorSearchMSGHitGrayBackground = NULL;
 static ITUAnimation* MonitorSearchMSGHitAnimation = NULL;
 
@@ -73,7 +73,7 @@ static void SetMonitorShowInit(void)
 		ituWidgetSetVisible(MonitorSearchListBackgroundPage[i], true);
 	}
 
-	for (i = 0; i < MAX_MONITOR_NUM; i++)
+	for (i = 0; i < MAX_MONITOR_LIST_NUM; i++)
 	{
 		ituWidgetSetVisible(MonitorSearchListContainer[i], true);
 		ituWidgetSetVisible(MonitorSearchListSprite[i], true);
@@ -128,9 +128,9 @@ static void SetMonitorShowNum(uint8 max)
 
 	// 隐藏多余行(目前分机只支持8条)
 	count = pagenum * MAX_PAGE_NUM;
-	if (count > MAX_MONITOR_NUM)
+	if (count > MAX_MONITOR_LIST_NUM)
 	{
-		count = MAX_MONITOR_NUM;
+		count = MAX_MONITOR_LIST_NUM;
 	}
 
 	for (i = count; i > max; i--)
@@ -175,9 +175,9 @@ static void ShowMonitorWin(void)
 	if (g_MonitorList && g_MonitorList->MonitorCount > 0)
 	{
 		max = g_MonitorList->MonitorCount;
-		if (max > MAX_MONITOR_NUM)
+		if (max > MAX_MONITOR_LIST_NUM)
 		{
-			max = MAX_MONITOR_NUM;
+			max = MAX_MONITOR_LIST_NUM;
 		}
 		// 图标类型
 		if (g_DevType == DEVICE_TYPE_STAIR)
@@ -249,6 +249,7 @@ bool MonitorSearchLayerOnTimer(ITUWidget* widget, char* param)
 		}
 	}
 
+	return true;
 }
 
 /*************************************************
@@ -270,6 +271,8 @@ bool MonitorSearchListState(ITUWidget* widget, char* param)
 		ShowMonitorWin();
 		ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
 	}
+
+	return true;
 }
 
 /*************************************************
@@ -287,12 +290,9 @@ bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param)
 	if (g_MonitorList && g_MonitorList->MonitorCount > 0)
 	{
 		g_DevType = g_MonitorList->pMonitorInfo[index].DeviceType;
-		printf("00focusIndex : %d\n", MonitorSearchListCoverFlow->focusIndex);
 		MonitorWin(g_DevType, index);		// 点击直接开始监视
-		printf("11focusIndex : %d\n", MonitorSearchListCoverFlow->focusIndex);
 	}
-	printf("MonitorSearchList g_DevType......:%x\n", g_DevType);
-	printf("MonitorSearchList index......:%d\n", index);
+	return true;
 }
 
 /*************************************************
@@ -306,7 +306,7 @@ Others:			无
 bool MonitorSearchMSGButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 index = atoi(param);
-	
+	return true;
 }
 
 /*************************************************
@@ -402,7 +402,7 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 			assert(MonitorSearchListBackgroundPage[i]);
 		}
 		
-		for (i = 0; i < MAX_MONITOR_NUM; i++)
+		for (i = 0; i < MAX_MONITOR_LIST_NUM; i++)
 		{
 			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "MonitorSearchListContainer", i);

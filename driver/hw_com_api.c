@@ -526,6 +526,7 @@ static void * jd_receive_thread(void* data)
 		{
 			//JdCallBackFunc(buf);
 		}
+        usleep(1000);
 	}
 }
 
@@ -694,12 +695,15 @@ int32 init_jd_callbackt(JdCallBack func)
 		
 		InitJdFlag = 1;
 		JdCallBackFunc = func;			
-		
+
+		// 底下注释掉 会导致按复位键和断电重启起不来现象
+		#if 1
 		pthread_attr_init(&attr);
 		attr.stacksize = UART_STACK_SIZE;
 		pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);
 		pthread_create(&task, &attr, jd_receive_thread, NULL);	
 		// pthread_create(&task, &attr, test_receive_thread, NULL);	
+		#endif
 	}
 #endif
 	return 0;

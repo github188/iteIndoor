@@ -43,7 +43,8 @@
 #include "picmanager/layer_picmanager.h"
 #include "call/layer_call.h"
 #include "set/layer_set.h"
-
+#include "alarm/layer_alarm.h"
+#include "screensaver/layer_screensaver.h"
 
 #ifdef __cplusplus
 extern "C" {

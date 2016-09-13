@@ -220,6 +220,34 @@ typedef enum
 
 #define INVALID_MSGID   LASTMSG  					// 无效消息ID
 
+typedef struct _FileList
+{
+	char filename[64];
+	struct _FileList *next;
+}FileList, *PFileList;
+
+/*************************************************
+  Function:    		get_filelist_node
+  Description: 		
+  Input: 
+	1.path			文件路径名
+  Ontput:
+  Return:			文件数
+  Others:
+*************************************************/
+FileList* get_filelist_node(FileList *list, uint8 index);
+
+/*************************************************
+  Function:    		get_filenum
+  Description: 		获得指定路径下的文件列表
+  Input: 
+	1.path			文件路径名
+  Ontput:
+  Return:			文件数
+  Others:
+*************************************************/
+int32 get_filelist(char *path, FileList **list);
+
 /*************************************************
 Function:		sync_data
 Description:	将数据从缓冲区写到NOR Flash里面
@@ -303,6 +331,17 @@ int32 is_fileexist(char * path);
   Others:
 *************************************************/
 int get_size (char* srcname);
+
+/*************************************************
+  Function:    		get_filenum
+  Description: 		获得指定路径下的文件数
+  Input: 
+	1.path			文件路径名
+  Ontput:
+  Return:			文件数
+  Others:
+*************************************************/
+int32 get_filenum(char *path);
 
 /*************************************************
   Function:    		FSFileDelete

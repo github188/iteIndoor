@@ -905,6 +905,7 @@ static void * check_ioctrl(void* data)
 				
 			}
 		}
+        usleep(1000);
 		// sleep(1);
 	}
 }

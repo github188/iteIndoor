@@ -405,7 +405,15 @@ bool MonitorState(ITUWidget* widget, char* param)
 {
 	uint32 temp = 0;
 	PINTER_CALLBACK pmonitorbak_data = (PINTER_CALLBACK)param;
+	if (NULL == pmonitorbak_data)
+	{
+		return false;
+	}
 
+	if (MONITOR_TEMP == pmonitorbak_data->InterState)
+	{
+		pmonitorbak_data->InterState = MONITOR_END;
+	}
 	dprintf("pmonitorbak_data->InterState......:%d\n", pmonitorbak_data->InterState);
 	switch (pmonitorbak_data->InterState)
 	{
@@ -493,7 +501,7 @@ bool MonitorState(ITUWidget* widget, char* param)
 			temp = atoi(pmonitorbak_data->Buf);
 			g_RemainTime = temp;
 			break;
-#if 0
+
 		case MONITOR_SNAP:
 			if (1 == atoi(pmonitorbak_data->Buf))
 			{
@@ -501,8 +509,6 @@ bool MonitorState(ITUWidget* widget, char* param)
 				ituSpriteGoto(MonitorHitSprite, MonitorSnapMSGIcon);
 			}
 			break;
-#endif
-
 
 		default:
 			break;
@@ -646,6 +652,7 @@ bool MonitorLayerOnEnter(ITUWidget* widget, char* param)
 	SetMonitorInfo();
 	DrawStringHint();
 	g_StartMonitorTick = 1;
+	BackgroundDrawVideo("MonitorBackground");
 
 	return true;
 }

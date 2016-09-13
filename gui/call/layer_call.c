@@ -206,7 +206,7 @@ static uint8 WhetherMissUnRead(void)
 	if (g_CallRecord == NULL)
 	{
 		printf("g_CallRecord is NULL\n");
-		return;
+		return FALSE;
 	}
 
 	if (g_CallRecord && g_CallRecord->CallCount > 0)
@@ -1299,10 +1299,6 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 			CallCeterListIcon[i] = ituSceneFindWidget(&theScene, callname);
 			assert(CallCeterListIcon[i]);
 		}
-#if 0
-		storage_set_language(CHINESE);
-		storage_set_subdev_ip(1, 0XC0A80C6D);
-#endif
 	}
 	g_Event = 0;
 	g_TimerRuning = FALSE;
@@ -1323,6 +1319,44 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 	}
 	CallKeyBordTextBox->text.layout = ITU_LAYOUT_MIDDLE_CENTER;
 
+	return true;
+}
+
+/*************************************************
+Function:		CalloutManager
+Description:	快捷呼叫管理员机
+Input:
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+bool CalloutManager(ITUWidget* widget, char* param)
+{
+	uint8 i = 0, tmp = 0;
+	INTER_INFO_S CallInfo = { 0 };
+
+	int32 ret = ui_show_win_arbitration(SYS_OPER_CALLOUT);
+	if (ret == TRUE)
+	{
+		CallInfo.InterType = INTER_CALLOUT_E;
+		CallInfo.DevType = DEVICE_TYPE_MANAGER;
+
+		for (i = 0; i < 3; i++)
+		{
+			if (storage_get_manager_ip(i + 1))
+			{
+				tmp = i + MANAGER_NUM + 1;
+				continue;
+			}
+		}
+
+		if (0 == tmp)
+		{
+			tmp = 0xFF;
+		}
+		sprintf(CallInfo.DevStr, "%d", tmp);
+		BeCallWin(&CallInfo);
+	}
 	return true;
 }
 

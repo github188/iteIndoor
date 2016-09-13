@@ -65,5 +65,6 @@
 #include "comm/logic_pubcmd.h"
 #include "comm/logic_model_func.h"
 
+#include "screen/logic_screen.h"
 #endif
 

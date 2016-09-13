@@ -376,7 +376,7 @@ void setPhotoMsgList()
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
 
-	uint8_t msgNum = 5;		//TODO:读取信息条数！！！！！
+	uint8_t msgNum = 0;		//TODO:读取信息条数！！！！！
 
 	//TODO: 读取存储内容设置列表信息！！！！！！！
 	for (i = 0; i < MAX_POOTOMSG_LIST_NUM; i++)
@@ -430,7 +430,14 @@ void setPhotoMsgList()
 		{
 			if ((i == (msgNum / PHOTOMSG_NUM_PER_PAGE)) && (msgNum % PHOTOMSG_NUM_PER_PAGE) == 0)
 			{
-				ituWidgetSetVisible(photoMsgPageContainer, false);
+				if (msgNum == 0)
+				{
+					ituWidgetSetVisible(photoMsgPageContainer, true);
+				}
+				else
+				{
+					ituWidgetSetVisible(photoMsgPageContainer, false);
+				}
 			}
 			else
 			{

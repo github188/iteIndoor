@@ -73,9 +73,9 @@ void timer_reboot_control(uint8 flag)
     else
     {
     	storage_set_isOpenScreen(FALSE);
-		sys_close_lcd();
+		ScreenOff();
 		// 为了保证网络芯片模块重启后正常工作
-		sleep(2); 
+		//sleep(2); 
     }
 	hw_set_lcd_pwm0(flag);
 }

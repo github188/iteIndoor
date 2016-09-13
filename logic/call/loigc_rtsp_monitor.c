@@ -30,7 +30,7 @@
 #define DEFAULT_HIKVISION_VIDEO_FRAMERATE		15
 #define DEFAULT_HIKVISION_VIDEO_BITRATE			512
 
-#define MONITOR_TIME_MAX						60				// 监视最长时间
+//#define MONITOR_TIME_MAX						60				// 监视最长时间
 #define MONITOR_REQUEST_TIME					5				// 请求时间10秒
 #define MONITOR_HEART_TIME						5				// 5秒一次心跳
 #define MONIROT_HEART_MAX						3				// 3次心跳
@@ -50,14 +50,21 @@ typedef struct
 	struct ThreadInfo mThread;						// 线程
 }RTSP_MONITOR_INFO;
 
+static uint16 g_RemainTime = 0;
 static uint32 g_ErrType;
 static struct ThreadInfo g_mThread;					// 获取列表线程
 static RTSP_MONITOR_INFO g_RtspMonItorInfo;
+static RTSP_MONITOR_INFO g_RtspListInfo;
 static PRtspDeviceList g_RtspMonItoRDevList = NULL;
-static MONITOR_STATE_E g_PreRtspMonitorState = MONITOR_END;   	
+static MONITOR_STATE_E g_PreRtspMonitorState = MONITOR_END;  
+
+#define RtspStateNotify(param1, param2)	if (g_RtspListInfo.gui_notify)\
+	g_RtspListInfo.gui_notify(param1, param2)
+
 
 #define RtspGuiNotify(param1, param2)	if (g_RtspMonItorInfo.gui_notify)\
 	g_RtspMonItorInfo.gui_notify(param1, param2)
+
 
 #ifdef _NEW_SELF_IPC_
 #define IPC_HEART_TIME			90					// 心跳超时时间s
@@ -322,11 +329,11 @@ err:
 
 	if (ret)
 	{
-		RtspGuiNotify(MONITOR_GETLIST, TRUE);
+		RtspStateNotify(MONITOR_GETLIST, TRUE);
 	}
 	else
 	{
-		RtspGuiNotify(MONITOR_GETLIST, FALSE);
+		RtspStateNotify(MONITOR_GETLIST, FALSE);
 	}
 	
 	inter_SetThread(&g_mThread);
@@ -974,6 +981,7 @@ static void* rtsp_monitor_proc(void *param)
 {
 	// 设置分离线程
 	pthread_detach(pthread_self());
+	time_t t0;
 	int16 times = 0;
 
 LabChange:	
@@ -1017,19 +1025,23 @@ LabChange:
 			}
 		}
 	}
-	
+	t0 = time(0);
 	if (MONITOR_MONITORING == g_RtspMonItorInfo.state)
 	{
 		RtspGuiNotify(g_RtspMonItorInfo.state, 0);
+		usleep(20*1000);
 		g_PreRtspMonitorState = g_RtspMonItorInfo.state;
 		
 		g_RtspMonItorInfo.HeartTime = 0;
 		g_RtspMonItorInfo.TimeOut = 0;
 		g_RtspMonItorInfo.TimeMax = MONITOR_TIME_MAX;
+		g_RemainTime = 0;
 		while (MONITOR_MONITORING == g_RtspMonItorInfo.state)
 		{
-			g_RtspMonItorInfo.TimeOut++;
-
+			//g_RtspMonItorInfo.TimeOut++;
+			g_RtspMonItorInfo.TimeOut = time(0) - t0;
+			// 剩余时间
+			g_RemainTime = g_RtspMonItorInfo.TimeMax - g_RtspMonItorInfo.TimeOut;
 			if (g_RtspMonItorInfo.TimeOut >= g_RtspMonItorInfo.TimeMax)
 			{
 				dprintf("txl TimeOut out %d\n",g_RtspMonItorInfo.TimeOut);					
@@ -1050,6 +1062,7 @@ LabChange:
 			}
 			else
 			{
+				RtspGuiNotify(MONITOR_TIMER, g_RemainTime);
 				if (g_RtspMonItorInfo.TimeOut % MONITOR_HEART_TIME == 0)
 				{
 					g_RtspMonItorInfo.HeartTime++;
@@ -1065,10 +1078,10 @@ LabChange:
 				}
 			}
 			
-			times = 50;
+			times = 10;
 			while ((times--) > 0 && MONITOR_MONITORING == g_RtspMonItorInfo.state)
 			{
-				usleep(20*1000);
+				usleep(100*1000);
 			}
 		}
 	}
@@ -1111,12 +1124,12 @@ LabChange:
   Return:		PMonitorDeviceList 设备列表
   Others:		
 *************************************************/
-uint32 rtsp_monitor_sync_devlist (PFGuiNotify GuiProc)
+uint32 rtsp_monitor_sync_devlist (void)
 {
 	memset(&g_mThread, 0, sizeof(struct ThreadInfo));
 	if (0 != inter_start_thread(&g_mThread, rtsp_get_monitor_sync_devlist, NULL, 0))
 	{
-		RtspGuiNotify(MONITOR_GETLIST, FALSE);
+		RtspStateNotify(MONITOR_GETLIST, FALSE);
 		return FALSE;
 	}
 	return TRUE;
@@ -1156,16 +1169,16 @@ PRtspDeviceList rtsp_monitor_get_devlist (uint8 flg)
 	
 	storage_get_monitordev_used(&g_list);
 
-	// 社区监视
+	// 家居监视
 	if (0 == flg)
-	{
-		max = g_list->Comnum;
-		g_list->Homenum = 0;
-	}
-	else
 	{
 		max = g_list->Homenum;
 		g_list->Comnum = 0;
+	}
+	else
+	{
+		max = g_list->Comnum;
+		g_list->Homenum = 0;
 	}
 
 	g_RtspMonItoRDevList->Devinfo = (PHOMEDEVICE)malloc(sizeof(HOMEDEVICE)*max+1);
@@ -1187,6 +1200,7 @@ PRtspDeviceList rtsp_monitor_get_devlist (uint8 flg)
 			g_RtspMonItoRDevList->Devinfo[index].ChannelNumber = g_list->Comdev[i].ChannelNumber;
 			memset(g_RtspMonItoRDevList->Devinfo[index].UserName, 0, sizeof(g_RtspMonItoRDevList->Devinfo[index].UserName));
 			memset(g_RtspMonItoRDevList->Devinfo[index].Password, 0, sizeof(g_RtspMonItoRDevList->Devinfo[index].Password));
+			g_RtspMonItoRDevList->Devinfo[index].CanControlPTZ = g_list->Comdev[i].CanControlPTZ;
 			index++;
 		}
 	}
@@ -1215,7 +1229,7 @@ exit:
   Return:			成功与否, TRUE / FALSE
   Others:
 *************************************************/
-int32 rtsp_monitor_start(uint32 index, uint32 type, PFGuiNotify GuiProc)
+int32 rtsp_monitor_start(uint32 index, uint32 type)
 {
 	dprintf("rtsp_monitor_start %d\n",g_RtspMonItorInfo.state);
 
@@ -1241,7 +1255,7 @@ int32 rtsp_monitor_start(uint32 index, uint32 type, PFGuiNotify GuiProc)
 	g_RtspMonItorInfo.type = type;
 
 	//g_RtspMonItorInfo.state = MONITOR_END;
-	g_RtspMonItorInfo.gui_notify = GuiProc;
+	//g_RtspMonItorInfo.gui_notify = GuiProc;
 	//rtsp_init(rtsp_monitor_callback, rtsp_video_callback, NULL); // 连接到监视切换状态回调
 	//rtsp_set_debug(0);
 	
@@ -1502,6 +1516,7 @@ uint8 get_commdev_state(uint32 IP)
 	{
 		if (g_CommDevlist->Comdev[i].DeviceIP == IP)
 		{
+			dprintf("g_CommDevlist->Comdev[%d].isOnLine...: %d\n", i, g_CommDevlist->Comdev[i].isOnLine);
 			return g_CommDevlist->Comdev[i].isOnLine;
 		}
 	}
@@ -1708,6 +1723,74 @@ int fenji_sync_ipc_list(void)
 	}		
 }
 #endif
+
+/*************************************************
+  Function:			set_control_ptz
+  Description:		云台方向和焦距控制
+  Input:			
+  	1.cmd			云台控制命令
+  	2.action 		0 启动控制 1 停止控制
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
+void set_control_ptz(uint8 cmd, uint8 action)
+{
+	char data[100] = {0};
+	uint32 rtsp_ip = storage_get_netparam_bytype(RTSP_IPADDR);
+
+	if (0 == rtsp_ip)
+	{
+		rtsp_ip = storage_get_center_ip();
+	}
+
+	sprintf(data,"PTZCONTROL_1_%s_%s_%d_%d_%d:%d:2",
+				g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].FactoryName, UlongtoIP(g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].DeviceIP), 
+				g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].DevPort, g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].ChannelNumber, cmd, action);
+	net_direct_send(CMD_RTSP_PTZ_CONTROL, data, sizeof(data), rtsp_ip, NETCMD_UDP_PORT);
+}
+
+/*************************************************
+  Function:			preset_control_ptz
+  Description:		云台预置点控制
+  Input:			
+  	1.index			预置点索引
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
+void preset_control_ptz(uint8 index)
+{
+	char data[100] = {0};
+	uint32 rtsp_ip = storage_get_netparam_bytype(RTSP_IPADDR);
+
+	if (0 == rtsp_ip)
+	{
+		rtsp_ip = storage_get_center_ip();
+	}
+
+	sprintf(data,"PTZCONTROL_1_%s_%s_%d_%d_%d:%d",
+				g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].FactoryName, UlongtoIP(g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].DeviceIP), 
+				g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].DevPort, g_RtspMonItoRDevList->Devinfo[g_RtspMonItorInfo.index].ChannelNumber, GOTO_PRESET, index);
+	net_direct_send(CMD_RTSP_PTZ_CONTROL, data, sizeof(data), rtsp_ip, NETCMD_UDP_PORT);
+}
+
+
+/*************************************************
+  Function:				rtsp_ini
+  Description:			监视初始化
+  Input: 	
+  	1.GuiProc			GUI回调函数
+  Output:				无
+  Return:				
+  Others:
+*************************************************/
+void rtsp_ini(PFGuiNotify RtspListProc, PFGuiNotify GuiProc)
+{
+	g_RtspListInfo.gui_notify = RtspListProc;
+	g_RtspMonItorInfo.gui_notify = GuiProc;
+}
+
 
 /*************************************************
   Function:			rtsp_distribute

@@ -19,7 +19,9 @@ static ITURadioBox* SetRtspFactoryMsg0RadioBox = NULL;
 static ITURadioBox* SetRtspFactoryMsg1RadioBox = NULL;
 static ITUBackground* SetRtspFactoryMsgBackground = NULL;
 static ITUBackground* SetRtspBackground = NULL;
-static ITUText* SetRtspParamList[8] = { NULL };
+static ITUText* SetRtspParamList[9] = { NULL };
+static ITUSprite* SetPTZEnableSprite = NULL;
+static ITUText* SetPTZEnable1Text = NULL;
 
 static uint32 g_camera_index = -1;							//设置第几个摄像头
 static PMonitorDeviceList g_list;
@@ -120,30 +122,54 @@ static void ShowSetCameraParamList(int index)
 		break;
 
 	case 1:
-		strcat(text_tmp, g_homedev.DeviceName);
+		if (strcmp(g_homedev.FactoryName, "HIKVISION") == 0)
+		{
+			ituSetColor(&((ITUWidget*)SetPTZEnable1Text)->color, 255, 255, 255, 255);
+			ituSetColor(&((ITUWidget*)SetRtspParamList[1])->color, 255, 255, 255, 255);
+		}
+		else
+		{
+			ituSetColor(&((ITUWidget*)SetPTZEnable1Text)->color, 255, 128, 138, 135);//冷灰
+			ituSetColor(&((ITUWidget*)SetRtspParamList[1])->color, 255, 192, 192, 192);//灰色
+		}
+
+		if (g_homedev.CanControlPTZ)
+		{
+			ituSpriteGoto(SetPTZEnableSprite, 1);
+			sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_PTZ_Used));
+		}
+		else
+		{
+			ituSpriteGoto(SetPTZEnableSprite, 0);
+			sprintf(text_tmp, "%s", get_str(SID_Set_Rtsp_PTZ_Unused));
+		}
 		break;
 
 	case 2:
-		sprintf(text_tmp, "%s", UlongtoIP(g_homedev.DeviceIP));
+		strcat(text_tmp, g_homedev.DeviceName);
 		break;
 
 	case 3:
-		sprintf(text_tmp, "%d", g_homedev.DevPort);
+		sprintf(text_tmp, "%s", UlongtoIP(g_homedev.DeviceIP));
 		break;
 
 	case 4:
-		sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
+		sprintf(text_tmp, "%d", g_homedev.DevPort);
 		break;
 
 	case 5:
-		sprintf(text_tmp, "%s", g_homedev.FactoryName);
+		sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
 		break;
 
 	case 6:
-		sprintf(text_tmp, "%s", g_homedev.UserName);
+		sprintf(text_tmp, "%s", g_homedev.FactoryName);
 		break;
 
 	case 7:
+		sprintf(text_tmp, "%s", g_homedev.UserName);
+		break;
+
+	case 8:
 		sprintf(text_tmp, "%s", g_homedev.Password);
 		break;
 
@@ -170,7 +196,7 @@ static void KeyBordGotoRtspParam()
 
 	switch (g_camera_param_index)
 	{
-	case 2:
+	case 3:
 		ret = IPIsCorrect(TextBox_data);
 		if (FALSE == ret)
 		{
@@ -183,7 +209,7 @@ static void KeyBordGotoRtspParam()
 		}
 		break;
 
-	case 3:
+	case 4:
 		count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
 		if (0 == count_textbox)
 		{
@@ -193,7 +219,7 @@ static void KeyBordGotoRtspParam()
 		g_homedev.DevPort = atoi(TextBox_data);
 		break;
 
-	case 4:
+	case 5:
 		count_textbox = TextBox_data ? strlen(TextBox_data) : 0;
 		if (0 == count_textbox)
 		{
@@ -203,11 +229,11 @@ static void KeyBordGotoRtspParam()
 		g_homedev.ChannelNumber = atoi(TextBox_data);
 		break;
 
-	case 6:
+	case 7:
 		strcpy(g_homedev.UserName, TextBox_data);
 		break;
 
-	case 7:
+	case 8:
 		strcpy(g_homedev.Password, TextBox_data);
 		break;
 	}
@@ -261,26 +287,29 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 		SetRtspParamList[0] = ituSceneFindWidget(&theScene, "SetCameraEnable2Text");
 		assert(SetRtspParamList[0]);
 
-		SetRtspParamList[1] = ituSceneFindWidget(&theScene, "CameraDevName2Text");
+		SetRtspParamList[1] = ituSceneFindWidget(&theScene, "SetPTZEnable2Text");
 		assert(SetRtspParamList[1]);
 
-		SetRtspParamList[2] = ituSceneFindWidget(&theScene, "CameraIP2Text");
+		SetRtspParamList[2] = ituSceneFindWidget(&theScene, "CameraDevName2Text");
 		assert(SetRtspParamList[2]);
 
-		SetRtspParamList[3] = ituSceneFindWidget(&theScene, "CameraPort2Text");
+		SetRtspParamList[3] = ituSceneFindWidget(&theScene, "CameraIP2Text");
 		assert(SetRtspParamList[3]);
 
-		SetRtspParamList[4] = ituSceneFindWidget(&theScene, "CameraVideo2Text");
+		SetRtspParamList[4] = ituSceneFindWidget(&theScene, "CameraPort2Text");
 		assert(SetRtspParamList[4]);
 
-		SetRtspParamList[5] = ituSceneFindWidget(&theScene, "CameraFactoryName2Text");
+		SetRtspParamList[5] = ituSceneFindWidget(&theScene, "CameraVideo2Text");
 		assert(SetRtspParamList[5]);
 
-		SetRtspParamList[6] = ituSceneFindWidget(&theScene, "CameraUserName2Text");
+		SetRtspParamList[6] = ituSceneFindWidget(&theScene, "CameraFactoryName2Text");
 		assert(SetRtspParamList[6]);
 
-		SetRtspParamList[7] = ituSceneFindWidget(&theScene, "CameraPwd2Text");
+		SetRtspParamList[7] = ituSceneFindWidget(&theScene, "CameraUserName2Text");
 		assert(SetRtspParamList[7]);
+
+		SetRtspParamList[8] = ituSceneFindWidget(&theScene, "CameraPwd2Text");
+		assert(SetRtspParamList[8]);
 
 		for (i = 0; i < MAX_HOME_NUM; i++)
 		{
@@ -292,6 +321,12 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 
 		CameraDevNameContainer = ituSceneFindWidget(&theScene, "CameraDevNameContainer");
 		assert(CameraDevNameContainer);
+
+		SetPTZEnableSprite = ituSceneFindWidget(&theScene, "SetPTZEnableSprite");
+		assert(SetPTZEnableSprite);
+
+		SetPTZEnable1Text = ituSceneFindWidget(&theScene, "SetPTZEnable1Text");
+		assert(SetPTZEnable1Text);
 
 		ituWidgetDisable(CameraDevNameContainer);
 	}
@@ -381,7 +416,7 @@ static void ShowSetCameraParam()
 	sprintf(g_homedev.DeviceName, "%s", text_tmp);
 #endif
 
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 9; i++)
 	{
 		ShowSetCameraParamList(i);
 	}
@@ -440,24 +475,41 @@ bool SetRtspParamListButtonOnMouseUp(ITUWidget* widget, char* param)
 		break;
 
 	case 1:
+		if (strcmp(g_homedev.FactoryName, "HIKVISION") == 0)
+		{
+			if (g_homedev.CanControlPTZ)
+			{
+				g_homedev.CanControlPTZ = 0;
+			}
+			else
+			{
+				g_homedev.CanControlPTZ = 1;
+			}
+
+			save_rtsp_param();
+			ShowSetCameraParamList(1);
+		}
 		break;
 
 	case 2:
+		break;
+
+	case 3:
 		sprintf(text_tmp, "%s", UlongtoIP(g_homedev.DeviceIP));
 		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, text_tmp);
 		break;
 
-	case 3:
+	case 4:
 		sprintf(text_tmp, "%d", g_homedev.DevPort);
 		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 4, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 
-	case 4:
+	case 5:
 		sprintf(text_tmp, "%d", g_homedev.ChannelNumber);
 		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 3, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 
-	case 5:
+	case 6:
 		if (strcmp(g_homedev.FactoryName, "HIKVISION") == 0)
 		{
 			ituRadioBoxSetChecked(SetRtspFactoryMsg0RadioBox, true);
@@ -470,12 +522,12 @@ bool SetRtspParamListButtonOnMouseUp(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(SetRtspFactoryMsgBackground, true);
 		break;
 
-	case 6:
+	case 7:
 		sprintf(text_tmp, "%s", g_homedev.UserName);
 		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 12, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
 
-	case 7:
+	case 8:
 		sprintf(text_tmp, "%s", g_homedev.Password);
 		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 12, EXPRESS_CHAR, CANCEL_BTN, text_tmp);
 		break;
@@ -506,10 +558,12 @@ bool SetRtspFactoryMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 
 	case 1:
 		strcpy(g_homedev.FactoryName, "SelfIPC");
+		g_homedev.CanControlPTZ = 0;
 		break;
 	}
 
-	ShowSetCameraParamList(5);
+	ShowSetCameraParamList(1);
+	ShowSetCameraParamList(6);
 	save_rtsp_param();
 
 	ituWidgetSetVisible(SetRtspFactoryMsgBackground, false);

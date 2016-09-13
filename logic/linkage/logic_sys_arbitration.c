@@ -23,7 +23,6 @@ static uint8 g_ViewPict_State = 0;
 
 static uint8 g_sysHintsNum[SYS_HINT_MAX_NUM];	// 消息记录未读条数
 static uint8 g_sysHints[SYS_HINT_MAX_NUM];
-SYS_LCD_STATE g_LcdState = SYS_LCD_CLOSE;
 static 	pthread_mutex_t g_MediaLock;
 static uint32 g_RecordTimer = 0;				// 家人留言录制定时器
 static uint32 g_RecordTimeOut = 0;				// 家人留言录制时间
@@ -538,6 +537,84 @@ void sys_set_no_deal(uint8 flg)
 }
 
 /*************************************************
+  Function:			sys_continue_play_file
+  Description: 		继续播放
+  Input: 			
+  Output:			无
+  Return:			无
+  Others:			
+*************************************************/
+int sys_continue_play_file(void)
+{
+	SYS_MEDIA_TYPE MediaType = sys_get_media_state();
+	switch (MediaType)
+	{
+		case SYS_MEDIA_MUSIC:
+			{
+				media_continue_sound();
+			}
+			break;
+		
+		case SYS_MEDIA_LEAVEWORD_PLAY:
+			{
+				if (LYLY_TYPE_VIDEO == g_LylyMode)
+				{
+					media_continue_video_lyly();
+				}
+				else
+				{
+					media_continue_sound();
+				}
+			}
+			break;
+		
+		default:
+			return SYS_MEDIA_ECHO_ERR;
+	}
+	
+	return SYS_MEDIA_ECHO_OK;
+}
+
+/*************************************************
+  Function:			sys_pause_play_file
+  Description: 		暂停播放媒体文件
+  Input: 			
+  Output:			无
+  Return:			无
+  Others:			
+*************************************************/
+int sys_pause_play_file(void)
+{
+	SYS_MEDIA_TYPE MediaType = sys_get_media_state();
+	switch (MediaType)
+	{
+		case SYS_MEDIA_MUSIC:
+			{
+				media_pause_sound();
+			}
+			break;
+		
+		case SYS_MEDIA_LEAVEWORD_PLAY:
+			{
+				if (LYLY_TYPE_VIDEO == g_LylyMode)
+				{
+					media_pause_video_lyly();
+				}
+				else
+				{
+					media_pause_sound();
+				}
+			}
+			break;
+		
+		default:
+			return SYS_MEDIA_ECHO_ERR;
+	}
+	
+	return SYS_MEDIA_ECHO_OK;
+}
+
+/*************************************************
   Function:			sys_stop_play_audio
   Description: 		停止播放音频文件
   Input: 			
@@ -680,7 +757,7 @@ int32 sys_start_play_leaveword(char *FileName, LYLY_TYPE type, uint8 volume, Med
 	}
 	else	// 播放纯声音
 	{
-		ret = media_play_sound_lyly(FileName, 0, (void*)play_media_callback);
+		ret = media_play_sound(FileName, 0, (void*)play_media_callback);
 		if (ret == FALSE)
 		{
 			set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
@@ -715,7 +792,7 @@ int32 sys_stop_play_leaveword(void)
 	}
 	else
 	{
-		media_stop_sound_lyly();
+		media_stop_sound();
 	}
 	set_curplay_state(SYS_MEDIA_NONE, NULL, NULL, FALSE);
 	g_LylyMode = LYLY_TYPE_MAX;
@@ -1121,78 +1198,6 @@ void sys_sync_hint_state(void)
 }
 
 /*************************************************
-  Function:			sys_get_lcd_state
-  Description: 		屏幕状态
-  Input: 		
-  Output:			无
-  Return:			无
-  Others:			
-*************************************************/
-SYS_LCD_STATE sys_get_lcd_state(void)
-{
-	return g_LcdState;
-}
-
-/*************************************************
-  Function:			sys_open_lcd
-  Description: 		开屏操作
-  Input: 		
-  Output:			无
-  Return:			无
-  Others:			
-*************************************************/
-uint8 sys_open_lcd(void)
-{
-	#if 0
-	if (SYS_LCD_CLOSE == g_LcdState)
-	{
-		//PMU_EnterModule(PMU_NORMAL);				// add by luofl 2011-08-16 降低待机功耗
-		hw_lcd_pwr_on();
-		g_LcdState = SYS_LCD_OPEN;
-		sys_set_hint_state(SYS_HINT_OPERATING, TRUE);
-		//hw_spk_on();
-		DelayMs_nops(150);
-		BL_SetBright(storage_get_bright());
-		return TRUE;
-	}
-	return FALSE;
-	#else
-	if (SYS_LCD_CLOSE == g_LcdState)
-	{
-		hw_lcd_power_on();							// 开屏电源
-		sys_set_hint_state(SYS_HINT_OPERATING, TRUE);
-		g_LcdState = SYS_LCD_OPEN;
-		usleep(200*1000);
-		hw_lcd_back_on();							// 开屏背光
-		//hw_speak_on();							// 开喇叭
-		return TRUE;
-	}
-	
-	return FALSE;
-	#endif
-}
-
-/*************************************************
-  Function:			sys_close_lcd
-  Description: 		关屏操作
-  Input: 		
-  Output:			无
-  Return:			无
-  Others:			
-*************************************************/
-void sys_close_lcd(void)
-{
-	if (SYS_LCD_OPEN == g_LcdState)
-	{
-		hw_lcd_back_off();
-		g_LcdState = SYS_LCD_CLOSE;
-		sys_set_hint_state(SYS_HINT_OPERATING, FALSE);
-		hw_speak_off();								// 关喇叭
-		hw_lcd_power_off();
-	}
-}
-
-/*************************************************
   Function:			sys_key_beep
   Description: 		按键音
   Input: 		
@@ -1314,15 +1319,14 @@ void sys_init_hint_state(void)
 	#ifdef _TIMER_REBOOT_NO_LCD_
 	if (storage_get_isOpenScreen())
 	{
-		sys_open_lcd();		
+		ScreenOn();		
 	}
 	else	
 	{
-		g_LcdState = SYS_LCD_OPEN;
 		timer_reboot_control(FALSE);
 	}
 	#else
-	sys_open_lcd();		
+	ScreenOn();		
 	#endif
 }
 

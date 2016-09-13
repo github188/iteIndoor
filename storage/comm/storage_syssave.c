@@ -15,7 +15,7 @@
 #include "storage_include.h"
 
 #define SYSCONFIG_SIZE			(sizeof(SYSCONFIG))
-#define DIR_PATH_NUM			11
+#define DIR_PATH_NUM			12
 
 SYSCONFIG gpSysConfig;
 PAF_FLASH_DATA	gpAfParam = &gpSysConfig.AfFlashData;
@@ -408,7 +408,8 @@ static void create_sys_dir(void)
 		{JRLY_DIR_PATH},
 		{JD_DIR_PATH},
 		{YUYUE_DIR_PATH},
-		{MONITOR_DIR_PATH}};
+		{MONITOR_DIR_PATH},
+		{LYLY_HIT_RE_PATH}};
 
 	// 目录不存在则创建
 	for (i = 0; i < DIR_PATH_NUM; i++)

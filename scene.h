@@ -1,4 +1,4 @@
-﻿/** @file
+/** @file
  * ITE DoorBell Indoor Scene Definition.
  *
  * @author Jim Tan
@@ -21,18 +21,17 @@ extern "C" {
 
 extern ITUScene theScene;
 
-// ������״̬�ص�����
 typedef enum
 {
-	UPDATE_DEVNO_E = 0X00,					// �����豸��		
-	UPDATE_NET_STATE_E = 0X01,					// ��������״̬
-	UPDATE_IPMODEL_STATE_E = 0X02,					// ����IPģ��״̬
-	UPDATE_ALARM_E = 0X03,					// ���±�������
-	UPDATE_CALL_E = 0X04,					// ����δ�Ӽ�¼����
-	UPDATE_MESSAGE_E = 0X05,					// ������Ϣ��Ϣ����
-	UPDATE_LYLY_E = 0X06,					// ������Ӱ��������
-	UPDATE_UNDISTURB_E = 0X07,					// ���������״̬
-	UPDATE_JRLY_E = 0X08,					// ���¼�����������
+	UPDATE_DEVNO_E = 0X00,	
+	UPDATE_NET_STATE_E = 0X01,	
+	UPDATE_IPMODEL_STATE_E = 0X02,
+	UPDATE_ALARM_E = 0X03,			
+	UPDATE_CALL_E = 0X04,			
+	UPDATE_MESSAGE_E = 0X05,		
+	UPDATE_LYLY_E = 0X06,			
+	UPDATE_UNDISTURB_E = 0X07,		
+	UPDATE_JRLY_E = 0X08,			
 
 }UPDATE_STATE_E;
 
@@ -41,24 +40,24 @@ typedef enum
  */
 typedef enum
 {
-	EVENT_CUSTOM0_STATE_UPDATE = ITU_EVENT_CUSTOM, 			// ״̬����֪ͨ �ο�UPDATE_STATE_E 
-	EVENT_CUSTOM1_SCREENSAVER, 								// ��Ļ����
-	EVENT_CUSTOM2_RESER, 									// Ԥ��
-	EVENT_CUSTOM3_RESER, 									// Ԥ��
-	EVENT_CUSTOM4_RESER, 									// Ԥ��
-	EVENT_CUSTOM5_RESER, 									// Ԥ��
-	EVENT_CUSTOM6_RESER, 									// Ԥ��
-	EVENT_CUSTOM7_RESER, 									// Ԥ��
-	EVENT_CUSTOM8_RESER, 									// Ԥ��
-	EVENT_CUSTOM9_RESER, 									// Ԥ��
-	EVENT_CUSTOM10_RESER, 									// Ԥ��
-	EVENT_CUSTOM11_CALLREQUEST, 							// 呼叫请求命令
-	EVENT_CUSTOM12_CALLOUT, 								// ���лص���Ϣ						
-	EVENT_CUSTOM13_CALLIN, 									// ���лص���Ϣ
-	EVENT_CUSTOM14_MONITOR_LIST, 							// 获取监视列表	
-	EVENT_CUSTOM15_MONITOR, 								// ���ӻص���Ϣ
-	EVENT_CUSTOM16_RTSP_LIST, 								// 获取RTSP监视列表	
-	EVENT_CUSTOM17_RTSP_MONITOR, 							// RTSP���ӻص���Ϣ	
+	EVENT_CUSTOM0_STATE_UPDATE = ITU_EVENT_CUSTOM, 
+	EVENT_CUSTOM1_SCREENSAVER, 						
+	EVENT_CUSTOM2_RESER, 							
+	EVENT_CUSTOM3_RESER, 								
+	EVENT_CUSTOM4_RESER, 								
+	EVENT_CUSTOM5_RESER, 								
+	EVENT_CUSTOM6_RESER, 								
+	EVENT_CUSTOM7_RESER, 								
+	EVENT_CUSTOM8_RESER, 								
+	EVENT_CUSTOM9_RESER, 								
+	EVENT_CUSTOM10_RESER, 								
+	EVENT_CUSTOM11_CALLREQUEST, 						
+	EVENT_CUSTOM12_CALLOUT, 							
+	EVENT_CUSTOM13_CALLIN, 								
+	EVENT_CUSTOM14_MONITOR_LIST, 						
+	EVENT_CUSTOM15_MONITOR, 							
+	EVENT_CUSTOM16_RTSP_LIST, 							
+	EVENT_CUSTOM17_RTSP_MONITOR, 						
 
 } CustomEvent;
 
@@ -105,6 +104,18 @@ typedef struct
 int32 af_callback_gui(int32 Param1, int32 Param2);
 
 /*************************************************
+Function:		callrequest_state_callbak
+Description:	呼叫请求回调函数
+Input:
+1. param1		状态
+2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+void callrequest_state_callbak(uint32 param1, uint32 param2);
+
+/*************************************************
   Function:			callout_state_callbak
   Description:
   Input:
@@ -125,6 +136,18 @@ void callout_state_callbak(uint32 param1, uint32 param2);
 void callin_state_callbak(uint32 param1, uint32 param2);
 
 /*************************************************
+Function:		monitor_list_state_callbak
+Description:	获取监视列表回调函数
+Input:
+1. param1		状态
+2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+void monitor_list_state_callbak(uint32 param1, uint32 param2);
+
+/*************************************************
   Function:			monitor_state_callbak
   Description:
   Input:
@@ -135,7 +158,19 @@ void callin_state_callbak(uint32 param1, uint32 param2);
 void monitor_state_callbak(uint32 param1, uint32 param2);
 
 /*************************************************
-  Function:			rtsp_monitor_state_callbak
+Function:		rtsp_list_state_callbak
+Description: 	搜索列表回调函数
+Input:
+1. param1		状态
+2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+void rtsp_list_state_callbak(uint32 param1, uint32 param2);
+
+/*************************************************
+  Function:			rtsp_state_callbak
   Description: 		����״̬�ص�
   Input:
   1.param1
@@ -144,7 +179,7 @@ void monitor_state_callbak(uint32 param1, uint32 param2);
   Return:
   Others:
   *************************************************/
-void rtsp_monitor_state_callbak(uint32 param1, uint32 param2);
+void rtsp_state_callbak(uint32 param1, uint32 param2);
 
 /*************************************************
   Function:			show_sys_event_hint

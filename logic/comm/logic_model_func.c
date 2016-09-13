@@ -76,7 +76,7 @@ void start_disturb_timer(void)
 
 		// ÈýÃë¶¨Ê±Æ÷
 		g_NofaceTimer = add_aurine_realtimer((1000*NODISTURB_TIME), disturb_timer_proc, NULL);	
-		dprintf("g_NofaceTimer : %d \n", g_NofaceTimer);
+		dprintf("g_NofaceTimer : %d , g_NofaceTime: %d\n", g_NofaceTimer, g_NofaceTime);
 	}
 }
 

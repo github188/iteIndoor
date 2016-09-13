@@ -240,6 +240,26 @@ void media_stop_analog_video(void);
 uint32 media_set_analog_output_volume(uint32 vol);
 
 /*************************************************
+  Function:			media_continue_video_lyly
+  Description:		继续播放留影留言
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+uint32 media_continue_video_lyly(void);
+
+/*************************************************
+  Function:			media_pause_video_lyly
+  Description:		留影留言播放暂停
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+uint32 media_pause_video_lyly(void);
+
+/*************************************************
   Function:			media_play_video_lyly
   Description:		
   Input: 
@@ -333,6 +353,26 @@ int media_disable_audio_recv(void);
   Others:
 *************************************************/
 uint32 media_snapshot(char *filename, PSNAP_CALLBACK proc);
+
+/*************************************************
+  Function:			media_continue_sound
+  Description:		继续播放
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_continue_sound(void);
+
+/*************************************************
+  Function:			media_pause_sound
+  Description:		声音播放暂停
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_pause_sound(void);
 
 /*************************************************
   Function:			media_play_sound

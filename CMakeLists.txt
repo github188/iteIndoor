@@ -202,6 +202,8 @@ logic/jiadian/logic_jiadian.c
 logic/jiadian/logic_jiadian.h
 logic/message/logic_message.c
 logic/message/logic_message.h
+logic/screen/logic_screen.c
+logic/screen/logic_screen.h
 logic/logic_include.h
 gui/mainmenu/layer_mainmenu.c
 gui/mainmenu/layer_mainmenu.h
@@ -223,6 +225,10 @@ gui/call/layer_becall.c
 gui/call/layer_monitor_search.c
 gui/call/layer_video.c
 gui/call/layer_monitor.c
+gui/call/layer_rtsp_search.c
+gui/call/layer_rtsp_monitor.c
+gui/alarm/layer_alarm.h
+gui/alarm/layer_alarm.c
 gui/comm/au_model_func.c	
 gui/set/layer_set_menu.c
 gui/set/layer_set_bottom_return.c   
@@ -266,6 +272,8 @@ gui/set/project/layer_set_jd_learn_ir.c
 gui/set/msg/layer_msg_fail_hint_success.c
 gui/set/msg/layer_msg_link_out_time.c
 gui/set/layer_set.h
+gui/screensaver/layer_screensaver.c
+gui/screensaver/layer_screensaver.h
     )
 
 # files

@@ -111,6 +111,8 @@ extern "C" {
 #define ESID_Set_Rtsp_Indoor_Camera     (g_China ? (g_Big5 ? "室內攝像頭" : "室内摄像头") : "Indoor Camera")
 #define ESID_Set_Rtsp_Camera_Used       (g_China ? (g_Big5 ? "室內攝像頭已啟用" : "室内摄像头已启用") : "Indoor Camera Enabled")
 #define ESID_Set_Rtsp_Camera_Unused     (g_China ? (g_Big5 ? "室內攝像頭未啟用" : "室内摄像头未启用") : "Indoor Camera Disabled")
+#define ESID_Set_Rtsp_PTZ_Used			(g_China ? (g_Big5 ? "PTZ控制已啟用" : "PTZ控制已啟用") : "PTZ control enabled")
+#define ESID_Set_Rtsp_PTZ_Unused        (g_China ? (g_Big5 ? "PTZ控制未啟用" : "PTZ控制未啟用") : "PTZ control disabled")
 #define ESID_Set_Data_Save_Err			(g_China ? (g_Big5 ? "數據保存失敗" : "数据保存失败") : "Data Save Error")
 #define ESID_Set_Rtsp_Port_Null			(g_China ? (g_Big5 ? "端口號不能為空" : "端口号不能为空") : "Pls enter port number!")
 #define ESID_Set_Rtsp_Channel_Null		(g_China ? (g_Big5 ? "視頻通道不能為空" : "视频通道不能为空") : "Pls enter channel number!")
@@ -126,6 +128,7 @@ extern "C" {
 #define ESID_Msg_Param_Suer_Save		(g_China ? (g_Big5 ? "是否保存設置？" : "是否保存设置？") : "Sure to save settings?")
 #define ESID_Msg_IP_Unline              (g_China ? (g_Big5 ? "IP協議轉換器未在線" : "IP协议转换器未在线") : "IP Converter Offline.")
 #define ESID_Msg_Obtain_Jd_False        (g_China ? (g_Big5 ? "獲取家電信息失敗！" : "获取家电信息失败！") : "Obtain appliance info. failed!")
+#define ESID_Set_Ring_Tips_Fail		    (g_China ? (g_Big5 ? "請錄製留言提示音" : "请录制留言提示音") : "Please record messages prompt tone.")	
 
 
 // IP协议转换器
@@ -137,8 +140,6 @@ extern "C" {
 #define ESID_Set_Online				     (g_China ? (g_Big5 ? "在線" : "在线") : "OnLine")
 #define ESID_Set_Offline 				 (g_China ? (g_Big5 ? "離線" : "离线") : "UnLine")
 
-
-
 // 网络门前机文字
 #define ESID_Net_Door             		 (g_China ? (g_Big5 ? "網絡門前機" : "网络门前机") : "IP Camera")
 #define ESID_Net_Door_First              (g_China ? (g_Big5 ? "網絡門前機一" : "网络门前机一") : "IP Camera 1")
@@ -147,7 +148,6 @@ extern "C" {
 #define ESID_Net_Door_Get_MAC            (g_China ? (g_Big5 ? "是否獲取MAC？" : "是否获取MAC？") : "Sure to obtain MAC?")
 #define ESID_Net_Door_Save_Reboot_Door   (g_China ? (g_Big5 ? "是否保存？保存后門前機將重啟" : "是否保存？保存后门前机将重启") : "Sure to save? Outdoor Camera will be rebooted after saving.")
 #define ESID_Net_Door_Card_Delet_All     (g_China ? (g_Big5 ? "是否刪除網絡門前機的所有卡？" : "是否删除网络门前机的所有卡？") : "Sure to save? Outdoor Camera will be rebooted after saving.")
-
 
 // 报警文字
 #define ESID_Bj_Report_Type_Chufa       (g_China ? (g_Big5 ? "觸發報警" : "触发报警") : "Triggerred Alarm")
@@ -193,6 +193,12 @@ extern "C" {
 #define ESID_Bj_Fangqu6					(g_China ? (g_Big5 ? "防區6" : "防区6") : "Zone6")
 #define ESID_Bj_Fangqu7					(g_China ? (g_Big5 ? "防區7" : "防区7") : "Zone7")
 #define ESID_Bj_Fangqu8					(g_China ? (g_Big5 ? "防區8" : "防区8") : "Zone8")
+#define ESID_Bj_Bengjikongzhi            (g_China ? (g_Big5 ? "本機控制" : "本机控制") : "Local Control") 
+#define ESID_Bj_Fengjikongzhi            (g_China ? (g_Big5 ? "分機控制" : "分机控制") : "Sub-phone Control") 
+#define ESID_Bj_Bf_Home                  (g_China ? (g_Big5 ? "在家" : "在家") : "Home")
+#define ESID_Bj_Bf_Out                   (g_China ? (g_Big5 ? "外出" : "外出") : "Away")
+#define ESID_Bj_Bf_Night                 (g_China ? (g_Big5 ? "夜間" : "夜间") : "Night")
+#define ESID_Bj_Already_Bufang           (g_China ? (g_Big5 ? "點擊單獨的防區可進行單獨布防" : "点击单独的防区可进行单独布防") : "Tap a zone to arm it")
 
 
 
@@ -651,6 +657,8 @@ typedef enum
 	SID_Set_Rtsp_Indoor_Camera,
 	SID_Set_Rtsp_Camera_Used,
 	SID_Set_Rtsp_Camera_Unused,
+	SID_Set_Rtsp_PTZ_Used,
+	SID_Set_Rtsp_PTZ_Unused,
 	SID_Set_Data_Save_Err,
 	SID_Set_Rtsp_Port_Null,
 	SID_Set_Rtsp_Channel_Null,
@@ -667,6 +675,7 @@ typedef enum
 	SID_Msg_Param_Suer_Save,
 	SID_Msg_IP_Unline,
 	SID_Msg_Obtain_Jd_False,
+	SID_Set_Ring_Tips_Fail,
 
 	// IP协议转换器
 	SID_Set_Unbounded,
@@ -729,6 +738,13 @@ typedef enum
 	SID_Bj_Fangqu6,
 	SID_Bj_Fangqu7,
 	SID_Bj_Fangqu8,
+	SID_Bj_Bengjikongzhi,
+	SID_Bj_Fengjikongzhi,
+	SID_Bj_Bf_Home,
+	SID_Bj_Bf_Out,
+	SID_Bj_Bf_Night,
+	SID_Bj_Already_Bufang,
+
 
 	// 对讲文字
 	SID_MainMonitor_Door,

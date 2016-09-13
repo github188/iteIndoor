@@ -199,8 +199,14 @@ uint32 media_set_analog_talk_volume(uint32 vol)
 int media_get_wav_time(char *filename)
 {
 	int ret = 0;
+		
 	if (filename)
 	{
+		if (is_fileexist(filename) == FALSE)
+		{
+			printf("%s is not exist !!!\n", filename);
+			return 0;
+		}
 		ret = leaf_get_wav_file_play_time(filename);
 	}
 	return ret;
@@ -778,6 +784,31 @@ int media_disable_audio_recv(void)
 	return TRUE;
 }
 
+/*************************************************
+  Function:			media_continue_sound
+  Description:		继续播放
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_continue_sound(void)
+{
+	return FALSE;
+}
+
+/*************************************************
+  Function:			media_pause_sound
+  Description:		声音播放暂停
+  Input: 			
+  Output:			无
+  Return:			TRUE/FALSE
+  Others:
+*************************************************/
+uint32 media_pause_sound(void)
+{
+	return FALSE;
+}
 
 /*************************************************
   Function:			media_play_sound
@@ -837,6 +868,32 @@ int media_stop_rtsp(void)
 {
 	return TRUE;
 }	
+
+/*************************************************
+  Function:			media_continue_video_lyly
+  Description:		继续播放留影留言
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+uint32 media_continue_video_lyly(void)
+{
+	return FALSE;
+}
+
+/*************************************************
+  Function:			media_pause_video_lyly
+  Description:		留影留言播放暂停
+  Input: 			无
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+uint32 media_pause_video_lyly(void)
+{
+	return FALSE;
+}
 
 /*************************************************
   Function:			media_play_video_lyly

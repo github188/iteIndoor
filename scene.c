@@ -1,4 +1,4 @@
-﻿#include <sys/time.h>
+#include <sys/time.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,16 +12,25 @@
 #include "logic_include.h"
 #include "gui_include.h"
 
+#define FPS_ENABLE
+
 #ifdef _WIN32
     #include <crtdbg.h>
 #endif
 
-#define MS_PER_FRAME                17     
+#define MS_PER_FRAME                17   
+#define MS_PER_FRAME_EXT            33
 #define MAX_COMMAND_QUEUE_SIZE      8
 #define GESTURE_THRESHOLD           40
 #define MOUSEDOWN_LONGPRESS_DELAY   1000
 
 #define _MAIN_MENU_LAYER_			"mainMenuLayer"
+
+//#define TK_ALARM						65
+#define TK_CENTER						SDLK_INSERT//SDLK_UP
+#define TK_MONITOR						SDLK_LEFT//SDLK_DOWN
+#define TK_LOCK							SDLK_DOWN//SDLK_LEFT
+#define TK_TALK							SDLK_UP
 
 // command
 typedef enum
@@ -59,7 +68,7 @@ static bool g_isReady = false;
 static mqd_t g_CommandQueue = -1;
 static ITUSurface* g_ScreenSurf = NULL;
 static SDL_Window *g_window = NULL;
-
+static bool g_LcdFuncNoDeal = false;
 extern ITUActionFunction actionFunctions[];
 
 
@@ -80,12 +89,8 @@ int32 af_callback_gui(int32 Param1,int32 Param2)
 Function:		callrequest_state_callbak
 Description:	呼叫请求回调函数
 Input:
- 1. param1		状态
- 2. param2		私有数据
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
+ 1. param1		状�? 2. param2		私有数据
+Output:			�?Return:			�?Others:			�?*************************************************/
 void callrequest_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -135,12 +140,8 @@ void callrequest_state_callbak(uint32 param1, uint32 param2)
   Function:			callout_state_callbak
   Description: 		主叫回调
   Input:
-  1. param1			状态
-  2. param2			私有数据
-  Output:			无
-  Return:			无
-  Others:			无
-*************************************************/
+  1. param1			状�?  2. param2			私有数据
+  Output:			�?  Return:			�?  Others:			�?*************************************************/
 void callout_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -204,12 +205,8 @@ void callout_state_callbak(uint32 param1, uint32 param2)
   Function:			callin_state_callbak
   Description: 		被叫回调
   Input:
-  1. param1			状态
-  2. param2			私有数据
-  Output:			无
-  Return:			无
-  Others:			无
-*************************************************/
+  1. param1			状�?  2. param2			私有数据
+  Output:			�?  Return:			�?  Others:			�?*************************************************/
 void callin_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -286,12 +283,8 @@ void callin_state_callbak(uint32 param1, uint32 param2)
 Function:		monitor_list_state_callbak
 Description:	获取监视列表回调函数
 Input:
-1. param1		状态
-2. param2		私有数据
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
+1. param1		状�?2. param2		私有数据
+Output:			�?Return:			�?Others:			�?*************************************************/
 void monitor_list_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -324,12 +317,8 @@ void monitor_list_state_callbak(uint32 param1, uint32 param2)
   Function:			monitor_state_callbak
   Description: 		监视回调函数
   Input:
-  1. param1			状态
-  2. param2			私有数据
-  Output:			无
-  Return:			无
-  Others:			无
-*************************************************/
+  1. param1			状�?  2. param2			私有数据
+  Output:			�?  Return:			�?  Others:			�?*************************************************/
 void monitor_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -356,11 +345,15 @@ void monitor_state_callbak(uint32 param1, uint32 param2)
 		case MONITOR_REQUEST:
 		case MONITOR_MONITORING:
 		case MONITOR_TIMER:
-		case MONITOR_END:
 			monitorbak_data.DataLen = sizeof(uint32);
 			sprintf(monitorbak_data.Buf, "%d", param2);
 			break;
-
+			
+		case MONITOR_END:
+			monitorbak_data.InterState = MONITOR_TEMP;
+			monitorbak_data.DataLen = sizeof(uint32);
+			sprintf(monitorbak_data.Buf, "%d", param2);
+			break;
 		case MONITOR_SNAP:
 			monitorbak_data.DataLen = 1;
 			sprintf(monitorbak_data.Buf, "%d", param2);
@@ -374,31 +367,60 @@ void monitor_state_callbak(uint32 param1, uint32 param2)
 }
 
 /*************************************************
-  Function:			rtsp_monitor_state_callbak
-  Description: 		RTSP回调函数
-  Input:
-  1. param1			状态
-  2. param2			私有数据
-  Output:			无
-  Return:			无
-  Others:			无
-*************************************************/
-void rtsp_monitor_state_callbak(uint32 param1, uint32 param2)
-{	
+Function:		rtsp_list_state_callbak
+Description: 	搜索列表回调函数
+Input:
+1. param1		状�?2. param2		私有数据
+Output:			�?Return:			�?Others:			�?*************************************************/
+void rtsp_list_state_callbak(uint32 param1, uint32 param2)
+{
 	Command cmd;
-	uint16 callbak_cmd;
-	
+	INTER_CALLBACK rtspbak_data;
+
 	if (g_CommandQueue == -1)
 	{
 		return;
 	}
 
-    callbak_cmd = param1;
 	memset(&cmd, 0, sizeof(Command));
-	memcpy(cmd.strarg1, &callbak_cmd, sizeof(uint16));		// ǰ�������ֽڴ洢�ص����� ����Ϊ���Ĳ���
-    cmd.id = CMD_CALLIN_CALLBAK;
-	
-	
+	memset(&rtspbak_data, 0, sizeof(INTER_CALLBACK));	
+	cmd.id = CMD_RTSP_LIST_CALLBAK;
+	rtspbak_data.InterState = (uint8)param1;
+
+	if (MONITOR_GETLIST == param1)
+	{
+		rtspbak_data.DataLen = sizeof(uint32);
+		sprintf(rtspbak_data.Buf, "%d", param2);
+	}
+	else
+	{
+		return;
+	}
+	memcpy(cmd.strarg1, &rtspbak_data, sizeof(INTER_CALLBACK));
+	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+}
+
+/*************************************************
+  Function:			rtsp_state_callbak
+  Description: 		rtsp回调函数
+  Input:
+  1. param1			状�?  2. param2			私有数据
+  Output:			�?  Return:			�?  Others:			�?*************************************************/
+void rtsp_state_callbak(uint32 param1, uint32 param2)
+{	
+	Command cmd;
+	INTER_CALLBACK rtspbak_data;
+
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
+
+	memset(&cmd, 0, sizeof(Command));
+	memset(&rtspbak_data, 0, sizeof(INTER_CALLBACK));
+	cmd.id = CMD_RTSP_CALLBAK;
+	rtspbak_data.InterState = (uint8)param1;
+
 	switch (param1)
 	{
 		case MONITOR_SEARCH:
@@ -410,20 +432,21 @@ void rtsp_monitor_state_callbak(uint32 param1, uint32 param2)
 		case MONITOR_MONITORING:			
 			break;
 
-		case MONITOR_END:
+		case MONITOR_TIMER:
+			rtspbak_data.DataLen = sizeof(uint32);
+			sprintf(rtspbak_data.Buf, "%d", param2);
 			break;
 
-		case MONITOR_GETLIST:
+		case MONITOR_END:
+			rtspbak_data.InterState = MONITOR_TEMP;
+			rtspbak_data.DataLen = sizeof(uint32);
+			sprintf(rtspbak_data.Buf, "%d", param2);
 			break;
 
 		default:
 			return;
 	}
-
-	if (param1 != MONITOR_TIMER)
-	{
-	}
-
+	memcpy(cmd.strarg1, &rtspbak_data, sizeof(INTER_CALLBACK));
 	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 }
 
@@ -437,7 +460,7 @@ void rtsp_monitor_state_callbak(uint32 param1, uint32 param2)
 *************************************************/
 void show_sys_event_hint(uint16 EventType)
 {
-
+	ScreenSaverRefresh();
 }
 
 /*************************************************
@@ -459,7 +482,7 @@ static void ItuSetLanguage(LANGUAGE_E lang)
   Function:		GotoLayer
   Description: 	�л�ͼ��
   Input:		
-  	name		ͼ���Ӧ���� ����Ψһ��
+  	name		ͼ���Ӧ����?����Ψһ��
   Output:		��
   Return:		��
   Others:
@@ -635,8 +658,7 @@ static void ProcessCommand(void)
 
 /*************************************************
   Function:		CheckQuitValue
-  Description: 	�˳���־���
-  Input:		
+  Description: 	�˳���־���?  Input:		
   Output:		��
   Return:		��
   Others:
@@ -769,7 +791,7 @@ void SceneLoad(void)
 int SceneRun(void)
 {
     SDL_Event ev;
-    int delay, frames, lastx, lasty;
+    int delay, frames, lastx, lasty, ret;
     uint32_t tick, dblclk, lasttick, mouseDownTick;
 
     /* Watch keystrokes */
@@ -788,9 +810,8 @@ int SceneRun(void)
         ProcessCommand();       
 
         tick = SDL_GetTicks();
-
-	#define FPS_ENABLE		//打印帧数
-    #ifdef  FPS_ENABLE
+	#define FPS_ENABLE
+    #ifdef FPS_ENABLE
         frames++;
         if (tick - lasttick >= 1000)
         {
@@ -800,72 +821,99 @@ int SceneRun(void)
         }
     #endif // FPS_ENABLE
 
-   
         while (SDL_PollEvent(&ev))
         {
             switch (ev.type)
-            {
+            {            
             	case SDL_KEYDOWN:
 					{
-		                //ScreenSaverRefresh();
-		                result = ituSceneUpdate(&theScene, ITU_EVENT_KEYDOWN, ev.key.keysym.sym, 0, 0);
-		                switch (ev.key.keysym.sym)
+						// add by chenbh
+						if (ScreenSaverIsScreenSaving())
 						{
-						    case SDLK_UP:
+							ScreenSaverRefresh();
+							g_LcdFuncNoDeal = true;
+							break;
+						}
+						
+		                ScreenSaverRefresh();
+		                result = ituSceneUpdate(&theScene, ITU_EVENT_KEYDOWN, ev.key.keysym.sym, 0, 0);
+						printf("ev.key.keysym.sym: %x\n", ev.key.keysym.sym);
+		                switch (ev.key.keysym.sym)
+						{						
+						    case TK_CENTER:
 						        {						            
-						            result = true;
+						            result = true;									
 						        }
 						        break;
 
-						    case SDLK_DOWN:
+						    case TK_MONITOR:
 						        {
-
+									result = true;	
+									ScreenOn();
 								}						        
 						        break;
 
-						    case SDLK_LEFT:
+						    case TK_LOCK:
 						        {						            
-						            result = true;
+						            result = true;	
+									ScreenOff();
 						        }
 						        break;
 
-						    case SDLK_RIGHT:
+						    case TK_TALK:
 						        {
 									result = true;
 								}						        
 						        break;
 
-						    case SDLK_INSERT:
-						        {						           
-						            result = true;
-						        }
-						        break;
+							default:
+								break;
 
 						}
-
-						/*
+						
 		                if (result && !ScreenIsOff())
-		                    LinphonePlayKeySound();
-		                  */
+		                    sys_key_beep();
+		                  
 		        }
                 break;
 
             case SDL_KEYUP:
 				{
-                	result = ituSceneUpdate(&theScene, ITU_EVENT_KEYUP, ev.key.keysym.sym, 0, 0);
+					if (g_LcdFuncNoDeal == false)
+					{
+                		result = ituSceneUpdate(&theScene, ITU_EVENT_KEYUP, ev.key.keysym.sym, 0, 0);
+					}
+					g_LcdFuncNoDeal = false;
             	}
                 break;
 
             case SDL_MOUSEMOTION:
 				{
-                	//ScreenSaverRefresh();
-                	result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, ev.button.button, ev.button.x, ev.button.y);
+					// add by chenbh
+					if (ScreenSaverIsScreenSaving())
+					{
+						ScreenSaverRefresh();
+					}
+					else
+					{
+	                	ScreenSaverRefresh();
+	                	result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, ev.button.button, ev.button.x, ev.button.y);
+					}
+					g_LcdFuncNoDeal = false;
             	}
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
 				{
-	                //ScreenSaverRefresh();
+					// add by chenbh
+					if (ScreenSaverIsScreenSaving())
+					{
+						ScreenSaverRefresh();
+						g_LcdFuncNoDeal = true;
+						break;
+					}
+					
+	                ScreenSaverRefresh();
 	                {
 	                    mouseDownTick = SDL_GetTicks();
 	                #ifdef DOUBLE_KEY_ENABLE
@@ -881,17 +929,15 @@ int SceneRun(void)
 	                        dblclk = mouseDownTick;
 	                        lastx = ev.button.x;
 	                        lasty = ev.button.y;
-							/*
+							
 	                        if (result && !ScreenIsOff())
-	                            LinphonePlayKeySound();
-	                           */
+	                            sys_key_beep();
+	                           
 	                    }
 					
-	                #ifdef CFG_SCREENSHOT_ENABLE
-					/*
+	                #ifdef CFG_SCREENSHOT_ENABLE					
 	                    if (ev.button.x < 50 && ev.button.y > CFG_LCD_HEIGHT - 50)
-	                        Screenshot(g_ScreenSurf);
-	                        */
+	                        Screenshot(g_ScreenSurf);	                        
 	                #endif 
 	                }
             	}
@@ -899,54 +945,75 @@ int SceneRun(void)
 
             case SDL_MOUSEBUTTONUP:
 				{
-	                if (SDL_GetTicks() - dblclk <= 200)
-	                {
-	                    int xdiff = abs(ev.button.x - lastx);
-	                    int ydiff = abs(ev.button.y - lasty);
+					if (g_LcdFuncNoDeal == false)
+					{
+						if (SDL_GetTicks() - dblclk <= 200)
+		                {
+		                    int xdiff = abs(ev.button.x - lastx);
+		                    int ydiff = abs(ev.button.y - lasty);
 
-	                    if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
-	                    {
-	                        if (ev.button.x > lastx)
-	                        {
-	                            printf("mouse: slide to right\n");
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, 1, ev.button.x, ev.button.y);
-	                        }
-	                        else
-	                        {
-	                            printf("mouse: slide to left\n");
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, 1, ev.button.x, ev.button.y);
-	                        }
-	                    }
-	                    else if (ydiff >= GESTURE_THRESHOLD)
-	                    {
-	                        if (ev.button.y > lasty)
-	                        {
-	                            printf("mouse: slide to down\n");
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, 1, ev.button.x, ev.button.y);
-	                        }
-	                        else
-	                        {
-	                            printf("mouse: slide to up\n");
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, 1, ev.button.x, ev.button.y);
-	                        }
-	                    }
-	                }
-	                result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, ev.button.button, ev.button.x, ev.button.y);
-	                mouseDownTick = 0;
+		                    if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
+		                    {
+		                        if (ev.button.x > lastx)
+		                        {
+		                            printf("mouse: slide to right\n");
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, 1, ev.button.x, ev.button.y);
+		                        }
+		                        else
+		                        {
+		                            printf("mouse: slide to left\n");
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, 1, ev.button.x, ev.button.y);
+		                        }
+		                    }
+		                    else if (ydiff >= GESTURE_THRESHOLD)
+		                    {
+		                        if (ev.button.y > lasty)
+		                        {
+		                            printf("mouse: slide to down\n");
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, 1, ev.button.x, ev.button.y);
+		                        }
+		                        else
+		                        {
+		                            printf("mouse: slide to up\n");
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, 1, ev.button.x, ev.button.y);
+		                        }
+		                    }
+		                }
+		                result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, ev.button.button, ev.button.x, ev.button.y);
+		                mouseDownTick = 0;
+					}					
+	               	g_LcdFuncNoDeal = false;
             	}
                 break;
 
             case SDL_FINGERMOTION:
 				{
-	                //ScreenSaverRefresh();
-	                //printf("touch: move %d, %d\n", ev.tfinger.x, ev.tfinger.y);
-	                result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, 1, ev.tfinger.x, ev.tfinger.y);
+					// add by chenbh
+					if (ScreenSaverIsScreenSaving())
+					{
+						ScreenSaverRefresh();
+					}
+					else
+					{
+						ScreenSaverRefresh();
+	                	//printf("touch: move %d, %d\n", ev.tfinger.x, ev.tfinger.y);
+	                	result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, 1, ev.tfinger.x, ev.tfinger.y);
+					}	
+					g_LcdFuncNoDeal = false;
             	}
                 break;
 
             case SDL_FINGERDOWN:
 				{
-	                //ScreenSaverRefresh();
+					// add by chenbh
+					if (ScreenSaverIsScreenSaving())
+					{
+						ScreenSaverRefresh();
+						g_LcdFuncNoDeal = true;
+						break;
+					}
+
+	                ScreenSaverRefresh();
 	                //printf("touch: down %d, %d\n", ev.tfinger.x, ev.tfinger.y);
 	                {
 	                    mouseDownTick = SDL_GetTicks();
@@ -964,18 +1031,14 @@ int SceneRun(void)
 	                        dblclk = mouseDownTick;
 	                        lastx = ev.tfinger.x;
 	                        lasty = ev.tfinger.y;
-
-							/*
+							
 	                        if (result && !ScreenIsOff())
-	                            LinphonePlayKeySound();
-	                            */
+	                            sys_key_beep();	                            
 	                    }
 					
-	                #ifdef CFG_SCREENSHOT_ENABLE
-					/*
+	                #ifdef CFG_SCREENSHOT_ENABLE					
 	                    if (ev.tfinger.x < 50 && ev.tfinger.y > CFG_LCD_HEIGHT - 50)
-	                        Screenshot(g_ScreenSurf);
-	                        */
+	                        Screenshot(g_ScreenSurf);	                        
 	                #endif
 	                }
             	}
@@ -983,50 +1046,53 @@ int SceneRun(void)
 
             case SDL_FINGERUP:
 				{
-	                //printf("touch: up %d, %d\n", ev.tfinger.x, ev.tfinger.y);
-	                if (SDL_GetTicks() - dblclk <= 300)
-	                {
-	                    int xdiff = abs(ev.tfinger.x - lastx);
-	                    int ydiff = abs(ev.tfinger.y - lasty);
+					if (g_LcdFuncNoDeal == false)
+					{
+		                //printf("touch: up %d, %d\n", ev.tfinger.x, ev.tfinger.y);
+		                if (SDL_GetTicks() - dblclk <= 300)
+		                {
+		                    int xdiff = abs(ev.tfinger.x - lastx);
+		                    int ydiff = abs(ev.tfinger.y - lasty);
 
-	                    if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
-	                    {
-	                        if (ev.tfinger.x > lastx)
-	                        {
-	                            printf("touch: slide to right %d %d\n", ev.tfinger.x, ev.tfinger.y);
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, 1, ev.tfinger.x, ev.tfinger.y);
-	                        }
-	                        else
-	                        {
-	                            printf("touch: slide to left %d %d\n", ev.button.x, ev.button.y);
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, 1, ev.tfinger.x, ev.tfinger.y);
-	                        }
-	                    }
-	                    else if (ydiff >= GESTURE_THRESHOLD)
-	                    {
-	                        if (ev.tfinger.y > lasty)
-	                        {
-	                            printf("touch: slide to down %d %d\n", ev.tfinger.x, ev.tfinger.y);
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, 1, ev.tfinger.x, ev.tfinger.y);
-	                        }
-	                        else
-	                        {
-	                            printf("touch: slide to up %d %d\n", ev.tfinger.x, ev.tfinger.y);
-	                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, 1, ev.tfinger.x, ev.tfinger.y);
-	                        }
-	                    }
-	                }
-	                result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, 1, ev.tfinger.x, ev.tfinger.y);
-	                mouseDownTick = 0;
+		                    if (xdiff >= GESTURE_THRESHOLD && xdiff > ydiff)
+		                    {
+		                        if (ev.tfinger.x > lastx)
+		                        {
+		                            printf("touch: slide to right %d %d\n", ev.tfinger.x, ev.tfinger.y);
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDERIGHT, 1, ev.tfinger.x, ev.tfinger.y);
+		                        }
+		                        else
+		                        {
+		                            printf("touch: slide to left %d %d\n", ev.button.x, ev.button.y);
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDELEFT, 1, ev.tfinger.x, ev.tfinger.y);
+		                        }
+		                    }
+		                    else if (ydiff >= GESTURE_THRESHOLD)
+		                    {
+		                        if (ev.tfinger.y > lasty)
+		                        {
+		                            printf("touch: slide to down %d %d\n", ev.tfinger.x, ev.tfinger.y);
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEDOWN, 1, ev.tfinger.x, ev.tfinger.y);
+		                        }
+		                        else
+		                        {
+		                            printf("touch: slide to up %d %d\n", ev.tfinger.x, ev.tfinger.y);
+		                            result |= ituSceneUpdate(&theScene, ITU_EVENT_TOUCHSLIDEUP, 1, ev.tfinger.x, ev.tfinger.y);
+		                        }
+		                    }
+		                }
+		                result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, 1, ev.tfinger.x, ev.tfinger.y);
+		                mouseDownTick = 0;
+					}
+					g_LcdFuncNoDeal = false;
             	}
                 break;
             }
         }
 
-		#if 0
-        if (callReceived || callConnected || SceneCameraIsViewing())
+		if (SYS_MEDIA_NONE != sys_get_media_state())
             ScreenSaverRefresh();
-
+		
         if (!ScreenIsOff())
         {
             if (mouseDownTick > 0 && (SDL_GetTicks() - mouseDownTick >= MOUSEDOWN_LONGPRESS_DELAY))
@@ -1046,35 +1112,40 @@ int SceneRun(void)
                 ituFlip(g_ScreenSurf);
             }
 
-            if (theConfig.screensaver_type != SCREENSAVER_NONE && ScreenSaverCheck())
-            {
-                ituSceneSendEvent(&theScene, EVENT_CUSTOM_SCREENSAVER, "0");
-
-                if (theConfig.screensaver_type == SCREENSAVER_BLANK)
-                {
-                    // have a change to flush action commands
-                    ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
-
-                    // draw black screen
-                    ituSceneDraw(&theScene, g_ScreenSurf);
-                    ituFlip(g_ScreenSurf);
-
-                    ScreenOff();
-                }
-            }
+			if (SYS_MEDIA_NONE == sys_get_media_state())
+			{
+				ret = ScreenSaverCheck();
+	            if (ret == -1)
+	            {
+	               ScreenProtect();
+	            }
+				else if (ret == -2)
+				{
+					ScreenOff();
+				}
+			}
         }
-		#else
-		result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
-        #ifndef _WIN32
-        if (result)
-    	#endif
-        {
-            ituSceneDraw(&theScene, g_ScreenSurf);
-            ituFlip(g_ScreenSurf);
-        }
-		#endif
-		
-        delay = MS_PER_FRAME - (SDL_GetTicks() - tick);
+		else	// add by chenbh ����Ҫ���������� ��Ҫ��������
+		{
+			result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
+	        //if (result)
+	        {
+	            ituSceneDraw(&theScene, g_ScreenSurf);
+	            ituFlip(g_ScreenSurf);
+	        }
+		}
+
+		// add by chenbh �Ż�ý�岿��
+		if ((sys_get_media_state() == SYS_MEDIA_INTERCOM) ||
+			(sys_get_media_state() == SYS_MEDIA_MONITOR) ||
+			(sys_get_media_state() == SYS_MEDIA_LEAVEWORD_PLAY))
+		{
+			delay = MS_PER_FRAME_EXT - (SDL_GetTicks() - tick);
+		}
+		else
+		{
+        	delay = MS_PER_FRAME - (SDL_GetTicks() - tick);
+		}
         //printf("scene loop delay=%d\n", delay);
         if (delay > 0)
             SDL_Delay(delay);

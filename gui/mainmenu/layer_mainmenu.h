@@ -28,8 +28,8 @@ typedef enum
 #define MAIN_MAX_MSG_NUM			20
 #define MAIN_MAX_SECURITY_NUM		20
 #define MAIN_MAX_MISSCALL_NUM		20
-#define MAIN_SCROLLTEXT_SHOW_TIME	6
-#define MAIN_MS_PER_SCROLL			500
+#define MAIN_SCROLLTEXT_SHOW_TIME	4
+#define MAIN_MS_PER_SCROLL			1000
 #define MAIN_SCROLL_STEP_COUNT		15
 
 bool	mainLayerOnEnter(ITUWidget* widget, char* param);
@@ -40,7 +40,7 @@ bool	mainSOSBtnOnPress(ITUWidget* widget, char* param);
 bool    mainCoverFlowOnChanged(ITUWidget* widget, char* param);
 void	mainLayerCornerNumReload();
 void	mainLayerScrollDataReload();
-void	mainMenuLayerReset();
+void	mainLayerShow();
 
 void 	zoneDateTimeToString(DATE_TIME time, char* tmpStr);
 

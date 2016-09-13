@@ -14,6 +14,7 @@ Modification:
 
 #include "layer_mainmenu.h"
 
+static ITULayer*	mainLayer = NULL;
 static ITUText*		mainDigitalClockWeekText;
 static ITUCoverFlow*mainPageCoverFlow;
 static ITUSprite*	mainIPSprite;
@@ -97,7 +98,7 @@ static bool		gSOSBtnIsPress;
 static bool		gSOSIsAlarm;
 static uint8_t  gScrollTimeCount;
 
-static uint8_t gMainBackgroundIndex;
+static uint8_t gMainBackgroundIndex = 0;
 
 static PJRLYLIST_INFO	gRecorderData = NULL;		//家人留言数据
 static uint8_t*			gPicManagerImageData;
@@ -126,7 +127,7 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 
 	gSOSBtnIsPress = false;
 	gSOSIsAlarm = false;
-	gMainBackgroundIndex = 0;
+	//gMainBackgroundIndex = 0;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
 
 	setSOSBtnType(false);
@@ -209,9 +210,11 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 			setSOSBtnType(false);
 			gSOSBtnLongPressCount = 0;
 		}
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 
@@ -225,6 +228,7 @@ bool mainCoverFlowOnChanged(ITUWidget* widget, char* param)
 
 	return true;
 }
+
 
 bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 {
@@ -284,10 +288,10 @@ bool setMainBackgroundImg()
 	}
 
 	tmpIndex = storage_get_desk();
-	if (tmpIndex == gMainBackgroundIndex)
-	{
-		return false;
-	}
+	//if (tmpIndex == gMainBackgroundIndex)
+	//{
+	//	return false;
+	//}
 	gMainBackgroundIndex = tmpIndex;
 
 	memset(tmpAddr, 0, sizeof(tmpAddr));
@@ -329,6 +333,7 @@ bool setMainBackgroundImg()
 	return true;
 
 }
+
 
 bool getIpIconStatus()
 {
@@ -471,6 +476,7 @@ void setDisturbStatus(bool status)
 		ituWidgetSetVisible(page1NoDisturbOffText, true);
 	}
 }
+
 
 bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 {
@@ -770,6 +776,7 @@ uint8_t getUnreadInformationNum()
 {
 	return (uint8_t)storage_get_msg_state();
 }
+
 
 void setUnreadInformationNum(uint8_t num)
 {
@@ -1262,37 +1269,16 @@ void setSecurityStatus(MAIN_SECURITY_STATUS_e status)
 }
 
 
-void mainMenuLayerReset()
+void mainLayerShow()
 {
-	//TODO:上电时候把静态变量全部初始化为NULL
-	mainDigitalClockWeekText = NULL;
-	mainIPSprite = NULL;
-
-	mainNetStatusOffIcon  = NULL;
-	mainNetStatusOnSprite = NULL;
-
-	mainDeviceNoText = NULL;
-
-	mainSOSOnButton  = NULL;
-	mainSOSOffButton = NULL;
-
-	page1NoDisturbOnIcon  = NULL;
-	page1NoDisturbOnText  = NULL;
-	page1NoDisturbOffIcon = NULL;
-	page1NoDisturbOffText = NULL;
-
-	page1RecorderNumIcon = NULL;
-	page1RecorderNumText = NULL;
-
-	page0SecurityNumIcon = NULL;
-	page0SecurityNumText = NULL;
-	page0SecuritySprite  = NULL;
-
-	page0PhotoMsgNumIcon = NULL;
-	page0PhotoMsgNumText = NULL;
-
-	page0InformationNumIcon = NULL;
-	page0InformationNumText = NULL;
+	if (!mainLayer)
+	{
+		mainLayer = ituSceneFindWidget(&theScene, "mainLayer");
+		assert(mainLayer);
+	}
+	if (!ituWidgetIsVisible(mainLayer))
+	{
+		ituLayerGoto(mainLayer);
+	}
 }
-
 

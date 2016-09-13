@@ -287,6 +287,12 @@ const char * get_str(STRID_E id)
 	case SID_Set_Rtsp_Camera_Unused:
 		return ESID_Set_Rtsp_Camera_Unused;
 
+	case SID_Set_Rtsp_PTZ_Used:
+		return ESID_Set_Rtsp_PTZ_Used;
+
+	case SID_Set_Rtsp_PTZ_Unused:
+		return ESID_Set_Rtsp_PTZ_Unused;
+
 	case SID_Set_Data_Save_Err:
 		return ESID_Set_Data_Save_Err;
 
@@ -334,6 +340,9 @@ const char * get_str(STRID_E id)
 
 	case SID_Msg_Obtain_Jd_False:
 		return ESID_Msg_Obtain_Jd_False;
+
+	case SID_Set_Ring_Tips_Fail:
+		return ESID_Set_Ring_Tips_Fail;
 
 // IP协议转换器
 	case SID_Set_Unbounded:
@@ -502,6 +511,25 @@ const char * get_str(STRID_E id)
 
 	case SID_Bj_Fangqu8:
 		return ESID_Bj_Fangqu8;
+
+	case SID_Bj_Bengjikongzhi:
+		return ESID_Bj_Bengjikongzhi;
+
+	case SID_Bj_Fengjikongzhi:
+		return ESID_Bj_Fengjikongzhi;
+
+	case SID_Bj_Bf_Home:
+		return ESID_Bj_Bf_Home;
+
+	case SID_Bj_Bf_Out:
+		return ESID_Bj_Bf_Out;
+
+	case SID_Bj_Bf_Night:
+		return ESID_Bj_Bf_Night;
+
+	case SID_Bj_Already_Bufang:
+		return ESID_Bj_Already_Bufang;
+
 
 
 // 对讲文字

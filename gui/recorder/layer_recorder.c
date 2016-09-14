@@ -47,9 +47,10 @@ static DATE_TIME	gNewRecorderTime;
 
 bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 {
-	gRecorderStatus = RECORDER_STATUS_STOP;
 	gRecorderTimeCount = 0;
 	gRecordNumCount = 0;
+	gCurrentRecordIndex = MAX_RECORDER_NUM;		//初始化时候当前无选中赋值一个大于个数的值就行
+	gRecorderStatus = RECORDER_STATUS_NULL;
 
 	recorderLayerInit();
 
@@ -65,6 +66,13 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 bool recorderLayerOnLeave(ITUWidget* widget, char* param)
 {
 	printf("\nrecorderLayerOnLeave!!!!!!!!!\n");
+
+	//TODO: 强制离开时候判断页面状态，如果是在录音状态则保存录音！！！！ 其他状态则直接退出即可！
+
+	if (gRecorderStatus == RECORDER_STATUS_STOP)
+	{
+		recorderStopBtnOnClicked();
+	}
 
 	return true;
 }
@@ -110,14 +118,10 @@ void recorderLayerInit()
 		setRecordRadioBoxStatus(i, false);
 	}
 
-	gCurrentRecordIndex = MAX_RECORDER_NUM;		//初始化时候当前无选中赋值一个大于个数的值就行
-
+	setRecorderAudioBtnStatus(gRecorderStatus);
 	setRecorderRecordCreateTime("");
-
 	setRecorderDuration("00:00");
-
-	setRecorderAudioBtnStatus(RECORDER_STATUS_NULL);
-
+	setRecorderRadioBoxIsEnable(true);
 	ituWidgetSetVisible(recorderTipsTransparencyBackground, false);
 
 }
@@ -195,14 +199,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 				if (((int)gRecorderTimeCount) < RECORD_TIME_MAX)
 				{
 					memset(buf, 0, sizeof(buf));
-					if (gRecorderTimeCount < 10)
-					{
-						sprintf(buf, "%s%d", "00:0", gRecorderTimeCount);
-					}
-					else
-					{
-						sprintf(buf, "%s%d", "00:", gRecorderTimeCount);
-					}
+					sprintf(buf, "%s%02d", "00:", gRecorderTimeCount);
 					setRecorderDuration(buf);
 				}
 				else
@@ -479,6 +476,7 @@ void recorderRecordingBtnOnClicked()
 		get_jrlyrecord_path(tmpFileName, &gNewRecorderTime);
 		sys_start_family_record(tmpFileName, NULL, NULL);
 		setRecorderAudioBtnStatus(RECORDER_STATUS_RECORDING);
+		setRecorderRadioBoxIsEnable(false);
 	}
 }
 
@@ -510,21 +508,23 @@ void recorderPlayingBtnOnClicked()
 			//TODO:设置存储为已读
 			setRecorderRecordStatus(gCurrentRecordIndex, RECORDER_RECORD_READ);
 			storage_set_jrlyrecord_flag(gCurrentRecordIndex, false);
+			sys_sync_hint_state();
 		}
 
 		if (gRecorderTimeCount > 0)
 		{
 			//TODO:继续播放录音、并继续计时（失能上面的RadioBox按键）
-
 		}
 		else
 		{
 			//TODO:重头开始播放录音、并重头开始计时（失能上面的RadioBox按键）
+			setRecorderPlayVol(gRecorderPlayVol);
 			get_jrlyrecord_path(tmpFileName, &(gRecorderList->JrlyInfo[gCurrentRecordIndex].Time));
 			sys_start_play_audio(SYS_MEDIA_MUSIC, tmpFileName, false, storage_get_ringvolume(), recorderPlayingCallback, recorderPlayingStopCallback);
 		}
 
 		setRecorderAudioBtnStatus(RECORDER_STATUS_PLAYING);
+		setRecorderRadioBoxIsEnable(false);
 	}
 }
 
@@ -547,7 +547,7 @@ void recorderStopBtnOnClicked()
 		//TODO:录音停止
 		sys_stop_family_record();
 		storage_add_jrlyrecord(gNewRecorderTime);
-
+		sys_sync_hint_state();
 		recorderLayerInit();
 
 		//if (gRecorderList != NULL)
@@ -564,6 +564,7 @@ void recorderStopBtnOnClicked()
 	gRecorderTimeCount = 0;
 	setRecorderDuration("00:00");
 	setRecorderAudioBtnStatus(RECORDER_STATUS_STOP);
+	setRecorderRadioBoxIsEnable(true);
 }
 
 
@@ -586,6 +587,26 @@ void setRecorderRecordCreateTime(char* timeStr)
 		assert(recorderRecordCreateTimeText);
 	}
 	ituTextSetString(recorderRecordCreateTimeText, timeStr);
+}
+
+
+void setRecorderRadioBoxIsEnable(bool status)
+{
+	char tmpStr[50] = { 0 };
+	uint8_t i = 0;
+
+	for (i = 0; i < MAX_RECORDER_NUM; i++)
+	{
+		sprintf(tmpStr, "%s%d", "recorderRecordRadioBox", i);
+		recorderRecordRadioBox = ituSceneFindWidget(&theScene, tmpStr);
+		assert(recorderRecordRadioBox);
+		
+		if (status)	
+			ituWidgetEnable(recorderRecordRadioBox);
+		else
+			ituWidgetDisable(recorderRecordRadioBox);
+	}
+
 }
 
 
@@ -614,6 +635,11 @@ void setRecordRadioBoxStatus(uint8_t index, bool status)
 void recorderReturnBtnOnClicked()
 {
 	printf("recorderReturnBtnOnClicked");
+
+	if (gRecorderStatus != RECORDER_STATUS_STOP && gRecorderStatus != RECORDER_STATUS_NULL)
+	{
+		return;
+	}
 
 	if (!mainLayer)
 	{
@@ -676,6 +702,7 @@ bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 		if (gCurrentRecordIndex < MAX_RECORDER_NUM)
 		{
 			storage_del_jrlyrecord(gCurrentRecordIndex);
+			sys_sync_hint_state();
 			recorderLayerInit();
 		}
 		break;

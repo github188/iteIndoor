@@ -526,7 +526,7 @@ static void * jd_receive_thread(void* data)
 		{
 			//JdCallBackFunc(buf);
 		}
-        usleep(1000);
+        //usleep(1000);		// 睡眠重启会起不来
 	}
 }
 

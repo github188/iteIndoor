@@ -123,7 +123,7 @@ SYSCONFIG gRecoSysConfig =
     {00, 00, 00, 00, 00, 03}},	// Door2Mac 门前机2MAC地址
 	// 基它参数
 	{1, 1, 0, 0, 0, 1, 1, 0},	// Extparam 外部模块
-    0,               			// Bright 亮度调节
+    8,               			// Bright 亮度调节
 	0,               			// DeskId 0-无桌面
     {0, 0, 0, 0, 0, 0, 0, 0},	// RingID 声音ID(梯口 区口 门口 中心 住户 分机 信息 预警)
 	4,
@@ -259,7 +259,7 @@ const SYSCONFIG  gInitSysConfig =
     {00, 00, 00, 00, 00, 03}},	// Door2Mac 门前机2MAC地址
 	// 基它参数
 	{1, 1, 0, 0, 0, 1, 1, 0},	// Extparam 外部模块
-    0,               			// Bright 亮度调节
+    8,               			// Bright 亮度调节
 	0,               			// DeskId 0-无桌面
     {0, 0, 0, 0, 0, 0, 0, 0},	// RingID 声音ID(梯口 区口 门口 中心 住户 分机 信息 预警)
 	4,

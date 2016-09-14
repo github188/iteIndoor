@@ -98,9 +98,15 @@ static bool		gSOSBtnIsPress;
 static bool		gSOSIsAlarm;
 static uint8_t  gScrollTimeCount;
 
-static uint8_t gMainBackgroundIndex = 0;
+static uint8_t  gMainBackgroundIndex = 0;
 
-static PJRLYLIST_INFO	gRecorderData = NULL;		//家人留言数据
+static PJRLYLIST_INFO			gRecorderData	 = NULL;		//家人留言数据
+static PLYLYLIST_INFO			gPhotoMsgData	 = NULL;		//留影留言数据 
+static PMSGLIST					gInformationData = NULL;		//信息数据
+static PALARM_TOUCH_INFO_LIST	gSecurityData	 = NULL;		//安防数据
+static PMCALLLISTINFO			gMissedCallData	 = NULL;		//未接呼叫数据
+
+
 static uint8_t*			gPicManagerImageData;
 static int				gPicManagerImageSize;
 static char				gPicManagerImageFilePath[PATH_MAX];
@@ -133,8 +139,8 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	setSOSBtnType(false);
 
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
-	mainLayerCornerNumReload();
 	mainLayerScrollDataReload();
+	mainLayerCornerNumReload();
 
 	return true;
 }
@@ -248,7 +254,7 @@ bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 
 void zoneDateTimeToString(DATE_TIME time, char* tmpStr)
 {
-	sprintf(tmpStr, "%d-%d-%d %d:%d:%d", time.year, time.month, time.day, time.hour, time.min, time.sec);
+	sprintf(tmpStr, "%04d-%02d-%02d %02d:%02d:%02d", time.year, time.month, time.day, time.hour, time.min, time.sec);
 }
 
 
@@ -499,7 +505,22 @@ bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 
 uint8_t	getUnreadRecorderNum()
 {
-	return storage_get_jrlyrecord_flag();
+	uint8_t tmpCount = 0;
+	uint8_t i = 0;
+
+	if (gRecorderData == NULL)
+	{
+		loadUnreadRecorderData();
+	}
+
+	for (i = 0; i < gRecorderData->Count; i++)
+	{
+		if (gRecorderData->JrlyInfo[i].UnRead == TRUE)
+		{
+			tmpCount++;
+		}
+	}
+	return tmpCount;
 }
 
 
@@ -592,7 +613,7 @@ void loadUnreadRecorderData()
 
 	free(tmpListInfo);
 
-	printf("\n unread recorder count  = %d", gRecorderData->Count);
+	printf("\n unread recorder count  = %d \n", gRecorderData->Count);
 }
 
 
@@ -642,6 +663,21 @@ void setUnreadRecorderScroll()
 
 uint8_t getUnreadPhotoMsgNum()
 {
+	uint8_t tmpCount = 0; 
+	uint8_t i = 0;
+
+	if (gPhotoMsgData == NULL)
+	{
+		loadUnreaPhotoMsgData();
+	}
+	for (i = 0; i < gPhotoMsgData->Count; i++)
+	{
+		if (gPhotoMsgData->LylyInfo[i].UnRead == TRUE)
+		{
+			tmpCount++;
+		}
+	}
+
 	return storage_get_lylyrecord_flag();
 }
 
@@ -724,7 +760,19 @@ void setUnreadPhotoMsgNum(uint8_t num)
 
 void loadUnreaPhotoMsgData()
 {	
-	//进入页面时候读取一次存储即可！
+	PLYLYLIST_INFO tmpListInfo = NULL;
+
+	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
+	if (gPhotoMsgData == NULL)
+	{
+		gPhotoMsgData = (PJRLYLIST_INFO)malloc(sizeof(JRLYLIST_INFO));
+	}
+	storage_get_lylyrecord(&tmpListInfo);
+	memcpy(gPhotoMsgData, tmpListInfo, sizeof(JRLYLIST_INFO));
+
+	free(tmpListInfo);
+
+	printf("\n unread PhotoMsg count  = %d \n", gPhotoMsgData->Count);
 }
 
 
@@ -774,7 +822,22 @@ void setUnreadPhotoMsgScroll()
 
 uint8_t getUnreadInformationNum()
 {
-	return (uint8_t)storage_get_msg_state();
+	uint8_t tmpCount = 0;
+	uint8_t i = 0;
+
+	if (gInformationData == NULL)
+	{
+		loadUnreadInformationData();
+	}
+	for (i = 0; i < gInformationData->ncount; i++)
+	{
+		if (1 == gInformationData->pinfo_data[i].is_unread)
+		{
+			tmpCount++;
+		}
+	}
+
+	return tmpCount;
 }
 
 
@@ -855,8 +918,19 @@ void setUnreadInformationNum(uint8_t num)
 
 void loadUnreadInformationData()
 {
-	//进入页面时候读取一次存储即可！！！
+	PMSGLIST tmpListInfo = NULL;
 
+	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
+	if (gInformationData == NULL)
+	{
+		gInformationData = (PMSGLIST)malloc(sizeof(MSGLIST));
+	}
+	tmpListInfo = storage_read_msg_list();
+	memcpy(gInformationData, tmpListInfo, sizeof(MSGLIST));
+
+	free(tmpListInfo);
+
+	printf("\n unread PhotoMsg count  = %d \n", gInformationData->ncount);
 }
 
 
@@ -925,7 +999,22 @@ void setUnreadInformationScroll()
 
 uint8_t getUnreadMissedCallNun()
 {
-	return storage_get_callrecord_state();
+	uint8_t tmpCount = 0;
+	uint8_t i = 0;
+
+	if (gMissedCallData == NULL)
+	{
+		loadUnreadMissedCallData();
+	}
+	for (i = 0; i < gMissedCallData->CallCount; i++)
+	{
+		if (1 == gMissedCallData->CallInfo[i].UnRead)
+		{
+			tmpCount++;
+		}
+	}
+
+	return tmpCount;
 }
 
 
@@ -1006,7 +1095,18 @@ void setUnreadMissedCallNum(uint8_t num)
 
 void loadUnreadMissedCallData()
 {
-	//进入页面时候读取一次存储即可！！！
+	PMCALLLISTINFO tmpListInfo = NULL;
+
+	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
+	if (gMissedCallData == NULL)
+	{
+		gMissedCallData = (PMCALLLISTINFO)malloc(sizeof(MCALLLISTINFO));
+	}
+	tmpListInfo = storage_get_callrecord(FLAG_CALLMISS);
+	memcpy(gMissedCallData, tmpListInfo, sizeof(MCALLLISTINFO));
+	free(tmpListInfo);
+
+	printf("\n unread PhotoMsg count  = %d \n", gMissedCallData->CallCount);
 }
 
 
@@ -1067,13 +1167,12 @@ void setUnreadMissedCallScroll()
 
 uint8_t getUnsolvedSecurityAlarmNum()
 {
-	uint8_t tmpNum = 0;
-	PALARM_TOUCH_INFO_LIST tmpList;
-	tmpList = storage_get_afbj_unread_record();
-	tmpNum = tmpList->nCount;
-	free(tmpList);
+	if (gSecurityData == NULL)
+	{
+		loadUnsolvedSecurityAlarmData();
+	}
 
-	return tmpNum;
+	return gSecurityData->nCount;
 }
 
 
@@ -1160,7 +1259,18 @@ void setUnsolvedSecurityAlarmNum(uint8_t num)
 
 void loadUnsolvedSecurityAlarmData()
 {
-	//进入页面时候读取一次存储即可！
+	PALARM_TOUCH_INFO_LIST tmpListInfo = NULL;
+
+	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
+	if (gSecurityData == NULL)
+	{
+		gSecurityData = (PALARM_TOUCH_INFO_LIST)malloc(sizeof(ALARM_TOUCH_INFO_LIST));
+	}
+	tmpListInfo = storage_get_afbj_unread_record();
+	memcpy(gSecurityData, tmpListInfo, sizeof(ALARM_TOUCH_INFO_LIST));
+	free(tmpListInfo);
+
+	printf("\n unread PhotoMsg count  = %d \n", gSecurityData->nCount);
 }
 
 

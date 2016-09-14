@@ -14,6 +14,8 @@ Modification:
 
 #include "layer_screensaver.h"
 
+#define PER_PICT_TIME		3000
+
 static FileList *g_List = NULL;
 static FileList *g_CurNode = NULL;
 static uint8 g_SaverPictCounts = 0;
@@ -87,7 +89,7 @@ bool ScreenSaverLayerOnTimer(ITUWidget* widget, char* param)
 			duration = 0xFFFFFFFF - ScreenSaverLastTimeTick + curtime;
 		}
 
-		if (duration >= 3000)
+		if (duration >= PER_PICT_TIME)
 		{
 			g_CurNode = g_CurNode->next;
 			if (g_CurNode == NULL)

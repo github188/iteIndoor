@@ -65,6 +65,7 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param);
 bool recorderRecordRadioBoxChanged(ITUWidget* widget, char* param);
 
 void recorderLayerInit();
+void setRecorderRadioBoxIsEnable(bool status);
 void setRecorderPlayVol(uint8_t volNum);
 void setRecorderRecordStatus(uint8_t index, RECORDER_RECORD_STATUS_e status);
 RECORDER_RECORD_STATUS_e getRecorderRecordStatus(uint8_t index);

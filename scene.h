@@ -191,6 +191,16 @@ void rtsp_state_callbak(uint32 param1, uint32 param2);
   *************************************************/
 void show_sys_event_hint(uint16 EventType);
 
+/*************************************************
+  Function:		ScenePredraw
+  Description: 	ÖØ»æ
+  Input:		
+  Output:	
+  Return:	
+  Others:
+*************************************************/
+void ScenePredraw(int arg);
+
 // scene
 /**
  * Initializes scene module.

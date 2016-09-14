@@ -89,8 +89,12 @@ int32 af_callback_gui(int32 Param1,int32 Param2)
 Function:		callrequest_state_callbak
 Description:	呼叫请求回调函数
 Input:
- 1. param1		状�? 2. param2		私有数据
-Output:			�?Return:			�?Others:			�?*************************************************/
+ 1. param1		状态
+ 2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
 void callrequest_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -140,8 +144,12 @@ void callrequest_state_callbak(uint32 param1, uint32 param2)
   Function:			callout_state_callbak
   Description: 		主叫回调
   Input:
-  1. param1			状�?  2. param2			私有数据
-  Output:			�?  Return:			�?  Others:			�?*************************************************/
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
 void callout_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -205,8 +213,12 @@ void callout_state_callbak(uint32 param1, uint32 param2)
   Function:			callin_state_callbak
   Description: 		被叫回调
   Input:
-  1. param1			状�?  2. param2			私有数据
-  Output:			�?  Return:			�?  Others:			�?*************************************************/
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
 void callin_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -283,8 +295,12 @@ void callin_state_callbak(uint32 param1, uint32 param2)
 Function:		monitor_list_state_callbak
 Description:	获取监视列表回调函数
 Input:
-1. param1		状�?2. param2		私有数据
-Output:			�?Return:			�?Others:			�?*************************************************/
+1. param1		状态
+2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
 void monitor_list_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -317,8 +333,12 @@ void monitor_list_state_callbak(uint32 param1, uint32 param2)
   Function:			monitor_state_callbak
   Description: 		监视回调函数
   Input:
-  1. param1			状�?  2. param2			私有数据
-  Output:			�?  Return:			�?  Others:			�?*************************************************/
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
 void monitor_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -370,8 +390,12 @@ void monitor_state_callbak(uint32 param1, uint32 param2)
 Function:		rtsp_list_state_callbak
 Description: 	搜索列表回调函数
 Input:
-1. param1		状�?2. param2		私有数据
-Output:			�?Return:			�?Others:			�?*************************************************/
+1. param1		状态
+2. param2		私有数据
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
 void rtsp_list_state_callbak(uint32 param1, uint32 param2)
 {
 	Command cmd;
@@ -404,8 +428,12 @@ void rtsp_list_state_callbak(uint32 param1, uint32 param2)
   Function:			rtsp_state_callbak
   Description: 		rtsp回调函数
   Input:
-  1. param1			状�?  2. param2			私有数据
-  Output:			�?  Return:			�?  Others:			�?*************************************************/
+  1. param1			状态
+  2. param2			私有数据
+  Output:			无
+  Return:			无
+  Others:			无
+*************************************************/
 void rtsp_state_callbak(uint32 param1, uint32 param2)
 {	
 	Command cmd;
@@ -482,7 +510,7 @@ static void ItuSetLanguage(LANGUAGE_E lang)
   Function:		GotoLayer
   Description: 	�л�ͼ��
   Input:		
-  	name		ͼ���Ӧ����?����Ψһ��
+  	name		ͼ���Ӧ���� ����Ψһ��
   Output:		��
   Return:		��
   Others:
@@ -658,7 +686,8 @@ static void ProcessCommand(void)
 
 /*************************************************
   Function:		CheckQuitValue
-  Description: 	�˳���־���?  Input:		
+  Description: 	�˳���־���
+  Input:		
   Output:		��
   Return:		��
   Others:
@@ -683,11 +712,30 @@ static bool CheckQuitValue(void)
 }
 
 /*************************************************
-  Function:		SceneInit
-  Description: 	������ʼ��
+  Function:		ScenePredraw
+  Description: 	�ػ�
   Input:		
-  Output:		��
-  Return:		��
+  Output:	
+  Return:	
+  Others:
+*************************************************/
+void ScenePredraw(int arg)
+{
+    Command cmd;
+
+    if (g_CommandQueue == -1)
+        return;
+
+    cmd.id     = CMD_PREDRAW;
+    mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+}
+
+/*************************************************
+  Function:		SceneInit
+  Description: 
+  Input:		
+  Output:		
+  Return:		
   Others:
 *************************************************/
 void SceneInit(void)
@@ -872,8 +920,7 @@ int SceneRun(void)
 						}
 						
 		                if (result && !ScreenIsOff())
-		                    sys_key_beep();
-		                  
+		                    sys_key_beep();		                  
 		        }
                 break;
 
@@ -1125,20 +1172,21 @@ int SceneRun(void)
 				}
 			}
         }
-		else	// add by chenbh ����Ҫ���������� ��Ҫ��������
+		else	// add by chenbh 
 		{
 			result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
-	        //if (result)
+	        if (result)
 	        {
 	            ituSceneDraw(&theScene, g_ScreenSurf);
 	            ituFlip(g_ScreenSurf);
 	        }
 		}
-
-		// add by chenbh �Ż�ý�岿��
+		
+		// add by chenbh 
 		if ((sys_get_media_state() == SYS_MEDIA_INTERCOM) ||
 			(sys_get_media_state() == SYS_MEDIA_MONITOR) ||
-			(sys_get_media_state() == SYS_MEDIA_LEAVEWORD_PLAY))
+			(sys_get_media_state() == SYS_MEDIA_LEAVEWORD_PLAY) ||
+			ScreenIsOff())
 		{
 			delay = MS_PER_FRAME_EXT - (SDL_GetTicks() - tick);
 		}

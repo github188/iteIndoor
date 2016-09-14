@@ -13,6 +13,7 @@
     2. ...
 *************************************************/
 #include "logic_screen.h"
+#include "../scene.h"
 
 static LCD_STATE_E g_ScreenState = LCD_STATE_OPEN;
 static float g_ScreenLcdPowerDown;			
@@ -22,6 +23,7 @@ static bool g_ScreenSaverPause;
 
 void ScreenInit(void)
 {
+	// 目前驱动那边不支持该设置
     //ioctl(ITP_DEVICE_BACKLIGHT, ITP_IOCTL_SET_BRIGHTNESS, (void*)theConfig.brightness);
     g_ScreenSaverLastTick = SDL_GetTicks();    
 	g_ScreenSaverCountDown = (storage_get_screen_intime())*1.0f;
@@ -37,7 +39,9 @@ bool ScreenIsOff(void)
 
 void ScreenSetBrightness(int value)
 {
-    ioctl(ITP_DEVICE_BACKLIGHT, ITP_IOCTL_SET_BRIGHTNESS, (void*)value);
+	dprintf("value: %d\n", value);
+	// 目前驱动那边不支持该设置
+    //ioctl(ITP_DEVICE_BACKLIGHT, ITP_IOCTL_SET_BRIGHTNESS, (void*)value);
 }
 
 void ScreenOff(void)

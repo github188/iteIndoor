@@ -530,6 +530,18 @@ const char * get_str(STRID_E id)
 	case SID_Bj_Already_Bufang:
 		return ESID_Bj_Already_Bufang;
 
+	case SID_Bj_Alarm_Cannot_Bf:
+		return ESID_Bj_Alarm_Cannot_Bf;
+
+	case SID_Bj_Touch_Cannot_Bf:
+		return ESID_Bj_Touch_Cannot_Bf;
+
+	case SID_Bj_Alarm_Cannot_Qc:
+		return ESID_Bj_Alarm_Cannot_Qc;
+
+	case SID_Set_Enter_Alarm_Pwd:
+		return ESID_Set_Enter_Alarm_Pwd;
+
 
 
 // 对讲文字

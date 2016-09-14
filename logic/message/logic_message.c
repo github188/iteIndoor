@@ -82,7 +82,9 @@ static void save_msg(uint32 ID, int8 * data, int size)
 	//dprintf("save_msg end \n");
 	storage_write_msg(&rec_bulletin_head, (char*)data + sizeof(REC_BULLETIN_HEAD), des);
 	show_sys_event_hint(AS_NEW_MSG);
-	sys_sync_hint_state();
+	// modi by chenbh 
+	//sys_sync_hint_state();
+	sys_sync_hint_state_ext(SYS_HINT_INFO);
 }
 
 /*************************************************
@@ -120,7 +122,9 @@ static void save_short_msg(REC_SHORT_MSG *rec_short_msg)
 	dprintf("des: %s, rec_short_msg->Content: %s,rec_short_msg->SendNo: %s\n", des, rec_short_msg->Content, rec_short_msg->SendNo);
 	storage_write_msg(&rec_bulletin_head, rec_short_msg->Content, des);
 	show_sys_event_hint(AS_NEW_MSG);
-	sys_sync_hint_state();
+	// modi by chenbh 
+	//sys_sync_hint_state();
+	sys_sync_hint_state_ext(SYS_HINT_INFO);
 }
 
 /*************************************************

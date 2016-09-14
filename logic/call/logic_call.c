@@ -402,8 +402,10 @@ static void add_inter_record(CALL_TYPE RecordType, DEVICE_TYPE_E DevType, char *
 				storage_add_callrecord(&callinfo);
 			}
 		}
+		sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
 	}
-	sys_sync_hint_state();
+	// del by chenbh 修改为上面函数 sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
+	//sys_sync_hint_state();
 #endif
 }
 
@@ -430,7 +432,9 @@ static void add_inter_lyly(LYLY_TYPE LylyType)
 	{
 		storage_add_lylyrecord(LylyType, g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1, g_LylyDateTime);
 	}	
-	sys_sync_hint_state();
+	// modi by chenbh 
+	//sys_sync_hint_state();
+	sys_sync_hint_state_ext(SYS_HINT_LEAVEWORD);
 }
 
 /*************************************************

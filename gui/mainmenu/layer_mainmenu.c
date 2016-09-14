@@ -100,6 +100,8 @@ static uint8_t  gScrollTimeCount;
 
 static uint8_t  gMainBackgroundIndex = 0;
 
+static PSysHintRecord			gMainScrollData= NULL;		//全局数据变量（公用一个）
+
 static PJRLYLIST_INFO			gRecorderData	 = NULL;		//家人留言数据
 static PLYLYLIST_INFO			gPhotoMsgData	 = NULL;		//留影留言数据 
 static PMSGLIST					gInformationData = NULL;		//信息数据
@@ -114,28 +116,23 @@ static char				gPicManagerImageFilePath[PATH_MAX];
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
 {
+#if 0
 	char tmpStr[50] = { 0 };
-
 	//char tmpLan[4] = {0xd2, 0xbb, 0x00, 0x00};
 
 	//char* tmpLan = "一二三";
 	char* tmpLan = "一二三";
-
-	//printf("111111111111111111111before  = %x %x %x \n", tmpLan[0], tmpLan[1], tmpLan[2]);
+	printf("111111111111111111111before  = %x %x %x \n", tmpLan[0], tmpLan[1], tmpLan[2]);
 	printf("before  = %s \n", tmpLan);
-
 	gb2312ToUtf8(tmpStr, strlen(tmpLan), tmpLan, strlen(tmpLan));
-
-	//printf("22222222222222222after = %x %x %x \n", tmpStr[0], tmpStr[1], tmpStr[2]);
+	printf("22222222222222222after = %x %x %x \n", tmpStr[0], tmpStr[1], tmpStr[2]);
 	printf("after = %s \n", tmpStr);
-
-	//setDeviceNo(tmpLan);
+	setDeviceNo(tmpLan);
+#endif
 
 	gSOSBtnIsPress = false;
 	gSOSIsAlarm = false;
-	//gMainBackgroundIndex = 0;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
-
 	setSOSBtnType(false);
 
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
@@ -261,23 +258,36 @@ void zoneDateTimeToString(DATE_TIME time, char* tmpStr)
 void mainLayerCornerNumReload()
 {
 	//TODO:用户在界面Enter时候载入不需要实时去获取的数据！！！！！
-	setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());				//设置家人留言条数
-	setUnreadPhotoMsgNum((uint8_t)getUnreadPhotoMsgNum());				//设置留影留言条数
-	setUnreadInformationNum((uint8_t)getUnreadInformationNum());		//设置信息条数
-	setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
-	setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
-	setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
+	//setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());				//设置家人留言条数
+	//setUnreadPhotoMsgNum((uint8_t)getUnreadPhotoMsgNum());				//设置留影留言条数
+	//setUnreadInformationNum((uint8_t)getUnreadInformationNum());		//设置信息条数
+	//setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
+	//setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
+	//setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
+
+	setUnreadRecorderNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_FAMILY]);					//设置家人留言条数
+	setUnreadPhotoMsgNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_LEAVEWORD]);					//设置留影留言条数
+	setUnreadInformationNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_INFO]);					//设置信息条数
+	setSecurityStatus((MAIN_SECURITY_STATUS_e)gMainScrollData->syshintnum[SYS_HINT_ALARM_STATE]);	//设置安防状态
+	setUnsolvedSecurityAlarmNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_ALARM_WARNING]);		//设置安防报警数
+	setUnreadMissedCallNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_MISSED_CALLS]);			//设置未接来电数
+
 	setMainBackgroundImg();												//设置主界面背景图
 }
 
 
 void mainLayerScrollDataReload()
 {
-	loadUnreadRecorderData();				//载入未读家人留言数据
-	loadUnreadInformationData();			//载入未读信息数据
-	loadUnreadMissedCallData();				//载入未接电话信息
-	loadUnreaPhotoMsgData();				//载入未读留影留言数据
-	loadUnsolvedSecurityAlarmData();		//载入为处理的报警数据
+	if (gMainScrollData == NULL)
+	{
+		gMainScrollData = (PSysHintRecord)sys_get_hint_list();
+	}
+
+	//loadUnreadRecorderData();				//载入未读家人留言数据
+	//loadUnreadInformationData();			//载入未读信息数据
+	//loadUnreadMissedCallData();				//载入未接电话信息
+	//loadUnreaPhotoMsgData();				//载入未读留影留言数据
+	//loadUnsolvedSecurityAlarmData();		//载入为处理的报警数据
 }
 
 
@@ -562,7 +572,7 @@ void setUnreadRecorderNum(uint8_t num)
 	if (num > 0)
 	{
 		gIsScrollingRecorder = true;
-		gRecorderTextIndex = -1;
+		gRecorderTextIndex = 0;
 		gScrollTimeCount = 0;
 
 		memset(numstr, 0, sizeof(numstr));
@@ -586,7 +596,7 @@ void setUnreadRecorderNum(uint8_t num)
 	else
 	{
 		gIsScrollingRecorder = false;
-		gRecorderTextIndex = -1;
+		gRecorderTextIndex = 0;
 		gScrollTimeCount = 0;
 
 		ituWidgetSetVisible(page1RecorderScrollTextContainer, false);
@@ -635,18 +645,47 @@ void setUnreadRecorderText(uint8_t index)
 
 void setUnreadRecorderScroll()
 {
+	uint8_t i = 0;
+	uint8_t j = 0;
+	uint8_t tmpIndex = 0;
+
 	if (gIsScrollingRecorder == true)
 	{
 		if (ituWidgetIsVisible(page1RecorderScrollTextContainer) == false)
 		{
-			if (gRecorderTextIndex >= getUnreadRecorderNum())
+			if (gRecorderTextIndex >= (uint8_t)gMainScrollData->JrlyUnReadList->Count)
 			{
 				gRecorderTextIndex = 0;
 			}
-			else
+			tmpIndex = gRecorderTextIndex;
+
+			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->JrlyUnReadList->Count; i++)
 			{
 				gRecorderTextIndex++;
+
+				if (!gMainScrollData->JrlyUnReadList->JrlyInfo[i].UnRead)
+				{
+					if (i == (uint8_t)gMainScrollData->JrlyUnReadList->Count)
+					{
+						gRecorderTextIndex = 0;
+
+						for (j = 0; j < tmpIndex; j++)
+						{
+							gRecorderTextIndex++;
+
+							if (gMainScrollData->JrlyUnReadList->JrlyInfo[j].UnRead)
+							{
+								break;
+							}
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
+
 			setUnreadRecorderText(gRecorderTextIndex);
 			ituWidgetShow(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}

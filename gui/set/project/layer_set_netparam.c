@@ -220,7 +220,8 @@ bool SetNetParamHostButtonOnMouseUp(ITUWidget* widget, char* param)
 	for (i = 0; i < 3; i++)
 	{
 		memset(tmp, 0, sizeof(tmp));
-		change_ip_to_str(g_ip[HOST_IPADDR + i], tmp);
+		//change_ip_to_str(g_ip[HOST_IPADDR + i], tmp);
+		sprintf(tmp, "%s", UlongtoIP(g_ip[HOST_IPADDR + i]));
 		ituTextSetString(text[i], tmp);
 	}
 	
@@ -243,10 +244,12 @@ bool SetNetParamSeverButtonOnMouseUp(ITUWidget* widget, char* param)
 	char tmp[30];
 		
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ip[CENTER_IPADDR], tmp);
+	//change_ip_to_str(g_ip[CENTER_IPADDR], tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ip[CENTER_IPADDR]));
 	ituTextSetString(SetCenterServerIP2Text, tmp);
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ip[RTSP_IPADDR], tmp);
+	//change_ip_to_str(g_ip[RTSP_IPADDR], tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ip[RTSP_IPADDR]));
 	ituTextSetString(SetRtspIP2Text, tmp);
 	
 	ituWidgetSetVisible(SetNetParamContainer, false);
@@ -297,7 +300,8 @@ bool SetAllNetParamButtonOnMouseUp(ITUWidget* widget, char* param)
 	g_ipType = (IP_TYPE)index;
 	
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ip[index], tmp);
+	//change_ip_to_str(g_ip[index], tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ip[index]));
 
 	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
 

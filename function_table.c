@@ -113,6 +113,11 @@ ITUActionFunction actionFunctions[] =
 	//Alarm
 	"AlarmOnEnter", AlarmOnEnter,
 	"AlarmLayerTimeoutOnTimer", AlarmLayerTimeoutOnTimer,
+	"AlarmBottomButtonOnMouseUp", AlarmBottomButtonOnMouseUp,
+	"AlarmRightButtonOnMouseUp", AlarmRightButtonOnMouseUp,
+	"AlarmKeyBordButtonOnMouseUp", AlarmKeyBordButtonOnMouseUp,
+	"AlarmKeyBordYesButtonOnMouseUp", AlarmKeyBordYesButtonOnMouseUp,
+	"AlarmKeyBordDelButtonOnMouseLongPress", AlarmKeyBordDelButtonOnMouseLongPress,
 
 	//Set_Botton_Return_Layer
 	"SetBottonReturnOnEnter", SetBottonReturnOnEnter,

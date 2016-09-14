@@ -51,6 +51,17 @@ typedef enum
 	SYS_HINT_MAX_NUM
 }SYS_HINT_TYPE;
 
+typedef struct _sys_hint_record
+{
+	uint8 syshint[SYS_HINT_MAX_NUM];				// 记录未读无处理状态
+	uint8 syshintnum[SYS_HINT_MAX_NUM];				// 消息记录未读条数
+	MSGLIST *MsgUnReadList;							// 未读信息列表
+	LYLYLIST_INFO *LylyUnReadList;					// 未读留影留言列表
+	JRLYLIST_INFO *JrlyUnReadList;					// 未读家人留言列表
+	MCALLLISTINFO *MissUnReadList;					// 未读未接来电列表
+	ALARM_TOUCH_INFO_LIST *AlarmUnReadList;			// 未读报警记录列表
+}SysHintRecord, *PSysHintRecord;
+
 /*************************************************
   Function:			sys_continue_play_file
   Description: 		继续播放
@@ -212,15 +223,14 @@ void sys_set_hint_state(SYS_HINT_TYPE HintType, uint8 flg);
 uint8 sys_get_hint_state(SYS_HINT_TYPE HintType);
 
 /*************************************************
-  Function:			sys_get_hint_num
-  Description: 		获得每种状态的信息条数
+  Function:			sys_get_hint_list
+  Description: 		
   Input: 		
-  	1.HintType		系统状态类型
   Output:			无
   Return:			
   Others:			
 *************************************************/
-uint8 sys_get_hint_num(SYS_HINT_TYPE HintType);
+SysHintRecord *sys_get_hint_list(void);
 
 /*************************************************
   Function:			sys_sync_hint_state
@@ -231,6 +241,16 @@ uint8 sys_get_hint_num(SYS_HINT_TYPE HintType);
   Others:			
 *************************************************/
 void sys_sync_hint_state(void);
+
+/*************************************************
+  Function:			sys_sync_hint_state
+  Description: 		同步系统状态
+  Input: 		
+  Output:			无
+  Return:			无
+  Others:			
+*************************************************/
+void sys_sync_hint_state_ext(SYS_HINT_TYPE HintType);
 
 /*************************************************
   Function:			sys_init_hint_state

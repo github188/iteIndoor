@@ -572,8 +572,6 @@ uint32 media_set_ring_volume(uint32 vol)
 *************************************************/
 uint32 media_set_mic_volume(uint8 vol)
 {
-	//vol = MIC_VOLUME;		// 目前固定设置一个音量值
-	
 	int level;
 	if (vol == 0)
 	{
@@ -581,7 +579,7 @@ uint32 media_set_mic_volume(uint8 vol)
 	}
 	else
 	{
-		level = 20+10*vol;
+		level = 80+2*vol;
 	}
 	leaf_set_rec_level(g_LeafCall, level);
 	return TRUE;

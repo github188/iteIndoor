@@ -405,7 +405,7 @@ Output:
 1.newPwd		转换后的密码
 Return:
 *************************************************/
-void toXiechiPwd(char * oldPwd, uint8 bAdd, char * newPwd)
+static void toXiechiPwd(char * oldPwd, uint8 bAdd, char * newPwd)
 {
 	int i;
 	int len = strlen(oldPwd);
@@ -443,6 +443,79 @@ void toXiechiPwd(char * oldPwd, uint8 bAdd, char * newPwd)
 	}
 }
 
+/*************************************************
+Function:		pass_oper
+Description:	键盘确认键按下处理函数
+Input:
+Output:		无
+Return:		无
+Others:
+*************************************************/
+MSG_EVENT msg_pass_oper_deal(PASS_TYPE type, uint8 xiechi, char* inputPass)
+{
+	MSG_EVENT event = MSG_EVENT_NO;
+
+	char otherPass[MAX_PASSWORD_LEN+1];
+	char otherPassXc[MAX_PASSWORD_LEN + 1];
+	char adminPass[MAX_PASSWORD_LEN + 1];
+	char adminPassXc[MAX_PASSWORD_LEN + 1];
+	char serverPass[MAX_PASSWORD_LEN + 1];
+	char serverPassXc[MAX_PASSWORD_LEN + 1];
+
+	memset(otherPass, 0, sizeof(otherPass));
+	memset(adminPass, 0, sizeof(adminPass));
+	sprintf(adminPass, "%s", storage_get_pass(PASS_TYPE_ADMIN));	
+	sprintf(otherPass, "%s", storage_get_pass(type));
+	
+	memset(adminPassXc, 0, sizeof(adminPassXc));
+	memset(otherPassXc, 0, sizeof(otherPassXc));
+	toXiechiPwd(adminPass, TRUE, adminPassXc);
+	toXiechiPwd(otherPass, TRUE, otherPassXc);
+
+	if (0xff == xiechi)
+	{
+		if (1 == storage_get_doorserver(0))
+		{
+			memset(serverPass, 0, sizeof(serverPass));
+			memset(serverPassXc, 0, sizeof(serverPassXc));
+			sprintf(serverPass, "%s", storage_get_pass(PASS_TYPE_SERVER));
+			toXiechiPwd(serverPass, TRUE, serverPassXc);
+			if (0 == strcmp(inputPass, serverPassXc))
+			{
+				event = MSG_EVENT_XIECHI;
+			}
+			else if (0 == strcmp(inputPass, serverPass))
+			{
+				event = MSG_EVENT_YES;
+			}
+			else
+			{
+				event = MSG_EVENT_NO;
+			}
+		}
+	}
+
+	if ((0 == strcmp(inputPass, otherPassXc) || 0 == strcmp(inputPass, adminPassXc)) && xiechi)				// 挟持
+	{
+		event = MSG_EVENT_XIECHI;
+	}
+
+	if (MSG_EVENT_NO == event)
+	{
+		if (0 == strcmp(inputPass, otherPass) || 0 == strcmp(inputPass, adminPass))
+		{
+			event = MSG_EVENT_YES;
+		}
+		else
+		{
+			event = MSG_EVENT_NO;
+		}
+	}
+
+	return event;
+}
+
+#if 0
 /*************************************************
 Function:		change_ip_to_char
 Description:  切换IP地址4个字节
@@ -584,6 +657,7 @@ uint8 check_ip_to_true(char *ip)
 
 	return TRUE;
 }
+#endif
 
 /*************************************************
 Function:		LogicShowWin

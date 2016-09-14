@@ -19,10 +19,14 @@ extern "C" {
 #endif
 #include "gui_include.h"
 
+#define MAX_PASSWORD_LEN		6
+
+#if 0
 #define ip_addr1(ipaddr) ((uint8)(ipaddr >> 24) & 0xff)
 #define ip_addr2(ipaddr) ((uint8)(ipaddr >> 16) & 0xff)
 #define ip_addr3(ipaddr) ((uint8)(ipaddr >> 8) & 0xff)
 #define ip_addr4(ipaddr) ((uint8)(ipaddr) & 0xff)
+#endif
 
 typedef enum
 {
@@ -50,6 +54,13 @@ typedef enum
 	SYS_OPER_CALLIN,							// 被叫
 	SYS_OPER_MONITOR							// 监视
 }SYS_ASYN_OPER_TYPE;
+
+typedef enum
+{
+	MSG_EVENT_YES = 0x01,							// 是
+	MSG_EVENT_NO,									// 否
+	MSG_EVENT_XIECHI								// 挟持密码
+} MSG_EVENT;
 
 /*************************************************
   Function:			ui_show_win_arbitration
@@ -90,17 +101,16 @@ char * get_houseno_desc(char * numtext, char * temp);
 uint32 get_dev_description(DEVICE_TYPE_E DevType, char * DevStr, char * DevStrOut, uint32 StrOutLen);
 
 /*************************************************
-Function:    		toXiechiPwd
-Description:		转换成挟持密码
+Function:		pass_oper
+Description:	键盘确认键按下处理函数
 Input:
-1.oldPwd		要转换的密码
-2.bAdd			挟持密码是否+1：true:+1；false: -1;
-Output:
-1.newPwd		转换后的密码
-Return:
+Output:		无
+Return:		无
+Others:
 *************************************************/
-void toXiechiPwd(char * oldPwd, uint8 bAdd, char * newPwd);
+MSG_EVENT msg_pass_oper_deal(PASS_TYPE type, uint8 xiechi, char* inputPass);
 
+#if 0
 /*************************************************
 Function:		change_ip_to_char
 Description:  切换IP地址4个字节
@@ -146,6 +156,7 @@ Return:		无
 Others:
 *************************************************/
 uint32 change_char_to_ip(uint8* ipaddr);
+#endif
 
 /*************************************************
 Function:		LogicShowWin

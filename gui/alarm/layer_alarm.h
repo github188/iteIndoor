@@ -20,6 +20,13 @@ extern "C" {
 
 	bool AlarmOnEnter(ITUWidget* widget, char* param);
 	bool AlarmLayerTimeoutOnTimer(ITUWidget* widget, char* param);
+	bool AlarmBottomButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool AlarmRightButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool AlarmKeyBordButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool AlarmKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool AlarmKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param);
+	bool AlarmLayerOnGoto(ITUWidget* widget, char* param);
+	bool UpdataAlarmLayerOnShow(ITUWidget* widget, char* param);
 
 
 #ifdef __cplusplus

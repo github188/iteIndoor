@@ -353,7 +353,8 @@ bool SetLinkEnableLylyButtonOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_lyly_param(g_lyly_param);
 	if (ret)
 	{
-		sys_sync_hint_state();
+		// del by chenbh 
+		//sys_sync_hint_state();
 	}
 
 	return true;
@@ -421,7 +422,8 @@ bool SetLinkLylyModeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_lyly_param(g_lyly_param);
 	if (ret)
 	{
-		sys_sync_hint_state();
+		// del by chenbh 
+		//sys_sync_hint_state();
 	}
 
 	ituTextSetString(SetLinkCallContainer2Text[0], get_str(SID_Set_Line_Lyly_Mode_Audio + g_lyly_param->Mode));
@@ -474,7 +476,8 @@ bool SetCallLinkDealSaveButtonOnMouseUp(ITUWidget* widget, char* param)
 	ret = storage_set_lyly_param(g_lyly_param);
 	if (ret)
 	{
-		sys_sync_hint_state();
+		// del by chenbh 
+		//sys_sync_hint_state();
 	}
 
 	return true;

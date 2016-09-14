@@ -186,6 +186,16 @@ void storage_clear_afcz_record(void);
 void storage_clear_afbj_record(void);
 
 /*************************************************
+  Function:		storage_clear_afbj_unread_state
+  Description:  清空安防报警记录未读状态
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:
+*************************************************/
+void storage_clear_afbj_unread_state(void);
+
+/*************************************************
   Function:		storage_af_timer_save
   Description: 	定时存储安防模块数据
   Input:		无

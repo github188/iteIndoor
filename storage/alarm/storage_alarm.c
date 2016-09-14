@@ -275,6 +275,27 @@ void storage_clear_afbj_record(void)
 }
 
 /*************************************************
+  Function:		storage_clear_afbj_unread_state
+  Description:  清空安防报警记录未读状态
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:
+*************************************************/
+void storage_clear_afbj_unread_state(void)
+{
+	uint16 i;
+	if (pAfBjList)
+	{
+		for (i = 0; i < pAfBjList->nCount; i++)
+		{
+			pAfBjList->pAfBjRec[i].bReaded = TRUE;			
+		}
+		Fwrite_common(AF_BJ_REC_PATH, pAfBjList->pAfBjRec, sizeof(AF_BJ_REC), pAfBjList->nCount);
+	}
+}
+
+/*************************************************
   Function:		storage_get_afbj_unread_record
   Description:  清空安防报警记录
   Input:		无

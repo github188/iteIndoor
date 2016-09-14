@@ -199,6 +199,16 @@ Others:
 uint16 get_time_for_timetype(SOUND_TYPE sound_type, uint8 time_type);
 
 /*************************************************
+Function:			judge_can_be_defend
+Description: 		获取是否能布防
+Input:
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+uint8 judge_can_be_defend(void);
+
+/*************************************************
   Function:			check_defend_oper
   Description:		安防状态处理
   Input: 
@@ -372,7 +382,7 @@ void alarm_gui_callback(int32 Param1, int32 Param2);
   Return:				
   Others:    add by wufn		       
 *************************************************/
-uint8 alarm_get_no24touch_param(void);
+uint8 alarm_get_24clear_param(void);
 
 /*************************************************
   Function:    		alarm_get_24clear_param  

@@ -143,5 +143,15 @@ uint8 storage_get_msg_state(void);
   Others:
 *************************************************/
 int storage_get_msg_allsize(void);
+
+/*************************************************
+  Function:			storage_get_msg_unread_list
+  Description: 		获取信息未读列表
+  Input:			无
+  Output:			无
+  Return:			TRUE:有未读 FALSE:无未读
+  Others:
+*************************************************/
+uint8 storage_get_msg_unread_list(MSGLIST **list);
 #endif
 

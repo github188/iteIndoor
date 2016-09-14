@@ -130,7 +130,6 @@ extern "C" {
 #define ESID_Msg_Obtain_Jd_False        (g_China ? (g_Big5 ? "獲取家電信息失敗！" : "获取家电信息失败！") : "Obtain appliance info. failed!")
 #define ESID_Set_Ring_Tips_Fail		    (g_China ? (g_Big5 ? "請錄製留言提示音" : "请录制留言提示音") : "Please record messages prompt tone.")	
 
-
 // IP协议转换器
 #define ESID_Set_Unbounded				 (g_China ? (g_Big5 ? "未綁定" : "未绑定") : "Unbounded")
 #define ESID_Set_Bounded  				 (g_China ? (g_Big5 ? "已綁定" : "已绑定") : "Binding")
@@ -193,14 +192,16 @@ extern "C" {
 #define ESID_Bj_Fangqu6					(g_China ? (g_Big5 ? "防區6" : "防区6") : "Zone6")
 #define ESID_Bj_Fangqu7					(g_China ? (g_Big5 ? "防區7" : "防区7") : "Zone7")
 #define ESID_Bj_Fangqu8					(g_China ? (g_Big5 ? "防區8" : "防区8") : "Zone8")
-#define ESID_Bj_Bengjikongzhi            (g_China ? (g_Big5 ? "本機控制" : "本机控制") : "Local Control") 
-#define ESID_Bj_Fengjikongzhi            (g_China ? (g_Big5 ? "分機控制" : "分机控制") : "Sub-phone Control") 
-#define ESID_Bj_Bf_Home                  (g_China ? (g_Big5 ? "在家" : "在家") : "Home")
-#define ESID_Bj_Bf_Out                   (g_China ? (g_Big5 ? "外出" : "外出") : "Away")
-#define ESID_Bj_Bf_Night                 (g_China ? (g_Big5 ? "夜間" : "夜间") : "Night")
-#define ESID_Bj_Already_Bufang           (g_China ? (g_Big5 ? "點擊單獨的防區可進行單獨布防" : "点击单独的防区可进行单独布防") : "Tap a zone to arm it")
-
-
+#define ESID_Bj_Bengjikongzhi           (g_China ? (g_Big5 ? "本機控制" : "本机控制") : "Local Control") 
+#define ESID_Bj_Fengjikongzhi           (g_China ? (g_Big5 ? "分機控制" : "分机控制") : "Sub-phone Control") 
+#define ESID_Bj_Bf_Home                 (g_China ? (g_Big5 ? "在家" : "在家") : "Home")
+#define ESID_Bj_Bf_Out                  (g_China ? (g_Big5 ? "外出" : "外出") : "Away")
+#define ESID_Bj_Bf_Night                (g_China ? (g_Big5 ? "夜間" : "夜间") : "Night")
+#define ESID_Bj_Already_Bufang          (g_China ? (g_Big5 ? "點擊單獨的防區可進行單獨布防" : "点击单独的防区可进行单独布防") : "Tap a zone to arm it")
+#define ESID_Bj_Alarm_Cannot_Bf         (g_China ? (g_Big5 ? "正在報警不能不防" : "正在报警不能布防") : "Alarming now. Cannot arm!")
+#define ESID_Bj_Touch_Cannot_Bf         (g_China ? (g_Big5 ? "觸發不能不防" : "触发不能布防") : "triggerred.Cannot arm!")
+#define ESID_Bj_Alarm_Cannot_Qc         (g_China ? (g_Big5 ? "正在報警，無法操作" : "正在报警，无法操作") : "Zone triggerred.Cannot operate!")
+#define ESID_Set_Enter_Alarm_Pwd        (g_China ? (g_Big5 ? "請輸入安防密碼" : "请输入安防密码") : "Enter Security Password")
 
 // 对讲文字
 #define ESID_MainMonitor_Door			 (g_China ? (g_Big5 ? "監視門前" : "监视门前") : "Doorway")
@@ -744,6 +745,10 @@ typedef enum
 	SID_Bj_Bf_Out,
 	SID_Bj_Bf_Night,
 	SID_Bj_Already_Bufang,
+	SID_Bj_Alarm_Cannot_Bf,
+	SID_Bj_Touch_Cannot_Bf,
+	SID_Bj_Alarm_Cannot_Qc,
+	SID_Set_Enter_Alarm_Pwd,
 
 
 	// 对讲文字

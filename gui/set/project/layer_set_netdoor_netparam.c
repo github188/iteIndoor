@@ -47,7 +47,6 @@ Others:
 *************************************************/
 static void KeyBordGotoSetNetDoorParam()
 {
-	//char tmp[50];
 	uint32 ip_data = 0;
 	ITUText* IPtext[3] = { SetNetDoorNetParamIP2Text, SetNetDoorNetParamMask2Text, SetNetDoorNetParamGateWay2Text };
 	char* IP_data = ituTextGetString(SetNumKeyBordTextBox);
@@ -73,8 +72,7 @@ static void KeyBordGotoSetNetDoorParam()
 			g_ndparam.DefaultGateway = data;
 			break;
 		}
-		//memset(tmp, 0, sizeof(tmp));
-		//change_ip_to_str(data, tmp);
+
 		ituTextSetString(IPtext[g_nd_ip_flag], IP_data);
 	}
 }
@@ -92,15 +90,18 @@ static void SetNetDoorNetParamOnShowData()
 	char tmp[50];
 
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ndparam.IP, tmp);
+	//change_ip_to_str(g_ndparam.IP, tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ndparam.IP));
 	ituTextSetString(SetNetDoorNetParamIP2Text, tmp);
 
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ndparam.SubNet, tmp);
+	//change_ip_to_str(g_ndparam.SubNet, tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ndparam.SubNet));
 	ituTextSetString(SetNetDoorNetParamMask2Text, tmp);
 
 	memset(tmp, 0, sizeof(tmp));
-	change_ip_to_str(g_ndparam.DefaultGateway, tmp);
+	//change_ip_to_str(g_ndparam.DefaultGateway, tmp);
+	sprintf(tmp, "%s", UlongtoIP(g_ndparam.DefaultGateway));
 	ituTextSetString(SetNetDoorNetParamGateWay2Text, tmp);
 
 	memset(tmp, 0, sizeof(tmp));

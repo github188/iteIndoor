@@ -14,12 +14,15 @@ Modification:
 
 #define GO_TO_ALARM_TIMER_LEN	1000	//安防进入定时器中断时间
 
+// 安防界面
+static ITULayer* AlarmLayer = NULL;
+
 // 右边
 static ITUContainer* AlarmRightHomeContainer = NULL;
 static ITUContainer* AlarmRightNoHomeContainer = NULL;
 static ITURadioBox* AlarmRightSecurityRadioBox = NULL;
 static ITURadioBox* AlarmRightAlarmLogRadioBox = NULL;
-//static ITURadioBox* AlarmRightOperLogRadioBox = NULL;
+static ITURadioBox* AlarmRightOperLogRadioBox = NULL;
 
 // 底部
 static ITUContainer* AlarmBottomContainer = NULL;
@@ -31,9 +34,9 @@ static ITUButton* AlarmBottomResetButton = NULL;
 static ITUSprite* AlarmBottomSprite[3] = { NULL };
 static ITUText* AlarmBottomText[3] = { NULL };
 
-
 // 记录界面
 static ITUCoverFlow* AlarmRecordListCoverFlow = NULL;
+static ITUBackground* AlarmRecordListBackground = NULL;
 static ITUContainer* AlarmRecordListContainer = NULL;
 static ITUText* AlarmRecordList0Text = NULL;
 static ITUText* AlarmRecordList1Text = NULL;
@@ -43,15 +46,28 @@ static ITUText* AlarmRecordList3Text = NULL;
 // 八防区主界面
 static ITUBackground* AlarmMainBackground = NULL;
 static ITUText* AlarmHitText = NULL;
+static ITUText* AlarmFqText = NULL;
+static ITUSprite* area_type_sprite[8] = { NULL };
+static ITUSprite* clone_area_type_sprite[8] = { NULL };
 
+// 键盘界面
+static ITUTextBox* AlarmKeyBordTextBox = NULL;
+static ITUText* AlarmKeyBordHitText = NULL;
+static ITUBackground* AlarmKeyBordBackground = NULL;
+static ITUBackground* AlarmBackground = NULL;
 
+// 提示框界面
+static ITUBackground* AlarmFailHitMsgBackground = NULL;
+static ITUText* AlarmFailHitMsgText = NULL;
+
+// 变量定义
 static PALARM_TOUCH_INFO_LIST g_pUnreadList = NULL;		// 报警未读记录
 static uint8 g_alarm_rec_scroll_open = FALSE;			// hit未读记录大于2条时滚动显示
 static uint8 g_alarm_rec_scroll_timer_flag = 0;			// 计时多久滚一次未读记录
 static uint32 g_unread_alarm_rec_show_num = 0;			// 记录当前显示第几条未读记录
 static uint32 g_last_time_tick;							// 用来记录定时器上个时刻的时间
-
-
+static uint8 g_timer_show_shanshuo_flag = 0;			// 定时器是否闪烁显示
+static uint8 g_sprite_shanshuo_flag[8] = { 0 };			// 闪烁颜色选择		// 1:蓝红闪烁	2:黄红闪烁
 
 /*************************************************
 Function:		updata_unread_alarm_rec_data
@@ -70,6 +86,28 @@ static void updata_unread_alarm_rec_data()
 	}
 
 	g_pUnreadList = storage_get_afbj_unread_record();
+}
+
+/*************************************************
+Function:		GetUnicodeLen
+Description:  获取unicode字符串长度
+Input:
+1.U1
+2.U2
+Output:		无
+Return:		长度
+Others:
+*************************************************/
+static uint8 GetUnicodeLen(char *p)
+{
+	uint8 Len = 0;
+	if (!p)return 0;
+	while (*p)
+	{
+		Len++;
+		p++;
+	}
+	return Len;
 }
 
 /*************************************************
@@ -110,26 +148,29 @@ static void ShowOneRecordWin(uint8 page_type, uint8 num, AF_BJ_REC bj_rec, AF_CZ
 {
 	char tmp[100];
 
-	memset(tmp, 0, sizeof(tmp));
-	sprintf(tmp, "%s%d", "AlarmRecordList0Text", num);
-	AlarmRecordList0Text = ituSceneFindWidget(&theScene, tmp);
-	assert(AlarmRecordList0Text);
-	memset(tmp, 0, sizeof(tmp));
-	sprintf(tmp, "%s%d", "AlarmRecordList0Text", num);
-	AlarmRecordList1Text = ituSceneFindWidget(&theScene, tmp);
-	assert(AlarmRecordList1Text);
-	memset(tmp, 0, sizeof(tmp));
-	sprintf(tmp, "%s%d", "AlarmRecordList0Text", num);
-	AlarmRecordList2Text = ituSceneFindWidget(&theScene, tmp);
-	assert(AlarmRecordList2Text);
-	memset(tmp, 0, sizeof(tmp));
-	sprintf(tmp, "%s%d", "AlarmRecordList0Text", num);
-	AlarmRecordList3Text = ituSceneFindWidget(&theScene, tmp);
-	assert(AlarmRecordList3Text);
-	memset(tmp, 0, sizeof(tmp));
-	sprintf(tmp, "%s%d", "AlarmRecordListContainer", num);
-	AlarmRecordListContainer = ituSceneFindWidget(&theScene, tmp);
-	assert(AlarmRecordListContainer);
+	if (num < 6)		//条数大于6后，使用clone出来的list，在clone时直接赋值text指针
+	{
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList0Text", num);
+		AlarmRecordList0Text = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmRecordList0Text);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList1Text", num);
+		AlarmRecordList1Text = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmRecordList1Text);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList2Text", num);
+		AlarmRecordList2Text = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmRecordList2Text);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList3Text", num);
+		AlarmRecordList3Text = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmRecordList3Text);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordListContainer", num);
+		AlarmRecordListContainer = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmRecordListContainer);
+	}
 
 	if (1 == page_type)
 	{
@@ -177,7 +218,69 @@ static void ShowOneRecordWin(uint8 page_type, uint8 num, AF_BJ_REC bj_rec, AF_CZ
 		ituSetColor(&((ITUWidget*)AlarmRecordList3Text)->color, 255, 255, 255, 255);
 		ituWidgetSetVisible(AlarmRecordList2Text, false);
 	}
-	ituWidgetSetVisible(AlarmRecordListContainer, true);
+
+	if (num < 6)
+	{
+		ituWidgetSetVisible(AlarmRecordListContainer, true);
+	}
+}
+
+/*************************************************
+Function:		clone_one_list
+Description: 	clone列表控件
+Input:		无
+Output:		无
+Return:		TRUE 成功 FALSE 失败
+Others:
+*************************************************/
+static void clone_one_list(uint8 num)
+{
+#if 0
+	char tmp[100];
+	bool result = FALSE;
+	ITUBackground* BackgroundOld = NULL;
+	ITUContainer* CloneChildContainer = NULL;
+
+	BackgroundOld = (ITUBackground*)ituSceneFindWidget(&theScene, "AlarmRecordListBackground5");
+
+	result = ituWidgetClone(BackgroundOld, &AlarmRecordListBackground);
+	if (result)
+	{
+		dprintf("itcTreeGetChildCount(AlarmRecordListBackground) = %d\n", itcTreeGetChildCount(AlarmRecordListBackground));
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordListBackground", num);
+		ituWidgetSetName(AlarmRecordListBackground, tmp);
+		ituWidgetSetX(AlarmRecordListBackground, 0);
+#if 0
+		CloneChildContainer = itcTreeGetChildAt(AlarmRecordListBackground, 1);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordListContainer", num);
+		ituWidgetSetName(CloneChildContainer, tmp);
+
+		AlarmRecordList0Text = itcTreeGetChildAt(AlarmRecordListBackground, 2);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList0Text", num);
+		ituWidgetSetName(AlarmRecordList0Text, tmp);
+
+		AlarmRecordList1Text = itcTreeGetChildAt(AlarmRecordListBackground, 3);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList1Text", num);
+		ituWidgetSetName(AlarmRecordList1Text, tmp);
+
+		AlarmRecordList2Text = itcTreeGetChildAt(AlarmRecordListBackground, 4);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList2Text", num);
+		ituWidgetSetName(AlarmRecordList2Text, tmp);
+
+		AlarmRecordList3Text = itcTreeGetChildAt(AlarmRecordListBackground, 5);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmRecordList3Text", num);
+		ituWidgetSetName(AlarmRecordList3Text, tmp);
+#endif
+		ituWidgetAdd(AlarmRecordListCoverFlow, AlarmRecordListBackground);
+		ituSceneUpdate(&theScene, ITU_EVENT_LAYOUT, 0, 0, 0);		
+	}
+#endif
 }
 
 /*************************************************
@@ -198,11 +301,13 @@ static void ShowRecordWin(uint8 page_type)
 	AF_FLASH_DATA alarm_data;
 	AF_BJ_REC bj_rec_null;
 	AF_CZ_REC cz_rec_null;
+	ITUButton* AlarmRecordListButton = NULL;
 
 	logic_get_alarm_param((uint8 *)(&alarm_data));
 
 	if (1 == page_type)
 	{
+		storage_clear_afbj_unread_state();
 		paf_bj_list = storage_get_afbj_record();
 		if (paf_bj_list && paf_bj_list->nCount > 0)
 		{
@@ -210,6 +315,10 @@ static void ShowRecordWin(uint8 page_type)
 			memset(&cz_rec_null, 0, sizeof(AF_CZ_REC));
 			for (i = 0; i < max; i++)
 			{
+				if (i >= 6)				//条数大于等于6时之后的列表都是用clone
+				{
+					clone_one_list(i);
+				}
 				ShowOneRecordWin(page_type, i, paf_bj_list->pAfBjRec[i], cz_rec_null, alarm_data);
 			}
 		}
@@ -223,32 +332,33 @@ static void ShowRecordWin(uint8 page_type)
 			memset(&bj_rec_null, 0, sizeof(AF_BJ_REC));
 			for (i = 0; i < max; i++)
 			{
+				if (i >= 6)				//条数大于等于6时之后的列表都是用clone
+				{
+					clone_one_list(i);
+				}
 				ShowOneRecordWin(page_type, i, bj_rec_null, paf_cz_list->pAfCzRec[i], alarm_data);
 			}
 		}
 	}
 
-	for (i = max; i < AF_REC_MAX; i++)
+	if (max < 6)
 	{
-		memset(tmp, 0, sizeof(tmp));
-		sprintf(tmp, "%s%d", "AlarmRecordListContainer", i);
-		AlarmRecordListContainer = ituSceneFindWidget(&theScene, tmp);
-		assert(AlarmRecordListContainer);
-		ituWidgetSetVisible(AlarmRecordListContainer, false);
+		for (max; max < 6; max++)
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AlarmRecordListContainer", max);
+			AlarmRecordListContainer = ituSceneFindWidget(&theScene, tmp);
+			assert(AlarmRecordListContainer);
+			ituWidgetSetVisible(AlarmRecordListContainer, false);
+		}
 	}
 
 	ituCoverFlowGoto(AlarmRecordListCoverFlow, 0);
-	if (!AlarmRightAlarmLogRadioBox)
-	{
-		AlarmRightAlarmLogRadioBox = ituSceneFindWidget(&theScene, "AlarmRightAlarmLogRadioBox");
-		assert(AlarmRightAlarmLogRadioBox);
-	}
-	ituRadioBoxSetChecked(AlarmRightAlarmLogRadioBox, true);
 
 	ituWidgetSetVisible(AlarmMainBackground, false);
 	ituWidgetSetVisible(AlarmRecordListCoverFlow, true);
-	ituWidgetSetVisible(AlarmRightHomeContainer, false);
-	ituWidgetSetVisible(AlarmRightNoHomeContainer, true);
+	ituWidgetSetVisible(AlarmRightNoHomeContainer, false);
+	ituWidgetSetVisible(AlarmRightHomeContainer, true);
 	ituWidgetSetVisible(AlarmBottomContainer, false);
 	ituWidgetSetVisible(AlarmBottomCleanBtnContainer, true);
 }
@@ -263,16 +373,33 @@ Others:
 *************************************************/
 static void show_alarm_main_hit()
 {
-	uint8 state = 0;
+	char tmp[200] = { 0 };
+	char tmp1[100] = { 0 };
+	uint8 touch_num = 0;
+	AF_FLASH_DATA alarm_data;
 
 	//updata_unread_alarm_rec_data();
 	if (g_pUnreadList && (g_pUnreadList->nCount > 0))
 	{
-		if (1 == g_pUnreadList->nCount)
+		if (1 == g_pUnreadList->nCount)			//未读条数为1，不滚动显示
 		{
+			logic_get_alarm_param((uint8 *)(&alarm_data));
+
+			touch_num = g_pUnreadList->pAlarmRec[g_unread_alarm_rec_show_num].TouchNum;
+			memset(tmp, 0, sizeof(tmp));
+			strcpy(tmp, get_str(SID_Bj_Report_Type_Chufa));
+			memset(tmp1, 0, sizeof(tmp1));
+			sprintf(tmp1, "%s%s%s%d", " ", get_str(SID_Bj_Fangqu), ":", touch_num);
+			strcat(tmp, tmp1);
+			memset(tmp1, 0, sizeof(tmp1));
+			sprintf(tmp1, "%s%s%s", " ", get_str(SID_Bj_SOS + alarm_data.area_type[touch_num - 1]), " ");
+			strcat(tmp, tmp1);
+			strcat(tmp, g_pUnreadList->pAlarmRec[g_unread_alarm_rec_show_num].time);
+
+			ituTextSetString(AlarmHitText, tmp);
 			ituWidgetSetVisible(AlarmHitText, true);
 		}
-		else
+		else									//未读条数不为1，滚动显示
 		{
 			g_alarm_rec_scroll_open = TRUE;
 		}
@@ -281,8 +408,7 @@ static void show_alarm_main_hit()
 	{
 		if (DIS_DEFEND == storage_get_defend_state())
 		{
-			state = judge_can_be_defend();
-			if (0 == state)
+			if (0 == judge_can_be_defend())
 			{
 				ituTextSetString(AlarmHitText, get_str(SID_Bj_Already_Bufang));
 				ituWidgetSetVisible(AlarmHitText, true);
@@ -300,16 +426,157 @@ static void show_alarm_main_hit()
 }
 
 /*************************************************
-Function:		show_alarm_main_eight_area
+Function:		clone_one_fangqu_sprite
+Description: 	clone一个防区
+Input:
+Output:		无
+Return:		无
+Others:
+*************************************************/
+static void clone_one_fangqu_sprite(ITUSprite* old_sprite, uint8 num, char* name_buf)
+{
+#if 0
+	uint8 i;
+	char tmp[100];
+	bool result = FALSE;
+	ITUIcon* CloneChildIcon = NULL;
+
+	result = ituWidgetClone(old_sprite, &clone_area_type_sprite[num]);
+	if (result)
+	{
+		ituWidgetSetName(clone_area_type_sprite[num], name_buf);
+		ituWidgetSetX(clone_area_type_sprite[num], 0);
+#if 0
+		for(i = 0; i < 5; i++)
+		{
+			CloneChildIcon = itcTreeGetChildAt(clone_area_type_sprite[num], i+1);
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%s%d", name_buf, "Icon", i);
+			ituWidgetSetName(CloneChildIcon, tmp);
+		
+		}
+#endif
+		ituWidgetAdd(AlarmMainBackground, AlarmRecordListBackground);
+		ituSceneUpdate(&theScene, ITU_EVENT_LAYOUT, 0, 0, 0);
+	}
+#endif
+}
+
+/*************************************************
+Function:		update_area_state
 Description: 	显示安防八防区
 Input:
 Output:		无
 Return:		无
 Others:
 *************************************************/
-static void show_alarm_main_eight_area()
+static void update_area_state()
 {
+	uint8 i;
+	char tmp[50];
+	uint8 is24hour;
+	uint8 no24clear;					// 非24小时防区是否清除警戒标志
+	uint8 no24touch;					// 非24小时防区触发标志
+	AF_FLASH_DATA af_data;
+	ITUSprite* free_sprite = NULL;
+	//状态与图标索引的对应
+	uint8 state_to_bmpoder[5] = { 0, 0, 3, 2, 1};
 
+	if (!area_type_sprite[0])
+	{
+		area_type_sprite[0] = ituSceneFindWidget(&theScene, "AlarmFqUrgencySprite");
+		assert(area_type_sprite[0]);
+
+		area_type_sprite[1] = ituSceneFindWidget(&theScene, "AlarmFqFireSprite");
+		assert(area_type_sprite[1]);
+
+		area_type_sprite[2] = ituSceneFindWidget(&theScene, "AlarmFqGasSprite");
+		assert(area_type_sprite[2]);
+
+		area_type_sprite[3] = ituSceneFindWidget(&theScene, "AlarmFqDoorSprite");
+		assert(area_type_sprite[3]);
+
+		area_type_sprite[4] = ituSceneFindWidget(&theScene, "AlarmFqRoomSprite");
+		assert(area_type_sprite[4]);
+
+		area_type_sprite[5] = ituSceneFindWidget(&theScene, "AlarmFqWindow1Sprite");
+		assert(area_type_sprite[5]);
+
+		area_type_sprite[6] = ituSceneFindWidget(&theScene, "AlarmFqWindow2Sprite");
+		assert(area_type_sprite[6]);
+
+		area_type_sprite[7] = ituSceneFindWidget(&theScene, "AlarmFqBalconySprite");
+		assert(area_type_sprite[7]);
+	}
+
+	logic_get_alarm_param((uint8 *)&af_data);
+	for (i = 0; i < 8; i++)
+	{
+		dprintf("af_data.area_type[i] = %d\n", af_data.area_type[i]);
+
+		if (i == af_data.area_type[i])
+		{
+			clone_area_type_sprite[i] = area_type_sprite[i];
+
+			if (!ituWidgetIsVisible(clone_area_type_sprite[i]))
+			{
+				ituWidgetSetVisible(clone_area_type_sprite[i], true);
+			}
+		}
+		else
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "clone_area_type_sprite", i);
+			free_sprite = ituSceneFindWidget(&theScene, tmp);
+
+			if (NULL != free_sprite)							//判断是否clone过
+			{
+				itcTreeRemove(free_sprite);						// 删除已有的
+			}
+			ituWidgetSetVisible(area_type_sprite[i], false);
+			clone_one_fangqu_sprite(area_type_sprite[i], i, tmp);
+		}
+	}
+	
+	is24hour = af_data.is_24_hour;
+	no24clear = alarm_get_24clear_param();
+	no24touch = alarm_get_no24touch_param();
+
+	memset(g_sprite_shanshuo_flag, 0, sizeof(g_sprite_shanshuo_flag));
+
+	for (i = 0; i < 8; i++)
+	{
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AlarmFqText", i);
+		AlarmFqText = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmFqText);
+
+		ituTextSetString(AlarmFqText, get_str(af_data.area_type[i] + SID_Bj_SOS));
+
+		if (ALARM_SHOW_STATE == af_data.show_state[i])
+		{
+			ituSetColor(&((ITUWidget*)AlarmFqText)->color, 255, 255, 0, 0);	// 字体红色
+			g_timer_show_shanshuo_flag = TRUE;
+
+			if ((0 == ((is24hour >> i) & 0x01) && (1 == ((no24clear >> i) & 0x01))) || (0 == ((is24hour >> i) & 0x01) && (1 == ((no24touch >> i) & 0x01))))
+			{
+				// 蓝红闪烁
+				g_sprite_shanshuo_flag[i] = 1;
+				dprintf("1update_area_state = %d\n", i);
+			}
+			else
+			{	// 黄红闪烁
+				g_sprite_shanshuo_flag[i] = 2;
+				dprintf("2update_area_state = %d\n", i);
+			}
+		}
+		else
+		{
+			dprintf("3update_area_state = %d\n", i);
+			g_timer_show_shanshuo_flag = FALSE;
+			ituSpriteGoto(clone_area_type_sprite[i], state_to_bmpoder[af_data.show_state[i]]);
+		}			
+	}
 }
 
 /*************************************************
@@ -428,7 +695,7 @@ Others:
 static void ShowAlarmMainWin()
 {
 	show_alarm_main_hit();
-	show_alarm_main_eight_area();
+	update_area_state();
 	show_alarm_main_bottom();
 	ituWidgetSetVisible(AlarmRecordListCoverFlow, false);
 	ituWidgetSetVisible(AlarmMainBackground, true);
@@ -447,7 +714,6 @@ Others:
 bool AlarmOnEnter(ITUWidget* widget, char* param)
 {
 	uint8 i = 0;
-	//char tmp[100];
 	PALARM_TOUCH_INFO_LIST pUnreadList = NULL;
 	uint8 alarming;
 
@@ -473,6 +739,31 @@ bool AlarmOnEnter(ITUWidget* widget, char* param)
 
 		AlarmHitText = ituSceneFindWidget(&theScene, "AlarmHitText");
 		assert(AlarmHitText);
+
+		AlarmRightAlarmLogRadioBox = ituSceneFindWidget(&theScene, "AlarmRightAlarmLogRadioBox");
+		assert(AlarmRightAlarmLogRadioBox);
+
+		AlarmRightOperLogRadioBox = ituSceneFindWidget(&theScene, "AlarmRightOperLogRadioBox");
+		assert(AlarmRightOperLogRadioBox);
+
+		AlarmRightSecurityRadioBox = ituSceneFindWidget(&theScene, "AlarmRightSecurityRadioBox");
+		assert(AlarmRightSecurityRadioBox);
+
+		AlarmBackground = ituSceneFindWidget(&theScene, "AlarmBackground");
+		assert(AlarmBackground);
+
+		AlarmKeyBordBackground = ituSceneFindWidget(&theScene, "AlarmKeyBordBackground");
+		assert(AlarmKeyBordBackground);
+
+		AlarmFailHitMsgBackground = ituSceneFindWidget(&theScene, "AlarmFailHitMsgBackground");
+		assert(AlarmFailHitMsgBackground);
+	}
+
+	ituWidgetSetVisible(AlarmKeyBordBackground, false);
+	ituWidgetSetVisible(AlarmFailHitMsgBackground, false);
+	if (!ituWidgetIsEnabled(AlarmBackground))
+	{
+		ituWidgetEnable(AlarmBackground);
 	}
 
 	g_last_time_tick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
@@ -485,10 +776,12 @@ bool AlarmOnEnter(ITUWidget* widget, char* param)
 		if (pUnreadList && (pUnreadList->nCount > 0))
 		{
 			ShowRecordWin(1);
+			ituRadioBoxSetChecked(AlarmRightAlarmLogRadioBox, true);
 			return true;
 		}
 	}
 	ShowAlarmMainWin();
+	ituRadioBoxSetChecked(AlarmRightSecurityRadioBox, true);
 
 	return true;
 }
@@ -512,10 +805,8 @@ static void ScrollShowAlarmUnreadRec()
 	{
 		return;
 	}
-	
-	ituWidgetHide(AlarmHitText, ITU_EFFECT_SCROLL_UP, 15);
 
-	//if (ituWidgetIsVisible(AlarmHitText) == false)
+	if (ituWidgetIsVisible(AlarmHitText) == false)
 	{
 		logic_get_alarm_param((uint8 *)(&alarm_data));
 
@@ -527,6 +818,8 @@ static void ScrollShowAlarmUnreadRec()
 		{
 			g_unread_alarm_rec_show_num++;
 		}
+
+		dprintf("1212g_pUnreadList->nCount = &d\n", g_pUnreadList->nCount);
 		
 		touch_num = g_pUnreadList->pAlarmRec[g_unread_alarm_rec_show_num].TouchNum;
 		memset(tmp, 0, sizeof(tmp));
@@ -542,10 +835,10 @@ static void ScrollShowAlarmUnreadRec()
 		ituTextSetString(AlarmHitText, tmp);
 		ituWidgetShow(AlarmHitText, ITU_EFFECT_SCROLL_UP, 15);
 	}
-#if 0
+#if 1
 	else
 	{
-		if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
+		//if (gScrollTimeCount == MAIN_SCROLLTEXT_SHOW_TIME)
 		{
 			ituWidgetHide(AlarmHitText, ITU_EFFECT_SCROLL_UP, 15);
 		}
@@ -563,6 +856,7 @@ Others:
 *************************************************/
 bool AlarmLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 {
+	uint8 i = 0;
 	uint32 duration;
 	uint32 curtime = SDL_GetTicks();
 
@@ -579,19 +873,441 @@ bool AlarmLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 	{
 		g_last_time_tick = curtime;
 
-		if (2 >= g_alarm_rec_scroll_timer_flag)
+		if (g_alarm_rec_scroll_timer_flag >= 1)		//安防界面未读记录滚动显示
 		{
 			g_alarm_rec_scroll_timer_flag = 0;
+
+			dprintf("88888888888888888\n");
 
 			if (TRUE == g_alarm_rec_scroll_open)
 			{
 				ScrollShowAlarmUnreadRec();
+				return true;
 			}
 		}
 		else
 		{
+			dprintf("77777777777777\n");
 			g_alarm_rec_scroll_timer_flag++;
 		}
+
+		dprintf("g_alarm_rec_scroll_timer_flag= %d\n", g_alarm_rec_scroll_timer_flag);
+
+		//if (TRUE == g_timer_show_shanshuo_flag)			//报警闪烁
+		{
+			for (i = 0; i < 8; i++)
+			{
+				if (1 == g_sprite_shanshuo_flag[i])		// 1:蓝红闪烁
+				{
+					if (0 == g_alarm_rec_scroll_timer_flag)
+					{
+						ituSpriteGoto(clone_area_type_sprite[i], 1);	//蓝
+					}
+					else
+					{
+						ituSpriteGoto(clone_area_type_sprite[i], 3);	//红
+					}	
+				}
+				else if (2 == g_sprite_shanshuo_flag[i])	// 2:黄红闪烁
+				{
+					if (0 == g_alarm_rec_scroll_timer_flag)
+					{
+						ituSpriteGoto(clone_area_type_sprite[i], 4);	//黄
+					}
+					else
+					{
+						ituSpriteGoto(clone_area_type_sprite[i], 3);	//红
+					}
+				}
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*************************************************
+Function:		ShowAlarmKetBordWin
+Description: 	安防界面键盘函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void ShowAlarmKetBordWin()
+{
+	if (!AlarmKeyBordTextBox)
+	{	
+		AlarmKeyBordTextBox = ituSceneFindWidget(&theScene, "AlarmKeyBordTextBox");
+		assert(AlarmKeyBordTextBox);
+
+		AlarmKeyBordHitText = ituSceneFindWidget(&theScene, "AlarmKeyBordHitText");
+		assert(AlarmKeyBordHitText);
+	}
+
+	AlarmKeyBordTextBox->text.layout = ITU_LAYOUT_MIDDLE_CENTER;
+	ituTextBoxSetString(AlarmKeyBordTextBox, NULL);
+	ituTextSetString(AlarmKeyBordHitText, get_str(SID_Set_Enter_Alarm_Pwd));
+
+	ituWidgetDisable(AlarmBackground);
+	ituWidgetSetVisible(AlarmKeyBordBackground, true);
+}
+
+/*************************************************
+Function:		ShowAlarmKetBordWin
+Description: 	安防界提示框器函数
+Input:		index:	0：正在报警不能布防
+					1：正在报警，无法操作
+					2：防区（x）触发不能布防
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+static void ShowAlarmFailHitMsgWin(uint32 err)
+{
+	char tmp[100];
+
+	if (!AlarmFailHitMsgText)
+	{
+		AlarmFailHitMsgText = ituSceneFindWidget(&theScene, "AlarmFailHitMsgText");
+		assert(AlarmFailHitMsgText);
+	}
+
+	memset(tmp, 0, sizeof(tmp));
+
+	switch (err)
+	{
+	case AF_BAOJINGNOBUFANG:
+		strcpy(tmp, get_str(SID_Bj_Alarm_Cannot_Bf));	//正在报警不能布防
+		break;
+
+	case AF_FQCHUFA:									//防区触发，不能布防
+		{
+			uint8 i = 0;
+			uint8 len = 0;
+			uint8 state = 0;
+			
+			state = judge_can_be_defend();
+		
+			strcpy(tmp, get_str(SID_Bj_Fangqu));
+			strcat(tmp, "(");
+			len = GetUnicodeLen(tmp);
+
+			for (i = 0; i < 8; i++)
+			{
+				if (1 == (0x01 & (state >> i)))					//防区触发
+				{
+					tmp[len++] = '1' + i;
+					tmp[len++] = ',';
+				}
+			}
+			tmp[len - 1] = 0;
+			strcat(tmp, ")");
+			strcat(tmp, get_str(SID_Bj_Touch_Cannot_Bf));
+		}
+		break;
+
+	case 9:
+		strcpy(tmp, get_str(SID_Bj_Alarm_Cannot_Qc));	//正在报警，不能操作
+		break;
+	}
+	ituTextSetString(AlarmFailHitMsgText, tmp);
+
+	ituWidgetDisable(AlarmBackground);
+	ituWidgetSetVisible(AlarmFailHitMsgBackground, true);
+}
+
+/*************************************************
+Function:		AlarmBottomButtonOnMouseUp
+Description: 	安防底部按键按下处理函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool AlarmBottomButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	uint32 ret = 0;
+	int bottom_index = atoi(param);
+
+	switch (bottom_index)
+	{
+	case 0:							// 在家按键
+		ShowAlarmKetBordWin();
+		break;
+
+	case 1:							// 外出按键
+		ret = alarm_set_operator(EXECUTOR_LOCAL_HOST);
+		if (AF_SUCCESS == ret)
+		{
+			show_alarm_main_hit();
+			update_area_state();
+			show_alarm_main_bottom();
+		}
+		else
+		{
+			show_alarm_main_bottom();
+			ShowAlarmFailHitMsgWin(ret);
+		}
+		break;
+
+	case 2:							// 夜间按键
+		ret = alarm_partset_operator(EXECUTOR_LOCAL_HOST);
+		if (AF_SUCCESS == ret)
+		{
+			show_alarm_main_hit();
+			update_area_state();
+			show_alarm_main_bottom();
+		}
+		else
+		{
+			show_alarm_main_bottom();
+			ShowAlarmFailHitMsgWin(ret);
+		}
+		break;
+
+	case 3:							// 清除警示按键
+		if (logic_get_g_whole_alarm_state_param())
+		{
+			ShowAlarmFailHitMsgWin(9);
+		}
+		else
+		{
+			alarm_clear_alerts_operator();
+			storage_clear_afbj_unread_state();
+			updata_unread_alarm_rec_data();
+		}
+		show_alarm_main_hit();
+		update_area_state();
+		show_alarm_main_bottom();
+		break;
+
+	case 4:							// 清空按键
+		if (ituRadioBoxIsChecked(AlarmRightOperLogRadioBox))
+		{
+			storage_clear_afcz_record();
+			ShowRecordWin(2);
+		}
+		else if (ituRadioBoxIsChecked(AlarmRightAlarmLogRadioBox))
+		{
+			storage_clear_afbj_record();
+			updata_unread_alarm_rec_data();
+			ShowRecordWin(1);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		AlarmRightButtonOnMouseUp
+Description: 	安防右边按键按下处理函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool AlarmRightButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	int right_index = atoi(param);
+	uint8 alarming;
+
+	alarming = logic_get_g_whole_alarm_state_param();
+
+	switch (right_index)
+	{
+	case 0:							// 安防按键
+		ShowAlarmMainWin();
+		break;
+
+	case 1:							// 报警记录按键
+		if (1 == alarming)
+		{
+			ShowAlarmFailHitMsgWin(9);
+		}
+		else
+		{
+			ShowRecordWin(1);
+			storage_clear_afbj_unread_state();
+		}
+		break;
+
+	case 2:							// 操作记录按键
+		if (1 == alarming)
+		{
+			ShowAlarmFailHitMsgWin(9);
+		}
+		else
+		{
+			ShowRecordWin(2);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		AlarmKeyBordButtonOnMouseUp
+Description: 	键盘按键按下执行函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool AlarmKeyBordButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	ITUButton* btn = (ITUButton*)widget;
+	char* input = ituTextGetString(&btn->text);
+	char* str_textbox = ituTextGetString(AlarmKeyBordTextBox);
+	int count_textbox = str_textbox ? strlen(str_textbox) : 0;
+	char* str_text = ituTextGetString(AlarmKeyBordHitText);
+	int count_text = str_text ? strlen(str_text) : 0;
+
+	if (count_text > 0)
+		ituTextSetString(AlarmKeyBordHitText, "");
+
+	if (count_textbox > AlarmKeyBordTextBox->maxLen)
+		ituTextSetString(AlarmKeyBordTextBox, NULL);
+
+	ituTextBoxInput(AlarmKeyBordTextBox, input);
+
+	return true;
+}
+
+/*************************************************
+Function:		AlarmKeyBordYesButtonOnMouseUp
+Description: 	键盘确认键按下执行函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool AlarmKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	MSG_EVENT event = MSG_EVENT_NO;
+
+	char* TextBox_data = ituTextGetString(AlarmKeyBordTextBox);
+
+	event = msg_pass_oper_deal(PASS_TYPE_USER, 0xff, TextBox_data);
+
+	switch (event)
+	{
+	case MSG_EVENT_YES:
+		if (AF_SUCCESS == alarm_unset_operator(EXECUTOR_LOCAL_HOST, 0))
+		{
+			show_alarm_main_hit();
+			update_area_state();
+			show_alarm_main_bottom();
+		}
+		else
+		{
+			show_alarm_main_bottom();
+		}
+		break;
+
+	case MSG_EVENT_XIECHI:
+		if (AF_SUCCESS == alarm_unset_operator(EXECUTOR_LOCAL_HOST, 1))
+		{
+			show_alarm_main_hit();
+			update_area_state();
+			show_alarm_main_bottom();
+		}
+		else
+		{
+			show_alarm_main_bottom();
+		}
+		break;
+
+	case MSG_EVENT_NO:
+		show_alarm_main_bottom();
+		break;
+	}
+
+	if (ituWidgetIsVisible(AlarmKeyBordBackground))
+	{
+		ituWidgetSetVisible(AlarmKeyBordBackground, false);
+		ituWidgetEnable(AlarmBackground);
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		AlarmKeyBordDelButtonOnMouseLongPress
+Description: 	回删长按执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool AlarmKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param)
+{
+	ituTextBoxSetString(AlarmKeyBordTextBox, NULL);
+	// 删除号码完毕，显示输入提示
+	ituTextSetString(AlarmKeyBordHitText, get_str(SID_Set_Enter_Alarm_Pwd));
+
+	return true;
+}
+
+/*************************************************
+Function:		AlarmLayerOnGoto
+Description: 	进入安防界面
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool AlarmLayerOnGoto(ITUWidget* widget, char* param)
+{
+	if (!AlarmLayer)
+	{
+		AlarmLayer = ituSceneFindWidget(&theScene, "AlarmLayer");
+		assert(AlarmLayer);
+	}
+
+	//if (!ituWidgetIsVisible(AlarmLayer))
+	{
+		ituLayerGoto(AlarmLayer);
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		UpdataAlarmLayerOnShow
+Description: 	刷新安防八防区界面
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool UpdataAlarmLayerOnShow(ITUWidget* widget, char* param)
+{
+	if (!AlarmLayer)
+	{
+		AlarmLayer = ituSceneFindWidget(&theScene, "AlarmLayer");
+		assert(AlarmLayer);
+	}
+	if (!AlarmMainBackground)
+	{
+		AlarmMainBackground = ituSceneFindWidget(&theScene, "AlarmMainBackground");
+		assert(AlarmMainBackground);
+	}
+
+	if (ituWidgetIsVisible(AlarmLayer) && ituWidgetIsVisible(AlarmLayer))
+	{
+		show_alarm_main_hit();
+		update_area_state();
+		show_alarm_main_bottom();
 	}
 
 	return true;

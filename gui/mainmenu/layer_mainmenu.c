@@ -638,7 +638,7 @@ void setUnreadRecorderText(uint8_t index)
 	}
 	//TODO:读取存储设置文字内容！！
 	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "2016-08-03 08:11:1", index);
+	zoneDateTimeToString(gMainScrollData->JrlyUnReadList->JrlyInfo[index].Time, tmpStr);
 	ituTextSetString(page1RecorderScrollTimeText, tmpStr);
 }
 

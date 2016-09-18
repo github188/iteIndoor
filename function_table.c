@@ -9,6 +9,7 @@ ITUActionFunction actionFunctions[] =
 	"mainDistrubStatusOnChange", mainDistrubStatusOnChange,
 	"mainSOSBtnOnPress", mainSOSBtnOnPress,
 	"mainCoverFlowOnChanged", mainCoverFlowOnChanged,
+	"mainBtnOnClicked", mainBtnOnClicked,
 
 	//elevatorCall
 	"elevatorCallBtnOnClicked", elevatorCallBtnOnClicked,

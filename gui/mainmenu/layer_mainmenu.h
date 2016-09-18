@@ -38,8 +38,10 @@ bool	mainDistrubStatusOnChange(ITUWidget* widget, char* param);
 bool    mainLayerTimeoutOnTimer(ITUWidget* widget, char* param);
 bool	mainSOSBtnOnPress(ITUWidget* widget, char* param);
 bool    mainCoverFlowOnChanged(ITUWidget* widget, char* param);
+bool	mainBtnOnClicked(ITUWidget* widget, char* param);
 void	mainLayerCornerNumReload();
 void	mainLayerScrollDataReload();
+void	mainLayerInit();
 void	mainLayerShow();
 
 void 	zoneDateTimeToString(DATE_TIME time, char* tmpStr);

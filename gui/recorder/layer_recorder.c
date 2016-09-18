@@ -118,7 +118,7 @@ void recorderLayerInit()
 		setRecordRadioBoxStatus(i, false);
 	}
 
-	setRecorderAudioBtnStatus(gRecorderStatus);
+	setRecorderAudioBtnStatus(RECORDER_STATUS_NULL);
 	setRecorderRecordCreateTime("");
 	setRecorderDuration("00:00");
 	setRecorderRadioBoxIsEnable(true);

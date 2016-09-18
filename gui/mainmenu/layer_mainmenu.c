@@ -14,20 +14,21 @@ Modification:
 
 #include "layer_mainmenu.h"
 
-static ITULayer*	mainLayer = NULL;
-static ITUText*		mainDigitalClockWeekText;
-static ITUCoverFlow*mainPageCoverFlow;
-static ITUSprite*	mainIPSprite;
-static ITUIcon*		mainNetStatusOffIcon;
-static ITUSprite*	mainNetStatusOnSprite;
-static ITUText*		mainDeviceNoText;
-static ITUButton*	mainSOSOnButton;
-static ITUButton*	mainSOSOffButton;
-static ITUIcon*		page1NoDisturbOnIcon;
-static ITUText*		page1NoDisturbOnText;
-static ITUIcon*		page1NoDisturbOffIcon;
-static ITUText*		page1NoDisturbOffText;
-static ITUIcon*		mainBackgroundImgIcon;
+static ITULayer*		mainLayer = NULL;
+static ITUBackground*	mainTipsTransparencyBackground;
+static ITUText*			mainDigitalClockWeekText;
+static ITUCoverFlow*	mainPageCoverFlow;
+static ITUSprite*		mainIPSprite;
+static ITUIcon*			mainNetStatusOffIcon;
+static ITUSprite*		mainNetStatusOnSprite;
+static ITUText*			mainDeviceNoText;
+static ITUButton*		mainSOSOnButton;
+static ITUButton*		mainSOSOffButton;
+static ITUIcon*			page1NoDisturbOnIcon;
+static ITUText*			page1NoDisturbOnText;
+static ITUIcon*			page1NoDisturbOffIcon;
+static ITUText*			page1NoDisturbOffText;
+static ITUIcon*			mainBackgroundImgIcon;
 
 static ITUIcon*		page1RecorderNumIcon;
 static ITUText*		page1RecorderNumText;
@@ -133,13 +134,28 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	gSOSBtnIsPress = false;
 	gSOSIsAlarm = false;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比
+
+	mainLayerInit();
+
+	return true;
+}
+
+
+void mainLayerInit()
+{
+	if (!mainTipsTransparencyBackground)
+	{
+		mainTipsTransparencyBackground = ituSceneFindWidget(&theScene, "mainTipsTransparencyBackground");
+		assert(mainTipsTransparencyBackground);
+	}
+
 	setSOSBtnType(false);
 
 	//在进入这个界面时候，需要做的动作，比如初始化图标，读取状态等！！！！！
 	mainLayerScrollDataReload();
 	mainLayerCornerNumReload();
 
-	return true;
+	ituWidgetSetVisible(mainTipsTransparencyBackground, false);
 }
 
 
@@ -244,6 +260,13 @@ bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 	{
 		gSOSBtnIsPress = false;
 	}
+
+	return true;
+}
+
+
+bool mainBtnOnClicked(ITUWidget* widget, char* param)
+{
 
 	return true;
 }
@@ -639,6 +662,7 @@ void setUnreadRecorderText(uint8_t index)
 	//TODO:读取存储设置文字内容！！
 	memset(tmpStr, 0, sizeof(tmpStr));
 	zoneDateTimeToString(gMainScrollData->JrlyUnReadList->JrlyInfo[index].Time, tmpStr);
+	printf("\n1111111111111 = %d    %s\n",index, tmpStr);
 	ituTextSetString(page1RecorderScrollTimeText, tmpStr);
 }
 
@@ -661,21 +685,23 @@ void setUnreadRecorderScroll()
 
 			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->JrlyUnReadList->Count; i++)
 			{
-				gRecorderTextIndex++;
-
 				if (!gMainScrollData->JrlyUnReadList->JrlyInfo[i].UnRead)
 				{
-					if (i == (uint8_t)gMainScrollData->JrlyUnReadList->Count)
+					gRecorderTextIndex++;
+
+					if (gRecorderTextIndex >= (uint8_t)gMainScrollData->JrlyUnReadList->Count)
 					{
 						gRecorderTextIndex = 0;
 
 						for (j = 0; j < tmpIndex; j++)
 						{
-							gRecorderTextIndex++;
-
 							if (gMainScrollData->JrlyUnReadList->JrlyInfo[j].UnRead)
 							{
 								break;
+							}
+							else
+							{
+								gRecorderTextIndex++;
 							}
 						}
 					}
@@ -687,6 +713,7 @@ void setUnreadRecorderScroll()
 			}
 
 			setUnreadRecorderText(gRecorderTextIndex);
+			gRecorderTextIndex++;
 			ituWidgetShow(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}
 		else

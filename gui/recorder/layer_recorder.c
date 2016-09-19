@@ -695,7 +695,9 @@ void recorderVoiceBtnOnClicked()
 
 bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 {
-	switch (atoi(param))
+	uint8_t tmpId = atoi(param);
+
+	switch (tmpId)
 	{
 	case RECORDER_MSG_BTN_COMFIRM:
 		//TODO:删除本条留言信息，刷新存储，刷新界面！！！！！！

@@ -16,6 +16,8 @@ Modification:
 
 static ITULayer*		mainLayer = NULL;
 static ITUBackground*	mainTipsTransparencyBackground;
+static ITUBackground*	mainBackground;
+static ITUText*			mainTipsText;
 static ITUText*			mainDigitalClockWeekText;
 static ITUCoverFlow*	mainPageCoverFlow;
 static ITUSprite*		mainIPSprite;
@@ -219,7 +221,9 @@ bool mainLayerTimeoutOnTimer(ITUWidget* widget, char* param)
 				{
 					gSOSIsAlarm = true;
 					printf("\ngSOSIsAlarm!!!\n");
-					sos_alarm_report();
+					alarm_deal(AS_ALARM_PROC, 0);
+					//sos_alarm_report();
+					//storage_add_afbj_record(1, 1);
 				}
 			}
 		}
@@ -267,7 +271,55 @@ bool mainSOSBtnOnPress(ITUWidget* widget, char* param)
 
 bool mainBtnOnClicked(ITUWidget* widget, char* param)
 {
+	MAIN_BTN_e tmpIndex = (MAIN_BTN_e)atoi(param);
 
+	switch (tmpIndex)
+	{
+	case MAIN_BTN_AUTOMATION:
+		if (storage_get_extmode(EXT_MODE_JD) == false)
+		{
+			printf("recorderDeleteBtnOnClicked");
+
+			if (!mainTipsText)
+			{
+				mainTipsText = ituSceneFindWidget(&theScene, "mainTipsText");
+				assert(mainTipsText);
+			}
+
+			if (!mainBackground)
+			{
+				mainBackground = ituSceneFindWidget(&theScene, "mainBackground");
+				assert(mainBackground);
+			}
+			//TODO:添加语言翻译！
+
+			ituTextSetString(mainTipsText, "Automation No Used!");
+
+			ituWidgetDisable(mainBackground);
+			ituWidgetSetVisible(mainTipsTransparencyBackground, true);
+		}
+		break;
+
+	default:
+		break;
+	}
+	return true;
+}
+
+
+bool mainMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
+{
+	switch (atoi(param))
+	{
+	case RECORDER_MSG_BTN_COMFIRM:
+		break;
+
+	default:
+		break;
+	}
+
+	ituWidgetEnable(mainBackground);
+	ituWidgetSetVisible(mainTipsTransparencyBackground, false);
 	return true;
 }
 
@@ -281,12 +333,6 @@ void zoneDateTimeToString(DATE_TIME time, char* tmpStr)
 void mainLayerCornerNumReload()
 {
 	//TODO:用户在界面Enter时候载入不需要实时去获取的数据！！！！！
-	//setUnreadRecorderNum((uint8_t)getUnreadRecorderNum());				//设置家人留言条数
-	//setUnreadPhotoMsgNum((uint8_t)getUnreadPhotoMsgNum());				//设置留影留言条数
-	//setUnreadInformationNum((uint8_t)getUnreadInformationNum());		//设置信息条数
-	//setSecurityStatus((MAIN_SECURITY_STATUS_e)getSecurityStatus());		//设置安防状态
-	//setUnsolvedSecurityAlarmNum((uint8_t)getUnsolvedSecurityAlarmNum());//设置安防报警数
-	//setUnreadMissedCallNum((uint8_t)getUnreadMissedCallNun());			//设置未接来电数
 
 	setUnreadRecorderNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_FAMILY]);					//设置家人留言条数
 	setUnreadPhotoMsgNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_LEAVEWORD]);					//设置留影留言条数
@@ -305,12 +351,6 @@ void mainLayerScrollDataReload()
 	{
 		gMainScrollData = (PSysHintRecord)sys_get_hint_list();
 	}
-
-	//loadUnreadRecorderData();				//载入未读家人留言数据
-	//loadUnreadInformationData();			//载入未读信息数据
-	//loadUnreadMissedCallData();				//载入未接电话信息
-	//loadUnreaPhotoMsgData();				//载入未读留影留言数据
-	//loadUnsolvedSecurityAlarmData();		//载入为处理的报警数据
 }
 
 
@@ -536,26 +576,6 @@ bool mainDistrubStatusOnChange(ITUWidget* widget, char* param)
 }
 
 
-uint8_t	getUnreadRecorderNum()
-{
-	uint8_t tmpCount = 0;
-	uint8_t i = 0;
-
-	if (gRecorderData == NULL)
-	{
-		loadUnreadRecorderData();
-	}
-
-	for (i = 0; i < gRecorderData->Count; i++)
-	{
-		if (gRecorderData->JrlyInfo[i].UnRead == TRUE)
-		{
-			tmpCount++;
-		}
-	}
-	return tmpCount;
-}
-
 
 void setUnreadRecorderNum(uint8_t num)
 {
@@ -632,24 +652,6 @@ void setUnreadRecorderNum(uint8_t num)
 }
 
 
-void loadUnreadRecorderData()
-{
-	PJRLYLIST_INFO tmpListInfo = NULL;
-
-	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
-	if (gRecorderData == NULL)
-	{
-		gRecorderData = (PJRLYLIST_INFO)malloc(sizeof(JRLYLIST_INFO));
-	}
-	storage_get_jrlyrecord(&tmpListInfo);
-	memcpy(gRecorderData, tmpListInfo, sizeof(JRLYLIST_INFO));
-
-	free(tmpListInfo);
-
-	printf("\n unread recorder count  = %d \n", gRecorderData->Count);
-}
-
-
 void setUnreadRecorderText(uint8_t index)
 {
 	char tmpStr[50] = { 0 };
@@ -714,6 +716,7 @@ void setUnreadRecorderScroll()
 
 			setUnreadRecorderText(gRecorderTextIndex);
 			gRecorderTextIndex++;
+			//if ((uint8_t)gMainScrollData->syshintnum[SYS_HINT_FAMILY] > 1)
 			ituWidgetShow(page1RecorderScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}
 		else
@@ -726,26 +729,6 @@ void setUnreadRecorderScroll()
 	}
 }
 
-
-uint8_t getUnreadPhotoMsgNum()
-{
-	uint8_t tmpCount = 0; 
-	uint8_t i = 0;
-
-	if (gPhotoMsgData == NULL)
-	{
-		loadUnreaPhotoMsgData();
-	}
-	for (i = 0; i < gPhotoMsgData->Count; i++)
-	{
-		if (gPhotoMsgData->LylyInfo[i].UnRead == TRUE)
-		{
-			tmpCount++;
-		}
-	}
-
-	return storage_get_lylyrecord_flag();
-}
 
 
 void setUnreadPhotoMsgNum(uint8_t num)
@@ -824,23 +807,6 @@ void setUnreadPhotoMsgNum(uint8_t num)
 }
 
 
-void loadUnreaPhotoMsgData()
-{	
-	PLYLYLIST_INFO tmpListInfo = NULL;
-
-	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
-	if (gPhotoMsgData == NULL)
-	{
-		gPhotoMsgData = (PJRLYLIST_INFO)malloc(sizeof(JRLYLIST_INFO));
-	}
-	storage_get_lylyrecord(&tmpListInfo);
-	memcpy(gPhotoMsgData, tmpListInfo, sizeof(JRLYLIST_INFO));
-
-	free(tmpListInfo);
-
-	printf("\n unread PhotoMsg count  = %d \n", gPhotoMsgData->Count);
-}
-
 
 void setUnreadPhotoMsgText(uint8_t index)
 {
@@ -860,19 +826,51 @@ void setUnreadPhotoMsgText(uint8_t index)
 
 void setUnreadPhotoMsgScroll()
 {
+	uint8_t tmpIndex = 0;
+	uint8_t i = 0;
+	uint8_t j = 0;
+
 	if (gIsScrollingPhotoMsg == true)
 	{
 		if (ituWidgetIsVisible(page0PhotoMsgScrollTextContainer) == false)
 		{
-			if (gPhotoMsgTextIndex >= getUnreadPhotoMsgNum())
+			if (gPhotoMsgTextIndex >= (uint8_t)gMainScrollData->LylyUnReadList->Count)
 			{
 				gPhotoMsgTextIndex = 0;
 			}
-			else
+			tmpIndex = gPhotoMsgTextIndex;
+
+			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->LylyUnReadList->Count; i++)
 			{
-				gPhotoMsgTextIndex++;
+				if (!gMainScrollData->LylyUnReadList->LylyInfo[j].UnRead)
+				{
+					gPhotoMsgTextIndex++;
+
+					if (gPhotoMsgTextIndex >= (uint8_t)gMainScrollData->LylyUnReadList->Count)
+					{
+						gPhotoMsgTextIndex = 0;
+
+						for (j = 0; j < tmpIndex; j++)
+						{
+							if (gMainScrollData->LylyUnReadList->LylyInfo[j].UnRead)
+							{
+								break;
+							}
+							else
+							{
+								gPhotoMsgTextIndex++;
+							}
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
+
 			setUnreadPhotoMsgText(gPhotoMsgTextIndex);
+			gPhotoMsgTextIndex++;
 			ituWidgetShow(page0PhotoMsgScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}
 		else
@@ -883,27 +881,6 @@ void setUnreadPhotoMsgScroll()
 			}
 		}
 	}
-}
-
-
-uint8_t getUnreadInformationNum()
-{
-	uint8_t tmpCount = 0;
-	uint8_t i = 0;
-
-	if (gInformationData == NULL)
-	{
-		loadUnreadInformationData();
-	}
-	for (i = 0; i < gInformationData->ncount; i++)
-	{
-		if (1 == gInformationData->pinfo_data[i].is_unread)
-		{
-			tmpCount++;
-		}
-	}
-
-	return tmpCount;
 }
 
 
@@ -982,22 +959,6 @@ void setUnreadInformationNum(uint8_t num)
 }
 
 
-void loadUnreadInformationData()
-{
-	PMSGLIST tmpListInfo = NULL;
-
-	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
-	if (gInformationData == NULL)
-	{
-		gInformationData = (PMSGLIST)malloc(sizeof(MSGLIST));
-	}
-	tmpListInfo = storage_read_msg_list();
-	memcpy(gInformationData, tmpListInfo, sizeof(MSGLIST));
-
-	free(tmpListInfo);
-
-	printf("\n unread PhotoMsg count  = %d \n", gInformationData->ncount);
-}
 
 
 void setUnreadInformationText(uint8_t index)
@@ -1037,19 +998,51 @@ void setUnreadInformationText(uint8_t index)
 
 void setUnreadInformationScroll()
 {
+	uint8_t tmpIndex = 0;
+	uint8_t i = 0;
+	uint8_t j = 0;
+
 	if (gIsScrollingInformation == true)
 	{
 		if (ituWidgetIsVisible(page0InformationScrollTextContainer) == false)
 		{
-			if (gInformationTextIndex >= getUnreadInformationNum())
+			if (gInformationTextIndex >= (uint8_t)gMainScrollData->MsgUnReadList->ncount)
 			{
 				gInformationTextIndex = 0;
 			}
-			else
+			tmpIndex = gInformationTextIndex;
+
+			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->MsgUnReadList->ncount; i++)
 			{
-				gInformationTextIndex++;
+				if (!gMainScrollData->MsgUnReadList->pinfo_data[j].is_unread)
+				{
+					gInformationTextIndex++;
+
+					if (gInformationTextIndex >= (uint8_t)gMainScrollData->MsgUnReadList->ncount)
+					{
+						gInformationTextIndex = 0;
+
+						for (j = 0; j < tmpIndex; j++)
+						{
+							if (gMainScrollData->MsgUnReadList->pinfo_data[j].is_unread)
+							{
+								break;
+							}
+							else
+							{
+								gInformationTextIndex++;
+							}
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
+
 			setUnreadInformationText(gInformationTextIndex);
+			gInformationTextIndex++;
 			ituWidgetShow(page0InformationScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}
 		else
@@ -1062,26 +1055,6 @@ void setUnreadInformationScroll()
 	}
 }
 
-
-uint8_t getUnreadMissedCallNun()
-{
-	uint8_t tmpCount = 0;
-	uint8_t i = 0;
-
-	if (gMissedCallData == NULL)
-	{
-		loadUnreadMissedCallData();
-	}
-	for (i = 0; i < gMissedCallData->CallCount; i++)
-	{
-		if (1 == gMissedCallData->CallInfo[i].UnRead)
-		{
-			tmpCount++;
-		}
-	}
-
-	return tmpCount;
-}
 
 
 void setUnreadMissedCallNum(uint8_t num)
@@ -1159,23 +1132,6 @@ void setUnreadMissedCallNum(uint8_t num)
 }
 
 
-void loadUnreadMissedCallData()
-{
-	PMCALLLISTINFO tmpListInfo = NULL;
-
-	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
-	if (gMissedCallData == NULL)
-	{
-		gMissedCallData = (PMCALLLISTINFO)malloc(sizeof(MCALLLISTINFO));
-	}
-	tmpListInfo = storage_get_callrecord(FLAG_CALLMISS);
-	memcpy(gMissedCallData, tmpListInfo, sizeof(MCALLLISTINFO));
-	free(tmpListInfo);
-
-	printf("\n unread PhotoMsg count  = %d \n", gMissedCallData->CallCount);
-}
-
-
 void setUnreadMissedCallText(uint8_t index)
 {
 	char tmpStr[50] = { 0 };
@@ -1191,13 +1147,18 @@ void setUnreadMissedCallText(uint8_t index)
 		assert(page0IntercomScrollTimeText);
 	}
 
+
+	if (!page1RecorderScrollTimeText)
+	{
+		page1RecorderScrollTimeText = ituSceneFindWidget(&theScene, "page1RecorderScrollTimeText");
+		assert(page1RecorderScrollTimeText);
+	}
+
 	//TODO:读取存储设置文字内容！！
-	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "Admin", index);
-	ituTextSetString(page0IntercomScrollFromText, tmpStr);
+	ituTextSetString(page0IntercomScrollFromText, gMainScrollData->MissUnReadList->CallInfo[index].devno);
 
 	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "2016-08-03 16:33:1", index);
+	zoneDateTimeToString(gMainScrollData->MissUnReadList->CallInfo[index].Time, tmpStr);
 	ituTextSetString(page0IntercomScrollTimeText, tmpStr);
 
 }
@@ -1205,19 +1166,51 @@ void setUnreadMissedCallText(uint8_t index)
 
 void setUnreadMissedCallScroll()
 {
+	uint8_t tmpIndex = 0;
+	uint8_t i = 0;
+	uint8_t j = 0;
+
 	if (gIsScrollingMissedCall == true)
 	{
 		if (ituWidgetIsVisible(page0IntercomScrollTextContainer) == false)
 		{
-			if (gMissedCallTextIndex >= getUnreadMissedCallNun())
+			if (gMissedCallTextIndex >= (uint8_t)gMainScrollData->MissUnReadList->CallCount)
 			{
 				gMissedCallTextIndex = 0;
 			}
-			else
+			tmpIndex = gMissedCallTextIndex;
+
+			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->MissUnReadList->CallCount; i++)
 			{
-				gMissedCallTextIndex++;
+				if (!gMainScrollData->MissUnReadList->CallInfo[j].UnRead)
+				{
+					gMissedCallTextIndex++;
+
+					if (gMissedCallTextIndex >= (uint8_t)gMainScrollData->MissUnReadList->CallCount)
+					{
+						gMissedCallTextIndex = 0;
+
+						for (j = 0; j < tmpIndex; j++)
+						{
+							if (gMainScrollData->MissUnReadList->CallInfo[j].UnRead)
+							{
+								break;
+							}
+							else
+							{
+								gMissedCallTextIndex++;
+							}
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
+
 			setUnreadMissedCallText(gMissedCallTextIndex);
+			gMissedCallTextIndex++;
 			ituWidgetShow(page0IntercomScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}
 		else
@@ -1228,17 +1221,6 @@ void setUnreadMissedCallScroll()
 			}
 		}
 	}
-}
-
-
-uint8_t getUnsolvedSecurityAlarmNum()
-{
-	if (gSecurityData == NULL)
-	{
-		loadUnsolvedSecurityAlarmData();
-	}
-
-	return gSecurityData->nCount;
 }
 
 
@@ -1323,22 +1305,6 @@ void setUnsolvedSecurityAlarmNum(uint8_t num)
 }
 
 
-void loadUnsolvedSecurityAlarmData()
-{
-	PALARM_TOUCH_INFO_LIST tmpListInfo = NULL;
-
-	//进入页面时候读取一次存储即可，然后滚动条直接调用这个指针
-	if (gSecurityData == NULL)
-	{
-		gSecurityData = (PALARM_TOUCH_INFO_LIST)malloc(sizeof(ALARM_TOUCH_INFO_LIST));
-	}
-	tmpListInfo = storage_get_afbj_unread_record();
-	memcpy(gSecurityData, tmpListInfo, sizeof(ALARM_TOUCH_INFO_LIST));
-	free(tmpListInfo);
-
-	printf("\n unread PhotoMsg count  = %d \n", gSecurityData->nCount);
-}
-
 
 void setUnsolvedSecurityAlarmText(uint8_t index)
 {
@@ -1377,19 +1343,51 @@ void setUnsolvedSecurityAlarmText(uint8_t index)
 
 void setUnsolvedSecurityAlarmScroll()
 {
+	uint8_t tmpIndex = 0;
+	uint8_t i = 0;
+	uint8_t j = 0;
+
 	if (gIsScrollingSecurity == true)
 	{
 		if (ituWidgetIsVisible(page0SecurityScrollTextContainer) == false)
 		{
-			if (gSecurityTextIndex >= getUnsolvedSecurityAlarmNum())
+			if (gSecurityTextIndex >= (uint8_t)gMainScrollData->AlarmUnReadList->nCount)
 			{
 				gSecurityTextIndex = 0;
 			}
-			else
+			tmpIndex = gSecurityTextIndex;
+
+			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->AlarmUnReadList->nCount; i++)
 			{
-				gSecurityTextIndex++;
+				if (!gMainScrollData->AlarmUnReadList->pAlarmRec[j].bReaded)
+				{
+					gSecurityTextIndex++;
+
+					if (gSecurityTextIndex >= (uint8_t)gMainScrollData->AlarmUnReadList->nCount)
+					{
+						gSecurityTextIndex = 0;
+
+						for (j = 0; j < tmpIndex; j++)
+						{
+							if (gMainScrollData->AlarmUnReadList->pAlarmRec[j].bReaded)
+							{
+								break;
+							}
+							else
+							{
+								gSecurityTextIndex++;
+							}
+						}
+					}
+				}
+				else
+				{
+					break;
+				}
 			}
+
 			setUnsolvedSecurityAlarmText(gSecurityTextIndex);
+			gSecurityTextIndex++;
 			ituWidgetShow(page0SecurityScrollTextContainer, ITU_EFFECT_SCROLL_UP, MAIN_SCROLL_STEP_COUNT);
 		}
 		else

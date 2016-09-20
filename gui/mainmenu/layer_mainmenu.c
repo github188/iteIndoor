@@ -664,7 +664,6 @@ void setUnreadRecorderText(uint8_t index)
 	//TODO:读取存储设置文字内容！！
 	memset(tmpStr, 0, sizeof(tmpStr));
 	zoneDateTimeToString(gMainScrollData->JrlyUnReadList->JrlyInfo[index].Time, tmpStr);
-	printf("\n1111111111111 = %d    %s\n",index, tmpStr);
 	ituTextSetString(page1RecorderScrollTimeText, tmpStr);
 }
 
@@ -819,7 +818,7 @@ void setUnreadPhotoMsgText(uint8_t index)
 	}
 	//TODO:读取存储设置文字内容！！
 	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "2016-08-03 09:22:1", index);
+	zoneDateTimeToString(gMainScrollData->LylyUnReadList->LylyInfo[index].Time, tmpStr);
 	ituTextSetString(page0PhotoMsgScrollTimeText, tmpStr);
 }
 
@@ -842,7 +841,7 @@ void setUnreadPhotoMsgScroll()
 
 			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->LylyUnReadList->Count; i++)
 			{
-				if (!gMainScrollData->LylyUnReadList->LylyInfo[j].UnRead)
+				if (!gMainScrollData->LylyUnReadList->LylyInfo[i].UnRead)
 				{
 					gPhotoMsgTextIndex++;
 
@@ -981,9 +980,7 @@ void setUnreadInformationText(uint8_t index)
 		assert(page0InformationScrollThemeText);
 	}
 	//TODO:读取存储设置文字内容！！
-	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "Theme", index);
-	ituTextSetString(page0InformationScrollThemeText, tmpStr);
+	ituTextSetString(page0InformationScrollThemeText, gMainScrollData->MsgUnReadList->pinfo_data[index].des);
 
 	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "01234567890", index);
@@ -1014,7 +1011,7 @@ void setUnreadInformationScroll()
 
 			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->MsgUnReadList->ncount; i++)
 			{
-				if (!gMainScrollData->MsgUnReadList->pinfo_data[j].is_unread)
+				if (!gMainScrollData->MsgUnReadList->pinfo_data[i].is_unread)
 				{
 					gInformationTextIndex++;
 
@@ -1155,10 +1152,12 @@ void setUnreadMissedCallText(uint8_t index)
 	}
 
 	//TODO:读取存储设置文字内容！！
-	ituTextSetString(page0IntercomScrollFromText, gMainScrollData->MissUnReadList->CallInfo[index].devno);
+	get_dev_description(gMainScrollData->MissUnReadList->CallInfo[index].Type, gMainScrollData->MissUnReadList->CallInfo[index].devno, tmpStr, sizeof(tmpStr)); // 获得设备描述
+	ituTextSetString(page0IntercomScrollFromText, tmpStr);
 
 	memset(tmpStr, 0, sizeof(tmpStr));
 	zoneDateTimeToString(gMainScrollData->MissUnReadList->CallInfo[index].Time, tmpStr);
+	printf("\n1111111111111 = %d    %s\n", index, tmpStr);
 	ituTextSetString(page0IntercomScrollTimeText, tmpStr);
 
 }
@@ -1182,7 +1181,7 @@ void setUnreadMissedCallScroll()
 
 			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->MissUnReadList->CallCount; i++)
 			{
-				if (!gMainScrollData->MissUnReadList->CallInfo[j].UnRead)
+				if (!gMainScrollData->MissUnReadList->CallInfo[i].UnRead)
 				{
 					gMissedCallTextIndex++;
 
@@ -1359,7 +1358,7 @@ void setUnsolvedSecurityAlarmScroll()
 
 			for (i = tmpIndex; i <= (uint8_t)gMainScrollData->AlarmUnReadList->nCount; i++)
 			{
-				if (!gMainScrollData->AlarmUnReadList->pAlarmRec[j].bReaded)
+				if (!gMainScrollData->AlarmUnReadList->pAlarmRec[i].bReaded)
 				{
 					gSecurityTextIndex++;
 

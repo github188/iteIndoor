@@ -1489,7 +1489,6 @@ static void sys_init_hint_record(void)
 			if (1 == g_SysHintRecord.MissUnReadList->CallInfo[i].UnRead)
 			{
 				unread_num++;
-				break;
 			}
 		}
 		g_SysHintRecord.syshintnum[SYS_HINT_MISSED_CALLS] = unread_num;

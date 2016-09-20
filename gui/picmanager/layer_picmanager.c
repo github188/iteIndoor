@@ -31,14 +31,20 @@ static ITUIcon*			picManagerPicContentIcon;
 static ITUIcon*			picManagerMiniPicUnChenkIcon;
 static ITUIcon*			picManagerMiniPicChenkIcon;
 
-static uint8_t	gPicManagerPhotoIndex;
-static uint8_t  gPicManagerLastIndex;
+static uint8_t	gPictureCurrentIndex[PICMANAGER_CONTENT_NUM];
+static uint8_t  gCoverFlowCurrentIndex;
+static uint8_t  gCoverFlowLastIndex;
+static uint8_t	gPictureNumCount;				//用来记录抓拍数量
 static uint8_t*	gPicManagerImageData;
 static int		gPicManagerImageSize;
 static char		gPicManagerImageFilePath[PATH_MAX];
+static PPHOTOLIST_INFO gPicManagerList = NULL;	//用来存放照片信息
+
 
 bool picManagerLayerOnEnter(ITUWidget* widget, char* param)
 {
+	gPictureNumCount = 0;
+
 	picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
 	setPicManagerMiniPicList();
 
@@ -173,22 +179,17 @@ bool picManagerBtnOnClicked(ITUWidget* widget, char* param)
 
 bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 {
-	uint8_t tmpCurrentIndex = picManagerPictureCoverFlow->focusIndex;
+	uint8_t tmpCoverFlowIndex = picManagerPictureCoverFlow->focusIndex;
 	bool  leftRightFlag = true;			//true  =  left
-	PPHOTOLIST_INFO photoList = NULL;
-	uint8_t	tmpCount = 0;
 	uint8_t i = 0;
 	char tmpFile[50] = { 0 };
 
-	storage_get_photo(&photoList);
-	tmpCount = photoList->Count;
-
-	if (tmpCount <= PICMANAGER_CONTENT_NUM)
+	if (gPictureNumCount <= PICMANAGER_CONTENT_NUM)
 	{
 		return false;
 	}
 
-	if (gPicManagerLastIndex - tmpCurrentIndex == 1 || gPicManagerLastIndex - tmpCurrentIndex == -2)
+	if (gCoverFlowLastIndex - tmpCoverFlowIndex == 1 || gCoverFlowLastIndex - tmpCoverFlowIndex == -2)
 	{
 		leftRightFlag = false;
 	}
@@ -197,45 +198,52 @@ bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 		leftRightFlag = true;
 	}
 
-	printf("111111111111111111 picnum = %d direction = %d", tmpCount, leftRightFlag);
+	printf("111111111111111111 picnum = %d direction = %d", gPictureNumCount, leftRightFlag);
 
-	if (leftRightFlag)		//左滑动只要载入
+	if (leftRightFlag)		//左滑动只要载入最左边一张
 	{
 		for (i = 0; i < PICMANAGER_CONTENT_NUM; i++)
 		{
-			if (i != gPicManagerLastIndex && i != tmpCurrentIndex)
+			if (i != gCoverFlowLastIndex && i != tmpCoverFlowIndex)
 			{
-				if ((tmpCurrentIndex + 1) > tmpCount)
+				if ((gPictureCurrentIndex[tmpCoverFlowIndex] + 1) >= gPictureNumCount)
 				{
-					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[0]).Time)));
+					gPictureCurrentIndex[i] = 0;
+					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
+					setPicManagerPictureContent(i, tmpFile);
 				}
 				else
 				{
-					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCurrentIndex + 1]).Time)));
+					gPictureCurrentIndex[i] = gPictureCurrentIndex[tmpCoverFlowIndex] + 1;
+					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
+					setPicManagerPictureContent(i, tmpFile);
 				}
 			}
 		}
 	}
-	else					//右滑动
+	else					//右滑动只要载入最右边一张即可！！！
 	{
 		for (i = 0; i < PICMANAGER_CONTENT_NUM; i++)
 		{
-			if (i != gPicManagerLastIndex && i != tmpCurrentIndex)
+			if (i != gCoverFlowLastIndex && i != tmpCoverFlowIndex)
 			{
-				if ((tmpCurrentIndex - 1) >= 0)
+				if ((gPictureCurrentIndex[tmpCoverFlowIndex] - 1) >= 0)
 				{
-					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCurrentIndex - 1]).Time)));
+					gPictureCurrentIndex[i] = gPictureCurrentIndex[tmpCoverFlowIndex] - 1;
+					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
+					setPicManagerPictureContent(i, tmpFile);
 				}
 				else
 				{
-					setPicManagerPictureContent(i, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCount]).Time)));
+					gPictureCurrentIndex[i] = gPictureNumCount - 1;
+					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
+					setPicManagerPictureContent(i, tmpFile);
 				}
 			}
 		}
 	}
 
-	gPicManagerLastIndex = tmpCurrentIndex;
-
+	gCoverFlowLastIndex = tmpCoverFlowIndex;
 
 	return true;
 }
@@ -243,36 +251,40 @@ bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 
 void setPicManagerPicture()
 {
-	PPHOTOLIST_INFO photoList = NULL;
-	uint8_t	tmpCount  = 0;
 	uint8_t	i = 0;
 	char tmpFile[50] = { 0 };
 
 	ituCoverFlowGoto(picManagerPictureCoverFlow, 0);
-	gPicManagerLastIndex = 0;
+	gCoverFlowLastIndex = 0;
 
-	storage_get_photo(&photoList);
-	tmpCount = photoList->Count;
+	get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]]).Time));
+	setPicManagerPictureContent(0, tmpFile);
 
-	/*setPicManagerPictureContent(0, get_photo_path(tmpFile, &((photoList->PhotoInfo[gPicManagerPhotoIndex]).Time)));
-
-	if ((gPicManagerPhotoIndex - 1) >= 0)
+	if ((gPictureCurrentIndex[0] - 1) >= 0)
 	{
-		setPicManagerPictureContent(1, get_photo_path(tmpFile, &((photoList->PhotoInfo[gPicManagerPhotoIndex - 1]).Time)));
+		gPictureCurrentIndex[2] = gPictureCurrentIndex[0] - 1;
+		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]]).Time));
+		setPicManagerPictureContent(2, tmpFile);
 	}
 	else
 	{
-		setPicManagerPictureContent(1, get_photo_path(tmpFile, &((photoList->PhotoInfo[tmpCount]).Time)));
+		gPictureCurrentIndex[2] = gPictureNumCount - 1;
+		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureNumCount - 1]).Time));
+		setPicManagerPictureContent(2, tmpFile);
 	}
 
-	if ((gPicManagerPhotoIndex + 1) > tmpCount)
+	if ((gPictureCurrentIndex[0] + 1) >= gPictureNumCount)
 	{
-		setPicManagerPictureContent(2, get_photo_path(tmpFile, &((photoList->PhotoInfo[0]).Time)));
+		gPictureCurrentIndex[1] = 0;
+		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
+		setPicManagerPictureContent(1, tmpFile);
 	}
 	else
 	{
-		setPicManagerPictureContent(2, get_photo_path(tmpFile, &((photoList->PhotoInfo[gPicManagerPhotoIndex + 1]).Time)));
-	}*/
+		gPictureCurrentIndex[1] = gPictureCurrentIndex[0] + 1;
+		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
+		setPicManagerPictureContent(1, tmpFile);
+	}
 }
 
 
@@ -337,6 +349,7 @@ void picManagerRetutnBtnOnClicked()
 	if (ituWidgetIsVisible(picManagerPictureCoverFlow))
 	{
 		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
+		setPicManagerMiniPicList();
 	}
 	else if (!ituWidgetIsVisible(picManagerPicEditContainer))
 	{
@@ -444,7 +457,7 @@ bool picManagerMiniPicBtnClicked(ITUWidget* widget, char* param)
 	case MINIPIC_CORNER_ICON_NULL:
 		//TODO:进入照片浏览界面！！！！！
 		picManagerPageInit(PICMANAGER_PAGE_CONTENT);
-		gPicManagerPhotoIndex = tmpIndex;
+		gPictureCurrentIndex[0] = tmpIndex;
 		setPicManagerPicture();
 		break;
 
@@ -614,7 +627,16 @@ void setPicManagerMiniPicList()
 {
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
-	uint8_t miniPicNum = 10;
+	char tmpFile[50] = { 0 };
+
+	if (gPicManagerList != NULL)
+	{
+		free(gPicManagerList);
+		gPicManagerList = NULL;
+	}
+
+	storage_get_photo(&gPicManagerList);
+	gPictureNumCount = gPicManagerList->Count;
 
 	//TODO: 读取存储内容缩略图信息信息！！！！！！！
 	for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)
@@ -626,10 +648,11 @@ void setPicManagerMiniPicList()
 
 		setMiniPicIsChecked(i, MINIPIC_CORNER_ICON_NULL);
 
-		if (i < miniPicNum)
+		if (i < gPictureNumCount)
 		{
+			get_photo_path(tmpFile, &gPicManagerList->PhotoInfo[i].Time);
+			setMiniPicContent(i, tmpFile);
 			ituWidgetSetVisible(picManagerMiniPicContainer, true);
-
 		}
 		else
 		{

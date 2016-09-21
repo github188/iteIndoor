@@ -66,6 +66,7 @@ void photoMsgLayerReset();
 void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId);
 void setPhotoMsgVideoPlayByIndex(uint8_t index);
 void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode);
+void setPhotoMsgAudioPlayPicture(char* picAddr);
 void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId);
 void photoMsgReturnBtnOnClicked();
 void photoMsgBoxShow(PHOTOMSG_BTN_e btnId);

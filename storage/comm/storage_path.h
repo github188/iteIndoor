@@ -114,6 +114,8 @@
 /**************************************************************************/
 #define LYLY_DIR_PATH			CFG_TEMP_DRIVE":/LYLY"								// 留影留言文件夹		
 #define LYLY_MANAGE_PATH		CFG_TEMP_DRIVE":/LYLY/MANAGE.BIN"						// 留影留言管理文件
+//#define LYLY_DIR_PATH			"D:/LYLY"								// 留影留言文件夹		
+//#define LYLY_MANAGE_PATH		"D:/LYLY/MANAGE.BIN"						// 留影留言管理文件
 
 // 留言提示音
 #define LYLY_HIT_CN_PATH		CFG_PRIVATE_DRIVE":/res/rings/Hit/LYLYCN.WAV"			// 默认中文留言提示音

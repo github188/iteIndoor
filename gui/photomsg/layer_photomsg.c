@@ -38,11 +38,14 @@ static ITUIcon*			photoMsgVoiceOffIcon;
 static ITUIcon*			photoMsgVoiceOnIcon;
 
 
-static		PHOTOMSG_VIDEOPLAY_STATUS_e	gPhotoMsgVideoMode;		//记录当前的界面的播放状态
-uint8_t*	gPhotoMsgListIconData;
-int			gPhotoMsgListIconSize;
-static char gPhotoMsgListIconFilePath[PATH_MAX];
+static uint8_t*	gPhotoMsgListIconData;
+static int		gPhotoMsgListIconSize;
+static uint8_t*	gPhotoMsgVideoBackgroundData;
+static int		gPhotoMsgVideoBackgroundSize;
 static uint8_t	gPhotoMsgPlayVol = 0;
+static uint8_t  gPhotoMsgNum;
+static PLYLYLIST_INFO gPhotoMsgList = NULL;
+static PHOTOMSG_VIDEOPLAY_STATUS_e	gPhotoMsgVideoMode;		//记录当前的界面的播放状态
 
 bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 {
@@ -370,28 +373,48 @@ bool setPhotoMsgListIsVisible(uint8_t index, bool status)
 }
 
 
-
 void setPhotoMsgList()
 {
 	uint8_t i = 0;
 	char tmpStr[50] = { 0 };
+	char tmpAddr[50] = { 0 };
 
-	uint8_t msgNum = 0;		//TODO:读取信息条数！！！！！
-
+	if (gPhotoMsgList != NULL)
+	{
+		free(gPhotoMsgList);
+		gPhotoMsgList = NULL;
+	}
+	storage_get_lylyrecord(&gPhotoMsgList);
+	gPhotoMsgNum = gPhotoMsgList->Count;
+	
 	//TODO: 读取存储内容设置列表信息！！！！！！！
 	for (i = 0; i < MAX_POOTOMSG_LIST_NUM; i++)
 	{
-		if (msgNum < PHOTOMSG_NUM_PER_PAGE)
+		if (gPhotoMsgNum < PHOTOMSG_NUM_PER_PAGE)
 		{
-			if (i < msgNum)
+			if (i < gPhotoMsgNum)
 			{
-				strcpy(gPhotoMsgListIconFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_05.jpg");
-				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
+				switch (gPhotoMsgList->LylyInfo[i].LyType)
+				{
+				case LYLY_TYPE_AUDIO:
+					break;
+
+				case LYLY_TYPE_PIC_AUDIO:
+					get_lylypic_path(tmpAddr, &gPhotoMsgList->LylyInfo[i].Time);
+					setPhotoMsgListMiniIcon(i, tmpAddr);
+					break;
+
+				case LYLY_TYPE_VIDEO:
+					break;
+
+				default:
+					break;
+				}
 				memset(tmpStr, 0, sizeof(tmpStr));
-				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
-				setPhotoMsgListTime(i, tmpStr, false);
+				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
+				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
 			}
-			else if (i >= msgNum && i < PHOTOMSG_NUM_PER_PAGE)
+			else if (i >= gPhotoMsgNum && i < PHOTOMSG_NUM_PER_PAGE)
 			{
 				setPhotoMsgListMiniIcon(i, "");
 				setPhotoMsgListTime(i, "", false);
@@ -403,13 +426,27 @@ void setPhotoMsgList()
 		}
 		else
 		{
-			if (i < msgNum)
+			if (i < gPhotoMsgNum)
 			{
-				strcpy(gPhotoMsgListIconFilePath, CFG_PRIVATE_DRIVE ":res/wallpaper/bk_02.jpg");
-				setPhotoMsgListMiniIcon(i, gPhotoMsgListIconFilePath);
+				switch (gPhotoMsgList->LylyInfo[i].LyType)
+				{
+				case LYLY_TYPE_AUDIO:
+					break;
+
+				case LYLY_TYPE_PIC_AUDIO:
+					get_lylypic_path(tmpAddr, &gPhotoMsgList->LylyInfo[i].Time);
+					setPhotoMsgListMiniIcon(i, tmpAddr);
+					break;
+
+				case LYLY_TYPE_VIDEO:
+					break;
+
+				default:
+					break;
+				}
 				memset(tmpStr, 0, sizeof(tmpStr));
-				sprintf(tmpStr, "%s%d", "2016-07-15 11:11:", i);
-				setPhotoMsgListTime(i, tmpStr, true);
+				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
+				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
 			}
 			else
 			{
@@ -426,11 +463,11 @@ void setPhotoMsgList()
 		photoMsgPageContainer = ituSceneFindWidget(&theScene, tmpStr);
 		assert(photoMsgPageContainer);
 
-		if (i <= (msgNum / PHOTOMSG_NUM_PER_PAGE))
+		if (i <= (gPhotoMsgNum / PHOTOMSG_NUM_PER_PAGE))
 		{
-			if ((i == (msgNum / PHOTOMSG_NUM_PER_PAGE)) && (msgNum % PHOTOMSG_NUM_PER_PAGE) == 0)
+			if ((i == (gPhotoMsgNum / PHOTOMSG_NUM_PER_PAGE)) && (gPhotoMsgNum % PHOTOMSG_NUM_PER_PAGE) == 0)
 			{
-				if (msgNum == 0)
+				if (gPhotoMsgNum == 0)
 				{
 					ituWidgetSetVisible(photoMsgPageContainer, true);
 				}
@@ -503,8 +540,8 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
 	free(gPhotoMsgListIconData);
-	return true;
 
+	return true;
 }
 
 
@@ -564,8 +601,6 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_PLAYING;
-
-		//TODO：开始播放相对应留影留言
 		break;
 	
 	case PHOTOMSG_VIDEOPLAY_PAUSE:
@@ -573,8 +608,6 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 		ituWidgetSetVisible(photoMsgPlayContainer, true);
 
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_PAUSE;
-
-		//TODO：暂停播放相对应留影留言
 		break;
 
 	case PHOTOMSG_VIDEOPLAY_STOP:
@@ -586,8 +619,6 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_STOP;
-
-		//TODO:	停止播放留影留言
 		break;
 
 	default:
@@ -596,11 +627,70 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 }
 
 
+void setPhotoMsgAudioPlayPicture(char* picAddr)
+{
+	FILE*	tmpFile;
+	char	tmpStr[50] = { 0 };
+
+	// try to load minipic jpeg file if exists
+	tmpFile = fopen(picAddr, "rb");
+	if (tmpFile)
+	{
+		struct stat sb;
+		if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
+		{
+			gPhotoMsgVideoBackgroundSize = (int)sb.st_size;
+			gPhotoMsgVideoBackgroundData = malloc(gPhotoMsgVideoBackgroundSize);
+			if (gPhotoMsgVideoBackgroundSize)
+			{
+				gPhotoMsgVideoBackgroundSize = fread(gPhotoMsgVideoBackgroundData, 1, gPhotoMsgVideoBackgroundSize, tmpFile);
+			}
+		}
+		fclose(tmpFile);
+	}
+
+	if (gPhotoMsgVideoBackgroundData)
+	{
+		ituIconLoadJpegData((ITUIcon*)photoMsgVideoDrawBackground, gPhotoMsgVideoBackgroundData, gPhotoMsgVideoBackgroundSize);
+	}
+
+	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
+	free(gPhotoMsgVideoBackgroundData);
+	return true;
+}
+
+
 void setPhotoMsgVideoPlayByIndex(uint8_t index)
 {
 	//TODO：相对应逻辑存储操作，设置页面按键状态。最后开始播放！
-	setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
+	char tmpAddr[50] = { 0 };
 
+	switch (gPhotoMsgList->LylyInfo[index].LyType)
+	{
+	case LYLY_TYPE_AUDIO:
+		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
+		//开始播放纯音频文件！！！！！！
+		break;
+
+	case LYLY_TYPE_PIC_AUDIO:
+		get_lylypic_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
+		setPhotoMsgAudioPlayPicture(tmpAddr);
+		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
+		//开始播放音频文件
+
+		break;
+
+	case LYLY_TYPE_VIDEO:
+		get_lylyavi_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
+		//开始播放视频文件！
+		break;
+
+	default:
+		break;
+	}
+
+	storage_set_lylyrecord_flag(index, false);
+	setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
 }
 
 

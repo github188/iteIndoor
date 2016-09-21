@@ -39,7 +39,6 @@ static ITUIcon*		page1RecorderIcon;
 static ITUIcon*		page1RecorderMiniIcon;
 static ITUText*		page1RecorderScrollTittleText;
 static ITUText*		page1RecorderScrollTimeText;
-
 static ITUIcon*		page0SecurityNumIcon;
 static ITUText*		page0SecurityNumText;
 static ITUSprite*   page0SecuritySprite;
@@ -49,14 +48,12 @@ static ITUText*		page0SecurityScrollTimeText;
 static ITUText*		page0SecurityText;
 static ITUIcon*		page0SecurityMiniIcon;
 static ITUIcon*		page0SecurityIcon;
-
 static ITUIcon*		page0PhotoMsgNumIcon;
 static ITUText*		page0PhotoMsgNumText;
 static ITUText*		page0PhotoMsgScrollTimeText;
 static ITUIcon*		page0PhotoMsgMiniIcon;
 static ITUIcon*		page0PhotoMsgIcon;
 static ITUText*		page0PhotoMsgText;
-
 static ITUIcon*		page0InformationNumIcon;
 static ITUText*		page0InformationNumText;
 static ITUText*		page0InformationScrollThemeText;
@@ -65,7 +62,6 @@ static ITUText*		page0InformationScrollContentText1;
 static ITUIcon*		page0InformationMiniIcon;
 static ITUIcon*		page0InformationIcon;
 static ITUText*		page0InformationText;
-
 static ITUIcon*		page0MissedCallNumIcon;
 static ITUText*		page0MissedCallNumText;
 static ITUText*		page0IntercomScrollFromText;
@@ -73,8 +69,6 @@ static ITUText*		page0IntercomScrollTimeText;
 static ITUIcon*		page0IntercomMiniIcon;
 static ITUText*		page0IntercomText;
 static ITUIcon*		page0IntercomIcon;
-
-
 static ITUWidget*	page1RecorderScrollTextContainer;
 static ITUWidget*	page0PhotoMsgScrollTextContainer;
 static ITUWidget*	page0IntercomScrollTextContainer;
@@ -82,9 +76,7 @@ static ITUWidget*	page0SecurityScrollTextContainer;
 static ITUWidget*	page0InformationScrollTextContainer;
 
 
-
 static uint32_t	gMainLayerLastTimeTick;	//用来记录定时器上个时刻的时间
-
 static bool		gIsScrollingRecorder;
 static uint8_t	gRecorderTextIndex;
 static bool		gIsScrollingInformation;
@@ -95,26 +87,14 @@ static bool		gIsScrollingSecurity;
 static uint8_t  gSecurityTextIndex;
 static bool		gIsScrollingMissedCall;
 static uint8_t  gMissedCallTextIndex;
-
 static uint8_t	gSOSBtnLongPressCount;
 static bool		gSOSBtnIsPress;
 static bool		gSOSIsAlarm;
 static uint8_t  gScrollTimeCount;
-
 static uint8_t  gMainBackgroundIndex = 0;
-
-static PSysHintRecord			gMainScrollData= NULL;		//全局数据变量（公用一个）
-
-static PJRLYLIST_INFO			gRecorderData	 = NULL;		//家人留言数据
-static PLYLYLIST_INFO			gPhotoMsgData	 = NULL;		//留影留言数据 
-static PMSGLIST					gInformationData = NULL;		//信息数据
-static PALARM_TOUCH_INFO_LIST	gSecurityData	 = NULL;		//安防数据
-static PMCALLLISTINFO			gMissedCallData	 = NULL;		//未接呼叫数据
-
-
-static uint8_t*			gPicManagerImageData;
-static int				gPicManagerImageSize;
-static char				gPicManagerImageFilePath[PATH_MAX];
+static uint8_t*	gMainBackgroundImageData;
+static int		gMainBackgroundImageSize;
+static PSysHintRecord	gMainScrollData= NULL;		//全局数据变量（公用一个）
 
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
@@ -383,11 +363,11 @@ bool setMainBackgroundImg()
 		struct stat sb;
 		if (fstat(fileno(tmpFile), &sb) != -1)			//用_fileno代替fileno避免运行时候的警告！！！！（但是板子上编译不过！！！！）
 		{
-			gPicManagerImageSize = (int)sb.st_size;
-			gPicManagerImageData = malloc(gPicManagerImageSize);
-			if (gPicManagerImageSize)
+			gMainBackgroundImageSize = (int)sb.st_size;
+			gMainBackgroundImageData = malloc(gMainBackgroundImageSize);
+			if (gMainBackgroundImageSize)
 			{
-				gPicManagerImageSize = fread(gPicManagerImageData, 1, gPicManagerImageSize, tmpFile);
+				gMainBackgroundImageSize = fread(gMainBackgroundImageData, 1, gMainBackgroundImageSize, tmpFile);
 			}
 		}
 		fclose(tmpFile);
@@ -397,9 +377,9 @@ bool setMainBackgroundImg()
 		printf("open  minipic jepg icon icon failed!");
 		return false;
 	}
-	if (gPicManagerImageData)
+	if (gMainBackgroundImageData)
 	{
-		ituIconLoadJpegData((ITUIcon*)mainBackgroundImgIcon, gPicManagerImageData, gPicManagerImageSize);
+		ituIconLoadJpegData((ITUIcon*)mainBackgroundImgIcon, gMainBackgroundImageData, gMainBackgroundImageSize);
 	}
 	else
 	{
@@ -408,7 +388,7 @@ bool setMainBackgroundImg()
 	}
 
 	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
-	free(gPicManagerImageData);
+	free(gMainBackgroundImageData);
 	return true;
 
 }

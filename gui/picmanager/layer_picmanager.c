@@ -37,7 +37,6 @@ static uint8_t  gCoverFlowLastIndex;
 static uint8_t	gPictureNumCount;				//用来记录抓拍数量
 static uint8_t*	gPicManagerImageData;
 static int		gPicManagerImageSize;
-static char		gPicManagerImageFilePath[PATH_MAX];
 static PPHOTOLIST_INFO gPicManagerList = NULL;	//用来存放照片信息
 
 
@@ -370,8 +369,11 @@ void picManagerRetutnBtnOnClicked()
 
 void picManagerEditBtnOnClicked()
 {
-	picManagerPageInit(PICMANAGER_PAGE_EDIT);
-	setMiniPicListIsChecked(MINIPIC_CORNER_ICON_UNCHECK);
+	if (gPictureNumCount)
+	{
+		picManagerPageInit(PICMANAGER_PAGE_EDIT);
+		setMiniPicListIsChecked(MINIPIC_CORNER_ICON_UNCHECK);
+	}
 }
 
 
@@ -425,6 +427,7 @@ bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 				storage_del_photo(i);
 			}
 		}
+		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
 		setPicManagerMiniPicList();
 		break;
 

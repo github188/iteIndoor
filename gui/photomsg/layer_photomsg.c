@@ -42,8 +42,9 @@ static uint8_t*	gPhotoMsgListIconData;
 static int		gPhotoMsgListIconSize;
 static uint8_t*	gPhotoMsgVideoBackgroundData;
 static int		gPhotoMsgVideoBackgroundSize;
-static uint8_t	gPhotoMsgPlayVol = 0;
+static uint8_t	gPhotoMsgPlayVol;
 static uint8_t  gPhotoMsgNum;
+static uint8_t  gPhotoMsgCurrentIndex;
 static PLYLYLIST_INFO gPhotoMsgList = NULL;
 static PHOTOMSG_VIDEOPLAY_STATUS_e	gPhotoMsgVideoMode;		//记录当前的界面的播放状态
 
@@ -53,8 +54,8 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 	ituCoverFlowGoto(photoMsgListCoverFlow, 0);
 	setPhotoMsgList();
 
-	//TODO:暂时的全局变量
 	gPhotoMsgPlayVol = PHOTOMSG_PLAY_VOL;
+	gPhotoMsgCurrentIndex = MAX_POOTOMSG_LIST_NUM;	//当前播放index，任意数值大于总条数即可
 
 	return true;
 }
@@ -151,15 +152,19 @@ void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
 	}
 }
 
+
 bool photoMsgListOnClicked(ITUWidget* widget, char* param)
 {
 	printf("photoMsgListOnClicked %s", param);
 
+	gPhotoMsgCurrentIndex = atoi(param);
+
 	photoMsgLayerInit(PHOTOMSG_CONTENT_PAGE);
-	setPhotoMsgVideoPlayByIndex(atoi(param));
+	setPhotoMsgVideoPlayByIndex(gPhotoMsgCurrentIndex);
 
 	return true;
 }
+
 
 bool photoMsgBtnOnClicked(ITUWidget* widget, char* param)
 {
@@ -220,18 +225,19 @@ bool photoMsgVolTrackBarOnChanged(ITUWidget* widget, char* param)
 
 bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 {
-
 	switch (atoi(param))
 	{
 	case PHOTOMSG_MSG_BTN_CONFIRM:
 		if (ituWidgetIsVisible(photoMsgListCoverFlow))
 		{
 			//TODO:这里写清空信息的存储操作
+			storage_clear_lylyrecord();
 			setPhotoMsgList();
 		}
 		else
 		{
 			//TODO:这里写删除一条的操作，删除完退出信息内容界面！！！！！！！
+			storage_del_lylyrecord(gPhotoMsgCurrentIndex);
 			photoMsgLayerInit(PHOTOMSG_LIST_PAGE);
 			setPhotoMsgList();
 		}
@@ -240,6 +246,7 @@ bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	default:
 		break;
 	}
+	sys_sync_hint_state();
 
 	ituWidgetEnable(photoMsgBackground);
 	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, false);
@@ -317,6 +324,7 @@ void photoMsgVoiceBtnOnClicked()
 	}
 }
 
+
 void setPhotoMsgPlayVol(uint8_t volNum)
 {
 	if (!photoMsgVolTrackBar)
@@ -347,8 +355,6 @@ void setPhotoMsgPlayVol(uint8_t volNum)
 	}
 
 	ituTrackBarSetValue(photoMsgVolTrackBar, volNum);
-
-	//photoMsgVoiceOnIcon
 }
 
 
@@ -537,8 +543,6 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 		ituWidgetSetVisible(photoMsgListMiniPicIcon, false);
 		return false;
 	}
-
-	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
 	free(gPhotoMsgListIconData);
 
 	return true;
@@ -571,14 +575,33 @@ bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread)
 		ituSetColor((ITUColor*)&photoMsgListTimeText->color, 255, 255, 255, 255);
 	}
 
-	//TODO: 可能要对传进来的指针数据进行释放，看后期数据如何传递！！！
 	return true;
 }
 
 
 void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 {
+	switch (btnId)
+	{
+	case PHOTOMSG_BTN_START:
+		//暂停时候，继续播放留影留言、停止时候，重新播放留影留言
+		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
+		break;
 
+	case PHOTOMSG_BTN_PAUSE:
+		//暂停播放，记录播放位置
+		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PAUSE);
+		break;
+
+	case PHOTOMSG_BTN_STOP:
+		//停止播放，重置界面
+		sys_stop_play_audio(SYS_MEDIA_MUSIC);
+		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
+		break;
+
+	default:
+		break;
+	}
 }
 
 
@@ -660,16 +683,38 @@ void setPhotoMsgAudioPlayPicture(char* picAddr)
 }
 
 
+void photoMsgPlayingStopCallback()
+{
+	printf("\n 1111111111111111111photoMsgPlayingCallback!!!!!!\n");
+}
+
+
+int32 photoMsgPlayingCallback(int32 playTime, int32 playPrecent, int32 state)
+{
+	printf("\n 22222222222222222222222photoMsgPlayingCallback  time = %d  percent = %d state = %d \n", playTime, playPrecent, state);
+	recorderStopBtnOnClicked();
+
+	return 0;
+}
+
+
 void setPhotoMsgVideoPlayByIndex(uint8_t index)
 {
 	//TODO：相对应逻辑存储操作，设置页面按键状态。最后开始播放！
 	char tmpAddr[50] = { 0 };
+
+	setPhotoMsgPlayVol(gPhotoMsgPlayVol);
+	media_set_ring_volume(gPhotoMsgPlayVol);	//TODO:通知逻辑设置音量！！！！！！
+	setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
+	storage_set_lylyrecord_flag(index, false);	//设置为已读留言
+	sys_sync_hint_state();
 
 	switch (gPhotoMsgList->LylyInfo[index].LyType)
 	{
 	case LYLY_TYPE_AUDIO:
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放纯音频文件！！！！！！
+		sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		break;
 
 	case LYLY_TYPE_PIC_AUDIO:
@@ -677,7 +722,7 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 		setPhotoMsgAudioPlayPicture(tmpAddr);
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放音频文件
-
+		sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		break;
 
 	case LYLY_TYPE_VIDEO:
@@ -688,9 +733,6 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 	default:
 		break;
 	}
-
-	storage_set_lylyrecord_flag(index, false);
-	setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
 }
 
 

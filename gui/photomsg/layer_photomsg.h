@@ -18,7 +18,7 @@ Modification:
 #include "../gui_include.h"
 
 
-#define PHOTOMSG_PLAY_VOL			5
+#define PHOTOMSG_PLAY_VOL			4
 #define MAX_POOTOMSG_LIST_NUM		20
 #define PHOTOMSG_NUM_PER_PAGE		6
 #define MAX_PHOTOMSG_PAGE_NUM		4
@@ -76,6 +76,8 @@ void setPhotoMsgPlayVol(uint8_t volNum);
 bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr);
 bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread);
 bool setPhotoMsgListIsVisible(uint8_t index, bool status);
+void photoMsgPlayingStopCallback();
+int32 photoMsgPlayingCallback(int32 playTime, int32 playPrecent, int32 state);
 
 
 

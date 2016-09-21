@@ -18,9 +18,8 @@ Modification:
 #include "../gui_include.h"
 
 #define MS_PER_SECOND			1000
-#define DEFAULT_PLAY_VOL		40
 #define MAX_RECORDER_NUM		5
-#define DEFAULT_PLAYVOL			5
+#define DEFAULT_PLAYVOL			4
 
 
 typedef enum

@@ -56,9 +56,9 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 
 	//TODO:获取系统当前音量
 	gRecorderPlayVol = DEFAULT_PLAYVOL;
-	media_set_ring_volume(DEFAULT_PLAYVOL);
 	setRecorderPlayVol(gRecorderPlayVol);
-
+	media_set_ring_volume(gRecorderPlayVol);
+	
 	return true;
 }
 
@@ -480,6 +480,7 @@ void recorderRecordingBtnOnClicked()
 	}
 }
 
+
 void recorderPlayingStopCallback()
 {
 	printf("\n 11111111111111111111recorderPlayingStopCallback!!!!!!\n");
@@ -510,6 +511,7 @@ void recorderPlayingBtnOnClicked()
 			storage_set_jrlyrecord_flag(gCurrentRecordIndex, false);
 			sys_sync_hint_state();
 		}
+		media_set_ring_volume(gRecorderPlayVol);	//TODO:通知逻辑设置音量！！！！！！
 
 		if (gRecorderTimeCount > 0)
 		{
@@ -518,7 +520,6 @@ void recorderPlayingBtnOnClicked()
 		else
 		{
 			//TODO:重头开始播放录音、并重头开始计时（失能上面的RadioBox按键）
-			setRecorderPlayVol(gRecorderPlayVol);
 			get_jrlyrecord_path(tmpFileName, &(gRecorderList->JrlyInfo[gCurrentRecordIndex].Time));
 			sys_start_play_audio(SYS_MEDIA_MUSIC, tmpFileName, false, storage_get_ringvolume(), recorderPlayingCallback, recorderPlayingStopCallback);
 		}
@@ -686,7 +687,7 @@ void recorderVoiceBtnOnClicked()
 	}
 	else
 	{
-		gRecorderPlayVol = DEFAULT_PLAY_VOL;
+		gRecorderPlayVol = DEFAULT_PLAYVOL;
 		setRecorderPlayVol(gRecorderPlayVol);
 	}
 	media_set_ring_volume(gRecorderPlayVol);	//TODO:通知逻辑设置音量！！！！！！

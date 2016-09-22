@@ -297,11 +297,11 @@ void storage_clear_afbj_unread_state(void)
 
 /*************************************************
   Function:		storage_get_afbj_unread_record
-  Description:  清空安防报警记录
+  Description:  获取未处理报警信息
   Input:		无
   Output:		无
   Return:		无
-  Others:
+  Others:		包含防区1的报警信息
 *************************************************/
 PALARM_TOUCH_INFO_LIST storage_get_afbj_unread_record(void)
 {
@@ -328,6 +328,57 @@ PALARM_TOUCH_INFO_LIST storage_get_afbj_unread_record(void)
 		for (i = 0; i < tmp->nCount; i++)
 		{
 			if (tmp->pAfBjRec[i].bReaded == FALSE)
+			{
+				UnreadList->pAlarmRec[UnreadList->nCount].bReaded = FALSE;
+				UnreadList->pAlarmRec[UnreadList->nCount].bClean = 0;
+				UnreadList->pAlarmRec[UnreadList->nCount].TouchNum = tmp->pAfBjRec[i].areaNum;
+				UnreadList->pAlarmRec[UnreadList->nCount].type = 0;//tmp->pAfBjRec[i].type;
+				UnreadList->pAlarmRec[UnreadList->nCount].id = i;
+				sprintf((char *)UnreadList->pAlarmRec[UnreadList->nCount].time, "%04d-%02d-%02d %02d:%02d:%02d", 
+					tmp->pAfBjRec[i].time.year, tmp->pAfBjRec[i].time.month, tmp->pAfBjRec[i].time.day, 
+					tmp->pAfBjRec[i].time.hour, tmp->pAfBjRec[i].time.min, tmp->pAfBjRec[i].time.sec);
+				UnreadList->nCount++;
+			}
+		}
+	}
+	
+	return UnreadList;
+}
+
+/*************************************************
+  Function:		storage_get_afbj_unread_record_ext
+  Description:  
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		不包含防区1的报警未读记录
+*************************************************/
+PALARM_TOUCH_INFO_LIST storage_get_afbj_unread_record_ext(void)
+{
+	PAF_BJ_LIST tmp = NULL;
+	PALARM_TOUCH_INFO_LIST UnreadList = NULL;
+	uint8 i;
+	
+	tmp = (PAF_BJ_LIST)storage_get_afbj_record();
+
+	UnreadList = (PALARM_TOUCH_INFO_LIST)malloc(sizeof(ALARM_TOUCH_INFO));
+
+	if (UnreadList == NULL)
+	{
+		return NULL;
+	}
+	if (UnreadList)
+	{
+		UnreadList->nCount = 0;
+		UnreadList->pAlarmRec = (PALARM_TOUCH_INFO)malloc(sizeof(ALARM_TOUCH_INFO) * AF_REC_MAX);
+	}
+
+	if (tmp)
+	{
+		for (i = 0; i < tmp->nCount; i++)
+		{
+			// 第一防区不处理
+			if (tmp->pAfBjRec[i].bReaded == FALSE && tmp->pAfBjRec[i].areaNum != 1)
 			{
 				UnreadList->pAlarmRec[UnreadList->nCount].bReaded = FALSE;
 				UnreadList->pAlarmRec[UnreadList->nCount].bClean = 0;

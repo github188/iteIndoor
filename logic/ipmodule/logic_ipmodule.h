@@ -120,6 +120,16 @@ void ipmodule_elevator_becken_unlock(const PRECIVE_PACKET recPacket);
 int ipmodule_get_extensionAddr(uint32 extensionNo);
 
 /*************************************************
+  Function:			ipmodule_get_fenjiused
+  Description:		室内分机向IP模块获取分机的IP地址
+  Input: 			
+  Output:			无
+  Return:			分机IP地址4B
+  Others:
+*************************************************/
+int ipmodule_get_fenjiused(IPAD_EXTENSION_LIST *pIpadList);
+
+/*************************************************
   Function:    		get_ipmodule
   Description:		
   Input: 			无

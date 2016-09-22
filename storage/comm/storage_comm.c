@@ -2060,6 +2060,26 @@ uint32 storage_set_subdev_ip(uint8 index, uint32 ip)
 }
 
 /*************************************************
+  Function:    		storage_set_subdev_ips
+  Description:		设置分机设备IP
+  Input: 			
+  Output:			无
+  Return:			理员机IP
+  Others:
+*************************************************/
+uint32 storage_set_subdev_ips(uint8 index, uint32 ip)
+{
+	if (index >=0 && index <= 7)
+	{
+		gpSysParam->Netparam.SubDevIP[index] = ip;
+	}
+	else
+		return FALSE;
+
+	return TRUE;
+}
+
+/*************************************************
   Function:    		storage_get_subdev_ip
   Description:		获取分机设备IP
   Input: 			

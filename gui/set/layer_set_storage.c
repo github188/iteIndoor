@@ -76,8 +76,7 @@ bool SetStorageOnEnter(ITUWidget* widget, char* param)
 		{
 			storage_format_system();
 			storage_set_lyly_tip(FALSE);
-			// del by chenbh 
-			//sys_sync_hint_state();
+			sys_sync_hint_state();
 		}
 	}
 

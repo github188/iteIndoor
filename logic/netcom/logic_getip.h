@@ -82,5 +82,18 @@ int32 net_get_devices_and_ips(uint32 AreaCode, uint8 DeviceType, char * DeviceNo
 *************************************************/
 int32 net_get_ips(uint32 AreaCode, uint8 DeviceType, char * DeviceNo, uint32 **IPList);
 
+/*************************************************
+  Function:    		net_get_ips
+  Description:		查询IP地址列表
+  Input: 
+	1.AreaCode		本地区号
+	2.DeviceType	设备类型
+	3.DeviceNo		设备号字符串
+  Output:			无
+  	1.IPList		IP地址列表指针
+  Return:			IP地址个数
+  Others:
+*************************************************/
+int32 net_get_ips_ext(uint32 AreaCode, uint8 DeviceType, char * DeviceNo, PDEVICE_NO *DevNoList, uint32 **IPList);
 #endif
 

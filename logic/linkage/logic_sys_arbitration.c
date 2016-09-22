@@ -1333,7 +1333,7 @@ void sys_sync_hint_state_ext(SYS_HINT_TYPE HintType)
 					g_SysHintRecord.AlarmUnReadList = NULL;
 				}
 				
-				g_SysHintRecord.AlarmUnReadList = storage_get_afbj_unread_record();
+				g_SysHintRecord.AlarmUnReadList = storage_get_afbj_unread_record_ext();
 				if(g_SysHintRecord.AlarmUnReadList)
 				{
 					g_SysHintRecord.syshintnum[SYS_HINT_ALARM_WARNING] = g_SysHintRecord.AlarmUnReadList->nCount;
@@ -1497,7 +1497,7 @@ static void sys_init_hint_record(void)
 
 	// 获取报警未处理信息
 	unread_num = 0;	
-	g_SysHintRecord.AlarmUnReadList = storage_get_afbj_unread_record();
+	g_SysHintRecord.AlarmUnReadList = storage_get_afbj_unread_record_ext();
 	if(g_SysHintRecord.AlarmUnReadList)
 	{
 		g_SysHintRecord.syshintnum[SYS_HINT_ALARM_WARNING] = g_SysHintRecord.AlarmUnReadList->nCount;

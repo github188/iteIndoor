@@ -44,6 +44,9 @@ typedef enum
     CMD_MONITOR_CALLBAK,
 	CMD_RTSP_LIST_CALLBAK,
     CMD_RTSP_CALLBAK,
+	CMD_KEY_SCENE,
+	CMD_ALARM_CALLBAK,
+	CMD_GOTO_ALARM,
     CMD_GOTO_MAINMENU,
 	CMD_GOTO_BECALL,
     CMD_CHANGE_LANG,
@@ -76,24 +79,68 @@ extern ITUActionFunction actionFunctions[];
   Function:			af_callback_gui
   Description: 		
   Input:			
-  Output:			��
+  Output:			安防回调函数
   Return:			
   Others:			
 *************************************************/
 int32 af_callback_gui(int32 Param1,int32 Param2)
 {
-	return 1;
+	Command cmd;
+	INTER_CALLBACK callbak_data;
+
+	if (FALSE == storage_get_extmode(EXT_MODE_ALARM))
+	{
+		return FALSE;
+	}
+
+	if (g_CommandQueue == -1)
+	{
+		return;
+	}
+
+	memset(&cmd, 0, sizeof(Command));
+	memset(&callbak_data, 0, sizeof(INTER_CALLBACK));
+	cmd.id = CMD_ALARM_CALLBAK;
+	callbak_data.InterState = (uint8)Param1;
+
+	dprintf("============come to  of callback-gui=======================\n");
+
+	switch (Param1)
+	{
+	case BAOJING_SHOW:
+		cmd.id = CMD_GOTO_ALARM;
+		memcpy(cmd.strarg1, &callbak_data, sizeof(INTER_CALLBACK));
+		mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+		return TRUE;
+
+	case BAOJING_FRESH:
+		break;
+
+	case BAOJING_KEY:
+		break;
+
+	case BAOJING_DUIJIANG:
+		break;
+
+	default:
+		break;
+	}
+
+	memcpy(cmd.strarg1, &callbak_data, sizeof(INTER_CALLBACK));
+	mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+
+	return TRUE;
 }
 
 /*************************************************
 Function:		callrequest_state_callbak
-Description:	呼叫请求回调函数
+Description:	å‘¼å«è¯·æ±‚å›žè°ƒå‡½æ•°
 Input:
- 1. param1		状态
- 2. param2		私有数据
-Output:			无
-Return:			无
-Others:			无
+ 1. param1		çŠ¶æ€
+ 2. param2		ç§æœ‰æ•°æ®
+Output:			æ— 
+Return:			æ— 
+Others:			æ— 
 *************************************************/
 void callrequest_state_callbak(uint32 param1, uint32 param2)
 {
@@ -142,13 +189,13 @@ void callrequest_state_callbak(uint32 param1, uint32 param2)
 
 /*************************************************
   Function:			callout_state_callbak
-  Description: 		主叫回调
+  Description: 		ä¸»å«å›žè°ƒ
   Input:
-  1. param1			状态
-  2. param2			私有数据
-  Output:			无
-  Return:			无
-  Others:			无
+  1. param1			çŠ¶æ€
+  2. param2			ç§æœ‰æ•°æ®
+  Output:			æ— 
+  Return:			æ— 
+  Others:			æ— 
 *************************************************/
 void callout_state_callbak(uint32 param1, uint32 param2)
 {
@@ -482,7 +529,7 @@ void rtsp_state_callbak(uint32 param1, uint32 param2)
   Function:			show_sys_event_hint
   Description: 		
   Input:			
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:			
   Others:			
 *************************************************/
@@ -493,11 +540,11 @@ void show_sys_event_hint(uint16 EventType)
 
 /*************************************************
   Function:		ItuSetLanguage
-  Description: 	����ϵͳ����
+  Description: 	ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½
   Input:		
-  	lang		����
-  Output:		��
-  Return:		��
+  	lang		ï¿½ï¿½ï¿½ï¿½
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 static void ItuSetLanguage(LANGUAGE_E lang)
@@ -508,11 +555,11 @@ static void ItuSetLanguage(LANGUAGE_E lang)
 
 /*************************************************
   Function:		GotoLayer
-  Description: 	�л�ͼ��
+  Description: 	ï¿½Ð»ï¿½Í¼ï¿½ï¿½
   Input:		
-  	name		ͼ���Ӧ���� ����Ψһ��
-  Output:		��
-  Return:		��
+  	name		Í¼ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Î¨Ò»ï¿½ï¿½
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 static void GotoLayer(const char *name)
@@ -524,10 +571,10 @@ static void GotoLayer(const char *name)
 
 /*************************************************
   Function:		LoadScene
-  Description: 	��������UI ���Ե�
+  Description: 	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½UI ï¿½ï¿½ï¿½Ôµï¿½
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 static void LoadScene(void)
@@ -568,10 +615,10 @@ static void LoadScene(void)
 
 /*************************************************
   Function:		ProcessCommand
-  Description: 	��Ϣ����ִ�к���
+  Description: 	ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ðºï¿½ï¿½ï¿½
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 static void ProcessCommand(void)
@@ -669,6 +716,14 @@ static void ProcessCommand(void)
 				}
 				break;
 
+			case CMD_KEY_SCENE:
+				{
+					char buf[MAX_STRARG_LEN];
+					memset(buf, 0, sizeof(buf));
+					memcpy(buf, cmd.strarg1, MAX_STRARG_LEN);
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM18_KEY_SCENE, buf);
+				}
+				break;
 			case CMD_GOTO_BECALL:
 				{
 					char buf[MAX_STRARG_LEN];
@@ -676,6 +731,18 @@ static void ProcessCommand(void)
 					memcpy(buf, cmd.strarg1, sizeof(INTER_INFO_S));
 					LogicShowWin(SHOW_BECALL_WIN, buf);
 				}
+				break;
+
+			case CMD_ALARM_CALLBAK:
+				UpdataAlarmLayerOnShow(NULL, NULL);
+				break;
+
+			case CMD_GOTO_ALARM:
+				if (FALSE == ui_show_win_arbitration(SYS_OPER_ALARMING))
+				{
+					return FALSE;
+				}
+				AlarmLayerOnGoto(NULL, NULL);
 				break;
 				
 			default:
@@ -686,10 +753,10 @@ static void ProcessCommand(void)
 
 /*************************************************
   Function:		CheckQuitValue
-  Description: 	�˳���־���
+  Description: 	ï¿½Ë³ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 static bool CheckQuitValue(void)
@@ -713,7 +780,7 @@ static bool CheckQuitValue(void)
 
 /*************************************************
   Function:		ScenePredraw
-  Description: 	�ػ�
+  Description: 	ÖØ»æ
   Input:		
   Output:	
   Return:	
@@ -778,10 +845,10 @@ void SceneInit(void)
 
 /*************************************************
   Function:		SceneExit
-  Description: 	��������ʼ��
+  Description: 	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 void SceneExit(void)
@@ -811,8 +878,8 @@ void SceneExit(void)
   Function:		SceneLoad
   Description: 	
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 void SceneLoad(void)
@@ -832,8 +899,8 @@ void SceneLoad(void)
   Function:		SceneRun
   Description: 	
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 int SceneRun(void)
@@ -858,7 +925,7 @@ int SceneRun(void)
         ProcessCommand();       
 
         tick = SDL_GetTicks();
-	#define FPS_ENABLE
+
     #ifdef FPS_ENABLE
         frames++;
         if (tick - lasttick >= 1000)
@@ -890,26 +957,28 @@ int SceneRun(void)
 						{						
 						    case TK_CENTER:
 						        {						            
+									TouchManagerKey();
 						            result = true;									
 						        }
 						        break;
 
 						    case TK_MONITOR:
 						        {
+									TouchMonitorKey();
 									result = true;	
-									ScreenOn();
+									//ScreenOn();
 								}						        
 						        break;
 
 						    case TK_LOCK:
-						        {						            
-						            result = true;	
-									ScreenOff();
-						        }
-						        break;
-
 						    case TK_TALK:
 						        {
+									Command cmd;
+									memset(&cmd, 0, sizeof(Command));
+
+									cmd.id = CMD_KEY_SCENE;
+									sprintf(cmd.strarg1, "%d", (ev.key.keysym.sym - TK_LOCK));
+									mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 									result = true;
 								}						        
 						        break;
@@ -1206,10 +1275,10 @@ int SceneRun(void)
 
 /*************************************************
   Function:		SceneSetQuitValue
-  Description: 	�����˳���־
+  Description: 	ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ö¾
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 void SceneSetQuitValue(QuitValue value)
@@ -1219,10 +1288,10 @@ void SceneSetQuitValue(QuitValue value)
 
 /*************************************************
   Function:		SceneGetQuitValue
-  Description: 	��ȡ�˳���־
+  Description: 	ï¿½ï¿½È¡ï¿½Ë³ï¿½ï¿½ï¿½Ö¾
   Input:		
-  Output:		��
-  Return:		��
+  Output:		ï¿½ï¿½
+  Return:		ï¿½ï¿½
   Others:
 *************************************************/
 QuitValue SceneGetQuitValue(void)

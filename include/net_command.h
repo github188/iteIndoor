@@ -55,6 +55,7 @@ typedef unsigned short NET_COMMAND;
 #define CMD_GET_MANAGER_LIST		(SSC_PUBLIC<<8 | 0xB4)		// 获取室内主机捆绑的管理中心列表
 #define CMD_IPMODULE_BIND_QUEST		(SSC_PUBLIC<<8 | 0xB5)		// 室内分机向IP模块请求捆绑注册
 #define CMD_IPMODULE_BIND			(SSC_PUBLIC<<8 | 0xB6)		// IP模块向室内主机绑定
+#define CMD_GET_FENJI_INFO			(SSC_PUBLIC<<8 | 0xB8)		// 获取分机列表
 #define CMD_GET_EXTENSION_ADDR		(SSC_PUBLIC<<8 | 0xB9)		// 移动终端或室内分机向IP模块获取分机的IP地址
 /************************以上为公共部分命令**********************************/
 

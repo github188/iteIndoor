@@ -18,6 +18,35 @@
 
 #include "logic_include.h"
 
+/*************************************************
+  Function:		start_disturb_timer
+  Description:  开启免打扰定时器
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
+*************************************************/
+void start_disturb_timer(void);
+
+/*************************************************
+  Function:		stop_disturb_timer
+  Description:  停止免打扰定时器
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
+*************************************************/
+void stop_disturb_timer(void);
+
+/*************************************************
+  Function:		get_fenji_list
+  Description:  获取分机列表
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
+*************************************************/
+uint32 get_fenji_list(void);
 
 /*************************************************
 Function:		gb2312ToUtf8

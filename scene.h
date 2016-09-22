@@ -58,7 +58,7 @@ typedef enum
 	EVENT_CUSTOM15_MONITOR, 							
 	EVENT_CUSTOM16_RTSP_LIST, 							
 	EVENT_CUSTOM17_RTSP_MONITOR, 						
-
+	EVENT_CUSTOM18_KEY_SCENE,								// 快捷按键命令
 } CustomEvent;
 
 /**
@@ -97,7 +97,7 @@ typedef struct
   Function:			af_callback_gui
   Description:
   Input:
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:
   Others:
   *************************************************/
@@ -119,7 +119,7 @@ void callrequest_state_callbak(uint32 param1, uint32 param2);
   Function:			callout_state_callbak
   Description:
   Input:
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:
   Others:
   *************************************************/
@@ -129,7 +129,7 @@ void callout_state_callbak(uint32 param1, uint32 param2);
   Function:			callin_state_callbak
   Description:
   Input:
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:
   Others:
   *************************************************/
@@ -151,7 +151,7 @@ void monitor_list_state_callbak(uint32 param1, uint32 param2);
   Function:			monitor_state_callbak
   Description:
   Input:
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:
   Others:
   *************************************************/
@@ -171,11 +171,11 @@ void rtsp_list_state_callbak(uint32 param1, uint32 param2);
 
 /*************************************************
   Function:			rtsp_state_callbak
-  Description: 		����״̬�ص�
+  Description: 		ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Øµï¿½
   Input:
   1.param1
   2.param2
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:
   Others:
   *************************************************/
@@ -185,7 +185,7 @@ void rtsp_state_callbak(uint32 param1, uint32 param2);
   Function:			show_sys_event_hint
   Description:
   Input:
-  Output:			��
+  Output:			ï¿½ï¿½
   Return:
   Others:
   *************************************************/
@@ -193,7 +193,7 @@ void show_sys_event_hint(uint16 EventType);
 
 /*************************************************
   Function:		ScenePredraw
-  Description: 	�ػ�
+  Description: 	ÖØ»æ
   Input:		
   Output:	
   Return:	

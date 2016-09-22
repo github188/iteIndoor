@@ -14,7 +14,7 @@ Modification:
 
 /*****************常量定义***********************/
 #define MAX_PAGE_NUM					6					// 每页最大条数
-#define MAX_MONITOR_LIST_NUM  				8					// 最大管理员机数
+#define MAX_MONITOR_LIST_NUM  			12					// 最大管理员机数
 #define MAX_MONITOR_PAGE_NUM  			2					// 管理员机最大页数
 
 /*****************变量定义***********************/
@@ -26,10 +26,13 @@ static ITUBackground* MonitorSearchBottomBackground = NULL;
 static ITUCoverFlow* MonitorSearchListCoverFlow = NULL;
 static ITUBackground* MonitorSearchListBackgroundPage[MAX_MONITOR_PAGE_NUM] = { NULL };
 static ITUContainer* MonitorSearchListContainer[MAX_MONITOR_LIST_NUM] = { NULL };
+static ITUButton* MonitorSearchListButton[MAX_MONITOR_LIST_NUM] = { NULL };
 static ITUSprite* MonitorSearchListSprite[MAX_MONITOR_LIST_NUM] = { NULL };
 static ITUText* MonitorSearchListDevTypeText[MAX_MONITOR_LIST_NUM] = { NULL };
 static ITUBackground* MonitorSearchMSGHitGrayBackground = NULL;
 static ITUAnimation* MonitorSearchMSGHitAnimation = NULL;
+static ITUButton* MonitorSearchRightNullButton0 = NULL;
+static ITUButton* MonitorSearchBottomNullButton[3] = { NULL };
 
 /*****************常量定义***********************/
 static PMONITORLISTINFO  g_MonitorList = NULL;
@@ -76,12 +79,13 @@ static void SetMonitorShowInit(void)
 	for (i = 0; i < MAX_MONITOR_LIST_NUM; i++)
 	{
 		ituWidgetSetVisible(MonitorSearchListContainer[i], true);
-		ituWidgetSetVisible(MonitorSearchListSprite[i], true);
+		ituWidgetDisable(MonitorSearchListButton[i]);
+		ituTextSetString(MonitorSearchListDevTypeText[i], "");
+		ituWidgetSetVisible(MonitorSearchListSprite[i], false);
 	}
 
 	// 初始化默认为首页
 	// 解决MonitorSearchListCoverFlow第一页是-1的情况
-#if 1
 	if (MonitorSearchListCoverFlow->frame == MonitorSearchListCoverFlow->totalframe)
 	{
 		ituCoverFlowGoto(MonitorSearchListCoverFlow, -1);
@@ -90,7 +94,6 @@ static void SetMonitorShowInit(void)
 	{
 		ituCoverFlowGoto(MonitorSearchListCoverFlow, 0);
 	}
-#endif
 }
 
 /*************************************************
@@ -126,19 +129,21 @@ static void SetMonitorShowNum(uint8 max)
 		ituWidgetSetVisible(MonitorSearchListBackgroundPage[i - 1], false);
 	}
 
+#if 0
 	// 隐藏多余行(目前分机只支持8条)
 	count = pagenum * MAX_PAGE_NUM;
 	if (count > MAX_MONITOR_LIST_NUM)
 	{
 		count = MAX_MONITOR_LIST_NUM;
 	}
+#endif
 
-	for (i = count; i > max; i--)
+	for (i = 0; i < max; i++)
 	{
-		ituWidgetSetVisible(MonitorSearchListContainer[i - 1], false);
+		ituWidgetEnable(MonitorSearchListButton[i]);
 	}
-	printf("SetMonitorShowNum..:count %d\n", count);
-	printf("SetMonitorShowNum..:max %d\n", max);
+
+	dprintf("SetMonitorShowNum..:max %d\n", max);
 }
 
 /*************************************************
@@ -199,6 +204,7 @@ static void ShowMonitorWin(void)
 			fill_devno_by_index(g_MonitorList->pMonitorInfo[i].DeviceType, g_MonitorList->pMonitorInfo[i].index, devno);
 			get_dev_description(g_MonitorList->pMonitorInfo[i].DeviceType, devno, devtype, 50);
 			ituTextSetString(MonitorSearchListDevTypeText[i], devtype);
+			ituWidgetSetVisible(MonitorSearchListSprite[i], true);
 			ituSpriteGoto(MonitorSearchListSprite[i], icontype);
 		}
 		SetMonitorShowNum(max);
@@ -365,9 +371,10 @@ Others:			无
 *************************************************/
 bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 {
+	uint8 i;
+
 	if (!MonitorSearchLayer)
 	{
-		uint8 i;
 		char callname[50];
 
 		MainLayer = ituSceneFindWidget(&theScene, "mainLayer");
@@ -394,6 +401,9 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 		MonitorSearchMSGHitAnimation = ituSceneFindWidget(&theScene, "MonitorSearchMSGHitAnimation");
 		assert(MonitorSearchMSGHitAnimation);
 
+		MonitorSearchRightNullButton0 = ituSceneFindWidget(&theScene, "MonitorSearchRightNullButton0");
+		assert(MonitorSearchRightNullButton0);
+
 		for (i = 0; i < MAX_MONITOR_PAGE_NUM; i++)
 		{
 			memset(callname, 0, sizeof(callname));
@@ -410,6 +420,11 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 			assert(MonitorSearchListContainer[i]);
 
 			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "MonitorSearchListButton", i);
+			MonitorSearchListButton[i] = ituSceneFindWidget(&theScene, callname);
+			assert(MonitorSearchListButton[i]);
+		
+			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "MonitorSearchListDevTypeText", i);
 			MonitorSearchListDevTypeText[i] = ituSceneFindWidget(&theScene, callname);
 			assert(MonitorSearchListDevTypeText[i]);
@@ -419,12 +434,25 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 			MonitorSearchListSprite[i] = ituSceneFindWidget(&theScene, callname);
 			assert(MonitorSearchListSprite[i]);
 		}
+
+		for (i = 0; i < 3; i++)
+		{
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "MonitorSearchBottomNullButton", i);
+			MonitorSearchBottomNullButton[i] = ituSceneFindWidget(&theScene, callname);
+			assert(MonitorSearchBottomNullButton[i]);
+		}
 	}
 	g_ShowLoadTick = 0;
 	g_DevType = DEVICE_TYPE_STAIR;
 	ShowMonitorWin();
 	ituRadioBoxSetChecked(MonitorSearchRightStairRadioBox, true);
 	ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
+	ituWidgetDisable(MonitorSearchRightNullButton0);
+	for (i = 0; i < 3; i++)
+	{
+		ituWidgetDisable(MonitorSearchBottomNullButton[i]);
+	}
 	g_MonitorSearchLastTick = SDL_GetTicks();
 
 	return true;

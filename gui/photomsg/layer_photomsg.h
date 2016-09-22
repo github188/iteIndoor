@@ -75,6 +75,7 @@ void photoMsgVoiceBtnOnClicked();
 void setPhotoMsgPlayVol(uint8_t volNum);
 bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr);
 bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread);
+void setPhotoMsgListSender(uint8_t index, char* senderStr, bool isUnread);
 bool setPhotoMsgListIsVisible(uint8_t index, bool status);
 void photoMsgPlayingStopCallback();
 int32 photoMsgPlayingCallback(int32 playTime, int32 playPrecent, int32 state);

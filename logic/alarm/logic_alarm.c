@@ -1057,11 +1057,10 @@ void alarm_clear_alerts_operator(void)
 {
 	uint8 i;
 	uint8 state;
-
+	
 	state = gpAfParam->is_24_hour ;
 	for (i = 0; i < AREA_AMOUNT; i++)
 	{
-
 		if(gpAfParam->show_state[i] == ALARM_SHOW_STATE)
 		{
 			// 处理非24小时防区触发报警后撤防探头未恢复清除警示的状态闪烁 add by wufn 2015-8-15 
@@ -1089,10 +1088,9 @@ void alarm_clear_alerts_operator(void)
 				gpAfParam->show_state[i] = NORM_SHOW_STATE;
 			}
 		}
-		
 		else 
 		{
-			gpAfParam->show_state[i] = NORM_SHOW_STATE;				
+			gpAfParam->show_state[i] = NORM_SHOW_STATE;			
 		}
 	}
 	

@@ -542,6 +542,8 @@ const char * get_str(STRID_E id)
 	case SID_Set_Enter_Alarm_Pwd:
 		return ESID_Set_Enter_Alarm_Pwd;
 
+	case SID_Bj_Alarm_Clear_data:
+		return ESID_Bj_Alarm_Clear_data;
 
 
 // 对讲文字

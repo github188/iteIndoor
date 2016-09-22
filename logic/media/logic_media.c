@@ -936,8 +936,12 @@ void media_stop_video_lyly (void)
 *************************************************/
 uint32 media_play_sound_lyly(char *filename, uint8 IsRepeat, void * proc)
 {
-	leaf_start_voice_memo_playback(g_LeafCall, filename);
-	return TRUE;	
+	if(!g_LeafCall->audiostream)
+	{
+    	leaf_start_sound_play(g_LeafCall, filename, IsRepeat, proc);
+		return TRUE;
+    }
+	return FALSE;
 }
 
 /*************************************************
@@ -950,7 +954,7 @@ uint32 media_play_sound_lyly(char *filename, uint8 IsRepeat, void * proc)
 *************************************************/
 void media_stop_sound_lyly (void)
 {
-	leaf_stop_voice_memo_playback(g_LeafCall);
+	leaf_stop_sound_play(g_LeafCall);
 }
 
 /*************************************************

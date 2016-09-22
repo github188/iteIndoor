@@ -126,6 +126,19 @@ void set_ipmodule_info(PIPMODULE_INFO IpModule)
 int32 set_ipad_extension(IPAD_EXTENSION_LIST ipadList)
 {
 	memcpy(&g_ipadList, &ipadList, sizeof(IPAD_EXTENSION_LIST));
+
+	// add by chenbh 更新分机列表
+	int i, index;
+	for (i=0; i<g_ipadList.count; i++)
+	{
+		if (g_ipadList.ipadData[i].ipAddr != 0)
+		{
+			index = g_ipadList.ipadData[i].devno;				
+			storage_set_subdev_ips(index, g_ipadList.ipadData[i].ipAddr);
+		}
+	}	
+	
+	SaveRegInfo();	// 记得保存分机列表
 	return 1;
 }
 
@@ -182,4 +195,3 @@ uint32 get_ipad_extension_addr(uint32 devno)
 	return address;
 }
 //#endif
-

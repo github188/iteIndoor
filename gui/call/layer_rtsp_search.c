@@ -14,7 +14,7 @@ Modification:
 
 /*****************常量定义***********************/
 #define MAX_PAGE_NUM			6					// 每页最大条数
-#define MAX_RTSP_NUM  			20					// 最大管理员机数
+#define MAX_RTSP_NUM  			24					// 最大管理员机数
 #define MAX_RTSP_PAGE_NUM  		4					// 管理员机最大页数
 
 /*****************变量定义***********************/
@@ -27,6 +27,7 @@ static ITUBackground* RTSPSearchBottomBackground = NULL;
 static ITUCoverFlow* RTSPSearchListCoverFlow = NULL;
 static ITUBackground* RTSPSearchListBackgroundPage[MAX_RTSP_PAGE_NUM] = { NULL };
 static ITUContainer* RTSPSearchListContainer[MAX_RTSP_NUM] = { NULL };
+static ITUButton* RTSPSearchListButton[MAX_RTSP_NUM] = { NULL };
 static ITUSprite* RTSPSearchListSprite[MAX_RTSP_NUM] = { NULL };
 static ITUText* RTSPSearchListDevNameText[MAX_RTSP_NUM] = { NULL };
 static ITUText* RTSPSearchListOnLineText[MAX_RTSP_NUM] = { NULL };
@@ -34,6 +35,9 @@ static ITUBackground* RTSPSearchMSGHitGrayBackground = NULL;
 static ITUAnimation* RTSPSearchMSGHitAnimation = NULL;
 static ITUContainer* RTSPSearchBottomSearchContainer = NULL;
 static ITUBackground* RTSPSearchBackground = NULL;
+static ITUContainer* RTSPSearchBottomNullContainer0 = NULL;
+static ITUButton* RTSPSearchBottomNullButton[4] = { NULL };
+static ITUButton* RTSPSearchRightNullButton[2] = { NULL };
 
 /*****************常量定义***********************/
 static PRtspDeviceList  g_RTSPList = NULL;
@@ -79,8 +83,11 @@ static void SetRTSPShowInit(void)
 	for (i = 0; i < MAX_RTSP_NUM; i++)
 	{
 		ituWidgetSetVisible(RTSPSearchListContainer[i], true);
+		ituWidgetDisable(RTSPSearchListButton[i]);
+		ituTextSetString(RTSPSearchListDevNameText[i], "");
 		ituWidgetSetVisible(RTSPSearchListOnLineText[i], true);
-		ituWidgetSetVisible(RTSPSearchListSprite[i], true);
+		ituTextSetString(RTSPSearchListOnLineText[i], "");
+		ituWidgetSetVisible(RTSPSearchListSprite[i], false);
 	}
 
 	// 初始化默认为首页
@@ -128,19 +135,21 @@ static void SetRTSPShowNum(uint8 max)
 		ituWidgetSetVisible(RTSPSearchListBackgroundPage[i - 1], false);
 	}
 
+#if 0
 	// 隐藏多余行
 	count = pagenum * MAX_PAGE_NUM;
 	if (count > MAX_RTSP_NUM)
 	{
 		count = MAX_RTSP_NUM;
 	}
+#endif
 
-	for (i = count; i > max; i--)
+	for (i = 0; i < max; i++)
 	{
-		ituWidgetSetVisible(RTSPSearchListContainer[i - 1], false);
+		ituWidgetEnable(RTSPSearchListButton[i]);
 	}
+
 	printf("SetRTSPShowNum..:count %d\n", count);
-	printf("SetRTSPShowNum..:max %d\n", max);
 }
 
 /*************************************************
@@ -183,6 +192,7 @@ static void ShowRtspWin(uint8 type)
 
 		for (i = 0; i < max; i++)
 		{
+			ituWidgetSetVisible(RTSPSearchListSprite[i], true);
 			ituSpriteGoto(RTSPSearchListSprite[i], icontype);
 			ituTextSetString(RTSPSearchListDevNameText[i], g_RTSPList->Devinfo[i].DeviceName);
 			#ifdef _NEW_SELF_IPC_
@@ -247,6 +257,8 @@ static void InitRTSPSWin(void)
 		ituRadioBoxSetChecked(RTSPSearchRightPublicRadioBox, false);
 		ituRadioBoxSetChecked(RTSPSearchRightHomeRadioBox, true);
 		ituWidgetSetVisible(RTSPSearchBottomSearchContainer, false);
+		ituWidgetSetVisible(RTSPSearchBottomNullContainer0, true);
+		ituWidgetDisable(RTSPSearchBottomNullButton[0]);
 		if (is_main_DeviceNo())
 		{
 			ShowRtspWin(0);
@@ -264,6 +276,7 @@ static void InitRTSPSWin(void)
 		ituRadioBoxSetChecked(RTSPSearchRightHomeRadioBox, false);
 		ituRadioBoxSetChecked(RTSPSearchRightPublicRadioBox, true);
 		ituWidgetSetVisible(RTSPSearchBottomSearchContainer, true);
+		ituWidgetSetVisible(RTSPSearchBottomNullContainer0, false);
 		SetRTSPShowNum(0);
 		g_ShowLoadTick = 1;
 		ituWidgetDisable(RTSPSearchBackground);
@@ -437,7 +450,18 @@ Others:			无
 *************************************************/
 bool RTSPSearchLayerOnEnter(ITUWidget* widget, char* param)
 {
+	uint8 i;
+
 	InitRTSPSWin();
+
+	for (i = 0; i < 2; i++)
+	{
+		ituWidgetDisable(RTSPSearchRightNullButton[i]);
+	}
+	for (i = 1; i < 4; i++)
+	{
+		ituWidgetDisable(RTSPSearchBottomNullButton[i]);
+	}
 	
 	return true;
 }
@@ -494,6 +518,9 @@ bool RTSPSearchLayerStart(ITUWidget* widget, char* param)
 			RTSPSearchBackground = ituSceneFindWidget(&theScene, "RTSPSearchBackground");
 			assert(RTSPSearchBackground);
 
+			RTSPSearchBottomNullContainer0 = ituSceneFindWidget(&theScene, "RTSPSearchBottomNullContainer0");
+			assert(RTSPSearchBottomNullContainer0);
+
 			for (i = 0; i < MAX_RTSP_PAGE_NUM; i++)
 			{
 				memset(callname, 0, sizeof(callname));
@@ -510,6 +537,11 @@ bool RTSPSearchLayerStart(ITUWidget* widget, char* param)
 				assert(RTSPSearchListContainer[i]);
 
 				memset(callname, 0, sizeof(callname));
+				sprintf(callname, "%s%d", "RTSPSearchListButton", i);
+				RTSPSearchListButton[i] = ituSceneFindWidget(&theScene, callname);
+				assert(RTSPSearchListButton[i]);
+
+				memset(callname, 0, sizeof(callname));
 				sprintf(callname, "%s%d", "RTSPSearchListDevNameText", i);
 				RTSPSearchListDevNameText[i] = ituSceneFindWidget(&theScene, callname);
 				assert(RTSPSearchListDevNameText[i]);
@@ -523,6 +555,22 @@ bool RTSPSearchLayerStart(ITUWidget* widget, char* param)
 				sprintf(callname, "%s%d", "RTSPSearchListSprite", i);
 				RTSPSearchListSprite[i] = ituSceneFindWidget(&theScene, callname);
 				assert(RTSPSearchListSprite[i]);
+			}
+			
+			for (i = 0; i < 2; i++)
+			{
+				memset(callname, 0, sizeof(callname));
+				sprintf(callname, "%s%d", "RTSPSearchRightNullButton", i);
+				RTSPSearchRightNullButton[i] = ituSceneFindWidget(&theScene, callname);
+				assert(RTSPSearchRightNullButton[i]);
+			}
+
+			for (i = 0; i < 4; i++)
+			{
+				memset(callname, 0, sizeof(callname));
+				sprintf(callname, "%s%d", "RTSPSearchBottomNullButton", i);
+				RTSPSearchBottomNullButton[i] = ituSceneFindWidget(&theScene, callname);
+				assert(RTSPSearchBottomNullButton[i]);
 			}
 		}
 		g_Type = index;

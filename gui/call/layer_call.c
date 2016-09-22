@@ -13,8 +13,9 @@ Modification:
 #include "gui_include.h"
 
 /*****************常量定义***********************/
+#define MAX_RECORD_LIST_NUM				24
 #define MAX_PAGE_NUM					6					// 每页最大条数
-#define MAX_CENTER_NUM  				8					// 最大管理员机数
+#define MAX_CENTER_LIST_NUM  			12					// 最大管理员机数
 #define MAX_RECORD_PAGE_NUM  			4					// 通话记录最大页数
 #define MAX_CENTER_PAGE_NUM  			2					// 管理员机最大页数
 
@@ -37,15 +38,19 @@ static ITUCoverFlow* CallRecordListCoverFlow = NULL;
 static ITUCoverFlow* CallCeterListCoverFlow = NULL;
 static ITUBackground* CallRecordListBackgroundPage[MAX_RECORD_PAGE_NUM] = { NULL };
 static ITUBackground* CallCeterListBackgroundPage[MAX_CENTER_PAGE_NUM] = { NULL };
-static ITUText* CallRecordListDevTypeText[MAX_RECORD_NUM] = { NULL };
-static ITUText* CallRecordListTimeText[MAX_RECORD_NUM] = { NULL };
-static ITUSprite* CallRecordListSprite[MAX_RECORD_NUM] = { NULL };
-static ITUContainer* CallRecordListContainer[MAX_RECORD_NUM] = { NULL };
-static ITUIcon* CallCeterListIcon[MAX_CENTER_NUM] = { NULL };
-static ITUText* CallCeterListDevTypeText[MAX_CENTER_NUM] = { NULL };
-static ITUContainer* CallCeterListContainer[MAX_CENTER_NUM] = { NULL };
+static ITUText* CallRecordListDevTypeText[MAX_RECORD_LIST_NUM] = { NULL };
+static ITUText* CallRecordListTimeText[MAX_RECORD_LIST_NUM] = { NULL };
+static ITUSprite* CallRecordListSprite[MAX_RECORD_LIST_NUM] = { NULL };
+static ITUContainer* CallRecordListContainer[MAX_RECORD_LIST_NUM] = { NULL };
+static ITUButton* CallRecordListButton[MAX_RECORD_LIST_NUM] = { NULL };
+static ITUIcon* CallCeterListIcon[MAX_CENTER_LIST_NUM] = { NULL };
+static ITUText* CallCeterListDevTypeText[MAX_CENTER_LIST_NUM] = { NULL };
+static ITUContainer* CallCeterListContainer[MAX_CENTER_LIST_NUM] = { NULL };
+static ITUButton* CallCeterListButton[MAX_CENTER_LIST_NUM] = { NULL };
 static ITUText* CallRecordMSGHitText = NULL;
 static ITUBackground* CallRecordMSGHitGrayBackground = NULL;
+static ITUButton* CallBottomNullButton0 = NULL;
+static ITUButton* CallBottomNullButton1 = NULL;
 
 /*****************常量定义***********************/
 static char g_CallNo[50];							// 呼叫号码
@@ -212,9 +217,9 @@ static uint8 WhetherMissUnRead(void)
 	if (g_CallRecord && g_CallRecord->CallCount > 0)
 	{
 		max = g_CallRecord->CallCount;
-		if (max > MAX_RECORD_NUM)
+		if (max > MAX_RECORD_LIST_NUM)
 		{
-			max = MAX_RECORD_NUM;
+			max = MAX_RECORD_LIST_NUM;
 		}
 
 		for (i = 0; i < max; i++)
@@ -246,10 +251,13 @@ static void SetRecordShowInit(void)
 		ituWidgetSetVisible(CallRecordListBackgroundPage[i], true);
 	}
 
-	for (i = 0; i < MAX_RECORD_NUM; i++)
+	for (i = 0; i < MAX_RECORD_LIST_NUM; i++)
 	{
 		ituWidgetSetVisible(CallRecordListContainer[i], true);
-		ituWidgetSetVisible(CallRecordListSprite[i], true);
+		ituWidgetDisable(CallRecordListButton[i]);
+		ituTextSetString(CallRecordListDevTypeText[i], "");
+		ituTextSetString(CallRecordListTimeText[i], "");
+		ituWidgetSetVisible(CallRecordListSprite[i], false);
 		ituSetColor(&((ITUWidget*)CallRecordListDevTypeText[i])->color, 255, 255, 255, 255);
 		ituSetColor(&((ITUWidget*)CallRecordListTimeText[i])->color, 255, 255, 255, 255);
 	}
@@ -297,19 +305,20 @@ static void SetRecordShowNum(uint8 max)
 		ituWidgetSetVisible(CallRecordListBackgroundPage[i - 1], false);
 	}
 
+#if 0
 	// 隐藏多余行(目前通话记录只支持20条)
 	count = pagenum * MAX_PAGE_NUM;
-	if (count > MAX_RECORD_NUM)
+	if (count > MAX_RECORD_LIST_NUM)
 	{
-		count = MAX_RECORD_NUM;
+		count = MAX_RECORD_LIST_NUM;
 	}
+#endif
 
-	for (i = count; i > max; i--)
+	for (i = 0; i < max; i++)
 	{
-		ituWidgetSetVisible(CallRecordListContainer[i - 1], false);
+		ituWidgetEnable(CallRecordListButton[i]);
 	}
-	printf("SetRecordShowNum..:count %d\n", count);
-	printf("SetRecordShowNum..:max %d\n", max);
+	dprintf("SetRecordShowNum..:max %d\n", max);
 }
 
 /*************************************************
@@ -348,9 +357,9 @@ static void ShowRecordWin(CALL_TYPE Calltype)
 	if (g_CallRecord && g_CallRecord->CallCount > 0)
 	{
 		max = g_CallRecord->CallCount;
-		if (max > MAX_RECORD_NUM)
+		if (max > MAX_RECORD_LIST_NUM)
 		{
-			max = MAX_RECORD_NUM;
+			max = MAX_RECORD_LIST_NUM;
 		}
 		for (i = 0; i < max; i++)
 		{
@@ -380,10 +389,11 @@ static void ShowRecordWin(CALL_TYPE Calltype)
 				if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_AREA || g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_STAIR
 					|| g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_DOOR_NET)
 				{
-					ituWidgetSetVisible(CallRecordListSprite[i], false);
+					//ituWidgetSetVisible(CallRecordListSprite[i], false);
 				}
 				else
 				{
+					ituWidgetSetVisible(CallRecordListSprite[i], true);
 					ituSpriteGoto(CallRecordListSprite[i], CallCallIcon);
 				}
 			}
@@ -423,9 +433,12 @@ static void SetCenterShowInit(void)
 		ituWidgetSetVisible(CallCeterListBackgroundPage[i], true);
 	}
 
-	for (i = 0; i < MAX_CENTER_NUM; i++)
+	for (i = 0; i < MAX_CENTER_LIST_NUM; i++)
 	{
 		ituWidgetSetVisible(CallCeterListContainer[i], true);
+		ituWidgetDisable(CallCeterListButton[i]);
+		ituTextSetString(CallCeterListDevTypeText[i], "");
+		ituWidgetSetVisible(CallCeterListIcon[i], false);
 	}
 	// 初始化默认为首页
 	// 解决CallCeterListCoverFlow第一页是-1的情况
@@ -472,19 +485,22 @@ static void SetCenterShowNum(uint8 max)
 		ituWidgetSetVisible(CallCeterListBackgroundPage[i - 1], false);
 	}
 
+#if 0
 	// 隐藏多余行(目前分机只支持8条)
 	count = pagenum * MAX_PAGE_NUM;
-	if (count > MAX_CENTER_NUM)
+	if (count > MAX_CENTER_LIST_NUM)
 	{
-		count = MAX_CENTER_NUM;
+		count = MAX_CENTER_LIST_NUM;
+	}
+#endif
+
+	for (i = 0; i < max; i++)
+	{
+		ituWidgetSetVisible(CallCeterListIcon[i], true);
+		ituWidgetEnable(CallCeterListButton[i]);
 	}
 
-	for (i = count; i > max; i--)
-	{
-		ituWidgetSetVisible(CallCeterListContainer[i - 1], false);
-	}
-	printf("SetCenterShowNum..:count %d\n", count);
-	printf("SetCenterShowNum..:max %d\n", max);
+	dprintf("SetCenterShowNum..:max %d\n", max);
 }
 
 /*************************************************
@@ -1114,7 +1130,6 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			break;
 
 		case CallRecordEvent:
-			printf(" Record Press.........\n");
 			ituRadioBoxSetChecked(CallBottomRecordMissRadioBox, true);
 			CallLayerPage(CallRecordPage);
 			ShowRecordWin(MISSED);
@@ -1259,12 +1274,17 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 			assert(CallCeterListBackgroundPage[i]);
 		}
 
-		for (i = 0; i < MAX_RECORD_NUM; i++)
+		for (i = 0; i < MAX_RECORD_LIST_NUM; i++)
 		{
 			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "CallRecordListContainer", i);
 			CallRecordListContainer[i] = ituSceneFindWidget(&theScene, callname);
 			assert(CallRecordListContainer[i]);
+
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "CallRecordListButton", i);
+			CallRecordListButton[i] = ituSceneFindWidget(&theScene, callname);
+			assert(CallRecordListButton[i]);
 
 			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "CallRecordListDevTypeText", i);
@@ -1282,7 +1302,7 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 			assert(CallRecordListSprite[i]);
 		}
 
-		for (i = 0; i < MAX_CENTER_NUM; i++)
+		for (i = 0; i < MAX_CENTER_LIST_NUM; i++)
 		{
 			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "CallCeterListContainer", i);
@@ -1290,20 +1310,33 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 			assert(CallCeterListContainer[i]);
 
 			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "CallCeterListButton", i);
+			CallCeterListButton[i] = ituSceneFindWidget(&theScene, callname);
+			assert(CallCeterListButton[i]);
+
+			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "CallCeterListDevTypeText", i);
 			CallCeterListDevTypeText[i] = ituSceneFindWidget(&theScene, callname);
 			assert(CallCeterListDevTypeText[i]);
-			 
+
 			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "CallCeterListIcon", i);
 			CallCeterListIcon[i] = ituSceneFindWidget(&theScene, callname);
 			assert(CallCeterListIcon[i]);
 		}
+
+		CallBottomNullButton0 = ituSceneFindWidget(&theScene, "CallBottomNullButton0");
+		assert(CallBottomNullButton0);
+
+		CallBottomNullButton1 = ituSceneFindWidget(&theScene, "CallBottomNullButton1");
+		assert(CallBottomNullButton1);
 	}
 	g_Event = 0;
 	g_TimerRuning = FALSE;
 	g_RecordType = MISSED;
 	SetCallRecordPageDisable(false);
+	ituWidgetDisable(CallBottomNullButton0);
+	ituWidgetDisable(CallBottomNullButton1);
 	if (WhetherMissUnRead() == TRUE)
 	{
 		CallLayerPage(CallRecordPage);
@@ -1332,6 +1365,7 @@ Others:			无
 *************************************************/
 bool CalloutManager(ITUWidget* widget, char* param)
 {
+#if 0
 	uint8 i = 0, tmp = 0;
 	INTER_INFO_S CallInfo = { 0 };
 
@@ -1357,6 +1391,9 @@ bool CalloutManager(ITUWidget* widget, char* param)
 		sprintf(CallInfo.DevStr, "%d", tmp);
 		BeCallWin(&CallInfo);
 	}
+#endif
+	TouchManagerKey();
+
 	return true;
 }
 

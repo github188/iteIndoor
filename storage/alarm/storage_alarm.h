@@ -124,6 +124,16 @@ typedef struct
 PALARM_TOUCH_INFO_LIST storage_get_afbj_unread_record(void);
 
 /*************************************************
+  Function:		storage_get_afbj_unread_record_ext
+  Description:  
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		不包含防区1的报警信息
+*************************************************/
+PALARM_TOUCH_INFO_LIST storage_get_afbj_unread_record_ext(void);
+
+/*************************************************
   Function:		storage_get_afcz_record
   Description: 	获取安防操作记录列表
   Input:		无

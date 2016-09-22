@@ -689,3 +689,67 @@ void LogicShowWin(SHOW_WIN_TYPE type, char* param)
 			break;
 	}
 }
+
+/*************************************************
+Function:		TouchManagerKey
+Description:	管理员机快捷键
+Input:
+1.type			显示类型
+Output:			无
+Return:			无
+Others:
+*************************************************/
+void TouchManagerKey(void)
+{
+	uint8 i = 0, tmp = 0;
+	INTER_INFO_S CallInfo = { 0 };
+
+	int32 ret = ui_show_win_arbitration(SYS_OPER_CALLOUT);
+	if (ret == TRUE)
+	{
+		CallInfo.InterType = INTER_CALLOUT_E;
+		CallInfo.DevType = DEVICE_TYPE_MANAGER;
+
+		for (i = 0; i < 3; i++)
+		{
+			if (storage_get_manager_ip(i + 1))
+			{
+				tmp = i + MANAGER_NUM + 1;
+				continue;
+			}
+		}
+
+		if (0 == tmp)
+		{
+			tmp = 0xFF;
+		}
+		sprintf(CallInfo.DevStr, "%d", tmp);
+		BeCallWin(&CallInfo);
+	}
+}
+
+/*************************************************
+Function:		TouchMonitorKey
+Description:	监视梯口快捷键
+Input:
+1.type			显示类型
+Output:			无
+Return:			无
+Others:
+*************************************************/
+void TouchMonitorKey(void)
+{
+	PMONITORINFO info = NULL;
+
+	dprintf("monitor!\n");
+	info = storage_get_monitorinfo(DEVICE_TYPE_STAIR, 0);
+	if (NULL == info)
+	{
+		dprintf("monitor stair list is null\n");
+		return;
+	}
+	else
+	{
+		MonitorWin(DEVICE_TYPE_STAIR, 0);		// 点击直接开始监视
+	}
+}

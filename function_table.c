@@ -80,7 +80,8 @@ ITUActionFunction actionFunctions[] =
 	"BeCallLayerOnTimer", BeCallLayerOnTimer,
 	"BeCallCallOutState", BeCallCallOutState,
 	"BeCallCallInState", BeCallCallInState,
-
+	"BeCallLayerKeyOnMouseUp", BeCallLayerKeyOnMouseUp,
+	
 	// MonitorSearch
 	"MonitorSearchLayerOnEnter", MonitorSearchLayerOnEnter,
 	"MonitorSearchLayerButtonOnMouseUp", MonitorSearchLayerButtonOnMouseUp,
@@ -97,6 +98,8 @@ ITUActionFunction actionFunctions[] =
 	"MonitorButtomSoundOnChanged", MonitorButtomSoundOnChanged,
 	"MonitorLayerOnTimer", MonitorLayerOnTimer,
 	"MonitorState", MonitorState,
+	"MonitorKeyOnMouseUp", MonitorKeyOnMouseUp,
+
 	// RTSPSearch
 	"RTSPSearchLayerStart", RTSPSearchLayerStart,
 	"RTSPSearchLayerOnEnter", RTSPSearchLayerOnEnter,
@@ -117,9 +120,13 @@ ITUActionFunction actionFunctions[] =
 	"AlarmLayerTimeoutOnTimer", AlarmLayerTimeoutOnTimer,
 	"AlarmBottomButtonOnMouseUp", AlarmBottomButtonOnMouseUp,
 	"AlarmRightButtonOnMouseUp", AlarmRightButtonOnMouseUp,
+	"AlarmFqSingleSetButtonOnMouseUp", AlarmFqSingleSetButtonOnMouseUp,
 	"AlarmKeyBordButtonOnMouseUp", AlarmKeyBordButtonOnMouseUp,
 	"AlarmKeyBordYesButtonOnMouseUp", AlarmKeyBordYesButtonOnMouseUp,
 	"AlarmKeyBordDelButtonOnMouseLongPress", AlarmKeyBordDelButtonOnMouseLongPress,
+	"AlarmKeyBordDianButtonOnMouseUp", AlarmKeyBordDianButtonOnMouseUp,
+	"AlarmMsgHitSuccessRadioBoxOnMouseUp", AlarmMsgHitSuccessRadioBoxOnMouseUp,
+	"AlarmLayerOnGoto", AlarmLayerOnGoto,
 
 	//Set_Botton_Return_Layer
 	"SetBottonReturnOnEnter", SetBottonReturnOnEnter,

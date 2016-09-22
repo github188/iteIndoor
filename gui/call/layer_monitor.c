@@ -30,6 +30,7 @@ static ITUSprite* MonitorSoundSprite = NULL;
 static ITUContainer* MonitorShowButtomContainer = NULL;
 static ITUBackground* MonitorRightSnapGrayBackground = NULL;
 static ITUButton* MonitorRightSnapButton = NULL;
+static ITUButton* MonitorRightNullButton0 = NULL;
 
 /*****************常量定义***********************/
 static DEVICE_TYPE_E g_DevType;
@@ -519,6 +520,40 @@ bool MonitorState(ITUWidget* widget, char* param)
 }
 
 /*************************************************
+Function:		BeCallLayerKeyOnMouseUp
+Description: 	开锁、通话快捷键
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool MonitorKeyOnMouseUp(ITUWidget* widget, char* param)
+{
+	uint8 btn_event = atoi(param);
+	char temp[10] = { 0 };
+
+	dprintf("key btn_event........: %d\n", btn_event);
+	if (0 == btn_event)
+	{
+		sprintf(temp, "%d", MonitorLockEvent);
+	}
+	else
+	{
+		if (true == ituWidgetIsVisible(MonitorRightHandUpContainer))
+		{
+			sprintf(temp, "%d", MonitorHandUpEvent);
+		}
+		else
+		{
+			sprintf(temp, "%d", MonitorAnswerEvent);
+		}
+	}
+	MonitorLayerButtonOnMouseUp(NULL, temp);
+
+	return true;
+}
+
+/*************************************************
 Function:		MonitorButtomSoundOnChanged
 Description: 	音量按下执行函数
 Input:			无
@@ -647,6 +682,7 @@ bool MonitorLayerOnEnter(ITUWidget* widget, char* param)
 	ituWidgetSetVisible(MonitorHitBackground, false);
 	ituWidgetSetVisible(MonitorBottomBackground, false);
 	ituWidgetSetVisible(MonitorShowButtomContainer, false);
+	ituWidgetDisable(MonitorRightNullButton0);
 	ituTextSetString(MonitorTimeText, NULL);
 	ituTextSetString(MonitorCallNoText, NULL);
 	SetMonitorInfo();
@@ -713,6 +749,9 @@ static void InitMonitorLayer(void)
 
 		MonitorRightSnapButton = ituSceneFindWidget(&theScene, "MonitorRightSnapButton");
 		assert(MonitorRightSnapButton);
+
+		MonitorRightNullButton0 = ituSceneFindWidget(&theScene, "MonitorRightNullButton0");
+		assert(MonitorRightNullButton0);
 	}
 }
 

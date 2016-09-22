@@ -202,6 +202,7 @@ extern "C" {
 #define ESID_Bj_Touch_Cannot_Bf         (g_China ? (g_Big5 ? "觸發不能不防" : "触发不能布防") : "triggerred.Cannot arm!")
 #define ESID_Bj_Alarm_Cannot_Qc         (g_China ? (g_Big5 ? "正在報警，無法操作" : "正在报警，无法操作") : "Zone triggerred.Cannot operate!")
 #define ESID_Set_Enter_Alarm_Pwd        (g_China ? (g_Big5 ? "請輸入安防密碼" : "请输入安防密码") : "Enter Security Password")
+#define ESID_Bj_Alarm_Clear_data        (g_China ? (g_Big5 ? "是否清空數據" : "是否清空数据") : "Sure to empty data?")
 
 // 对讲文字
 #define ESID_MainMonitor_Door			 (g_China ? (g_Big5 ? "監視門前" : "监视门前") : "Doorway")
@@ -749,6 +750,7 @@ typedef enum
 	SID_Bj_Touch_Cannot_Bf,
 	SID_Bj_Alarm_Cannot_Qc,
 	SID_Set_Enter_Alarm_Pwd,
+	SID_Bj_Alarm_Clear_data,
 
 
 	// 对讲文字

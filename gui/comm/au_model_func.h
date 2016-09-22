@@ -169,6 +169,27 @@ Others:
 *************************************************/
 void LogicShowWin(SHOW_WIN_TYPE type, char* param);
 
+/*************************************************
+Function:		TouchManagerKey
+Description:	管理员机快捷键
+Input:
+1.type			显示类型
+Output:			无
+Return:			无
+Others:
+*************************************************/
+void TouchManagerKey(void);
+
+/*************************************************
+Function:		TouchMonitorKey
+Description:	监视梯口快捷键
+Input:
+1.type			显示类型
+Output:			无
+Return:			无
+Others:
+*************************************************/
+void TouchMonitorKey(void);
 #ifdef __cplusplus 
 }
 #endif

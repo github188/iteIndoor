@@ -41,6 +41,7 @@ bool BeCallButtomSoundOnChanged(ITUWidget* widget, char* param);
 bool BeCallLayerOnTimer(ITUWidget* widget, char* param);
 bool BeCallCallOutState(ITUWidget* widget, char* param);
 bool BeCallCallInState(ITUWidget* widget, char* param);
+bool BeCallLayerKeyOnMouseUp(ITUWidget* widget, char* param);
 void BeCallWin(INTER_INFO_S* info);
 
 // MonitorSearchLayer
@@ -59,6 +60,7 @@ bool MonitorButtomSoundButtonOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorButtomSoundOnChanged(ITUWidget* widget, char* param);
 bool MonitorLayerOnTimer(ITUWidget* widget, char* param);
 bool MonitorState(ITUWidget* widget, char* param);
+bool MonitorKeyOnMouseUp(ITUWidget* widget, char* param);
 void MonitorWin(DEVICE_TYPE_E DevType, uint8 index);
 
 // RTSPSearchLayer

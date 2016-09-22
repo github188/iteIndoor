@@ -97,6 +97,73 @@ void stop_disturb_timer(void)
 	}
 }
 
+/*************************************************
+  Function:		get_fenji_list
+  Description:  获取分机列表
+  Input:		无
+  Output:		无
+  Return:		无
+  Others:		
+*************************************************/
+uint32 get_fenji_list(void)
+{
+	uint32 *IPs  = NULL;
+	PDEVICE_NO *DevNoList;	
+	char DeviceNo[20];
+	uint8 len = 0, count = 0, i = 0;
+	memset(DeviceNo, 0, sizeof(DeviceNo));	
+	strcpy(DeviceNo, storage_get_devno_str());
+	len = strlen(DeviceNo);
+	DeviceNo[len-1] = '*';
+	count = net_get_ips_ext(storage_get_areano(), DEVICE_TYPE_ROOM, DeviceNo, &DevNoList, &IPs);	
+	if (count)
+	{
+		dprintf("lgoic_call.c : logic_call_resident : DeviceNo = %s, count = %d , address = %x \n", DeviceNo, count, IPs[0]);
+		for (i=0; i<count; i++)
+		{
+			uint8 fenji = (DevNoList[i]->DeviceNo2)%10;			
+			storage_set_subdev_ips(fenji, IPs[i]);
+		}
+	}			
+
+	#ifdef _IP_MODULE_DJ_
+	IPAD_EXTENSION_LIST IpadList;
+	memset(&IpadList, 0, sizeof(IPAD_EXTENSION_LIST));
+	if (TRUE == get_ipmodule())
+	{
+		if (is_main_DeviceNo())
+		{
+			get_ipad_extension(&IpadList);
+		}
+		else
+		{				
+			ipmodule_get_fenjiused(&IpadList);	// 获取注册过的分机号 
+			for (i=0; i<IPAD_EXTENSION_MAX; i++)
+			{
+				if (IpadList.ipadData[i].state == 1)
+				{
+					IpadList.ipadData[i].ipAddr = ipmodule_get_extensionAddr(IpadList.ipadData[i].devno);
+					if (IpadList.ipadData[i].ipAddr != 0)
+					{
+						IpadList.count++;
+					}
+				}
+			}
+		}
+	}	
+
+	for (i=0; i<IPAD_EXTENSION_MAX; i++)
+	{
+		if (IpadList.ipadData[i].ipAddr != 0)
+		{
+			storage_set_subdev_ips(i, IpadList.ipadData[i].ipAddr);
+		}
+	}
+	#endif
+
+	SaveRegInfo();
+	return TRUE;
+}
 
 /*************************************************
 Function:		gb2312ToUtf8

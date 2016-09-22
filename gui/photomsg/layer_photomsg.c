@@ -32,6 +32,7 @@ static ITUWidget*		photoMsgBottomBarContainer0;
 static ITUWidget*		photoMsgBottomBarContainer1;
 static ITUWidget*		photoMsgListMiniPicIcon;
 static ITUWidget*		photoMsgListTimeText;
+static ITUWidget*		photoMsgListSenderText;
 static ITUText*			photoMsgTipsText;
 static ITUTrackBar*		photoMsgVolTrackBar;
 static ITUIcon*			photoMsgVoiceOffIcon;
@@ -403,6 +404,7 @@ void setPhotoMsgList()
 				switch (gPhotoMsgList->LylyInfo[i].LyType)
 				{
 				case LYLY_TYPE_AUDIO:
+					setPhotoMsgListMiniIcon(i, "");
 					break;
 
 				case LYLY_TYPE_PIC_AUDIO:
@@ -419,10 +421,13 @@ void setPhotoMsgList()
 				memset(tmpStr, 0, sizeof(tmpStr));
 				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
+				get_dev_description(gPhotoMsgList->LylyInfo[i].DevType, gPhotoMsgList->LylyInfo[i].DevNo, tmpStr, sizeof(tmpStr)); // 获得设备描述
+				setPhotoMsgListSender(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
 			}
 			else if (i >= gPhotoMsgNum && i < PHOTOMSG_NUM_PER_PAGE)
 			{
 				setPhotoMsgListMiniIcon(i, "");
+				setPhotoMsgListSender(i, "", false);
 				setPhotoMsgListTime(i, "", false);
 			}
 			else
@@ -437,6 +442,7 @@ void setPhotoMsgList()
 				switch (gPhotoMsgList->LylyInfo[i].LyType)
 				{
 				case LYLY_TYPE_AUDIO:
+					setPhotoMsgListMiniIcon(i, "");
 					break;
 
 				case LYLY_TYPE_PIC_AUDIO:
@@ -453,6 +459,8 @@ void setPhotoMsgList()
 				memset(tmpStr, 0, sizeof(tmpStr));
 				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
+				get_dev_description(gPhotoMsgList->LylyInfo[i].DevType, gPhotoMsgList->LylyInfo[i].DevNo, tmpStr, sizeof(tmpStr)); // 获得设备描述
+				setPhotoMsgListSender(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
 			}
 			else
 			{
@@ -573,6 +581,36 @@ bool setPhotoMsgListTime(uint8_t index, char* timeStr, bool isUnread)
 	else
 	{
 		ituSetColor((ITUColor*)&photoMsgListTimeText->color, 255, 255, 255, 255);
+	}
+
+	return true;
+}
+
+
+void setPhotoMsgListSender(uint8_t index, char* senderStr, bool isUnread)
+{
+	char tmpStr[50] = { 0 };
+
+	if (index > MAX_POOTOMSG_LIST_NUM)
+	{
+		printf("photomsg list index overflow!!!!!!!!!!!!!");
+		return false;
+	}
+
+	memset(tmpStr, 0, sizeof(tmpStr));
+	sprintf(tmpStr, "%s%d", "photoMsgListSenderText", index);
+	photoMsgListSenderText = ituSceneFindWidget(&theScene, tmpStr);
+	assert(photoMsgListSenderText);
+
+	ituTextSetString(photoMsgListSenderText, senderStr);
+
+	if (isUnread)
+	{
+		ituSetColor((ITUColor*)&photoMsgListSenderText->color, 255, 255, 0, 0);
+	}
+	else
+	{
+		ituSetColor((ITUColor*)&photoMsgListSenderText->color, 255, 255, 255, 255);
 	}
 
 	return true;
@@ -742,8 +780,11 @@ void photoMsgReturnBtnOnClicked()
 
 	if (ituWidgetIsVisible(photoMsgVideoDrawBackground))
 	{
-		/*ituWidgetSetVisible(informationMSGContentContainer, false);
-		ituWidgetSetVisible(informationMSGListCoverFlow, true);*/
+		if (gPhotoMsgVideoMode != PHOTOMSG_VIDEOPLAY_STOP)
+		{
+			sys_stop_play_audio(SYS_MEDIA_MUSIC);
+			setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
+		}
 		photoMsgLayerInit(PHOTOMSG_LIST_PAGE);
 		setPhotoMsgList();
 	}

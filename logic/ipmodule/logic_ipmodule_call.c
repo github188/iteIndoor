@@ -307,6 +307,67 @@ int ipmodule_get_extensionAddr(uint32 extensionNo)
 		return 0;
 	}
 }
+
+/*************************************************
+  Function:			ipmodule_get_fenjiused
+  Description:		室内分机向IP模块获取分机的IP地址
+  Input: 			
+  Output:			无
+  Return:			分机IP地址4B
+  Others:
+*************************************************/
+int ipmodule_get_fenjiused(IPAD_EXTENSION_LIST *pIpadList)
+{
+	uint8 EchoValue = ECHO_OK;
+	int ReciSize = 0;
+	char *ReciData = NULL;
+	int count = 0;
+	int i;
+	int value,return_value;
+	int fenjilist[5] = {0};
+	
+	char bindCode[10] = {0};
+	sprintf(bindCode, "%06d", get_ipmodule_bindcode());
+	uint32 ipModuleAddr = get_ipmodule_address();
+
+	char data[10] = {0};
+	memcpy(data, bindCode, 6);
+	int ret = net_send_command(CMD_GET_FENJI_INFO, data, 6, ipModuleAddr, \
+							NETCMD_UDP_PORT, 3, &EchoValue, &ReciData, &ReciSize);
+	if ( ret == false )
+	{
+		dprintf(">>>ipmodule_get_extensionAddr: send_command error.\n");
+		return 0;
+	}
+	if(EchoValue == ECHO_OK && ReciData != NULL && ReciSize > 0 )
+	{
+		memcpy(&count, ReciData, 4);
+		dprintf(">>>ipmodule_get_extensionAddr: count = %d.\n", count);
+		for(i=0;i<count;i++)
+		{
+			memcpy(&value, ReciData+4*(i+1), 4);
+			fenjilist[value] = 1;
+		}
+		return_value = 0;
+		for(i=0;i<5;i++)
+		{
+			return_value |= fenjilist[i] << (5 - i);
+
+			// add by chenbh 
+			if (fenjilist[i] == 1)
+			{
+				pIpadList->ipadData[i].devno = i;
+				pIpadList->ipadData[i].state = 1;
+			}
+		}
+		return  return_value;
+	}
+	else
+	{
+		dprintf(">>>ipmodule_get_extensionAddr: EchoValue = %d.\n", EchoValue);
+		return 0;
+	}
+}
 #endif
 
 #ifdef _USE_ELEVATOR_

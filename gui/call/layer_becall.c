@@ -21,6 +21,8 @@ static ITUContainer* BeCallRightAnswerContainer = NULL;
 static ITUContainer* BeCallRightHandUpContainer = NULL;
 static ITUContainer* BeCallRightLockContainer = NULL;
 static ITUContainer* BeCallRightSnapContainer = NULL;
+static ITUContainer* BeCallRightNullContainer[3] = { NULL };
+static ITUButton* BeCallRightNullButton[3] = { NULL };
 static ITUBackground* BeCallBottomBackground = NULL;
 static ITUBackground* BeCallHitBackground = NULL;
 static ITUText* BeCallTimeText = NULL;
@@ -89,6 +91,8 @@ Others:			无
 *************************************************/
 static void InitRightButton(void)
 {
+	uint8 i;
+
 	if (g_OperType == INTER_CALLIN_E)
 	{
 		ituWidgetSetVisible(BeCallRightAnswerContainer, true);
@@ -97,6 +101,8 @@ static void InitRightButton(void)
 		{
 			ituWidgetSetVisible(BeCallRightLockContainer, true);
 			ituWidgetSetVisible(BeCallRightSnapContainer, true);
+			ituWidgetSetVisible(BeCallRightNullContainer[0], false);
+			ituWidgetSetVisible(BeCallRightNullContainer[1], false);
 			ituWidgetSetVisible(BeCallRightSnapGrayBackground, false);
 			ituWidgetEnable(BeCallRightSnapButton);
 		}
@@ -104,6 +110,8 @@ static void InitRightButton(void)
 		{
 			ituWidgetSetVisible(BeCallRightLockContainer, false);
 			ituWidgetSetVisible(BeCallRightSnapContainer, false);
+			ituWidgetSetVisible(BeCallRightNullContainer[0], true);
+			ituWidgetSetVisible(BeCallRightNullContainer[1], true);
 		}
 	}
 	else
@@ -112,6 +120,13 @@ static void InitRightButton(void)
 		ituWidgetSetVisible(BeCallRightHandUpContainer, true);
 		ituWidgetSetVisible(BeCallRightLockContainer, false);
 		ituWidgetSetVisible(BeCallRightSnapContainer, false);
+		ituWidgetSetVisible(BeCallRightNullContainer[0], true);
+		ituWidgetSetVisible(BeCallRightNullContainer[1], true);
+	}
+
+	for (i = 0; i < 3; i++)
+	{
+		ituWidgetDisable(BeCallRightNullButton[i]);
 	}
 }
 
@@ -371,6 +386,44 @@ static void BeCallCalloutStart(void)
 }
 
 /*************************************************
+Function:		BeCallLayerKeyOnMouseUp
+Description: 	开锁、通话快捷键
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool BeCallLayerKeyOnMouseUp(ITUWidget* widget, char* param)
+{
+	uint8 btn_event = atoi(param);
+	char temp[10] = { 0 };
+
+	dprintf("key btn_event........: %d\n", btn_event);
+	if (0 == btn_event)
+	{
+		if (false == g_unlock)
+		{
+			return false;
+		}
+		sprintf(temp, "%d", BeCallLockEvent);
+	}
+	else
+	{
+		if (true == ituWidgetIsVisible(BeCallRightHandUpContainer))
+		{
+			sprintf(temp, "%d", BeCallHandUpEvent);
+		}
+		else
+		{
+			sprintf(temp, "%d", BeCallAnswerEvent);
+		}
+	}
+	BeCallLayerButtonOnMouseUp(NULL, temp);
+
+	return true;
+}
+
+/*************************************************
 Function:		BeCallLayerOnTimer
 Description: 	定时器
 Input:			无
@@ -404,7 +457,7 @@ bool BeCallLayerOnTimer(ITUWidget* widget, char* param)
 				ituWidgetSetVisible(BeCallBottomBackground, false);
 			}
 		}
-		
+
 		if (g_MSGLockTicks)
 		{
 			g_MSGLockTicks--;
@@ -792,6 +845,9 @@ static void InitBeCallLayer(void)
 {
 	if (!BeCallLayer)
 	{
+		uint8 i;
+		char callname[50];
+
 		MainLayer = ituSceneFindWidget(&theScene, "mainLayer");
 		assert(MainLayer);
 
@@ -839,6 +895,19 @@ static void InitBeCallLayer(void)
 
 		BeCallRightSnapButton = ituSceneFindWidget(&theScene, "BeCallRightSnapButton");
 		assert(BeCallRightSnapButton);
+
+		for (i = 0; i < 3; i++)
+		{
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "BeCallRightNullContainer", i);
+			BeCallRightNullContainer[i] = ituSceneFindWidget(&theScene, callname);
+			assert(BeCallRightNullContainer[i]);
+
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "BeCallRightNullButton", i);
+			BeCallRightNullButton[i] = ituSceneFindWidget(&theScene, callname);
+			assert(BeCallRightNullButton[i]);
+		}
 	}
 }
 

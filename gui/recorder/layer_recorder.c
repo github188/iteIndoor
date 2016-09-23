@@ -69,7 +69,7 @@ bool recorderLayerOnLeave(ITUWidget* widget, char* param)
 
 	//TODO: 强制离开时候判断页面状态，如果是在录音状态则保存录音！！！！ 其他状态则直接退出即可！
 
-	if (gRecorderStatus == RECORDER_STATUS_STOP)
+	if (gRecorderStatus != RECORDER_STATUS_STOP)
 	{
 		recorderStopBtnOnClicked();
 	}

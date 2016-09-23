@@ -72,6 +72,7 @@ void setInformationContentDetail(char* detailStr);
 bool setInformationContentImage(char* imageStr);
 void setInformationList();
 bool setInformationListIsVisible(uint8_t index, bool status);
+bool setInformationListIsEnable(uint8_t index, bool status);
 bool setInformationIsReaded(uint8_t index, INFORMATION_MSGICON_STATUS_e status);
 bool setInformationListSender(uint8_t index, char* senderStr);
 bool setInformationListTheme(uint8_t index, char* themeStr);

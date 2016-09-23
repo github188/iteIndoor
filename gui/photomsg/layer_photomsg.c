@@ -66,6 +66,11 @@ bool photoMsgLayerOnLeave(ITUWidget* widget, char* param)
 {
 	printf("\photoMsgLayerOnLeave!!!!!!!!!\n");
 
+	if (gPhotoMsgVideoMode != PHOTOMSG_VIDEOPLAY_STOP)
+	{
+		photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_STOP);
+	}
+
 	return true;
 }
 
@@ -258,12 +263,16 @@ bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 
 void photoMsgBoxShow(PHOTOMSG_BTN_e btnId)
 {
+	if (!gPhotoMsgNum)
+	{
+		return;
+	}
+
 	if (!photoMsgTipsText)
 	{
 		photoMsgTipsText = ituSceneFindWidget(&theScene, "photoMsgTipsText");
 		assert(photoMsgTipsText);
 	}
-
 	if (!photoMsgBackground)
 	{
 		photoMsgBackground = ituSceneFindWidget(&theScene, "photoMsgBackground");
@@ -380,6 +389,34 @@ bool setPhotoMsgListIsVisible(uint8_t index, bool status)
 }
 
 
+void setPhotoMsgListIsEnable(uint8_t index, bool  status)
+{
+	char tmpStr[50] = { 0 };
+
+	if (index >= MAX_POOTOMSG_LIST_NUM)
+	{
+		printf("setting index overflow!!!!!!!!!!");
+		return false;
+	}
+	else
+	{
+		memset(tmpStr, 0, sizeof(tmpStr));
+		sprintf(tmpStr, "%s%d", "photoMsgListContainer", index);
+		photoMsgListContainer = ituSceneFindWidget(&theScene, tmpStr);
+		assert(photoMsgListContainer);
+		if (status)
+		{
+			ituWidgetEnable(photoMsgListContainer);
+		}
+		else
+		{
+			ituWidgetDisable(photoMsgListContainer);
+		}
+	}
+	return true;
+}
+
+
 void setPhotoMsgList()
 {
 	uint8_t i = 0;
@@ -423,12 +460,14 @@ void setPhotoMsgList()
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
 				get_dev_description(gPhotoMsgList->LylyInfo[i].DevType, gPhotoMsgList->LylyInfo[i].DevNo, tmpStr, sizeof(tmpStr)); // 获得设备描述
 				setPhotoMsgListSender(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
+				setPhotoMsgListIsEnable(i, true);
 			}
 			else if (i >= gPhotoMsgNum && i < PHOTOMSG_NUM_PER_PAGE)
 			{
 				setPhotoMsgListMiniIcon(i, "");
 				setPhotoMsgListSender(i, "", false);
 				setPhotoMsgListTime(i, "", false);
+				setPhotoMsgListIsEnable(i, false);
 			}
 			else
 			{
@@ -461,6 +500,7 @@ void setPhotoMsgList()
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
 				get_dev_description(gPhotoMsgList->LylyInfo[i].DevType, gPhotoMsgList->LylyInfo[i].DevNo, tmpStr, sizeof(tmpStr)); // 获得设备描述
 				setPhotoMsgListSender(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
+				setPhotoMsgListIsEnable(i, true);
 			}
 			else
 			{
@@ -785,8 +825,12 @@ void photoMsgReturnBtnOnClicked()
 			sys_stop_play_audio(SYS_MEDIA_MUSIC);
 			setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
 		}
-		photoMsgLayerInit(PHOTOMSG_LIST_PAGE);
-		setPhotoMsgList();
+		else
+		{
+			photoMsgLayerInit(PHOTOMSG_LIST_PAGE);
+			setPhotoMsgList();
+		}
+		
 	}
 	else
 	{

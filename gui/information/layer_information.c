@@ -304,6 +304,7 @@ bool setInformationListTime(uint8_t index, char* timeStr)
 	return true;
 }
 
+
 bool setInformationListIsVisible(uint8_t index, bool status)
 {
 	char tmpStr[50] = { 0 };
@@ -325,6 +326,36 @@ bool setInformationListIsVisible(uint8_t index, bool status)
 	return true;
 }
 
+
+bool setInformationListIsEnable(uint8_t index, bool status)
+{
+	char tmpStr[50] = { 0 };
+
+	if (index >= MAX_INFORMATION_NUM)
+	{
+		printf("setting index overflow!!!!!!!!!!");
+		return false;
+	}
+	else
+	{
+		memset(tmpStr, 0, sizeof(tmpStr));
+		sprintf(tmpStr, "%s%d", "informationMSGListContainer", index);
+		informationMSGListContainer = ituSceneFindWidget(&theScene, tmpStr);
+		assert(informationMSGListContainer);
+
+		if (status)
+		{
+			ituWidgetEnable(informationMSGListContainer);
+		}
+		else
+		{
+			ituWidgetDisable(informationMSGListContainer);
+		}
+	}
+	return true;
+}
+
+
 bool informationMSGListClicked(ITUWidget* widget, char* param)
 {
 	informationLayerInit(INFORMATION_CONTENT_PAGE);
@@ -332,6 +363,7 @@ bool informationMSGListClicked(ITUWidget* widget, char* param)
 
 	return true;
 }
+
 
 void setInformationContent(uint8_t index)
 {
@@ -502,6 +534,11 @@ void informationPreMsgBtnOnClicked()
 
 void informationMsgBoxShow(INFORMATION_BTN_e index)
 {
+	if (true)		//TODO:信息条数大于0 才显示消息框
+	{
+		return;
+	}
+
 	if (!informationTipsText)
 	{
 		informationTipsText = ituSceneFindWidget(&theScene, "informationTipsText");
@@ -566,6 +603,8 @@ void setInformationList()
 				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);			
 				printf("time = %s", tmpStr);
 				setInformationListTime(i, tmpStr);									//设置信息时间
+
+				setInformationListIsEnable(i, true);
 			}
 			else if (i >= msgNum && i < INFORMATION_PER_PAGE)
 			{
@@ -573,6 +612,7 @@ void setInformationList()
 				setInformationListSender(i, "");
 				setInformationListTheme(i, "");
 				setInformationListTime(i, "");
+				setInformationListIsEnable(i, false);
 			}
 			else
 			{
@@ -595,6 +635,8 @@ void setInformationList()
 				zoneDateTimeToString(tmpList->pinfo_data[i].time, tmpStr);
 				printf("time = %s", tmpStr);
 				setInformationListTime(i, tmpStr);									//设置信息时间
+
+				setInformationListIsEnable(i, true);
 			}
 			else
 			{

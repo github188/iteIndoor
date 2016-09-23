@@ -655,6 +655,10 @@ void recorderDeleteBtnOnClicked()
 {
 	printf("recorderDeleteBtnOnClicked");
 
+	if (gCurrentRecordIndex >= MAX_RECORDER_NUM)
+	{
+		return;
+	}
 	if (!recorderTipsText)
 	{
 		recorderTipsText = ituSceneFindWidget(&theScene, "recorderTipsText");
@@ -705,6 +709,7 @@ bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 		if (gCurrentRecordIndex < MAX_RECORDER_NUM)
 		{
 			storage_del_jrlyrecord(gCurrentRecordIndex);
+			gCurrentRecordIndex = MAX_RECORDER_NUM;
 			sys_sync_hint_state();
 			recorderLayerInit();
 		}

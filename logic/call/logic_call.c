@@ -1103,6 +1103,7 @@ static void * becall_proc(void *arg)
 {
 	pthread_detach(pthread_self());
 	time_t t0;
+	int ret;
 	uint32 temp = 0;
 	char CallNo[32] = {0};
 	char data[8] = {0};
@@ -1263,9 +1264,14 @@ static void * becall_proc(void *arg)
 		if (HintFile != NULL)
 		{
 			dprintf("becall proc : hint file is %s\n", HintFile);
-			meida_start_net_hint(g_BeCallInfo.RemoteDeviceType, HintFile, (void *)play_recordhint_callback);
-			media_add_audio_sendaddr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
-			media_enable_audio_send();
+			ret = meida_start_net_hint(g_BeCallInfo.RemoteDeviceType, HintFile, (void *)play_recordhint_callback);
+			if (ret == TRUE)
+			{
+				media_add_audio_sendaddr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
+				media_enable_audio_send();
+			}
+			else
+				g_BeCallInfo.state = CALL_STATE_RECORDING;
 		}
 		else
 		{

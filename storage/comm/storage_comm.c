@@ -1627,7 +1627,7 @@ char* storage_get_lyly_tip_path(void)
 	}
 	else
 	{
-		return LYLY_HIT_RE_PATH;
+		return LYLY_HIT_RE_FILE_PATH;
 	}
 }
 

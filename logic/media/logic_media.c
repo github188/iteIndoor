@@ -295,7 +295,7 @@ void media_stop_net_audio(void)
 *************************************************/
 uint32 meida_start_net_hint(uint8 RemoteDeviceType, char *filename, void * proc)
 {
-	int IsPack, PackNum;
+	int IsPack, PackNum, ret;
 	if ((media_stream_FileExtCmp((const uint8*)filename, ".wav") != 0)
 		&& (media_stream_FileExtCmp((const uint8*)filename, ".WAV")) != 0)
 	{
@@ -315,7 +315,11 @@ uint32 meida_start_net_hint(uint8 RemoteDeviceType, char *filename, void * proc)
 	}
 		
 	
-	leaf_start_lyly_hit(g_LeafCall, NETAUDIO_UDP_PORT, PAYLOAD_G711A, filename, IsPack, PackNum, proc);
+	/*ret = */leaf_start_lyly_hit(g_LeafCall, NETAUDIO_UDP_PORT, PAYLOAD_G711A, filename, IsPack, PackNum, proc);
+	//if (ret == 0)
+	//{
+	//	return FALSE;
+	//}
 	return TRUE;
 }
 

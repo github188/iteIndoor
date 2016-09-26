@@ -312,14 +312,10 @@ bool photoMsgVideoDrawBtnOnClicked(ITUWidget* widget, char* param)
 	{
 		if (ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
-			ituWidgetSetVisible(photoMsgPreVideoButton, false);
-			ituWidgetSetVisible(photoMsgNextVideoButton, false);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 		}
 		else
 		{
-			ituWidgetSetVisible(photoMsgPreVideoButton, true);
-			ituWidgetSetVisible(photoMsgNextVideoButton, true);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 
 			setPhotoMsgPlayVol(gPhotoMsgPlayVol);
@@ -721,9 +717,15 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 			  
 		if (ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
-			ituWidgetSetVisible(photoMsgPreVideoButton, false);
-			ituWidgetSetVisible(photoMsgNextVideoButton, false);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
+		}
+		if (ituWidgetIsVisible(photoMsgPreVideoButton))
+		{
+			ituWidgetSetVisible(photoMsgPreVideoButton, false);
+		}
+		if (ituWidgetIsVisible(photoMsgNextVideoButton))
+		{
+			ituWidgetSetVisible(photoMsgNextVideoButton, false);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_PLAYING;
 		break;
@@ -741,9 +743,15 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 
 		if (!ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
-			ituWidgetSetVisible(photoMsgPreVideoButton, true);
-			ituWidgetSetVisible(photoMsgNextVideoButton, true);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
+		}
+		if (!ituWidgetIsVisible(photoMsgPreVideoButton))
+		{
+			ituWidgetSetVisible(photoMsgPreVideoButton, true);
+		}
+		if (!ituWidgetIsVisible(photoMsgNextVideoButton))
+		{
+			ituWidgetSetVisible(photoMsgNextVideoButton, true);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_STOP;
 		break;

@@ -278,6 +278,10 @@ bool mainBtnOnClicked(ITUWidget* widget, char* param)
 			ituWidgetDisable(mainBackground);
 			ituWidgetSetVisible(mainTipsTransparencyBackground, true);
 		}
+		else
+		{
+			//TOTO:添加家电界面接口（AurineJDWin）
+		}
 		break;
 
 	default:

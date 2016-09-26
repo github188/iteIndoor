@@ -28,6 +28,8 @@ static ITUWidget*		photoMsgMessageContainer;
 static ITUWidget*		photoMsgPlayContainer;
 static ITUWidget*		photoMsgPauseContainer;
 static ITUWidget*		photoMsgStopContainer;
+static ITUButton*		photoMsgPreVideoButton;
+static ITUButton*		photoMsgNextVideoButton;
 static ITUWidget*		photoMsgBottomBarContainer0;
 static ITUWidget*		photoMsgBottomBarContainer1;
 static ITUWidget*		photoMsgListMiniPicIcon;
@@ -45,7 +47,7 @@ static uint8_t*	gPhotoMsgVideoBackgroundData;
 static int		gPhotoMsgVideoBackgroundSize;
 static uint8_t	gPhotoMsgPlayVol;
 static uint8_t  gPhotoMsgNum;
-static uint8_t  gPhotoMsgCurrentIndex;
+static int8_t  gPhotoMsgCurrentIndex;
 static PLYLYLIST_INFO gPhotoMsgList = NULL;
 static PHOTOMSG_VIDEOPLAY_STATUS_e	gPhotoMsgVideoMode;		//记录当前的界面的播放状态
 
@@ -197,6 +199,11 @@ bool photoMsgBtnOnClicked(ITUWidget* widget, char* param)
 		photoMsgVoiceBtnOnClicked();
 		break;
 
+	case PHOTOMSG_BTN_PRE:
+	case PHOTOMSG_BTN_NEXT:
+		setPhotoMsgPreNextVideo(tmpBtn);
+		break;
+
 	default:
 		break;
 	}
@@ -244,6 +251,7 @@ bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 		{
 			//TODO:这里写删除一条的操作，删除完退出信息内容界面！！！！！！！
 			storage_del_lylyrecord(gPhotoMsgCurrentIndex);
+			gPhotoMsgCurrentIndex = MAX_POOTOMSG_LIST_NUM;
 			photoMsgLayerInit(PHOTOMSG_LIST_PAGE);
 			setPhotoMsgList();
 		}
@@ -304,10 +312,14 @@ bool photoMsgVideoDrawBtnOnClicked(ITUWidget* widget, char* param)
 	{
 		if (ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
+			ituWidgetSetVisible(photoMsgPreVideoButton, false);
+			ituWidgetSetVisible(photoMsgNextVideoButton, false);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 		}
 		else
 		{
+			ituWidgetSetVisible(photoMsgPreVideoButton, true);
+			ituWidgetSetVisible(photoMsgNextVideoButton, true);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 
 			setPhotoMsgPlayVol(gPhotoMsgPlayVol);
@@ -690,6 +702,16 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 		photoMsgBottomBarContainer1 = ituSceneFindWidget(&theScene, "photoMsgBottomBarContainer1");
 		assert(photoMsgBottomBarContainer1);
 	}
+	if (!photoMsgPreVideoButton)
+	{
+		photoMsgPreVideoButton = ituSceneFindWidget(&theScene, "photoMsgPreVideoButton");
+		assert(photoMsgPreVideoButton);
+	}
+	if (!photoMsgNextVideoButton)
+	{
+		photoMsgNextVideoButton = ituSceneFindWidget(&theScene, "photoMsgNextVideoButton");
+		assert(photoMsgNextVideoButton);
+	}
 
 	switch (mode)
 	{
@@ -699,6 +721,8 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 			  
 		if (ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
+			ituWidgetSetVisible(photoMsgPreVideoButton, false);
+			ituWidgetSetVisible(photoMsgNextVideoButton, false);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_PLAYING;
@@ -717,6 +741,8 @@ void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode)
 
 		if (!ituWidgetIsVisible(photoMsgBottomBarContainer1))
 		{
+			ituWidgetSetVisible(photoMsgPreVideoButton, true);
+			ituWidgetSetVisible(photoMsgNextVideoButton, true);
 			ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 		}
 		gPhotoMsgVideoMode = PHOTOMSG_VIDEOPLAY_STOP;
@@ -773,6 +799,38 @@ int32 photoMsgPlayingCallback(int32 playTime, int32 playPrecent, int32 state)
 	recorderStopBtnOnClicked();
 
 	return 0;
+}
+
+
+void setPhotoMsgPreNextVideo(PHOTOMSG_BTN_e btnId)
+{
+	if (gPhotoMsgNum <= 1)
+	{
+		//只有一条时候不进行上下条操作
+		return;
+	}
+	switch (btnId)
+	{
+	case PHOTOMSG_BTN_PRE:
+		gPhotoMsgCurrentIndex--;
+		if (gPhotoMsgCurrentIndex < 0)
+		{
+			gPhotoMsgCurrentIndex = gPhotoMsgNum - 1;
+		}
+		break;
+
+	case PHOTOMSG_BTN_NEXT:
+		gPhotoMsgCurrentIndex++;
+		if (gPhotoMsgCurrentIndex >= gPhotoMsgNum)
+		{
+			gPhotoMsgCurrentIndex = 0;
+		}
+		break;
+
+	default:
+		break;
+	}
+	setPhotoMsgVideoPlayByIndex(gPhotoMsgCurrentIndex);
 }
 
 

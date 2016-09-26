@@ -38,6 +38,8 @@ typedef enum
 	PHOTOMSG_BTN_EMPTY,
 	PHOTOMSG_BTN_DELETE,
 	PHOTOMSG_BTN_VOL,
+	PHOTOMSG_BTN_PRE,
+	PHOTOMSG_BTN_NEXT,
 }PHOTOMSG_BTN_e;
 
 typedef enum
@@ -65,6 +67,7 @@ void photoMsgLayerReset();
 
 void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId);
 void setPhotoMsgVideoPlayByIndex(uint8_t index);
+void setPhotoMsgPreNextVideo(PHOTOMSG_BTN_e btnId);
 void setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STATUS_e mode);
 void setPhotoMsgAudioPlayPicture(char* picAddr);
 void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId);

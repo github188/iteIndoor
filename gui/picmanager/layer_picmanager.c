@@ -413,8 +413,9 @@ void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId)
 
 bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 {
-	uint16 i = 0;
-	uint16 tmpId = atoi(param);
+	uint8_t i = 0;
+	uint8_t tmpId = atoi(param);
+	uint8_t delCount = 0;
 
 	switch (tmpId)
 	{
@@ -424,7 +425,8 @@ bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 			if (getMiniPicIsChecked(i) == MINIPIC_CORNER_ICON_CHECK)
 			{
 				//TODO:这里写删除所选照片的操作，删除完重新绘制内容界面！！！！！！！
-				storage_del_photo(i);
+				storage_del_photo(i - delCount);
+				delCount++;
 			}
 		}
 		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);

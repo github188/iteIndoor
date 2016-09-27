@@ -14,24 +14,24 @@ Modification:
 
 #include "layer_recorder.h"
 
-static ITULayer*		mainLayer;
-static ITUBackground*	recorderTipsTransparencyBackground;
-static ITUBackground*	recorderBackground;
-static ITUText*			recorderTipsText;
-static ITUTrackBar*		recorderVolTrackBar;
-static ITUIcon*			recorderVoiceOffIcon;
-static ITUIcon*			recorderVoiceOnIcon;
-static ITUText*			recorderRecordDurationText; 
-static ITUText*			recorderRecordCreateTimeText;
-static ITUText*			recorderRecordText;
-static ITUIcon*			recorderRecordTopLeftIcon;
-static ITUButton*		recorderRecordNullButton;
-static ITURadioBox*		recorderRecordRadioBox;
+static ITULayer*		mainLayer = NULL;
+static ITUBackground*	recorderTipsTransparencyBackground = NULL;
+static ITUBackground*	recorderBackground = NULL;
+static ITUText*			recorderTipsText = NULL;
+static ITUTrackBar*		recorderVolTrackBar = NULL;
+static ITUIcon*			recorderVoiceOffIcon = NULL;
+static ITUIcon*			recorderVoiceOnIcon = NULL;
+static ITUText*			recorderRecordDurationText = NULL;
+static ITUText*			recorderRecordCreateTimeText = NULL;
+static ITUText*			recorderRecordText = NULL;
+static ITUIcon*			recorderRecordTopLeftIcon = NULL;
+static ITUButton*		recorderRecordNullButton = NULL;
+static ITURadioBox*		recorderRecordRadioBox = NULL;
 
-static ITUButton*		recorderRecordStartButton;   
-static ITUButton*		recorderRecordPauseButton;
-static ITUButton*		recorderRecordPlayButton;
-static ITUButton*		recorderRecordStopButton;
+static ITUButton*		recorderRecordStartButton = NULL;
+static ITUButton*		recorderRecordPauseButton = NULL;
+static ITUButton*		recorderRecordPlayButton = NULL;
+static ITUButton*		recorderRecordStopButton = NULL;
 
 
 //静态全局参数，用户保存界面状态信息等参数

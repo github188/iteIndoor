@@ -14,34 +14,34 @@ Modification:
 
 #include "layer_information.h"
 
-static ITULayer*		mainLayer;
-static ITUWidget*		informationMSGContentContainer;
-static ITUCoverFlow*	informationMSGListCoverFlow;
-static ITUWidget*		informationPageContainer;
-static ITUWidget*		informationEmptyContainer;
-static ITUWidget*		informationPreContainer;
-static ITUWidget*		informationNextContainer;
-static ITUWidget*		informationDeleteContainer;
-static ITUWidget*		informationNullContainer4;
-static ITUWidget*		informationNullContainer5;
-static ITUBackground*	informationBackground;
-static ITUBackground*	informationTipsTransparencyBackground;
-static ITUText*			informationTipsText;
+static ITULayer*		mainLayer = NULL;
+static ITUWidget*		informationMSGContentContainer = NULL;
+static ITUCoverFlow*	informationMSGListCoverFlow = NULL;
+static ITUWidget*		informationPageContainer = NULL;
+static ITUWidget*		informationEmptyContainer = NULL;
+static ITUWidget*		informationPreContainer = NULL;
+static ITUWidget*		informationNextContainer = NULL;
+static ITUWidget*		informationDeleteContainer = NULL;
+static ITUWidget*		informationNullContainer4 = NULL;
+static ITUWidget*		informationNullContainer5 = NULL;
+static ITUBackground*	informationBackground = NULL;
+static ITUBackground*	informationTipsTransparencyBackground = NULL;
+static ITUText*			informationTipsText = NULL;
 
 //MSGList
-static ITUWidget*		informationMSGListContainer;	
-static ITUIcon*			informationMSGListReadIcon;
-static ITUIcon*			informationMSGListUnReadIcon;
-static ITUText*			informationMSGListThemeText;
-static ITUText*			informationMSGListTimeText;
-static ITUText*			informationMSGListSenderText;
+static ITUWidget*		informationMSGListContainer = NULL;
+static ITUIcon*			informationMSGListReadIcon = NULL;
+static ITUIcon*			informationMSGListUnReadIcon = NULL;
+static ITUText*			informationMSGListThemeText = NULL;
+static ITUText*			informationMSGListTimeText = NULL;
+static ITUText*			informationMSGListSenderText = NULL;
 
 //MSGContent
-static ITUTextBox*		informationMSGContentDetailTextBox;
-static ITUBackground*	informationMSGContentImageIcon;
-static ITUText*			informationMSGContentSenderText;
-static ITUText*			informationMSGContentThemeText;
-static ITUText*			informationMSGContentTimeText;
+static ITUTextBox*		informationMSGContentDetailTextBox = NULL;
+static ITUBackground*	informationMSGContentImageIcon = NULL;
+static ITUText*			informationMSGContentSenderText = NULL;
+static ITUText*			informationMSGContentThemeText = NULL;
+static ITUText*			informationMSGContentTimeText = NULL;
 
 
 static uint8_t*	gInformationImageData;

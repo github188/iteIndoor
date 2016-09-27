@@ -16,8 +16,8 @@ Modification:
 #include "layer_cleanscreen.h"
 
 //itu
-static ITULayer*	mainLayer;
-static ITUText*		cleanScreenTimeText;
+static ITULayer*	mainLayer = NULL;
+static ITUText*		cleanScreenTimeText = NULL;
 
 // status
 static uint8_t		gCleanScreenTimeoutCount;	//³¬Ê±Ê±¼ä

@@ -14,22 +14,22 @@ Modification:
 
 #include "layer_picmanager.h"
 
-static ITULayer*		mainLayer;
-static ITUBackground*	picManagerTipsTransparencyBackground;
-static ITUBackground*	picManagerBackground;
-static ITUText*			picManagerTipsText;
-static ITUWidget*		picManagerEmptyContainer;
-static ITUWidget*		picManagerDeleteContainer;
-static ITUWidget*		picManagerPicEditContainer;
-static ITUCoverFlow*	picManagerPictureCoverFlow;
-static ITUWidget*		picManagerMiniPicListContainer;
-static ITUWidget*		picManagerMiniPicContainer;
-static ITUWidget*		picManagerBottomBarContainer;
-static ITUWidget*		picManagerNullContainer3;
-static ITUIcon*			picManagerMiniPicIcon;
-static ITUIcon*			picManagerPicContentIcon;
-static ITUIcon*			picManagerMiniPicUnChenkIcon;
-static ITUIcon*			picManagerMiniPicChenkIcon;
+static ITULayer*		mainLayer = NULL;
+static ITUBackground*	picManagerTipsTransparencyBackground = NULL;
+static ITUBackground*	picManagerBackground = NULL;
+static ITUText*			picManagerTipsText = NULL;
+static ITUWidget*		picManagerEmptyContainer = NULL;
+static ITUWidget*		picManagerDeleteContainer = NULL;
+static ITUWidget*		picManagerPicEditContainer = NULL;
+static ITUCoverFlow*	picManagerPictureCoverFlow = NULL;
+static ITUWidget*		picManagerMiniPicListContainer = NULL;
+static ITUWidget*		picManagerMiniPicContainer = NULL;
+static ITUWidget*		picManagerBottomBarContainer = NULL;
+static ITUWidget*		picManagerNullContainer3 = NULL;
+static ITUIcon*			picManagerMiniPicIcon = NULL;
+static ITUIcon*			picManagerPicContentIcon = NULL;
+static ITUIcon*			picManagerMiniPicUnChenkIcon = NULL;
+static ITUIcon*			picManagerMiniPicChenkIcon = NULL;
 
 static uint8_t	gPictureCurrentIndex[PICMANAGER_CONTENT_NUM];
 static uint8_t  gCoverFlowCurrentIndex;

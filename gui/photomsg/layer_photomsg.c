@@ -15,30 +15,30 @@ Modification:
 #include "layer_photomsg.h"
 
 
-static ITULayer*		mainLayer;
-static ITUCoverFlow*	photoMsgListCoverFlow;
-static ITUBackground*	photoMsgVideoDrawBackground;
-static ITUBackground*	photoMsgTipsTransparencyBackground;
-static ITUBackground*	photoMsgBackground;
-static ITUWidget*		photoMsgPageContainer;
-static ITUWidget*		photoMsgListContainer;
-static ITUWidget*		photoMsgEmptyContainer;
-static ITUWidget*		photoMsgNullContainer0;
-static ITUWidget*		photoMsgMessageContainer;
-static ITUWidget*		photoMsgPlayContainer;
-static ITUWidget*		photoMsgPauseContainer;
-static ITUWidget*		photoMsgStopContainer;
-static ITUButton*		photoMsgPreVideoButton;
-static ITUButton*		photoMsgNextVideoButton;
-static ITUWidget*		photoMsgBottomBarContainer0;
-static ITUWidget*		photoMsgBottomBarContainer1;
-static ITUWidget*		photoMsgListMiniPicIcon;
-static ITUWidget*		photoMsgListTimeText;
-static ITUWidget*		photoMsgListSenderText;
-static ITUText*			photoMsgTipsText;
-static ITUTrackBar*		photoMsgVolTrackBar;
-static ITUIcon*			photoMsgVoiceOffIcon;
-static ITUIcon*			photoMsgVoiceOnIcon;
+static ITULayer*		mainLayer = NULL;
+static ITUCoverFlow*	photoMsgListCoverFlow = NULL;
+static ITUBackground*	photoMsgVideoDrawBackground = NULL;
+static ITUBackground*	photoMsgTipsTransparencyBackground = NULL;
+static ITUBackground*	photoMsgBackground = NULL;
+static ITUWidget*		photoMsgPageContainer = NULL;
+static ITUWidget*		photoMsgListContainer = NULL;
+static ITUWidget*		photoMsgEmptyContainer = NULL;
+static ITUWidget*		photoMsgNullContainer0 = NULL;
+static ITUWidget*		photoMsgMessageContainer = NULL;
+static ITUWidget*		photoMsgPlayContainer = NULL;
+static ITUWidget*		photoMsgPauseContainer = NULL;
+static ITUWidget*		photoMsgStopContainer = NULL;
+static ITUButton*		photoMsgPreVideoButton = NULL;
+static ITUButton*		photoMsgNextVideoButton = NULL;
+static ITUWidget*		photoMsgBottomBarContainer0 = NULL;
+static ITUWidget*		photoMsgBottomBarContainer1 = NULL;
+static ITUWidget*		photoMsgListMiniPicIcon = NULL;
+static ITUWidget*		photoMsgListTimeText = NULL;
+static ITUWidget*		photoMsgListSenderText = NULL;
+static ITUText*			photoMsgTipsText = NULL;
+static ITUTrackBar*		photoMsgVolTrackBar = NULL;
+static ITUIcon*			photoMsgVoiceOffIcon = NULL;
+static ITUIcon*			photoMsgVoiceOnIcon = NULL;
 
 
 static uint8_t*	gPhotoMsgListIconData;
@@ -671,7 +671,8 @@ void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 	{
 	case PHOTOMSG_BTN_START:
 		//暂停时候，继续播放留影留言、停止时候，重新播放留影留言
-		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
+		setPhotoMsgVideoPlayByIndex(gPhotoMsgCurrentIndex);
+		//setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
 		break;
 
 	case PHOTOMSG_BTN_PAUSE:
@@ -681,7 +682,8 @@ void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 
 	case PHOTOMSG_BTN_STOP:
 		//停止播放，重置界面
-		sys_stop_play_audio(SYS_MEDIA_MUSIC);
+		//sys_stop_play_audio(SYS_MEDIA_MUSIC);
+		sys_stop_play_leaveword();
 		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
 		break;
 
@@ -858,7 +860,8 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 	case LYLY_TYPE_AUDIO:
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放纯音频文件！！！！！！
-		sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
+		//sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
+		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_AUDIO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		break;
 
 	case LYLY_TYPE_PIC_AUDIO:
@@ -866,12 +869,15 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 		setPhotoMsgAudioPlayPicture(tmpAddr);
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放音频文件
-		sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
+		//sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
+		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_PIC_AUDIO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		break;
 
 	case LYLY_TYPE_VIDEO:
+		BackgroundDrawVideo("photoMsgVideoDrawButton");
 		get_lylyavi_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放视频文件！
+		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_VIDEO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		break;
 
 	default:

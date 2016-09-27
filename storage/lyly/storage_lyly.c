@@ -174,7 +174,7 @@ char* get_lylyavi_path(char *filename, PDATE_TIME Time)
 	if (Time && filename)
 	{
 		memset(filename, 0, sizeof(filename));
-		sprintf(filename,"%s/%04d%02d%02d%02d%02d%02d.avi",LYLY_DIR_PATH,Time->year,Time->month,Time->day
+		sprintf(filename,"%s/%04d%02d%02d%02d%02d%02d.mkv",LYLY_DIR_PATH,Time->year,Time->month,Time->day
 				,Time->hour,Time->min,Time->sec);
 		return filename;
 	}

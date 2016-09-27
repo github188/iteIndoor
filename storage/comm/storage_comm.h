@@ -959,6 +959,16 @@ uint32 storage_get_center_ip(void);
 uint32 storage_get_manager_ip(uint8 NO);
 
 /*************************************************
+  Function:    		storage_clear_subdev_ips
+  Description:		清空分机设备IP
+  Input: 			
+  Output:			无
+  Return:			理员机IP
+  Others:
+*************************************************/
+uint32 storage_clear_subdev_ips(void);
+
+/*************************************************
   Function:    		storage_set_subdev_ips
   Description:		设置分机设备IP
   Input: 			

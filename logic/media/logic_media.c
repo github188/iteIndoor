@@ -315,11 +315,11 @@ uint32 meida_start_net_hint(uint8 RemoteDeviceType, char *filename, void * proc)
 	}
 		
 	
-	/*ret = */leaf_start_lyly_hit(g_LeafCall, NETAUDIO_UDP_PORT, PAYLOAD_G711A, filename, IsPack, PackNum, proc);
-	//if (ret == 0)
-	//{
-	//	return FALSE;
-	//}
+	ret = leaf_start_lyly_hit(g_LeafCall, NETAUDIO_UDP_PORT, PAYLOAD_G711A, filename, IsPack, PackNum, proc);
+	if (ret == 0)
+	{
+		return FALSE;
+	}
 	return TRUE;
 }
 
@@ -401,11 +401,14 @@ uint32 meida_start_net_leave_rec(LEAVE_WORD_MODE_E mode, uint32 ipaddress, char 
 	if (mode == LWM_AUDIO || mode == LWM_AUDIO_PIC)
 	{
 		sprintf(RecordName, "%s%s", filename, LEAVE_SVM_TYPE);
-		ret = leaf_start_net_voice_memo_record(g_LeafCall, RecordName, ipaddress, NETAUDIO_UDP_PORT, PAYLOAD_G711A);		
+		ret = leaf_start_net_voice_memo_record(g_LeafCall, RecordName, ipaddress, NETAUDIO_UDP_PORT, PAYLOAD_G711A, 0);		
 	}
 	else
 	{
+		ret = leaf_start_net_voice_memo_record(g_LeafCall, RecordName, ipaddress, NETAUDIO_UDP_PORT, PAYLOAD_G711A, 1);		
+		usleep(200*1000);
 		sprintf(RecordName, "%s%s", filename, LEAVE_MKV_TYPE);
+		ret = leaf_start_video_memo_record(g_LeafCall, RecordName);
 	}
 	
 	return ret;	
@@ -426,11 +429,12 @@ uint32 media_stop_net_leave_rec(uint8 issave)
 
 	if (g_LylyRecordCtrl.mode == LWM_AUDIO || g_LylyRecordCtrl.mode == LWM_AUDIO_PIC)
 	{
-		leaf_stop_net_voice_memo_record(g_LeafCall);
+		leaf_stop_net_voice_memo_record(g_LeafCall, 0);
 	}
 	else
 	{
-
+		leaf_stop_video_memo_record(g_LeafCall);
+		leaf_stop_net_voice_memo_record(g_LeafCall, 1);
 	}
 	
 	if (issave == FALSE)

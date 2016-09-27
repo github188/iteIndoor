@@ -1,4 +1,4 @@
-/** @file
+﻿/** @file
  * ITE DoorBell Indoor Scene Definition.
  *
  * @author Jim Tan

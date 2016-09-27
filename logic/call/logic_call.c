@@ -3623,6 +3623,8 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 				#ifdef _SEND_SDP_PARAM_
 				if (g_Use_SDP == TRUE)
 				{
+					// modi by chenbh 2016-09-26 帧率提高 优化视频
+					#if 0
 					if (storage_get_lyly_enable() && TRUE == is_main_DeviceNo())
 					{
 						memcpy(EchoData+len, &g_lyly_venc_parm, sizeof(VIDEO_SDP_PARAM));
@@ -3631,6 +3633,9 @@ int32 inter_call_distribute(const PRECIVE_PACKET recPacket)
 					{
 						memcpy(EchoData+len, &g_venc_parm, sizeof(VIDEO_SDP_PARAM));
 					}
+					#else
+					memcpy(EchoData+len, &g_venc_parm, sizeof(VIDEO_SDP_PARAM));
+					#endif
 					len += sizeof(VIDEO_SDP_PARAM);
 					memcpy(EchoData+len, &g_audio_parm, sizeof(AUDIO_SDP_PARAM));
 					len += sizeof(AUDIO_SDP_PARAM);

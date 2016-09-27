@@ -1,4 +1,4 @@
-#include <sys/time.h>
+﻿#include <sys/time.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +18,7 @@
     #include <crtdbg.h>
 #endif
 
-#define DOUBLE_KEY_ENABLE
+//#define DOUBLE_KEY_ENABLE
 #define MS_PER_FRAME                17   
 #define MS_PER_FRAME_EXT            33
 #define MAX_COMMAND_QUEUE_SIZE      8

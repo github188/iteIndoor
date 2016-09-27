@@ -115,6 +115,7 @@ uint32 get_fenji_list(void)
 	strcpy(DeviceNo, storage_get_devno_str());
 	len = strlen(DeviceNo);
 	DeviceNo[len-1] = '*';
+	storage_clear_subdev_ips();
 	count = net_get_ips_ext(storage_get_areano(), DEVICE_TYPE_ROOM, DeviceNo, &DevNoList, &IPs);	
 	if (count)
 	{

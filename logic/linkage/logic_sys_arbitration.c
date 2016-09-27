@@ -744,7 +744,8 @@ int32 sys_start_play_leaveword(char *FileName, LYLY_TYPE type, uint8 volume, Med
 
 	// add by chenbh 2016-08-18 先做音量设置
 	media_set_ring_volume(volume);
-	
+
+	dprintf("FileName: %s\n", FileName);
 	// 开始播放留影留言
 	if (LYLY_TYPE_VIDEO == type)
 	{

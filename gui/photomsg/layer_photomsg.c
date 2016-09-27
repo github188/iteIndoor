@@ -894,8 +894,7 @@ void photoMsgReturnBtnOnClicked()
 	{
 		if (gPhotoMsgVideoMode != PHOTOMSG_VIDEOPLAY_STOP)
 		{
-			sys_stop_play_audio(SYS_MEDIA_MUSIC);
-			setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
+			photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_STOP);
 		}
 		else
 		{

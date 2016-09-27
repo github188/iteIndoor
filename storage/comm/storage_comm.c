@@ -2039,6 +2039,27 @@ uint32 storage_clear_subdev_ip(void)
 }
 
 /*************************************************
+  Function:    		storage_clear_subdev_ips
+  Description:		清空分机设备IP
+  Input: 			
+  Output:			无
+  Return:			理员机IP
+  Others:
+*************************************************/
+uint32 storage_clear_subdev_ips(void)
+{
+	int i = 0, count;
+	count = sizeof(gpSysParam->Netparam.SubDevIP)/sizeof(uint32);
+	for (i=0; i<count; i++)
+	{
+		gpSysParam->Netparam.SubDevIP[i] = 0;
+	}
+	
+	SaveRegInfo();
+	return TRUE;
+}
+
+/*************************************************
   Function:    		storage_set_subdev_ip
   Description:		设置分机设备IP
   Input: 			
@@ -2048,7 +2069,8 @@ uint32 storage_clear_subdev_ip(void)
 *************************************************/
 uint32 storage_set_subdev_ip(uint8 index, uint32 ip)
 {
-	if (index >=0 && index <= 7)
+	int count = sizeof(gpSysParam->Netparam.SubDevIP)/sizeof(uint32);
+	if (index >=0 && index < count)
 	{
 		gpSysParam->Netparam.SubDevIP[index] = ip;
 	}
@@ -2069,7 +2091,8 @@ uint32 storage_set_subdev_ip(uint8 index, uint32 ip)
 *************************************************/
 uint32 storage_set_subdev_ips(uint8 index, uint32 ip)
 {
-	if (index >=0 && index <= 7)
+	int count = sizeof(gpSysParam->Netparam.SubDevIP)/sizeof(uint32);
+	if (index >=0 && index < count)
 	{
 		gpSysParam->Netparam.SubDevIP[index] = ip;
 	}
@@ -2089,7 +2112,8 @@ uint32 storage_set_subdev_ips(uint8 index, uint32 ip)
 *************************************************/
 uint32 storage_get_subdev_ip(uint8 index)
 {
-	if (index >=0 && index <= 7)
+	int count = sizeof(gpSysParam->Netparam.SubDevIP)/sizeof(uint32);
+	if (index >=0 && index < count)
 	{
 		return gpSysParam->Netparam.SubDevIP[index];
 	}

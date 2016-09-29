@@ -351,10 +351,10 @@ bool setMainBackgroundImg()
 	}
 
 	tmpIndex = storage_get_desk();
-	//if (tmpIndex == gMainBackgroundIndex)
-	//{
-	//	return false;
-	//}
+	if (tmpIndex == gMainBackgroundIndex)
+	{
+		return false;
+	}
 	gMainBackgroundIndex = tmpIndex;
 
 	memset(tmpAddr, 0, sizeof(tmpAddr));
@@ -384,6 +384,7 @@ bool setMainBackgroundImg()
 	if (gMainBackgroundImageData)
 	{
 		ituIconLoadJpegData((ITUIcon*)mainBackgroundImgIcon, gMainBackgroundImageData, gMainBackgroundImageSize);
+		mainBackgroundImgIcon->widget.flags |= ITU_EXTERNAL_IMAGE;
 	}
 	else
 	{

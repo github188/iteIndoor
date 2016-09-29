@@ -32,7 +32,7 @@ static ITUButton*		photoMsgPreVideoButton = NULL;
 static ITUButton*		photoMsgNextVideoButton = NULL;
 static ITUWidget*		photoMsgBottomBarContainer0 = NULL;
 static ITUWidget*		photoMsgBottomBarContainer1 = NULL;
-static ITUWidget*		photoMsgListMiniPicIcon = NULL;
+static ITUIcon*			photoMsgListMiniPicIcon = NULL;
 static ITUWidget*		photoMsgListTimeText = NULL;
 static ITUWidget*		photoMsgListSenderText = NULL;
 static ITUText*			photoMsgTipsText = NULL;
@@ -449,7 +449,8 @@ void setPhotoMsgList()
 				switch (gPhotoMsgList->LylyInfo[i].LyType)
 				{
 				case LYLY_TYPE_AUDIO:
-					setPhotoMsgListMiniIcon(i, "");
+					sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_audio.jpg");
+					setPhotoMsgListMiniIcon(i, tmpAddr);
 					break;
 
 				case LYLY_TYPE_PIC_AUDIO:
@@ -458,6 +459,8 @@ void setPhotoMsgList()
 					break;
 
 				case LYLY_TYPE_VIDEO:
+					sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_video.jpg");
+					setPhotoMsgListMiniIcon(i, tmpAddr);
 					break;
 
 				default:
@@ -489,7 +492,8 @@ void setPhotoMsgList()
 				switch (gPhotoMsgList->LylyInfo[i].LyType)
 				{
 				case LYLY_TYPE_AUDIO:
-					setPhotoMsgListMiniIcon(i, "");
+					sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_audio.jpg");
+					setPhotoMsgListMiniIcon(i, tmpAddr);
 					break;
 
 				case LYLY_TYPE_PIC_AUDIO:
@@ -498,6 +502,8 @@ void setPhotoMsgList()
 					break;
 
 				case LYLY_TYPE_VIDEO:
+					sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_video.jpg");
+					setPhotoMsgListMiniIcon(i, tmpAddr);
 					break;
 
 				default:
@@ -592,6 +598,7 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	if (gPhotoMsgListIconData)
 	{
 		ituIconLoadJpegData((ITUIcon*)photoMsgListMiniPicIcon, gPhotoMsgListIconData, gPhotoMsgListIconSize);
+		photoMsgListMiniPicIcon->widget.flags |= ITU_EXTERNAL_IMAGE;
 	}
 	else
 	{

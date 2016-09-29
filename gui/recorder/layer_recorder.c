@@ -27,12 +27,10 @@ static ITUText*			recorderRecordText = NULL;
 static ITUIcon*			recorderRecordTopLeftIcon = NULL;
 static ITUButton*		recorderRecordNullButton = NULL;
 static ITURadioBox*		recorderRecordRadioBox = NULL;
-
 static ITUButton*		recorderRecordStartButton = NULL;
 static ITUButton*		recorderRecordPauseButton = NULL;
 static ITUButton*		recorderRecordPlayButton = NULL;
 static ITUButton*		recorderRecordStopButton = NULL;
-
 
 //静态全局参数，用户保存界面状态信息等参数
 static uint8_t		gRecorderPlayVol;			//用来记录播放音量

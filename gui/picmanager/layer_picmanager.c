@@ -348,7 +348,7 @@ void picManagerRetutnBtnOnClicked()
 	if (ituWidgetIsVisible(picManagerPictureCoverFlow))
 	{
 		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
-		setPicManagerMiniPicList();
+		//setPicManagerMiniPicList();
 	}
 	else if (!ituWidgetIsVisible(picManagerPicEditContainer))
 	{
@@ -615,6 +615,7 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 	if (gPicManagerImageData)
 	{
 		ituIconLoadJpegData((ITUIcon*)picManagerMiniPicIcon, gPicManagerImageData, gPicManagerImageSize);
+		picManagerMiniPicIcon->widget.flags |= ITU_EXTERNAL_IMAGE;
 	}
 	else
 	{

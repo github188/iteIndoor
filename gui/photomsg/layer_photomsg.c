@@ -813,7 +813,7 @@ void photoMsgPlayingStopCallback()
 int32 photoMsgPlayingCallback(int32 playTime, int32 playPrecent, int32 state)
 {
 	printf("\n 22222222222222222222222photoMsgPlayingCallback  time = %d  percent = %d state = %d \n", playTime, playPrecent, state);
-	recorderStopBtnOnClicked();
+	photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_STOP);
 
 	return 0;
 }

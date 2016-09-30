@@ -460,12 +460,17 @@ char* getDeviceNo()
 
 void setDeviceNo(char* deviceno)
 {
-	if (!mainDeviceNoText)
+	char tmpStr[50] = { 0 };
+	uint8_t i = 0;
+
+	for (i = 0; i < 2; i++)
 	{
-		mainDeviceNoText = ituSceneFindWidget(&theScene, "mainDeviceNoText");
+		sprintf(tmpStr, "%s%d", "mainDeviceNoText", i);
+		mainDeviceNoText = ituSceneFindWidget(&theScene, tmpStr);
 		assert(mainDeviceNoText);
+
+		ituTextSetString(mainDeviceNoText, deviceno);
 	}
-	ituTextSetString(mainDeviceNoText, deviceno);
 
 	free(deviceno);
 }

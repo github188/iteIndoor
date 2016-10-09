@@ -227,6 +227,8 @@ gui/call/layer_video.c
 gui/call/layer_monitor.c
 gui/call/layer_rtsp_search.c
 gui/call/layer_rtsp_monitor.c
+gui/jd/layer_aurine_jd.h
+gui/jd/layer_aurine_jd.c
 gui/alarm/layer_alarm.h
 gui/alarm/layer_alarm.c
 gui/comm/au_model_func.c	
@@ -271,6 +273,7 @@ gui/set/project/layer_set_jd_param.c
 gui/set/project/layer_set_jd_learn_ir.c
 gui/set/msg/layer_msg_fail_hint_success.c
 gui/set/msg/layer_msg_link_out_time.c
+gui/set/msg/layer_msg_wait_hit.c
 gui/set/layer_set.h
 gui/screensaver/layer_screensaver.c
 gui/screensaver/layer_screensaver.h

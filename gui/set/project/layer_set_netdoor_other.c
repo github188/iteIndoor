@@ -57,11 +57,11 @@ static void OnNetDoorDeal(uint32 wParam)
 		ret = logic_set_netdoor_other_settings(g_value);
 		if (NETDOOR_ECHO_SUCESS == ret)
 		{
-			ShowMsgFailHintSuccessLayer(2, SID_Msg_Save_OK, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Msg_Save_OK, "SetNetDoorOtherLayer");
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Msg_Save_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Save_Err, "SetNetDoorOtherLayer");
 		}
 		break;
 	}
@@ -152,7 +152,7 @@ void SetNetDoorOtherLayerOnReturn()
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(1, SID_Msg_Param_Save, 1);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Param_Save, "SetNetDoorOtherLayer");
 		}
 		
 		return;

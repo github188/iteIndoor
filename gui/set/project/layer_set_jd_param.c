@@ -76,7 +76,7 @@ static int save_param()
 	{
 		if (strlen(g_devinfo.Name) == 0)
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Dev_Noname, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Dev_Noname, "SetJdParamLayer");
 			return FALSE;
 		}
 	}
@@ -92,7 +92,7 @@ static int save_param()
 				g_devinfo.TextIDName == 0 || g_devinfo.TextIDName == SID_Jd_None)
 			#endif
 			{
-				ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Dev_Noname, 0);
+				ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Dev_Noname, "SetJdParamLayer");
 				return FALSE;
 			}
 		}
@@ -102,15 +102,15 @@ static int save_param()
 	switch (ret)
 	{
 	case ECHO_STORAGE_SAME_NAME:
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Name_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Name_Err, "SetJdParamLayer");
 		return FALSE;
 
 	case ECHO_STORAGE_SAME_ADDR:
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Adr_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Adr_Err, "SetJdParamLayer");
 		return FALSE;
 
 	case ECHO_STORAGE_ERR:
-		ShowMsgFailHintSuccessLayer(0, SID_Msg_Save_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Save_Err, "SetJdParamLayer");
 		return FALSE;
 
 	case ECHO_STORAGE_OK:
@@ -276,7 +276,7 @@ static void KeyBordGotoSetJDParamOnEnterShow()
 
 	if (address > 254)
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Adr_Max_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Adr_Max_Err, "SetJdParamLayer");
 	}
 	else
 	{
@@ -911,7 +911,7 @@ bool SetJdParamAddressButtonOnMouseUp(ITUWidget* widget, char* param)
 	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%d", addr2);
 
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 3, EXPRESS_CHAR, CANCEL_BTN, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 3, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetJdParamLayer");
 
 	return true;
 }

@@ -42,6 +42,7 @@
 #include "recorder/layer_recorder.h"
 #include "picmanager/layer_picmanager.h"
 #include "call/layer_call.h"
+#include "jd/layer_aurine_jd.h"
 #include "set/layer_set.h"
 #include "alarm/layer_alarm.h"
 #include "screensaver/layer_screensaver.h"

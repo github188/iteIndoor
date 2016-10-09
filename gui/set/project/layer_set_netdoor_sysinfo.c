@@ -142,7 +142,7 @@ static void show_updata()
 			break;
 
 		case 5:
-			sprintf(value, "%s", UlongtoIP(g_param.ManagerIP));
+			sprintf(value, "%s", UlongtoIP(g_param.ManagerIP[0]));
 			break;
 
 		case 6:

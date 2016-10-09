@@ -77,6 +77,7 @@ ITUActionFunction actionFunctions[] =
 	"BeCallShowButtomBackgroundOnMouseUp", BeCallShowButtomBackgroundOnMouseUp,
 	"BeCallButtomSoundButtonOnMouseUp", BeCallButtomSoundButtonOnMouseUp,
 	"BeCallButtomSoundOnChanged", BeCallButtomSoundOnChanged,
+	"BeCallHideSoundOnMouseUp", BeCallHideSoundOnMouseUp,
 	"BeCallLayerOnTimer", BeCallLayerOnTimer,
 	"BeCallCallOutState", BeCallCallOutState,
 	"BeCallCallInState", BeCallCallInState,
@@ -96,6 +97,7 @@ ITUActionFunction actionFunctions[] =
 	"MonitorShowButtomBackgroundOnMouseUp", MonitorShowButtomBackgroundOnMouseUp,
 	"MonitorButtomSoundButtonOnMouseUp", MonitorButtomSoundButtonOnMouseUp,
 	"MonitorButtomSoundOnChanged", MonitorButtomSoundOnChanged,
+	"MonitorHideSoundOnMouseUp", MonitorHideSoundOnMouseUp,
 	"MonitorLayerOnTimer", MonitorLayerOnTimer,
 	"MonitorState", MonitorState,
 	"MonitorKeyOnMouseUp", MonitorKeyOnMouseUp,
@@ -114,6 +116,21 @@ ITUActionFunction actionFunctions[] =
 	"RTSPMonitorLayerOnTimer", RTSPMonitorLayerOnTimer,
 	"RTSPMonitorState", RTSPMonitorState,
 	"RTSPMonitorLayerShowBottomButtonOnMouseUp", RTSPMonitorLayerShowBottomButtonOnMouseUp,
+
+	// AurineJDLayer
+	"AurineJDWin", AurineJDWin,
+	"AurineJDLayerOnEnter", AurineJDLayerOnEnter,
+	"AurineJDLayerButtonOnMouseUp", AurineJDLayerButtonOnMouseUp,
+	"AurineJDLayerOnTimer", AurineJDLayerOnTimer,
+	"AurineJDSceneButtonOnMouseUp", AurineJDSceneButtonOnMouseUp,
+	"AurineJDLightUnControlButtonOnMouseUp", AurineJDLightUnControlButtonOnMouseUp,
+	"AurineJDLightControlButtonOnMouseUp", AurineJDLightControlButtonOnMouseUp,
+	"AurineJDAirButtonOnMouseUp", AurineJDAirButtonOnMouseUp,
+	"AurineJDCurtainButtonOnMouseUp", AurineJDCurtainButtonOnMouseUp,
+	"AurineJDPowerButtonOnMouseUp", AurineJDPowerButtonOnMouseUp,
+	"AurineJDGasButtonOnMouseUp", AurineJDGasButtonOnMouseUp,
+	"AurineJDLightOnChanged", AurineJDLightOnChanged,
+	"AurineJDExitLightControlButtonOnMouseUp", AurineJDExitLightControlButtonOnMouseUp,
 
 	//Alarm
 	"AlarmOnEnter", AlarmOnEnter,
@@ -166,9 +183,10 @@ ITUActionFunction actionFunctions[] =
 	"SetNoDisturbTimeRadioBoxOnMouseUp", SetNoDisturbTimeRadioBoxOnMouseUp,
 
 	//Set_Numkeybord_Layer
-	"SetNumKeyBordOnEnter", SetNumKeyBordOnEnter,
+	//"SetNumKeyBordOnEnter", SetNumKeyBordOnEnter,
 	"SetNumKeyBord1ButtonOnMouseUp", SetNumKeyBord1ButtonOnMouseUp,
 	"SetNumKeyBordYesButtonOnMouseUp", SetNumKeyBordYesButtonOnMouseUp,
+	"SetNumKeyBordDelButtonOnMouseLongPress", SetNumKeyBordDelButtonOnMouseLongPress,
 	"SetNumKeyBordLayerOnLeave", SetNumKeyBordLayerOnLeave,
 
 	//Set_Password_Layer
@@ -243,6 +261,8 @@ ITUActionFunction actionFunctions[] =
 	"SetYujingTimeButtonOnMouseUp", SetYujingTimeButtonOnMouseUp,
 	"SetYujingTimeMsgRadioBoxOnMouseUp", SetYujingTimeMsgRadioBoxOnMouseUp,
 	"SetGeliAndJufangButtonOnMouseUp", SetGeliAndJufangButtonOnMouseUp,
+	"SetUserJDModeButtonOnMouseUp", SetUserJDModeButtonOnMouseUp,
+	"SetUserALarmModeButtonOnMouseUp", SetUserALarmModeButtonOnMouseUp,
 
 	//Set_Alarm_Remote
 	"SetAlarmRemoteOnEnter", SetAlarmRemoteOnEnter,
@@ -269,12 +289,12 @@ ITUActionFunction actionFunctions[] =
 	"SetDevnoOnEnter", SetDevnoOnEnter,
 	"SetDevnoListButtonOnMouseUp", SetDevnoListButtonOnMouseUp,
 
-	//	Set_Dianti_IP
+	// Set_Dianti_IP
 	"SetDiantiParamOnEnter", SetDiantiParamOnEnter,
 	"SetDiantiParamIPButtonOnMouseUp", SetDiantiParamIPButtonOnMouseUp,
 
 	// MsgFailHintSuccess
-	"MsgFailHintSuccessOnEnter", MsgFailHintSuccessOnEnter,
+	//"MsgFailHintSuccessOnEnter", MsgFailHintSuccessOnEnter,
 	"MsgFailHintSuccessButtonOnMouseUp", MsgFailHintSuccessButtonOnMouseUp,
 	"MsgFailHintSuccessLayerOnLeave", MsgFailHintSuccessLayerOnLeave,
 
@@ -282,6 +302,8 @@ ITUActionFunction actionFunctions[] =
 	"SetProjectOnEnter", SetProjectOnEnter,
 	"SetPrjProjectPwdButtonOnMouseUp", SetPrjProjectPwdButtonOnMouseUp,
 	"SetPrjBackButtonOnMouseUp", SetPrjBackButtonOnMouseUp,
+	"SetPrjJDButtonOnMouseUp", SetPrjJDButtonOnMouseUp,
+	"SetPrjAlarmButtonOnMouseUp", SetPrjAlarmButtonOnMouseUp,
 
 	// Set_Rtsp
 	"SetRtspOnEnter", SetRtspOnEnter,
@@ -299,6 +321,7 @@ ITUActionFunction actionFunctions[] =
 	// Set_Net_Door
 	"SetNetDoorOnEnter", SetNetDoorOnEnter,
 	"SetNetDoorNumButtonOnMouseUp", SetNetDoorNumButtonOnMouseUp,
+	//"SetNetDoorLayerOnTimer", SetNetDoorLayerOnTimer,
 
 	// Msg_Link_OutTime
 	"MsgLinkOutTimeOnTimer", MsgLinkOutTimeOnTimer,
@@ -385,6 +408,10 @@ ITUActionFunction actionFunctions[] =
 	"SetJdSceneNameMsgFalseButtonOnMouseUp", SetJdSceneNameMsgFalseButtonOnMouseUp,
 	"SetJdSceneNameMsgButtonOnMouseUp", SetJdSceneNameMsgButtonOnMouseUp,
 	"SetJdSceneAddrMsgButtonOnMouseUp", SetJdSceneAddrMsgButtonOnMouseUp,
+	"SetJdScenceParamAddressButtonOnMouseUp", SetJdScenceParamAddressButtonOnMouseUp,
+
+	// Msg_Wait_Hit_Layer
+	"MsgWaitHitLayerOnTimer", MsgWaitHitLayerOnTimer,
 
 
     NULL, NULL

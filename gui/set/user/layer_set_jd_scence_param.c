@@ -197,9 +197,9 @@ static void KeyBordGotoSetJDScenceParamOnEnterShow()
 
 	address = (uint16)atoi(get_keybord_text);
 
-	if ((address > 254) && (address < 6))
+	if ((address > 254) && (address < 16))
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Adr_Max_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Adr_Max_Err, "SetJdScenceParamLayer");
 	}
 	else
 	{
@@ -366,6 +366,29 @@ bool SetJdScenceParamNameButtonOnMouseUp(ITUWidget* widget, char* param)
 	ituRadioBoxSetChecked(SetJdSceneNameMsgAddressRadioBox, true);
 	ituWidgetDisable(SetJdScenceParamBackground);
 	ituWidgetSetVisible(SetJdSceneNameMsgBackground, true);
+
+	return true;
+}
+
+/*************************************************
+Function:		SetJdScenceParamAddressButtonOnMouseUp
+Description: 	地址按键按下处理函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetJdScenceParamAddressButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	char tmp[50];
+	uint16 addr1, addr2;
+
+	memset(tmp, 0, sizeof(tmp));
+	addr2 = g_sceneinfo.Address;
+	addr2 &= 0xff;
+	sprintf(tmp, "%d", addr2);
+
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 3, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetJdScenceParamLayer");
 
 	return true;
 }
@@ -724,7 +747,7 @@ static int save_param()
 		if (g_text_new[0] == 0 || g_text_new[0] == SID_Jd_None ||
 			g_text_new[1] == 0 || g_text_new[1] == SID_Jd_None)
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Scene_Noname, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Scene_Noname, "SetJdScenceParamLayer");
 			return FALSE;
 		}
 	}
@@ -739,19 +762,19 @@ static int save_param()
 	switch (ret)
 	{
 	case ECHO_STORAGE_SAME_NAME:
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Name_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Name_Err, "SetJdScenceParamLayer");
 		return FALSE;
 
 	case ECHO_STORAGE_SAME_ADDR:
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Adr_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Adr_Err, "SetJdScenceParamLayer");
 		return FALSE;
 
 	case ECHO_STORAGE_ERR:
-		ShowMsgFailHintSuccessLayer(0, SID_Msg_Save_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Save_Err, "SetJdScenceParamLayer");
 		return FALSE;
 
 	case ECH0_STORAGE_ERR_ADDR:
-		ShowMsgFailHintSuccessLayer(0, SID_Jd_Set_Adr_Max_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Jd_Set_Adr_Max_Err, "SetJdScenceParamLayer");
 		return FALSE;
 
 	case ECHO_STORAGE_OK:

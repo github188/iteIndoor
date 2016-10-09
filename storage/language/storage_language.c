@@ -302,6 +302,9 @@ const char * get_str(STRID_E id)
 	case SID_Set_Rtsp_Channel_Null:
 		return ESID_Set_Rtsp_Channel_Null;
 
+	case SID_Set_Ring_Tips_Fail:
+		return ESID_Set_Ring_Tips_Fail;
+
 	case SID_Msg_Connect_Outtime:
 		return ESID_Msg_Connect_Outtime;
 
@@ -341,8 +344,9 @@ const char * get_str(STRID_E id)
 	case SID_Msg_Obtain_Jd_False:
 		return ESID_Msg_Obtain_Jd_False;
 
-	case SID_Set_Ring_Tips_Fail:
-		return ESID_Set_Ring_Tips_Fail;
+	case SID_Msg_JD_Mode_Unused:
+		return ESID_Msg_JD_Mode_Unused;
+
 
 // IP协议转换器
 	case SID_Set_Unbounded:
@@ -366,8 +370,11 @@ const char * get_str(STRID_E id)
 	case SID_Set_Offline:
 		return ESID_Set_Offline;
 
+	case SID_Set_Bind_OK:
+		return ESID_Set_Bind_OK;
 
-
+	case SID_Set_Bind_Fail:
+		return ESID_Set_Bind_Fail;
 
 // 网络门前机文字
 	case SID_Net_Door:
@@ -545,6 +552,11 @@ const char * get_str(STRID_E id)
 	case SID_Bj_Alarm_Clear_data:
 		return ESID_Bj_Alarm_Clear_data;
 
+	case SID_Bj_Mode_Unused:
+		return ESID_Bj_Mode_Unused;
+
+	case SID_Bj_Set_Err:
+		return ESID_Bj_Set_Err;
 
 // 对讲文字
 	case SID_MainMonitor_Door:

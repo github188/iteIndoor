@@ -281,6 +281,7 @@ bool mainBtnOnClicked(ITUWidget* widget, char* param)
 		else
 		{
 			//TOTO:添加家电界面接口（AurineJDWin）
+			AurineJDWin();
 		}
 		break;
 

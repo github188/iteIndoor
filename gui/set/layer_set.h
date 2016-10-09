@@ -34,6 +34,22 @@ extern "C" {
 		SPOT_BTN = 1,					// .
 	}SPRITE_KEYBORD_BTN_TYPE;
 
+	//提示框layer枚举定义
+	//图标显示第几个	0：	1：	2：“√”
+	typedef enum
+	{
+		HIT_SPRITE_TO_ERROR	    = 0,					// “X”				
+		HIT_SPRITE_TO_WARNNING	= 1,					// “！”
+		HIT_SPRITE_TO_OK		= 2,					// “√”
+	}HIT_ICON_TYPE;
+#if 0
+	//calendarflag:	显示一个按键还是两个按键
+	typedef enum
+	{
+		HIT_BUTTON_OK = 0,					// 确认				
+		HIT_BUTTON_OK_NO = 1,					// 确认，取消
+	}HIT_BUTTON_TYPE;
+#endif
 
 	//Set_Botton_Return_Layer
 	bool SetBottonReturnOnEnter(ITUWidget* widget, char* param);
@@ -76,11 +92,12 @@ extern "C" {
 	void SetNoDisturLayerOnReturn(void);
 
 	//Set_Numkeybord_Layer
-	bool SetNumKeyBordOnEnter(ITUWidget* widget, char* param);
+	//bool SetNumKeyBordOnEnter(ITUWidget* widget, char* param);
 	bool SetNumKeyBord1ButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetNumKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetNumKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param);
 	bool SetNumKeyBordLayerOnLeave(ITUWidget* widget, char* param);
-	void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, NUM_CAHR_TYPE text_flag, SPRITE_KEYBORD_BTN_TYPE sprite_flag, char * buf);
+	void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, NUM_CAHR_TYPE text_flag, SPRITE_KEYBORD_BTN_TYPE sprite_flag, char * buf, char* old_layer);
 	void SetNumKeyBordLayerOnReturn(void);
 
 	//Set_Password_Layer
@@ -162,6 +179,8 @@ extern "C" {
 	bool SetYujingTimeButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetYujingTimeMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param);
 	bool SetGeliAndJufangButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetUserJDModeButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetUserALarmModeButtonOnMouseUp(ITUWidget* widget, char* param);
 	void SetUserLayerOnReturn(void);
 
 	//Set_Alarm_Remote
@@ -197,15 +216,17 @@ extern "C" {
 	bool SetDiantiParamIPButtonOnMouseUp(ITUWidget* widget, char* param);
 
 	// MsgFailHintSuccess
-	bool MsgFailHintSuccessOnEnter(ITUWidget* widget, char* param);
+	//bool MsgFailHintSuccessOnEnter(ITUWidget* widget, char* param);
 	bool MsgFailHintSuccessButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool MsgFailHintSuccessLayerOnLeave(ITUWidget* widget, char* param);
-	void ShowMsgFailHintSuccessLayer(uint8 spriteflag, uint32 id, uint8 calendarflag);
+	void ShowMsgFailHintSuccessLayer(HIT_ICON_TYPE spriteflag, uint32 id, char* old_layer);
 
 	// Set_Project
 	bool SetProjectOnEnter(ITUWidget* widget, char* param);
 	bool SetPrjProjectPwdButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetPrjBackButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetPrjJDButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetPrjAlarmButtonOnMouseUp(ITUWidget* widget, char* param);
 
 	// Set_Rtsp
 	bool SetRtspOnEnter(ITUWidget* widget, char* param);
@@ -226,6 +247,7 @@ extern "C" {
 	// Set_Net_Door
 	bool SetNetDoorOnEnter(ITUWidget* widget, char* param);
 	bool SetNetDoorNumButtonOnMouseUp(ITUWidget* widget, char* param);
+	//bool SetNetDoorLayerOnTimer(ITUWidget* widget, char* param);
 	void SetNetDoorLayerOnReturn();
 
 	// Msg_Link_OutTime
@@ -319,12 +341,18 @@ extern "C" {
 	bool SetJdScenceParamOnEnter(ITUWidget* widget, char* param);
 	bool SetJdScenceParamEnableButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetJdScenceParamNameButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdScenceParamAddressButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetJdSceneNameMsgTureButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetJdSceneNameMsgFalseButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetJdSceneNameMsgButtonOnMouseUp(ITUWidget* widget, char* param);
 	bool SetJdSceneAddrMsgButtonOnMouseUp(ITUWidget* widget, char* param);
 	uint32 SetAurinJDSceneList(uint8 Index, PJD_SCENE_INFO_LIST sencelist);
 	void SetJDSceneParamLayerOnReturn(void);
+
+	// Msg_Wait_Hit_Layer
+	void MsgWaitHitLayerOnShow(char* old_layer);
+	void MsgWaitHitLayerOnHide();
+	bool MsgWaitHitLayerOnTimer(ITUWidget* widget, char* param);
 
 
 #ifdef __cplusplus

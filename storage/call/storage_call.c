@@ -462,23 +462,20 @@ uint8 storage_get_callrecord_state(void)
   Return:		нч
   Others:		
 *************************************************/
-void storage_set_callrecord_state(PMCALLLISTINFO calllist)
+void storage_set_callrecord_state(void)
 {
-#if 0
 	uint8 i;
-
 	PMCALLLISTINFO calllist = storage_get_callrecord(MISSED);
 
 	if (calllist && calllist->CallCount > 0)
 	{
 		for (i = 0; i < calllist->CallCount; i++)
 		{
-			calllist->CallInfo[i].ReadFlag = 0;
+			calllist->CallInfo[i].UnRead = 0;
 		}
 	}
-#endif
 	save_call_storage(FLAG_CALLMISS, calllist);
-	//free_call_memory(&calllist);
+	free_call_memory(&calllist);
 }
 
 

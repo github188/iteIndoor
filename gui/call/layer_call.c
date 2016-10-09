@@ -406,7 +406,8 @@ static void ShowRecordWin(CALL_TYPE Calltype)
 
 		if (Calltype == MISSED)
 		{
-			storage_set_callrecord_state(g_CallRecord);
+			storage_set_callrecord_state();
+			sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
 		}
 		SetRecordShowNum(max);
 	}

@@ -330,6 +330,7 @@ void hw_stop_feet_dog(void)
 	jd_stop_feet_dog(buf, sizeof(buf));
 	jd_stop_feet_dog(buf, sizeof(buf));
 	jd_stop_feet_dog(buf, sizeof(buf));
+	FeetDog = 1;
 	#else
 	FeetDog = 1;
 	#endif
@@ -697,7 +698,7 @@ int32 init_jd_callbackt(JdCallBack func)
 		JdCallBackFunc = func;			
 
 		// 底下注释掉 会导致按复位键和断电重启起不来现象
-		#if 1
+		#if 0
 		pthread_attr_init(&attr);
 		attr.stacksize = UART_STACK_SIZE;
 		pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED);

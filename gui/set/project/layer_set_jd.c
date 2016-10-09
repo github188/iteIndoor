@@ -321,7 +321,7 @@ bool SetJDUpdataButtonOnMouseUp(ITUWidget* widget, char* param)
 	{
 		if (!get_ipmodule_online())
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Msg_IP_Unline, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_IP_Unline, "SetJDLayer");
 		}
 		else
 		{
@@ -331,7 +331,7 @@ bool SetJDUpdataButtonOnMouseUp(ITUWidget* widget, char* param)
 			}
 			else
 			{
-				ShowMsgFailHintSuccessLayer(0, SID_Msg_Obtain_Jd_False, 0);
+				ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Obtain_Jd_False, "SetJDLayer");
 			}
 		}
 	}

@@ -68,13 +68,14 @@ Others:
 *************************************************/
 static void KeyBordGotoSetNetParam()
 {
+	uint8 tmp[30];
 	ITUText* IPtext[IP_MAX] = { SetHostIP2Text, SetHostNetMask2Text, SetHostGateWay2Text, SetCenterServerIP2Text, 
 								SetManageIP12Text, SetManageIP22Text, SetManageIP32Text, 0, 0, SetRtspIP2Text };
 	char* IP_data = ituTextGetString(SetNumKeyBordTextBox);
 	int ret = IPIsCorrect(IP_data);
 	if (FALSE == ret)
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_IP_Address_Err, "SetNetParamLayer");
 	}
 	else
 	{
@@ -91,7 +92,10 @@ static void KeyBordGotoSetNetParam()
 			{
 				g_ip_host[g_ipType] = data;
 			}
-			ituTextSetString(IPtext[g_ipType], IP_data);
+
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s", UlongtoIP(data));
+			ituTextSetString(IPtext[g_ipType], tmp);
 		}
 	}
 }
@@ -199,7 +203,6 @@ bool SetNetParamOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(SetNetParamContainer, true);
 	}
 
-
 	return true;
 }
 
@@ -220,8 +223,7 @@ bool SetNetParamHostButtonOnMouseUp(ITUWidget* widget, char* param)
 	for (i = 0; i < 3; i++)
 	{
 		memset(tmp, 0, sizeof(tmp));
-		//change_ip_to_str(g_ip[HOST_IPADDR + i], tmp);
-		sprintf(tmp, "%s", UlongtoIP(g_ip[HOST_IPADDR + i]));
+		sprintf(tmp, "%s", UlongtoIP(g_ip_host[HOST_IPADDR + i]));
 		ituTextSetString(text[i], tmp);
 	}
 	
@@ -244,11 +246,9 @@ bool SetNetParamSeverButtonOnMouseUp(ITUWidget* widget, char* param)
 	char tmp[30];
 		
 	memset(tmp, 0, sizeof(tmp));
-	//change_ip_to_str(g_ip[CENTER_IPADDR], tmp);
 	sprintf(tmp, "%s", UlongtoIP(g_ip[CENTER_IPADDR]));
 	ituTextSetString(SetCenterServerIP2Text, tmp);
 	memset(tmp, 0, sizeof(tmp));
-	//change_ip_to_str(g_ip[RTSP_IPADDR], tmp);
 	sprintf(tmp, "%s", UlongtoIP(g_ip[RTSP_IPADDR]));
 	ituTextSetString(SetRtspIP2Text, tmp);
 	
@@ -300,10 +300,17 @@ bool SetAllNetParamButtonOnMouseUp(ITUWidget* widget, char* param)
 	g_ipType = (IP_TYPE)index;
 	
 	memset(tmp, 0, sizeof(tmp));
-	//change_ip_to_str(g_ip[index], tmp);
-	sprintf(tmp, "%s", UlongtoIP(g_ip[index]));
 
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
+	if (g_ipType > HOST_GATEWAY)
+	{
+		sprintf(tmp, "%s", UlongtoIP(g_ip[index]));
+	}
+	else
+	{
+		sprintf(tmp, "%s", UlongtoIP(g_ip_host[index]));
+	}
+
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp, "SetNetParamLayer");
 
 	return true;
 }
@@ -330,7 +337,7 @@ void SetNetParamLayerOnReturn(void)
 	{
 		if (0 != strncasecmp(g_ip, g_ip_host, sizeof(g_ip_host)))
 		{
-			ShowMsgFailHintSuccessLayer(1, SID_Msg_Param_Suer_Save, 1);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Param_Suer_Save, "SetNetParamLayer");
 		}
 		else
 		{

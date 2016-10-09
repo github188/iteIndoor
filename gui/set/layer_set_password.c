@@ -300,11 +300,11 @@ bool SetPasswordMsgNewPassBtnRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 
 	if (PRJPASSWORDPAGE == g_page_pass)
 	{
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, CIPHERTEXT, CANCEL_BTN, NULL, "SetPasswordLayer");
 	}
 	else
 	{
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, CIPHERTEXT, CANCEL_BTN, NULL, "SetPasswordLayer");
 	}
 
 	return true;
@@ -324,11 +324,11 @@ bool SetPasswordMsgTruePassBtnRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 
 	if (PRJPASSWORDPAGE == g_page_pass)
 	{
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, CIPHERTEXT, CANCEL_BTN, NULL, "SetPasswordLayer");
 	}
 	else
 	{
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 5, CIPHERTEXT, CANCEL_BTN, NULL, "SetPasswordLayer");
 	}
 
 	return true;
@@ -366,7 +366,7 @@ bool SetPasswordMsgTureButtonOnMouseUp(ITUWidget* widget, char* param)
 	}
 	else
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Pwd_Two_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Pwd_Two_Err, "SetPasswordLayer");
 	}
 
 	memset(g_new_pass, 0, sizeof(g_new_pass));

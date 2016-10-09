@@ -47,7 +47,7 @@ bool SetDiantiParamOnEnter(ITUWidget* widget, char* param)
 		int ret = IPIsCorrect(IP_data);
 		if (FALSE == ret)
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_IP_Address_Err, "SetDiantiParamLayer");
 		}
 		else
 		{
@@ -56,6 +56,8 @@ bool SetDiantiParamOnEnter(ITUWidget* widget, char* param)
 			{
 				storage_set_netparam(0, DIANTI_IPADDR, data);
 
+				memset(tmp, 0, sizeof(tmp));
+				sprintf(tmp, "%s", UlongtoIP(data));
 				ituTextSetString(SetDiantiParamIP2Text, IP_data);
 				g_dianti_ip = data;
 			}	
@@ -78,7 +80,7 @@ bool SetDiantiParamIPButtonOnMouseUp(ITUWidget* widget, char* param)
 	char tmp[40];
 	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%s", UlongtoIP(g_dianti_ip));
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp, "SetDiantiParamLayer");
 
 	return true;
 }

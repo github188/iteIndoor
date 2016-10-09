@@ -179,7 +179,7 @@ uint8 storage_get_callrecord_state(void);
   Return:		无
   Others:		
 *************************************************/
-void storage_set_callrecord_state(PMCALLLISTINFO calllist);
+void storage_set_callrecord_state(void);
 
 /*********************************************************/
 /*					设备号设备规则设置					 */	

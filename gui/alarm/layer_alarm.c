@@ -253,7 +253,6 @@ Others:
 *************************************************/
 static void clone_one_list(uint8 num)
 {
-#if 0
 	char tmp[100];
 	bool result = FALSE;
 	ITUBackground* BackgroundOld = NULL;
@@ -306,7 +305,6 @@ static void clone_one_list(uint8 num)
 		//ituSceneUpdate(AlarmRecordListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
 		ituCoverFlowUpdate((ITUWidget*)AlarmRecordListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
 	}
-#endif
 }
 
 /*************************************************
@@ -482,7 +480,6 @@ Others:
 *************************************************/
 static void clone_one_fangqu_sprite(ITUSprite* old_sprite, uint8 num, char* name_buf)
 {
-#if 0
 	uint8 i;
 	char tmp[100];
 	bool result = FALSE;
@@ -515,7 +512,6 @@ static void clone_one_fangqu_sprite(ITUSprite* old_sprite, uint8 num, char* name
 		
 		ituWidgetUpdate(AlarmMainBackground, ITU_EVENT_LAYOUT, 0, 0, 0);
 	}
-#endif
 }
 
 /*************************************************
@@ -597,20 +593,6 @@ static void update_area_state(uint8 clone_flag)
 				ituWidgetSetVisible(area_type_sprite[i], false);
 				clone_one_fangqu_sprite(area_type_sprite[af_data.area_type[i]], i, tmp);
 			}
-
-			memset(tmp, 0, sizeof(tmp));					//防区按键是否使能
-			sprintf(tmp, "%s%d", "AlarmFqButton", i);
-			AlarmFqButton = ituSceneFindWidget(&theScene, tmp);
-			assert(AlarmFqButton);
-			if (NORM_SHOW_STATE == af_data.show_state[i])
-			{
-				ituWidgetEnable(AlarmFqButton);
-			}
-			else
-			{
-				ituWidgetDisable(AlarmFqButton);
-			}
-
 		}
 	}
 	
@@ -659,6 +641,19 @@ static void update_area_state(uint8 clone_flag)
 			}
 			ituSpriteGoto(clone_area_type_sprite[i], state_to_bmpoder[af_data.show_state[i]]);
 		}	
+
+		memset(tmp, 0, sizeof(tmp));					//防区按键是否使能
+		sprintf(tmp, "%s%d", "AlarmFqButton", i);
+		AlarmFqButton = ituSceneFindWidget(&theScene, tmp);
+		assert(AlarmFqButton);
+		if (NORM_SHOW_STATE == af_data.show_state[i])
+		{
+			ituWidgetEnable(AlarmFqButton);
+		}
+		else
+		{
+			ituWidgetDisable(AlarmFqButton);
+		}
 	}
 }
 
@@ -1492,6 +1487,7 @@ bool AlarmLayerOnGoto(ITUWidget* widget, char* param)
 	debug_log("****** GoTo AlarmLayer***********\n");
 	if (FALSE == storage_get_extmode(EXT_MODE_ALARM))
 	{
+		dprintf("alarm mode not open!!\n");
 		return FALSE;
 	}
 

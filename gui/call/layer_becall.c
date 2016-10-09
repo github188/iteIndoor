@@ -33,6 +33,7 @@ static ITUSprite* BeCallSoundSprite = NULL;
 static ITUContainer* BeCallShowButtomContainer = NULL;
 static ITUBackground* BeCallRightSnapGrayBackground = NULL;
 static ITUButton* BeCallRightSnapButton = NULL;
+static ITUTrackBar* BeCallSoundTrackBar = NULL;
 
 /*****************常量定义***********************/
 static DEVICE_TYPE_E g_DevType;
@@ -311,7 +312,8 @@ static void SetBeCallLockAndSnap(BeCallButtonEvent event)
 				#ifdef _USE_ELEVATOR_			//被动招梯
 				if (g_DevType == DEVICE_TYPE_STAIR)
 				{
-					dianti_set_cmd(ELEVATOR_CALL);
+					// modify caogw 2016-09-29 因视频卡顿现象暂时屏蔽
+					//dianti_set_cmd(ELEVATOR_CALL);
 				}
 				#endif
 				dprintf("becall lock ok!\n");
@@ -331,7 +333,6 @@ static void SetBeCallLockAndSnap(BeCallButtonEvent event)
 		ituWidgetDisable(BeCallRightSnapButton);
 		ituWidgetSetVisible(BeCallRightSnapGrayBackground, true);
 		inter_video_snap();
-		g_MSGSnapTicks = 3;
 	}
 }
 
@@ -564,6 +565,7 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 		case CALL_STATE_TALK:
 			ituWidgetSetVisible(BeCallShowButtomContainer, true);
 			g_volume = storage_get_talkvolume();
+			ituTrackBarSetValue(BeCallSoundTrackBar, g_volume);
 			g_InterState = CALL_STATE_TALK;
 			break;
 
@@ -583,6 +585,7 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 			{
 				ituWidgetSetVisible(BeCallHitBackground, true);
 				ituSpriteGoto(BeCallHitSprite, BeCallSnapMSGIcon);
+				g_MSGSnapTicks = 3;
 			}
 			break;
 
@@ -639,6 +642,7 @@ bool BeCallCallOutState(ITUWidget* widget, char* param)
 		case CALL_STATE_TALK:
 			ituWidgetSetVisible(BeCallShowButtomContainer, true);
 			g_volume = storage_get_talkvolume();
+			ituTrackBarSetValue(BeCallSoundTrackBar, g_volume);
 			g_InterState = CALL_STATE_TALK;
 			break;
 
@@ -703,6 +707,34 @@ bool BeCallButtomSoundButtonOnMouseUp(ITUWidget* widget, char* param)
 	ChangeVolume();
 
 	return true;
+}
+
+/*************************************************
+Function:		BeCallHideSoundOnMouseUp
+Description: 	隐藏声音进度条执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool BeCallHideSoundOnMouseUp(ITUWidget* widget, char* param)
+{
+	if (g_SetVolume)
+	{
+		g_volumeticks = 0;
+		g_SetVolume = FALSE;
+		// 保存铃声或通话音量
+		if (g_InterState == CALL_STATE_CALLING)
+		{
+			storage_set_volume(g_volume, storage_get_talkvolume(), storage_get_keykeep());
+		}
+		else
+		{
+			storage_set_volume(storage_get_ringvolume(), g_volume, storage_get_keykeep());
+		}
+		ituWidgetSetVisible(BeCallBottomBackground, false);
+	}
+	dprintf("g_SetVolume..........%d\n", g_SetVolume);
 }
 
 /*************************************************
@@ -895,6 +927,9 @@ static void InitBeCallLayer(void)
 
 		BeCallRightSnapButton = ituSceneFindWidget(&theScene, "BeCallRightSnapButton");
 		assert(BeCallRightSnapButton);
+
+		BeCallSoundTrackBar = ituSceneFindWidget(&theScene, "BeCallSoundTrackBar");
+		assert(BeCallSoundTrackBar);
 
 		for (i = 0; i < 3; i++)
 		{

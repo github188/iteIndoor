@@ -108,7 +108,8 @@ void stop_disturb_timer(void)
 uint32 get_fenji_list(void)
 {
 	uint32 *IPs  = NULL;
-	PDEVICE_NO *DevNoList;	
+	DEVICE_NO *DevNoList = NULL;	
+	PDEVICE_NO *pDevNoList = NULL;	
 	char DeviceNo[20];
 	uint8 len = 0, count = 0, i = 0;
 	memset(DeviceNo, 0, sizeof(DeviceNo));	
@@ -120,9 +121,10 @@ uint32 get_fenji_list(void)
 	if (count)
 	{
 		dprintf("lgoic_call.c : logic_call_resident : DeviceNo = %s, count = %d , address = %x \n", DeviceNo, count, IPs[0]);
+		pDevNoList = &DevNoList;
 		for (i=0; i<count; i++)
 		{
-			uint8 fenji = (DevNoList[i]->DeviceNo2)%10;			
+			uint8 fenji = (pDevNoList[i]->DeviceNo2)%10;	
 			storage_set_subdev_ips(fenji, IPs[i]);
 		}
 	}			

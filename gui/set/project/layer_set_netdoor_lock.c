@@ -99,11 +99,11 @@ static void OnNetDoorDeal(uint32 wParam)
 	case CMD_NETDOOR_SET_LOCK:
 		if (NETDOOR_ECHO_SUCESS == logic_set_netdevice_lockinfo(g_state[0], g_locktime[0]))
 		{
-			ShowMsgFailHintSuccessLayer(2, SID_Msg_Save_OK, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Msg_Save_OK, "SetNetDoorLockLayer");
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Msg_Save_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Save_Err, "SetNetDoorLockLayer");
 		}
 		break;
 	}
@@ -216,7 +216,7 @@ bool SetNetDoorLockTimeButtonOnMouseUp(ITUWidget* widget, char* param)
 	char tmp[50];
 	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%d", g_locktime[0]);
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 2, EXPRESS_CHAR, CANCEL_BTN, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 2, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetNetDoorLockLayer");
 
 	return true;
 }
@@ -261,7 +261,7 @@ void SetNetDoorLockLayerOnReturn()
 	{
 		if ((g_state[1] != g_state[0]) || (g_locktime[1] != g_locktime[0]))
 		{
-			ShowMsgFailHintSuccessLayer(1, SID_Net_Door_Save_Reboot_Door, 1);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Net_Door_Save_Reboot_Door, "SetNetDoorLockLayer");
 		}
 		else
 		{

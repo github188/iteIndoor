@@ -787,7 +787,7 @@ bool SetLylyRingRecMsgYesButtonOnMouseUp(ITUWidget* widget, char* param)
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Ring_Tips_Fail, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Ring_Tips_Fail, "SetRingtoneLayer");
 		}
 	}
 	return true;
@@ -953,7 +953,7 @@ bool SetLylyRingRecMsgRecStateButtonOnMouseUp(ITUWidget* widget, char* param)
 			{
 				if (is_fileexist(LYLY_HIT_RE_FILE_PATH) == FALSE )
 				{
-					ShowMsgFailHintSuccessLayer(0, SID_Set_Ring_Tips_Fail, 0);
+					ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Ring_Tips_Fail, "SetRingtoneLayer");
 					return true;
 				}
 				ret = sys_start_play_audio(SYS_MEDIA_MUSIC, LYLY_HIT_RE_FILE_PATH, FALSE, PLAY_VOLUME, MediaPlay_Callback, NULL);

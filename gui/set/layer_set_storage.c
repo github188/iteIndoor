@@ -95,7 +95,7 @@ Others:
 *************************************************/
 bool SetStorageCleanDataButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ShowMsgFailHintSuccessLayer(1, SID_Msg_Format, 1);
+	ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Format, "SetStorageLayer");
 
 	return true;
 }

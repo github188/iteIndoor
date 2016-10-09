@@ -76,43 +76,42 @@ Others:
 static void show_win_fenji()
 {
 	uint8 j = 0;
-	uint32 extenNo = 0;
 	char pExtIp[20] = { 0 };
-	uint8 tmp[50] = { 0 };
-	uint32 cOnlineID = 0;
+	uint8 fenji_index[8] = { 0 };
+	uint32 fenji_ip[8] = { 0 };
+	uint8 fenji_mun = 0;
+	char devtype[50], devno[5];
 
 	// 获取IPAD分机信息
-	get_ipad_extension(&g_IpadList);
-
-	for (j = 0; j < g_IpadList.count; j++)
+	memset(fenji_index, 0, sizeof(fenji_index));
+	for (j = 0; j < 8; j++)
 	{
-		extenNo = g_IpadList.ipadData[j].devno;
-		memset(pExtIp, 0, sizeof(pExtIp));
-		sprintf(pExtIp, "%s", UlongtoIP(g_IpadList.ipadData[j].ipAddr));
-		if (g_IpadList.ipadData[j].state == 1)
+		if (storage_get_subdev_ip(j))
 		{
-			cOnlineID = get_str(SID_Set_Online);
+			fenji_index[fenji_mun] = j;
+			fenji_ip[fenji_mun] = storage_get_subdev_ip(j);
+			fenji_mun++;
 		}
-		else
-		{
-			cOnlineID = get_str(SID_Set_Offline);
-		}
-
-		memset(tmp, 0, sizeof(tmp));
-		if (g_bindstatus)
-		{
-			sprintf(tmp, "%s:%d (%s)", get_str(SID_Set_ExtenNo), extenNo, cOnlineID);
-		}
-		else
-		{
-			sprintf(tmp, "%s:%d", get_str(SID_Set_ExtenNo), extenNo);
-		}
-		ituTextSetString(SetIpProtocolFJInfoFenji1Text[j], tmp);
-		ituTextSetString(SetIpProtocolFJInfoFenji2Text[j], pExtIp);
 	}
 
+	if (fenji_mun > 0)
+	{
+		for (j = 0; j < fenji_mun; j++)
+		{
+			memset(devno, 0, sizeof(devno));
+			memset(devtype, 0, sizeof(devtype));
+			sprintf(devno, "%d", fenji_index[j]);
+			get_dev_description(DEVICE_TYPE_FENJI_NET, devno, devtype, 50);
+
+			memset(pExtIp, 0, sizeof(pExtIp));
+			sprintf(pExtIp, "%s", UlongtoIP(fenji_ip[j]));
+
+			ituTextSetString(SetIpProtocolFJInfoFenji1Text[j], devtype);
+			ituTextSetString(SetIpProtocolFJInfoFenji2Text[j], pExtIp);
+		}
+	}
 	
-	if (g_IpadList.count > 4)
+	if (fenji_mun > 4)
 	{
 		ituWidgetSetVisible(SetIpProtocolFenjiListContainer[2], true);
 	}
@@ -120,11 +119,11 @@ static void show_win_fenji()
 	{
 		ituWidgetSetVisible(SetIpProtocolFenjiListContainer[2], false);
 	}
-	for (j = 0; j < g_IpadList.count; j++)
+	for (j = 0; j < fenji_mun; j++)
 	{
 		ituWidgetSetVisible(SetIpProtocolFJInfoFenjiContainer[j], true);
 	}
-	for (j = g_IpadList.count; j < MAX_SHOW_FENJI_NUM; j++)
+	for (j = fenji_mun; j < MAX_SHOW_FENJI_NUM; j++)
 	{
 		ituWidgetSetVisible(SetIpProtocolFJInfoFenjiContainer[j], false);
 	}
@@ -140,8 +139,8 @@ Others:
 *************************************************/
 static void KeyBordGotoSetIpProtocol()
 {
-	//char tmp[50];
 	uint32 ip_data = 0;
+	char tmp[50];
 
 	char* text_data = ituTextGetString(SetNumKeyBordTextBox);
 	if (0 == buttonflag)
@@ -154,15 +153,15 @@ static void KeyBordGotoSetIpProtocol()
 		int ret = IPIsCorrect(text_data);
 		if (FALSE == ret)
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_IP_Address_Err, "SetIpProtocolFenjiLayer");
 		}
 		else
 		{
 			g_ip = IPtoUlong(text_data);
 
-			//memset(tmp, 0, sizeof(tmp));
-			//sprintf(tmp, "%s", UlongtoIP(g_ip));
-			ituTextSetString(SetIpProtocolIPFenji2Text, text_data);
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s", UlongtoIP(g_ip));
+			ituTextSetString(SetIpProtocolIPFenji2Text, tmp);
 		}
 	}		
 }
@@ -256,7 +255,7 @@ bool SetIpProtocolBindNumFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 	
 	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%d", g_extcode);
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, EXPRESS_CHAR, CANCEL_BTN, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 6, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetIpProtocolFenjiLayer");
 
 	return true;
 }
@@ -277,7 +276,7 @@ bool SetIpProtocolIPFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%s", UlongtoIP(g_ip));
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp, "SetIpProtocolFenjiLayer");
 
 	return true;
 }
@@ -292,7 +291,7 @@ Others:
 *************************************************/
 bool SetIpProtocolBingFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 ret = 0;
+	uint32 ret = 0;
 
 	set_ipmodule_bindcode(g_extcode);
 	set_ipmodule_addr(g_ip);
@@ -300,12 +299,13 @@ bool SetIpProtocolBingFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 	ret = ipmodule_request_bind();
 	if (ret)
 	{
-		//show_msg(hDlg, IDC_MSG_CTRL, MSG_WARNING, SID_Set_Bind_OK);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Set_Bind_OK, "SetIpProtocolFenjiLayer");
 	}
 	else
 	{
-		//show_msg(hDlg, IDC_MSG_CTRL, MSG_ERROR, SID_Set_Bind_Fail);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Bind_Fail, "SetIpProtocolFenjiLayer");
 	}
+
 	return true;
 }
 
@@ -319,9 +319,7 @@ Others:
 *************************************************/
 bool SetIpProtocolGetFJFenjiButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-
-
-
+	get_fenji_list();
 	show_win_fenji();
 
 	return true;

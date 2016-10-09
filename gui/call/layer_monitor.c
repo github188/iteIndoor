@@ -31,6 +31,7 @@ static ITUContainer* MonitorShowButtomContainer = NULL;
 static ITUBackground* MonitorRightSnapGrayBackground = NULL;
 static ITUButton* MonitorRightSnapButton = NULL;
 static ITUButton* MonitorRightNullButton0 = NULL;
+static ITUTrackBar* MonitorSoundTrackBar = NULL;
 
 /*****************常量定义***********************/
 static DEVICE_TYPE_E g_DevType;
@@ -285,7 +286,6 @@ static void SetMonitorLockAndSnap(MonitorButtonEvent event)
 		ituWidgetDisable(MonitorRightSnapButton);
 		ituWidgetSetVisible(MonitorRightSnapGrayBackground, true);
 		monitor_video_snap();
-		g_MSGSnapTicks = 3;
 	}
 }
 
@@ -470,6 +470,7 @@ bool MonitorState(ITUWidget* widget, char* param)
 			ituTextSetString(MonitorTimeText, NULL);
 			ituWidgetSetVisible(MonitorShowButtomContainer, true);
 			g_volume = storage_get_talkvolume();
+			ituTrackBarSetValue(MonitorSoundTrackBar, g_volume);
 			g_InterState = MONITOR_TALKING;
 			break;
 
@@ -508,6 +509,7 @@ bool MonitorState(ITUWidget* widget, char* param)
 			{
 				ituWidgetSetVisible(MonitorHitBackground, true);
 				ituSpriteGoto(MonitorHitSprite, MonitorSnapMSGIcon);
+				g_MSGSnapTicks = 3;
 			}
 			break;
 
@@ -595,6 +597,26 @@ bool MonitorButtomSoundButtonOnMouseUp(ITUWidget* widget, char* param)
 	ChangeVolume();
 
 	return true;
+}
+
+/*************************************************
+Function:		MonitorHideSoundOnMouseUp
+Description: 	隐藏声音进度条执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool MonitorHideSoundOnMouseUp(ITUWidget* widget, char* param)
+{
+	if (g_SetVolume)
+	{
+		g_volumeticks = 0;
+		g_SetVolume = FALSE;
+		storage_set_volume(storage_get_ringvolume(), g_volume, storage_get_keykeep());
+		ituWidgetSetVisible(MonitorBottomBackground, false);
+	}
+	dprintf("g_SetVolume..........%d\n", g_SetVolume);
 }
 
 /*************************************************
@@ -752,6 +774,9 @@ static void InitMonitorLayer(void)
 
 		MonitorRightNullButton0 = ituSceneFindWidget(&theScene, "MonitorRightNullButton0");
 		assert(MonitorRightNullButton0);
+
+		MonitorSoundTrackBar = ituSceneFindWidget(&theScene, "MonitorSoundTrackBar");
+		assert(MonitorSoundTrackBar);
 	}
 }
 

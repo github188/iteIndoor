@@ -1149,67 +1149,176 @@ SysHintRecord *sys_get_hint_list(void)
 *************************************************/
 void sys_sync_hint_state(void)
 {
-	uint8 flg, unread_num;
-	
-	// 获取信息未读状态
-	unread_num = storage_get_msg_state();
-	if (unread_num)
-	{
-		sys_set_hint_state(SYS_HINT_INFO, TRUE);
-	}
-	else
-	{
-		sys_set_hint_state(SYS_HINT_INFO, FALSE);
-	}
-	g_sysHintsNum[SYS_HINT_INFO] = unread_num;
-	
-	// 获取留影留言未读状态
-	unread_num = storage_get_lylyrecord_flag();
-	if (unread_num)
-	{
-		sys_set_hint_state(SYS_HINT_LEAVEWORD, TRUE);
-	}
-	else
-	{
-		sys_set_hint_state(SYS_HINT_LEAVEWORD, FALSE);
-	}
-	g_sysHintsNum[SYS_HINT_LEAVEWORD] = unread_num;
-	
-	// 获取家人留言未读状态
-	unread_num = storage_get_jrlyrecord_flag();
-	if (unread_num)
-	{
-		sys_set_hint_state(SYS_HINT_FAMILY, TRUE);
-	}
-	else
-	{
-		sys_set_hint_state(SYS_HINT_FAMILY, FALSE);
-	}
-	g_sysHintsNum[SYS_HINT_FAMILY] = unread_num;
-	
-	// 获取未接来电未读状态
-	unread_num = storage_get_callrecord_state();
-	if (unread_num)
-	{
-		sys_set_hint_state(SYS_HINT_MISSED_CALLS, TRUE);
-	}
-	else
-	{
-		sys_set_hint_state(SYS_HINT_MISSED_CALLS, FALSE);
-	}
-	g_sysHintsNum[SYS_HINT_MISSED_CALLS] = unread_num;
+	uint8 i, flg, unread_num;
 
-	// 初始化免打扰-无免打扰
-	flg = storage_get_noface();
-	if (flg == TRUE)
 	{
-		sys_set_hint_state(SYS_HINT_NO_DISTURB, TRUE);
+		// 获取信息未读状态
+		unread_num = 0;
+		if (g_SysHintRecord.MsgUnReadList != NULL)
+		{
+			free(g_SysHintRecord.MsgUnReadList);
+			g_SysHintRecord.MsgUnReadList = NULL;
+		}
+		g_SysHintRecord.MsgUnReadList = storage_read_msg_list();
+		if (g_SysHintRecord.MsgUnReadList)
+		{
+			for (i = 0; i < g_SysHintRecord.MsgUnReadList->ncount; i++)
+			{
+				if (1 == g_SysHintRecord.MsgUnReadList->pinfo_data[i].is_unread)
+				{
+					unread_num ++;
+				}
+			}
+			g_SysHintRecord.syshintnum[SYS_HINT_INFO] = unread_num;
+			dprintf("MsgUnReadList num: %d\n", g_SysHintRecord.MsgUnReadList->ncount);
+		}
+		
+		if (unread_num)
+		{
+			sys_set_hint_state(SYS_HINT_INFO, TRUE);
+		}
+		else
+		{
+			sys_set_hint_state(SYS_HINT_INFO, FALSE);
+		}
 	}
-	else
+
 	{
-		sys_set_hint_state(SYS_HINT_NO_DISTURB, FALSE);
+		// 获取留影留言未读状态
+		// 获取留影留言信息
+		unread_num = 0;
+		if (g_SysHintRecord.LylyUnReadList != NULL)
+		{
+			storage_free_lyly_memory(&(g_SysHintRecord.LylyUnReadList));
+		}
+		storage_get_lylyrecord(&(g_SysHintRecord.LylyUnReadList));
+		if (g_SysHintRecord.LylyUnReadList)
+		{		
+			for (i = 0; i < g_SysHintRecord.LylyUnReadList->Count; i++)
+			{
+				if (g_SysHintRecord.LylyUnReadList->LylyInfo[i].UnRead == TRUE)
+				{
+					unread_num ++;
+				}
+			}
+			g_SysHintRecord.syshintnum[SYS_HINT_LEAVEWORD] = unread_num;
+			dprintf("LylyUnReadList num: %d\n", g_SysHintRecord.LylyUnReadList->Count);
+		}
+		if (unread_num)
+		{
+			sys_set_hint_state(SYS_HINT_LEAVEWORD, TRUE);
+		}
+		else
+		{
+			sys_set_hint_state(SYS_HINT_LEAVEWORD, FALSE);
+		}
 	}
-	g_sysHintsNum[SYS_HINT_NO_DISTURB] = flg;
+
+	{
+		// 获取家人留言未读状态
+		unread_num = 0;
+		if (g_SysHintRecord.JrlyUnReadList != NULL)
+		{
+			storage_free_jrly_memory(&(g_SysHintRecord.JrlyUnReadList));
+		}
+		storage_get_jrlyrecord(&(g_SysHintRecord.JrlyUnReadList));
+		if (g_SysHintRecord.JrlyUnReadList)
+		{
+			for (i = 0; i < g_SysHintRecord.JrlyUnReadList->Count; i++)
+			{
+				if (g_SysHintRecord.JrlyUnReadList->JrlyInfo[i].UnRead == TRUE)
+				{
+					unread_num++;
+				}
+			}
+			g_SysHintRecord.syshintnum[SYS_HINT_FAMILY] = unread_num;
+			dprintf("JrlyUnReadList num: %d\n", g_SysHintRecord.JrlyUnReadList->Count);
+		}
+		if (unread_num)
+		{
+			sys_set_hint_state(SYS_HINT_FAMILY, TRUE);
+		}
+		else
+		{
+			sys_set_hint_state(SYS_HINT_FAMILY, FALSE);
+		}
+	}
+
+	{
+		// 获取报警未处理信息
+		if (g_SysHintRecord.AlarmUnReadList != NULL)
+		{
+			free(g_SysHintRecord.AlarmUnReadList);
+			g_SysHintRecord.AlarmUnReadList = NULL;
+		}
+		
+		g_SysHintRecord.AlarmUnReadList = storage_get_afbj_unread_record_ext();
+		if(g_SysHintRecord.AlarmUnReadList)
+		{
+			g_SysHintRecord.syshintnum[SYS_HINT_ALARM_WARNING] = g_SysHintRecord.AlarmUnReadList->nCount;
+			sys_set_hint_state(SYS_HINT_ALARM_WARNING, TRUE);		
+			dprintf("AlarmUnReadList num: %d\n", g_SysHintRecord.AlarmUnReadList->nCount);
+		}
+	}
+
+	{
+		// 获取未接来电未读状态
+		unread_num = 0;
+		if (g_SysHintRecord.MissUnReadList != NULL)
+		{
+			free(g_SysHintRecord.MissUnReadList);
+			g_SysHintRecord.MissUnReadList = NULL;
+		}
+		g_SysHintRecord.MissUnReadList = storage_get_callrecord(MISSED);
+		if (g_SysHintRecord.MissUnReadList)
+		{
+			for(i = 0; i < g_SysHintRecord.MissUnReadList->CallCount; i++)
+			{
+				if (1 == g_SysHintRecord.MissUnReadList->CallInfo[i].UnRead)
+				{
+					unread_num++;
+					break;
+				}
+			}
+			g_SysHintRecord.syshintnum[SYS_HINT_MISSED_CALLS] = unread_num;
+			dprintf("MissUnReadList num: %d\n", g_SysHintRecord.MissUnReadList->CallCount);
+		}
+		if (unread_num)
+		{
+			sys_set_hint_state(SYS_HINT_MISSED_CALLS, TRUE);
+		}
+		else
+		{
+			sys_set_hint_state(SYS_HINT_MISSED_CALLS, FALSE);
+		}
+	}
+
+	{
+		// 初始化免打扰-无免打扰
+		flg = storage_get_noface();
+		if (flg == TRUE)
+		{
+			sys_set_hint_state(SYS_HINT_NO_DISTURB, TRUE);
+		}
+		else
+		{
+			sys_set_hint_state(SYS_HINT_NO_DISTURB, FALSE);
+		}
+		g_SysHintRecord.syshintnum[SYS_HINT_NO_DISTURB] = flg;
+	}
+
+	{
+		flg = storage_get_alarm_state();	
+		if (flg == FALSE)						// 撤防
+		{
+			sys_set_hint_state(SYS_HINT_ALARM_STATE, FALSE);
+		}	
+		else									// 布防
+		{
+			sys_set_hint_state(SYS_HINT_ALARM_STATE, TRUE);		
+		}	
+		g_SysHintRecord.syshintnum[SYS_HINT_ALARM_STATE] = flg;
+	}	
 }
 
 /*************************************************

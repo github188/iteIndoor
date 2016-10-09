@@ -159,7 +159,7 @@ void SetSystemLanguageLayerOnReturn(void)
 {
 	if (g_language != storage_get_language())
 	{
-		ShowMsgFailHintSuccessLayer(1, SID_Msg_Recover_OK, 1);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Recover_OK, "SetSystemLanguageLayer");
 	}
 	else
 	{

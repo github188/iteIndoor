@@ -18,10 +18,12 @@ static ITUTextBox* SetNumKeyBordTextBox = NULL;
 static ITUText* SetNumKeyBordHitText = NULL;
 static ITUSprite* SetNumKeyBordDianSprite = NULL;
 static ITULayer* SetNumKeyBordLayer = NULL;
+static ITULayer* SetBottonReturnLayer = NULL;
 
 static uint8 g_numkeybord_textbox_data[50] = {0};
 static PASS_TYPE g_UserOrPrj_pwd = PASS_TYPE_MAX;
 
+#if 0	
 /*************************************************
 Function:		SetNumKeyBordOnEnter
 Description: 	进入数字键盘界面初始化函数
@@ -44,6 +46,7 @@ bool SetNumKeyBordOnEnter(ITUWidget* widget, char* param)
 
 	return true;
 }
+#endif
 
 /*************************************************
 Function:		SetNoDisturLayerOnReturn
@@ -55,7 +58,7 @@ Others:
 *************************************************/
 void SetNumKeyBordLayerOnReturn(void)
 {
-	//if (!ituWidgetIsVisible(GotoOldLayer))
+	if (ituWidgetIsVisible(SetNumKeyBordLayer))
 	{
 		ituTextBoxSetString(SetNumKeyBordTextBox, g_numkeybord_textbox_data);
 
@@ -109,55 +112,40 @@ Output:		无
 Return:		TRUE 是 FALSE 否
 Others:
 *************************************************/
-static bool PasswordDeal(char* pass)
+static void PasswordDeal()
 {
-	char userpass[7];	
-	char prjpass[7]; 
-	memset(userpass, 0, sizeof(userpass));
-	memset(prjpass, 0, sizeof(prjpass));
-	sprintf(prjpass, "%s", storage_get_pass(PASS_TYPE_ADMIN));	//存储获取工程密码;
-	sprintf(userpass, "%s", storage_get_pass(PASS_TYPE_USER));  //存储获取用户密码
+	MSG_EVENT event = MSG_EVENT_NO;
 
-	if (PASS_TYPE_USER == g_UserOrPrj_pwd)
-	{
-		if (0 == strcmp(pass, userpass) || (0 == strcmp(pass, prjpass)))
-		{
-			g_UserOrPrj_pwd = PASS_TYPE_MAX;
-			//if (!ituWidgetIsVisible(GotoNewLayer))
-			{
-				ituWidgetEnable(GotoOldLayer);
-				ituLayerGoto(GotoNewLayer);
-				return true;
-			}
-		}
-		else
-		{
-			ituTextBoxSetString(SetNumKeyBordTextBox, NULL);
-			ituTextSetString(SetNumKeyBordHitText, get_str(SID_Set_Pwd_Err));
-			return false;
-		}
-	}
-	else 
-	{
-		if (0 == strcmp(pass, prjpass))
-		{
-			g_UserOrPrj_pwd = PASS_TYPE_MAX;
-			//if (!ituWidgetIsVisible(GotoNewLayer))
-			{
-				ituWidgetEnable(GotoOldLayer);
-				ituLayerGoto(GotoNewLayer);
-				return true;
-			}
-		}
-		else
-		{
-			ituTextBoxSetString(SetNumKeyBordTextBox, NULL);
-			ituTextSetString(SetNumKeyBordHitText, get_str(SID_Set_Pwd_Err));
-			return false;
-		}
-	}
+	char* TextBox_data = ituTextGetString(SetNumKeyBordTextBox);
 
-	return false;
+	event = msg_pass_oper_deal(g_UserOrPrj_pwd, 1, TextBox_data);
+	switch (event)
+	{
+	case MSG_EVENT_YES:
+		g_UserOrPrj_pwd = PASS_TYPE_MAX;
+		if (ituWidgetIsVisible(SetNumKeyBordLayer))
+		{
+			ituWidgetEnable(GotoOldLayer);
+			ituLayerGoto(GotoNewLayer);
+		}
+		break;
+
+	case MSG_EVENT_XIECHI:
+		dprintf("xiechi----------------\n");
+		force_alarm_report();
+		g_UserOrPrj_pwd = PASS_TYPE_MAX;
+		if (ituWidgetIsVisible(SetNumKeyBordLayer))
+		{
+			ituWidgetEnable(GotoOldLayer);
+			ituLayerGoto(GotoNewLayer);
+		}
+		break;
+
+	case MSG_EVENT_NO:
+		ituTextBoxSetString(SetNumKeyBordTextBox, NULL);
+		ituTextSetString(SetNumKeyBordHitText, get_str(SID_Set_Pwd_Err));
+		break;
+	}
 }
 
 /*************************************************
@@ -170,19 +158,63 @@ Others:
 *************************************************/
 bool SetNumKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	char* TextBox_data = ituTextGetString(SetNumKeyBordTextBox);
-
 	if ((PASS_TYPE_USER == g_UserOrPrj_pwd) || (PASS_TYPE_ADMIN == g_UserOrPrj_pwd))//密码判断
 	{
-		return PasswordDeal(TextBox_data);
+		PasswordDeal();
+		return true;
 	}
 
-	//if (!ituWidgetIsVisible(GotoOldLayer))
+	if (ituWidgetIsVisible(SetNumKeyBordLayer))
 	{
 		ituWidgetEnable(GotoOldLayer);
 		ituLayerGoto(GotoOldLayer);
 	}
 	
+	return true;
+}
+
+/*************************************************
+Function:		SetNumKeyBordDelButtonOnMouseLongPress
+Description: 	回删长按执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool SetNumKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param)
+{
+	ituTextBoxSetString(SetNumKeyBordTextBox, NULL);
+	// 删除号码完毕，显示输入提示
+	if (PASS_TYPE_USER == g_UserOrPrj_pwd)
+	{
+		ituTextSetString(SetNumKeyBordHitText, get_str(SID_Set_EnterUserPwd));
+	}
+	else if (PASS_TYPE_ADMIN == g_UserOrPrj_pwd)
+	{
+		ituTextSetString(SetNumKeyBordHitText, get_str(SID_Set_EnterProjectPwd));
+	}
+	else
+	{
+		ituTextSetString(SetNumKeyBordHitText, "");
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		MsgFailHintSuccessLayerOnLeave
+Description:
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetNumKeyBordLayerOnLeave(ITUWidget* widget, char* param)
+{
+	if (!ituWidgetIsEnabled(GotoOldLayer))
+	{
+		ituWidgetEnable(GotoOldLayer);
+	}
 	return true;
 }
 
@@ -196,11 +228,12 @@ Input:
 	4、text_flag：明文显示密文显示；	 33：输入的用“*”显示；  32：输入的用数字显示
 	5、sprite_flag：	0：键盘显示“X”；  1：键盘显示“.”
 	6、buf： 传入显示的数据
+	7、old_layer：进入时的界面
 Output:		无
 Return:		
 Others:
 *************************************************/
-void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, NUM_CAHR_TYPE text_flag, SPRITE_KEYBORD_BTN_TYPE sprite_flag, char * buf)
+void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, NUM_CAHR_TYPE text_flag, SPRITE_KEYBORD_BTN_TYPE sprite_flag, char * buf, char* old_layer)
 {
 	if (!SetNumKeyBordTextBox)
 	{
@@ -215,6 +248,9 @@ void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, 
 
 		SetNumKeyBordLayer = ituSceneFindWidget(&theScene, "SetNumKeyBordLayer");
 		assert(SetNumKeyBordLayer);
+
+		SetBottonReturnLayer = ituSceneFindWidget(&theScene, "SetBottonReturnLayer");
+		assert(SetBottonReturnLayer);
 	}
 
 	GotoNewLayer = widget;
@@ -248,30 +284,13 @@ void KeybordLayerOnShow(ITULayer* widget, PASS_TYPE pass_type, int text_maxlen, 
 		ituTextBoxSetString(SetNumKeyBordTextBox, NULL);
 	}
 
-	ituLayerGoto(SetNumKeyBordLayer);
+	SetNumKeyBordTextBox->text.layout = ITU_LAYOUT_MIDDLE_CENTER;	//字体上下垂直居中显示
 
-}
+	GotoOldLayer = ituSceneFindWidget(&theScene, old_layer);
+	assert(GotoOldLayer);
 
-/*************************************************
-Function:		MsgFailHintSuccessLayerOnLeave
-Description:
-Input:		无
-Output:		无
-Return:		TRUE 是 FALSE 否
-Others:
-*************************************************/
-bool SetNumKeyBordLayerOnLeave(ITUWidget* widget, char* param)
-{
-	if (!ituWidgetIsEnabled(GotoOldLayer))
-	{
-		ituWidgetEnable(GotoOldLayer);
-	}
-	return true;
-}
-
-void SetNumKeyBordReset(void)
-{
-	SetNumKeyBordTextBox = NULL;
-	GotoOldLayer = NULL;
-	GotoNewLayer = NULL;
+	ituWidgetDisable(GotoOldLayer);
+	ituWidgetShow(SetNumKeyBordLayer, ITU_EFFECT_NONE, 0);		// 键盘界面使用show出，不是goto
+	SetBottonReturnOnReload(SetNumKeyBordLayer, NULL);
+	ituWidgetShow(SetBottonReturnLayer, ITU_EFFECT_NONE, 0);
 }

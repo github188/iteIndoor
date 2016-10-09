@@ -7,7 +7,7 @@ Date: 		2016-06-15
 Description:
 Modification:消息框提示错误、警告、成功页面
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITULayer* g_GotoLayer = NULL;						
 static ITUSprite* MsgFailHintSuccessSprite = NULL;
@@ -17,7 +17,9 @@ static ITUCalendar* MsgFailHintSuccess0Calendar = NULL;
 static ITUCalendar* MsgFailHintSuccess1Calendar = NULL;
 static ITURadioBox* MsgFailHintSuccess0RadioBox = NULL;
 static ITURadioBox* MsgFailHintSuccess1RadioBox = NULL;
+static ITULayer* SetBottonReturnLayer = NULL;
 
+#if 0
 /*************************************************
 Function:		MsgFailHintSuccessOnEnter
 Description: 	消息框提示错误、警告、成功初始化函数
@@ -39,6 +41,7 @@ bool MsgFailHintSuccessOnEnter(ITUWidget* widget, char* param)
 
 	return true;
 }
+#endif
 
 /*************************************************
 Function:		SetBottonReturnButtonOnPress
@@ -85,9 +88,9 @@ Others:
 param:
 	spriteflag: 图标显示第几个	0：“X”	1：“！”	2：“√”
 	id：		显示字的ID
-	calendarflag:	显示一个按键还是两个按键	0:确认；	1：确认，取消
+	old_layer：进入时的界面
 *************************************************/
-void ShowMsgFailHintSuccessLayer(uint8 spriteflag, uint32 id, uint8 calendarflag)
+void ShowMsgFailHintSuccessLayer(HIT_ICON_TYPE spriteflag, uint32 id, char* old_layer)
 {
 	if (!MsgFailHintSuccessLayer)
 	{
@@ -111,23 +114,32 @@ void ShowMsgFailHintSuccessLayer(uint8 spriteflag, uint32 id, uint8 calendarflag
 
 		MsgFailHintSuccess1RadioBox = ituSceneFindWidget(&theScene, "MsgFailHintSuccess1RadioBox");
 		assert(MsgFailHintSuccess1RadioBox);
+
+		SetBottonReturnLayer = ituSceneFindWidget(&theScene, "SetBottonReturnLayer");
+		assert(SetBottonReturnLayer);
 	}
 
 	ituSpriteGoto(MsgFailHintSuccessSprite, spriteflag);
 	ituTextSetString(MsgFailHintSuccessText, get_str(id));
-	if (0 == calendarflag)
-	{
-		ituWidgetSetVisible(MsgFailHintSuccess1Calendar, false);
-		ituWidgetSetVisible(MsgFailHintSuccess0Calendar, true);
-	}
-	else
+	if (HIT_SPRITE_TO_WARNNING == spriteflag)
 	{
 		ituWidgetSetVisible(MsgFailHintSuccess0Calendar, false);
 		ituWidgetSetVisible(MsgFailHintSuccess1Calendar, true);
 	}
-
-	if (!ituWidgetIsVisible(MsgFailHintSuccessLayer))
+	else
 	{
-		ituLayerGoto(MsgFailHintSuccessLayer);
+		ituWidgetSetVisible(MsgFailHintSuccess1Calendar, false);
+		ituWidgetSetVisible(MsgFailHintSuccess0Calendar, true);
 	}
+
+	ituRadioBoxSetChecked(MsgFailHintSuccess0RadioBox, false);
+	ituRadioBoxSetChecked(MsgFailHintSuccess1RadioBox, false);
+
+	g_GotoLayer = ituSceneFindWidget(&theScene, old_layer);
+	assert(g_GotoLayer);
+
+	ituWidgetDisable(g_GotoLayer);
+	ituWidgetShow(MsgFailHintSuccessLayer, ITU_EFFECT_NONE, 0);	// 提示框界面使用show出，不是goto
+	SetBottonReturnOnReload(MsgFailHintSuccessLayer, NULL);
+	ituWidgetShow(SetBottonReturnLayer, ITU_EFFECT_NONE, 0);
 }

@@ -12,6 +12,8 @@ static ITUCoverFlow* SetProjectCoverFlow = NULL;
 static ITULayer* SetPasswordLayer = NULL;
 static ITURadioBox* MsgFailHintSuccess1RadioBox = NULL;
 static ITULayer* SetProjectLayer = NULL;
+static ITULayer* SetJDLayer = NULL;
+static ITULayer* SetAlarmLayer = NULL;
 
 /*************************************************
 Function:		SetProjectOnEnter
@@ -68,7 +70,7 @@ Others:
 *************************************************/
 bool SetPrjBackButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	ShowMsgFailHintSuccessLayer(1, SID_Msg_Return_FactorySet, 1);
+	ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Return_FactorySet, "SetProjectLayer");
 
 	return true;
 }
@@ -89,4 +91,68 @@ bool SetPrjProjectPwdButtonOnMouseUp(ITUWidget* widget, char* param)
 	return true;
 }
 
+/*************************************************
+Function:		SetPrjJDButtonOnMouseUp
+Description: 	家电设置
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetPrjJDButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	if (FALSE == storage_get_extmode(EXT_MODE_JD))
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_JD_Mode_Unused, "SetProjectLayer");
+		return true;
+	}
 
+	if (!SetJDLayer)
+	{
+		SetJDLayer = ituSceneFindWidget(&theScene, "SetJDLayer");
+		assert(SetJDLayer);
+	}
+
+	if (!ituWidgetIsVisible(SetJDLayer))
+	{
+		ituLayerGoto(SetJDLayer);
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		SetPrjAlarmButtonOnMouseUp
+Description: 	安防设置
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetPrjAlarmButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	if (FALSE == storage_get_extmode(EXT_MODE_ALARM))
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Bj_Mode_Unused, "SetProjectLayer");
+		return true;
+	}
+
+	if (DIS_DEFEND != storage_get_defend_state())
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Bj_Set_Err, "SetProjectLayer");
+		return true;
+	}
+
+	if (!SetAlarmLayer)
+	{
+		SetAlarmLayer = ituSceneFindWidget(&theScene, "SetAlarmLayer");
+		assert(SetAlarmLayer);
+	}
+
+	if (!ituWidgetIsVisible(SetAlarmLayer))
+	{
+		ituLayerGoto(SetAlarmLayer);
+	}
+
+	return true;
+}

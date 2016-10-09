@@ -108,6 +108,8 @@
 /**************************************************************************/
 #define SNAP_DIR_PATH			CFG_TEMP_DRIVE":/SNAP"								// 抓拍文件夹		
 #define SNAP_MANAGE_PATH		CFG_TEMP_DRIVE":/SNAP/MANAGE.BIN"						// 抓拍管理文件
+//#define SNAP_DIR_PATH			"D:/SNAP"								// 抓拍文件夹		
+//#define SNAP_MANAGE_PATH		"D:/SNAP/MANAGE.BIN"						// 抓拍管理文件
 
 /**************************************************************************/
 /*								  留影留言								  */	

@@ -129,19 +129,19 @@ static uint8 check_devno_param(void)
 		break;
 
 	case 1:										// 单元长度非法
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Riser_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_Rule_Riser_Err, "SetDevnoLayer");
 		break;
 
 	case 2:										// 梯号长度非法
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Stair_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_Rule_Stair_Err, "SetDevnoLayer");
 		break;
 
 	case 3:										// 房号长度非法
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Room_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_Rule_Room_Err, "SetDevnoLayer");
 		break;
 
 	case 4:										// 总长度不能大于18
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_RuleAll_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_Rule_RuleAll_Err, "SetDevnoLayer");
 		break;
 	}
 
@@ -154,11 +154,11 @@ static uint8 check_devno_param(void)
 			return TRUE;
 
 		case 1:
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_Len_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_Rule_Len_Err, "SetDevnoLayer");
 			break;
 
 		case 2:
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_Rule_RoomNo_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_Rule_RoomNo_Err, "SetDevnoLayer");
 			break;
 		}
 	}
@@ -297,7 +297,7 @@ static void KeyBordGotoSetDevnoOnEnterShow()
 
 	if (0 >= nlen)
 	{
-		ShowMsgFailHintSuccessLayer(0, text_id[g_button_num], 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, text_id[g_button_num], "SetDevnoLayer");
 	}
 }
 
@@ -395,25 +395,25 @@ bool SetDevnoListButtonOnMouseUp(ITUWidget* widget, char* param)
 	case DEVICE_RULE:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%s", g_devparam->DeviceNoStr);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 16, EXPRESS_CHAR, CANCEL_BTN, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 16, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetDevnoLayer");
 		break;
 
 	case STAIR_LEN:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%d", g_devparam->Rule.StairNoLen);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetDevnoLayer");
 		break;
 
 	case ROOM_LEN:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%d", g_devparam->Rule.RoomNoLen);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetDevnoLayer");
 		break;
 
 	case RISER_LEN:
 		memset(tmp, 0, sizeof(tmp));
 		sprintf(tmp, "%d", g_devparam->Rule.CellNoLen);
-		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp);
+		KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 1, EXPRESS_CHAR, CANCEL_BTN, tmp, "SetDevnoLayer");
 		break;
 
 	case RISER_ENABLE:

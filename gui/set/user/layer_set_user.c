@@ -14,7 +14,11 @@ static ITURadioBox* SetYujingTimeMsgRadioBox[5] = { NULL };
 static ITUBackground* SetYujingTimeMsgBackground = NULL;
 static ITUBackground* SetUserBackground = NULL;
 static ITULayer* SetMenuLayer = NULL;
-//static ITULayer* SetAlarmAreaListLayer;
+static ITULayer* SetJdScenceLayer = NULL;
+static ITULayer* SetJdYuYueLayer = NULL;
+static ITULayer* SetAlarmNumLayer = NULL;
+static ITULayer* SetAlarmRemoteLayer = NULL;
+
 
 static uint8 g_time_alarm_param[3] = { 0 };
 
@@ -83,9 +87,6 @@ bool SetUserOnEnter(ITUWidget* widget, char* param)
 
 		SetMenuLayer = ituSceneFindWidget(&theScene, "SetMenuLayer");
 		assert(SetMenuLayer); 
-
-		//SetAlarmAreaListLayer = ituSceneFindWidget(&theScene, "SetAlarmAreaListLayer");
-		//assert(SetAlarmAreaListLayer);
 	}
 
 	if (strcmp(param, "SetNumKeyBordLayer") == 0)
@@ -175,7 +176,125 @@ bool SetGeliAndJufangButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
 
+	if (FALSE == storage_get_extmode(EXT_MODE_ALARM))
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Bj_Mode_Unused, "SetUserLayer");
+		return true;
+	}
+
+	if (DIS_DEFEND != storage_get_defend_state())
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Bj_Set_Err, "SetUserLayer");
+		return true;
+	}
+
 	SetAlarmAreaList((uint8)index);
+
+	return true;
+}
+
+/*************************************************
+Function:		SetUserJDModeButtonOnMouseUp
+Description: 	情景设置，家电预约按下处理
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetUserJDModeButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	int index = atoi(param);
+
+	if (FALSE == storage_get_extmode(EXT_MODE_JD))
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_JD_Mode_Unused, "SetUserLayer");
+		return true;
+	}
+
+	if (!SetJdScenceLayer)
+	{
+		SetJdScenceLayer = ituSceneFindWidget(&theScene, "SetJdScenceLayer");
+		assert(SetJdScenceLayer);
+
+		SetJdYuYueLayer = ituSceneFindWidget(&theScene, "SetJdYuYueLayer");
+		assert(SetJdYuYueLayer);
+	}
+
+	switch (index)
+	{
+	case 0:											// 情景设置
+		if (!ituWidgetIsVisible(SetJdScenceLayer))
+		{
+			ituLayerGoto(SetJdScenceLayer);
+		}
+		break;
+
+	case 1:											// 家电预约
+		if (!ituWidgetIsVisible(SetJdYuYueLayer))
+		{
+			ituLayerGoto(SetJdYuYueLayer);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		SetUserALarmModeButtonOnMouseUp
+Description: 	安防号码，远程控制按下处理
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetUserALarmModeButtonOnMouseUp(ITUWidget* widget, char* param)
+{
+	int index = atoi(param);
+
+	if (FALSE == storage_get_extmode(EXT_MODE_ALARM))
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Bj_Mode_Unused, "SetUserLayer");
+		return true;
+	}
+
+	if (DIS_DEFEND != storage_get_defend_state())
+	{
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Bj_Set_Err, "SetUserLayer");
+		return true;
+	}
+
+	if (!SetAlarmNumLayer)
+	{
+		SetAlarmNumLayer = ituSceneFindWidget(&theScene, "SetAlarmNumLayer");
+		assert(SetAlarmNumLayer);
+
+		SetAlarmRemoteLayer = ituSceneFindWidget(&theScene, "SetAlarmRemoteLayer");
+		assert(SetAlarmRemoteLayer);
+	}
+
+	switch (index)
+	{
+	case 0:											// 安防号码
+		if (!ituWidgetIsVisible(SetAlarmNumLayer))
+		{
+			ituLayerGoto(SetAlarmNumLayer);
+		}
+		break;
+
+	case 1:											// 远程控制
+		if (!ituWidgetIsVisible(SetAlarmRemoteLayer))
+		{
+			ituLayerGoto(SetAlarmRemoteLayer);
+		}
+		break;
+
+	default:
+		break;
+	}
 
 	return true;
 }

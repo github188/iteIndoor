@@ -549,7 +549,7 @@ LabChange:
 	{				
 		dprintf("MONITOR_TALKING == g_MonitorInfo.state \n");
 		GuiNotify(g_MonitorInfo.state, 0);
-		usleep(20*1000);
+
 		g_PreMonitorState = MONITOR_TALKING;
 		g_MonitorInfo.TimeMax = MONITOR_TALK_TIME_MAX;		
 		g_MonitorInfo.TimeOut = 0;

@@ -404,8 +404,6 @@ static void add_inter_record(CALL_TYPE RecordType, DEVICE_TYPE_E DevType, char *
 		}
 		sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
 	}
-	// del by chenbh 修改为上面函数 sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
-	//sys_sync_hint_state();
 #endif
 }
 
@@ -433,7 +431,6 @@ static void add_inter_lyly(LYLY_TYPE LylyType)
 		storage_add_lylyrecord(LylyType, g_BeCallInfo.RemoteDeviceType, g_BeCallInfo.CallNo1, g_LylyDateTime);
 	}	
 	// modi by chenbh 
-	//sys_sync_hint_state();
 	sys_sync_hint_state_ext(SYS_HINT_LEAVEWORD);
 }
 
@@ -937,9 +934,8 @@ static void * callout_proc(void *arg)
 	{
 		ret = FALSE;
 		CallGuiNotify(g_CallInfo.state, 0);
-		usleep(20*1000);
-		uint8 TalkVolume = storage_get_talkvolume();
 		
+		uint8 TalkVolume = storage_get_talkvolume();
 		dprintf("callout proc : AS_INTER_TALK\n");
 		hw_switch_digit(); 		// 切换到数字对讲 
 		
@@ -1375,7 +1371,7 @@ static void * becall_proc(void *arg)
 						
 			// 消逝时间+剩余时间
 			temp = (g_BeCallInfo.TimeOut << 16) | HeartParam.Times;
-			BeCallGuiNotify(CALL_TIMER, temp);
+			//BeCallGuiNotify(CALL_TIMER, temp);
 			
 			if (g_BeCallInfo.HeartTime > HEART_TIMEOUT)
 			{

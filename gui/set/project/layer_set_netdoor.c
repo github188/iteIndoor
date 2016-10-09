@@ -18,6 +18,10 @@ static ITUCalendar* SetNetDoorNumContainer = NULL;
 static ITUCalendar* SetNetDoorParamContainer = NULL;
 static ITULayer* SetProjectLayer = NULL;
 
+//static uint32 g_TimerClock = 0;
+//static uint8 g_open_timer = FALSE;
+static int g_door_index = 0;
+
 /*************************************************
 Function:			EnterNetDoorDeal
 Description: 		工程设置界面进入网络门前机
@@ -60,11 +64,11 @@ static void EnterNetDoorParamListDeal(int num)
 	{
 		if (1 == num)
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_ExtDoor1_Unused, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_ExtDoor1_Unused, "SetNetDoorLayer");
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_ExtDoor2_Unused, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_ExtDoor2_Unused, "SetNetDoorLayer");
 		}
 		return;
 	}
@@ -74,6 +78,8 @@ static void EnterNetDoorParamListDeal(int num)
 	{
 		MsgLinkOutTimeOnShow();			//显示连接超时
 	}
+
+	MsgWaitHitLayerOnHide();
 }
 
 /*************************************************
@@ -114,6 +120,8 @@ bool SetNetDoorOnEnter(ITUWidget* widget, char* param)
 
 	if (strcmp(param, "SetProjectLayer") == 0)
 	{
+		//g_TimerClock = SDL_GetTicks();
+
 		EnterNetDoorDeal();
 	}
 
@@ -131,6 +139,7 @@ Others:
 bool SetNetDoorNumButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	int index = atoi(param);
+	g_door_index = index;
 
 	set_netdoorparam_Page(index);
 
@@ -139,10 +148,52 @@ bool SetNetDoorNumButtonOnMouseUp(ITUWidget* widget, char* param)
 	ituWidgetSetVisible(SetNetDoorNumContainer, false);
 	ituWidgetSetVisible(SetNetDoorParamContainer, true);
 
-	EnterNetDoorParamListDeal(index);
+	MsgWaitHitLayerOnShow("SetNetDoorLayer");
+	//g_open_timer = TRUE;
+	EnterNetDoorParamListDeal(g_door_index);
 	
 	return true;
 }
+
+#if 0
+/*************************************************
+Function:		MsgLinkOutTimeOnTimer
+Description: 	定时器函数
+Input:		无
+Output:		无
+Return:		TRUE 是 FALSE 否
+Others:
+*************************************************/
+bool SetNetDoorLayerOnTimer(ITUWidget* widget, char* param)
+{
+	uint32 diff = 0;
+	uint32 tick = SDL_GetTicks();
+
+	if (tick >= g_TimerClock)
+	{
+		diff = tick - g_TimerClock;
+	}
+	else
+	{
+		diff = 0xFFFFFFFF - g_TimerClock + tick;
+	}
+
+	dprintf("diff = %d\n", diff);
+
+	if (diff >= 500)
+	{
+		g_TimerClock = tick;
+
+		if (g_open_timer == TRUE)
+		{
+			g_open_timer = FALSE;
+			
+		}
+	}
+
+	return true;
+}
+#endif
 
 /*************************************************
 Function:		SetNetDoorLayerOnReturn

@@ -15,7 +15,6 @@ Modification:
 #define MAX_SHOW_FENJI_NUM			10					// UI最大支持显示几个分机
 
 static ITUText* SetIpProtocolBinding2Text = NULL;
-//static ITUText* SetIpProtocolBindNum1Text = NULL;
 static ITUText* SetIpProtocolBindNum2Text = NULL;
 static ITUText* SetIpProtocolIP2Text = NULL;
 
@@ -27,12 +26,8 @@ static ITUCalendar* SetIpProtocolFJInfoContainer[MAX_SHOW_FENJI_NUM] = { NULL };
 
 static uint32 g_ip = 0;
 static uint32 g_maincode = 0;					// 存放主机绑定码
-//static uint32 g_extcode = 0;					// 与IP模块捆绑的验证码
 static uint32 g_bindstatus; 					// 0 : 未绑定; 1 :已绑定 
-//static uint8 g_host;							// TRUE : 主机;  FALSE : 分机
 static IPMODULE_INFO ipmoduleinfo;
-static IPAD_EXTENSION_LIST g_IpadList;
-
 
 /*************************************************
 Function:		show_win_bind
@@ -83,46 +78,71 @@ Others:
 static void show_win_fenji()
 {
 	uint8 j = 0;
-	uint32 extenNo = 0;
+	uint8 i = 0;
 	char pExtIp[20] = { 0 };
-	uint8 tmp[50] = { 0 };
-	uint32 cOnlineID = 0;
+	IPAD_EXTENSION_LIST IpadList;
+	uint8 fenji_index[8] = { 0 };
+	uint32 fenji_ip[8] = { 0 };
+	uint8 fenji_mun = 0;
+	uint8 ipad_state[30] = { 0 };
+	char devtype[50], devno[5];
 
-	// 获取IPAD分机信息
-	get_ipad_extension(&g_IpadList);
-
-	for (j = 0; j < g_IpadList.count; j++)
+	// 获取IPAD分机信息和室内分机信息
+	get_ipad_extension(&IpadList);
+	memset(fenji_index, 0, sizeof(fenji_index));
+	for (j = 0; j < 8; j++)
 	{
-		extenNo = g_IpadList.ipadData[j].devno;
-		memset(pExtIp, 0, sizeof(pExtIp));
-		sprintf(pExtIp, "%s", UlongtoIP(g_IpadList.ipadData[j].ipAddr));
-		if (g_IpadList.ipadData[j].state == 1)
+		if (storage_get_subdev_ip(j))
 		{
-			cOnlineID = get_str(SID_Set_Online);
+			fenji_index[fenji_mun] = j;
+			fenji_ip[fenji_mun] = storage_get_subdev_ip(j);
+			fenji_mun++;
 		}
-		else
-		{
-			cOnlineID = get_str(SID_Set_Offline);
-		}
-
-		memset(tmp, 0, sizeof(tmp));
-		if (g_bindstatus)
-		{
-			sprintf(tmp, "%s:%d (%s)", get_str(SID_Set_ExtenNo), extenNo, cOnlineID);
-		}
-		else
-		{
-			sprintf(tmp, "%s:%d", get_str(SID_Set_ExtenNo), extenNo);
-		}
-		ituTextSetString(SetIpProtocolFJInfo1Text[j], tmp);
-		ituTextSetString(SetIpProtocolFJInfo2Text[j], pExtIp);
 	}
 
-	
-	if (g_IpadList.count > 0)
+	if (fenji_mun > 0)
+	{
+		for (j = 0; j < fenji_mun; j++)
+		{
+			for (i = 0; i < IpadList.count; i++)
+			{
+				if (IpadList.ipadData[i].ipAddr == fenji_ip[j]);
+				{
+					memset(ipad_state, 0, sizeof(ipad_state));
+					if (IpadList.ipadData[j].state == 1)
+					{
+						sprintf(ipad_state, "(%s)", get_str(SID_Set_Online));
+					}
+					else
+					{
+						sprintf(ipad_state, "(%s)", get_str(SID_Set_Offline));
+					}
+				}
+			}
+
+			memset(devno, 0, sizeof(devno));
+			memset(devtype, 0, sizeof(devtype));
+			sprintf(devno, "%d", fenji_index[j]);
+			get_dev_description(DEVICE_TYPE_FENJI_NET, devno, devtype, 50);
+
+			if (strlen(ipad_state) > 0)
+			{
+				debug_log("strlen(ipad_state) !!!!!!!!!!!\n");
+				strcat(devtype, ipad_state);
+			}
+
+			memset(pExtIp, 0, sizeof(pExtIp));
+			sprintf(pExtIp, "%s", UlongtoIP(fenji_ip[j]));
+			
+			ituTextSetString(SetIpProtocolFJInfo1Text[j], devtype);
+			ituTextSetString(SetIpProtocolFJInfo2Text[j], pExtIp);
+		}
+	}
+
+	if (fenji_mun > 0)
 	{
 		ituWidgetSetVisible(SetIpProtocolListContainer[1], true);
-		if (g_IpadList.count > 5)
+		if (fenji_mun > 5)
 		{
 			ituWidgetSetVisible(SetIpProtocolListContainer[2], true);
 		}
@@ -136,12 +156,12 @@ static void show_win_fenji()
 		ituWidgetSetVisible(SetIpProtocolListContainer[1], false);
 		ituWidgetSetVisible(SetIpProtocolListContainer[2], false);
 	}
-	for (j = 0; j < g_IpadList.count; j++)
+	for (j = 0; j < fenji_mun; j++)
 	{
 		ituWidgetSetVisible(SetIpProtocolFJInfoContainer[j], true);
 		
 	}
-	for (j = g_IpadList.count; j < MAX_SHOW_FENJI_NUM; j++)
+	for (j = fenji_mun; j < MAX_SHOW_FENJI_NUM; j++)
 	{
 		ituWidgetSetVisible(SetIpProtocolFJInfoContainer[j], false);
 	}
@@ -164,9 +184,6 @@ bool SetIpProtocolHostOnEnter(ITUWidget* widget, char* param)
 
 		SetIpProtocolBinding2Text = ituSceneFindWidget(&theScene, "SetIpProtocolBinding2Text");
 		assert(SetIpProtocolBinding2Text);
-
-		//SetIpProtocolBindNum1Text = ituSceneFindWidget(&theScene, "SetIpProtocolBindNum1Text");
-		//assert(SetIpProtocolBindNum1Text);
 
 		SetIpProtocolBindNum2Text = ituSceneFindWidget(&theScene, "SetIpProtocolBindNum2Text");
 		assert(SetIpProtocolBindNum2Text);
@@ -203,10 +220,8 @@ bool SetIpProtocolHostOnEnter(ITUWidget* widget, char* param)
 			assert(SetIpProtocolFJInfoContainer[i]);
 		}
 
-		//g_maincode = get_ipmodule_bindcode();
 		g_maincode = 0;
 		g_ip = 0;
-		//g_host = is_main_DeviceNo();
 		show_win_bind();
 		show_win_fenji();
 		ituCoverFlowGoto(SetIpProtocolCoverFlow, 0);
@@ -267,8 +282,8 @@ Others:
 *************************************************/
 bool SetIpProtocolGetFJButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-
-
+	get_fenji_list();
+	show_win_fenji();
 
 	return true;
 }

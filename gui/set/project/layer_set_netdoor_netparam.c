@@ -39,21 +39,20 @@ static uint8 g_msg_true_flag = FALSE;				// TRUE:保存参数消息框按下，F
 Function:			KeyBordGotoSetNetDoorParam
 Description: 		键盘界面进入网络门前机
 Input:
-1.win:   		当前处理的窗口
-2.wParam:
 Output:
 Return:
 Others:
 *************************************************/
 static void KeyBordGotoSetNetDoorParam()
 {
+	char tmp[30];
 	uint32 ip_data = 0;
 	ITUText* IPtext[3] = { SetNetDoorNetParamIP2Text, SetNetDoorNetParamMask2Text, SetNetDoorNetParamGateWay2Text };
 	char* IP_data = ituTextGetString(SetNumKeyBordTextBox);
 	int ret = IPIsCorrect(IP_data);
 	if (FALSE == ret)
 	{
-		ShowMsgFailHintSuccessLayer(0, SID_Set_Prj_IP_Address_Err, 0);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Set_Prj_IP_Address_Err, "SetNetDoorNetParamLayer");
 	}
 	else
 	{
@@ -73,6 +72,8 @@ static void KeyBordGotoSetNetDoorParam()
 			break;
 		}
 
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s", UlongtoIP(data));
 		ituTextSetString(IPtext[g_nd_ip_flag], IP_data);
 	}
 }
@@ -90,17 +91,14 @@ static void SetNetDoorNetParamOnShowData()
 	char tmp[50];
 
 	memset(tmp, 0, sizeof(tmp));
-	//change_ip_to_str(g_ndparam.IP, tmp);
 	sprintf(tmp, "%s", UlongtoIP(g_ndparam.IP));
 	ituTextSetString(SetNetDoorNetParamIP2Text, tmp);
 
 	memset(tmp, 0, sizeof(tmp));
-	//change_ip_to_str(g_ndparam.SubNet, tmp);
 	sprintf(tmp, "%s", UlongtoIP(g_ndparam.SubNet));
 	ituTextSetString(SetNetDoorNetParamMask2Text, tmp);
 
 	memset(tmp, 0, sizeof(tmp));
-	//change_ip_to_str(g_ndparam.DefaultGateway, tmp);
 	sprintf(tmp, "%s", UlongtoIP(g_ndparam.DefaultGateway));
 	ituTextSetString(SetNetDoorNetParamGateWay2Text, tmp);
 
@@ -159,6 +157,8 @@ static void OnNetDoorDealNetParam(uint32 wParam)
 		break;
 
 	case CMD_GATEWAY_SET_NET_PARAM:
+		set_default_ip();
+		DelayMs_nops(200);
 		//设置网络门前机设备编号以及规则
 		ret = logic_set_netdoor_devnoinfo(&g_netdoorno, NULL);
 		// 将中心机等参数从本机中取重新设置门前机
@@ -173,19 +173,23 @@ static void OnNetDoorDealNetParam(uint32 wParam)
 		ret |= logic_set_netdoor_netparam(&g_ndparam);
 		if (NETDOOR_ECHO_SUCESS == ret)
 		{
-			net_set_local_param();
-			ShowMsgFailHintSuccessLayer(2, SID_Msg_Save_OK, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Msg_Save_OK, "SetNetDoorNetParamLayer");
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Msg_Save_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Save_Err, "SetNetDoorNetParamLayer");
+		}
+		if (readmacflag)
+		{
+			net_set_local_param();
+			readmacflag = FALSE;
 		}
 		storage_set_netdoor_ip(1, (g_devIndex - 1), g_ndparam.IP);
 		break;
 
 	case CMD_GATEWAY_GET_MAC:
 		set_default_ip();
-		DelayMs_nops(100);
+		DelayMs_nops(200);
 		ret = logic_get_netdoor_mac(g_devIndex, HWaddr);
 		if (NETDOOR_ECHO_SUCESS == ret)
 		{
@@ -195,11 +199,11 @@ static void OnNetDoorDealNetParam(uint32 wParam)
 		else
 		{
 			MsgLinkOutTimeOnShow();
-			if (readmacflag)
-			{
-				net_set_local_param();
-				readmacflag = FALSE;
-			}
+		}
+		if (readmacflag)
+		{
+			net_set_local_param();
+			readmacflag = FALSE;
 		}
 		break;
 	}
@@ -300,7 +304,7 @@ bool SetNetDoorNetParamButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	if (3 == index)		//设置MAC
 	{
-		ShowMsgFailHintSuccessLayer(1, SID_Net_Door_Get_MAC, 1);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Net_Door_Get_MAC, "SetNetDoorNetParamLayer");
 		return true;
 	}
 
@@ -323,7 +327,7 @@ bool SetNetDoorNetParamButtonOnMouseUp(ITUWidget* widget, char* param)
 
 	memset(tmp, 0, sizeof(tmp));
 	sprintf(tmp, "%s", UlongtoIP(ip_flag));
-	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp);
+	KeybordLayerOnShow(NULL, PASS_TYPE_MAX, 15, EXPRESS_CHAR, SPOT_BTN, tmp, "SetNetDoorNetParamLayer");
 
 	return true;
 }
@@ -338,6 +342,7 @@ Others:
 *************************************************/
 bool SetNetDoorNetParamLayerOnLeave(ITUWidget* widget, char* param)
 {
+	debug_log("set netdoor param leave readmacflag = %d\n", readmacflag);
 	if (readmacflag)
 	{
 		net_set_local_param();
@@ -399,7 +404,7 @@ void SetNetDoorNetparamLayerOnReturn()
 		if((g_ndparam.IP != g_old_ndparam.IP) || (g_ndparam.SubNet != g_old_ndparam.SubNet) || (g_ndparam.DefaultGateway != g_old_ndparam.DefaultGateway))
 		{
 			g_msg_true_flag = TRUE;
-			ShowMsgFailHintSuccessLayer(1, SID_Msg_Param_Save, 1);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Param_Save, "SetNetDoorNetParamLayer");
 		}
 		else
 		{

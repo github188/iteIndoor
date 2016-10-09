@@ -7,7 +7,7 @@ Date: 		2016-06-26
 Description:
 Modification:连接超时提示
 *************************************************/
-#include "gui_include.h"
+#include "../layer_set.h"
 
 static ITULayer* MsgLinkOutTimeLayer = NULL;
 
@@ -24,12 +24,24 @@ Others:
 bool MsgLinkOutTimeOnTimer(ITUWidget* widget, char* param)
 {
 	uint32 tick = SDL_GetTicks();
-	uint32 diff = tick - g_TimerClock;
+	uint32 diff = 0;
+
+	if (tick >= g_TimerClock)
+	{
+		diff = tick - g_TimerClock;
+	}
+	else
+	{
+		diff = 0xFFFFFFFF - g_TimerClock + tick;
+	}
 
 	if (diff >= 2000)
 	{
+		g_TimerClock = tick;
+
 		ituWidgetHide(MsgLinkOutTimeLayer, ITU_EFFECT_NONE, 0);
 	}
+
 	return true;
 }
 
@@ -73,7 +85,6 @@ void MsgLinkOutTimeOnShow()
 		assert(MsgLinkOutTimeLayer);
 	}
 	
-	//ituLayerGoto(MsgLinkOutTimeLayer);
 	g_TimerClock = SDL_GetTicks();
 	ituWidgetShow(MsgLinkOutTimeLayer, ITU_EFFECT_NONE, 0);
 }

@@ -401,6 +401,7 @@ void monitor_state_callbak(uint32 param1, uint32 param2)
 	memset(&monitorbak_data, 0, sizeof(INTER_CALLBACK));
 	cmd.id = CMD_MONITOR_CALLBAK;
 	monitorbak_data.InterState = (uint8)param1;
+	dprintf("param1.........:%d\n", param1);
 
 	switch (param1)
 	{
@@ -626,7 +627,7 @@ static void ProcessCommand(void)
 {
     Command cmd;
 
-    while (mq_receive(g_CommandQueue, (char*)&cmd, sizeof(Command), 0) > 0)
+    if (mq_receive(g_CommandQueue, (char*)&cmd, sizeof(Command), 0) > 0)
     {
         switch (cmd.id)
         {

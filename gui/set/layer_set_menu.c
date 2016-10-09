@@ -93,20 +93,20 @@ bool SetMenuPwdButtonOnMouseUp(ITUWidget* widget, char* param)
 	if (SetMenuDoorPwdButton == buttonflag)
 	{
 		UpdataPassType(0);
-		KeybordLayerOnShow(SetPasswordLayer, PASS_TYPE_USER, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(SetPasswordLayer, PASS_TYPE_USER, 6, CIPHERTEXT, CANCEL_BTN, NULL, "SetMenuLayer");
 	}
 	else if (SetMenuSecurityPwdButton == buttonflag)
 	{
 		UpdataPassType(1);
-		KeybordLayerOnShow(SetPasswordLayer, PASS_TYPE_USER, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(SetPasswordLayer, PASS_TYPE_USER, 6, CIPHERTEXT, CANCEL_BTN, NULL, "SetMenuLayer");
 	}
 	else if (SetMenuUserButton == buttonflag)
 	{
-		KeybordLayerOnShow(SetUserLayer, PASS_TYPE_USER, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(SetUserLayer, PASS_TYPE_USER, 6, CIPHERTEXT, CANCEL_BTN, NULL, "SetMenuLayer");
 	}
 	else if (SetMenuProjectButton == buttonflag)
 	{
-		KeybordLayerOnShow(SetProjectLayer, PASS_TYPE_ADMIN, 6, CIPHERTEXT, CANCEL_BTN, NULL);
+		KeybordLayerOnShow(SetProjectLayer, PASS_TYPE_ADMIN, 6, CIPHERTEXT, CANCEL_BTN, NULL, "SetMenuLayer");
 	}
 	else if (SetMenuIPModuleButton == buttonflag)
 	{

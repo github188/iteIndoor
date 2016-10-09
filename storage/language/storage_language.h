@@ -116,6 +116,7 @@ extern "C" {
 #define ESID_Set_Data_Save_Err			(g_China ? (g_Big5 ? "數據保存失敗" : "数据保存失败") : "Data Save Error")
 #define ESID_Set_Rtsp_Port_Null			(g_China ? (g_Big5 ? "端口號不能為空" : "端口号不能为空") : "Pls enter port number!")
 #define ESID_Set_Rtsp_Channel_Null		(g_China ? (g_Big5 ? "視頻通道不能為空" : "视频通道不能为空") : "Pls enter channel number!")
+#define ESID_Set_Ring_Tips_Fail		    (g_China ? (g_Big5 ? "請錄製留言提示音" : "请录制留言提示音") : "Please record messages prompt tone.")	
 #define ESID_Msg_Connect_Outtime        (g_China ? (g_Big5 ? "連接超時..." : "连接超时...") : "Connection timeout!")
 #define ESID_Msg_Save_OK				(g_China ? (g_Big5 ? "保存成功" : "保存成功") : "OK!")
 #define ESID_Msg_Save_Err				(g_China ? (g_Big5 ? "保存失敗" : "保存失败") : "Failed!")
@@ -128,7 +129,8 @@ extern "C" {
 #define ESID_Msg_Param_Suer_Save		(g_China ? (g_Big5 ? "是否保存設置？" : "是否保存设置？") : "Sure to save settings?")
 #define ESID_Msg_IP_Unline              (g_China ? (g_Big5 ? "IP協議轉換器未在線" : "IP协议转换器未在线") : "IP Converter Offline.")
 #define ESID_Msg_Obtain_Jd_False        (g_China ? (g_Big5 ? "獲取家電信息失敗！" : "获取家电信息失败！") : "Obtain appliance info. failed!")
-#define ESID_Set_Ring_Tips_Fail		    (g_China ? (g_Big5 ? "請錄製留言提示音" : "请录制留言提示音") : "Please record messages prompt tone.")	
+#define ESID_Msg_JD_Mode_Unused         (g_China ? (g_Big5 ? "家電控制器未啟用" : "家电控制器未启用") : "Appliance controller disabled")
+
 
 // IP协议转换器
 #define ESID_Set_Unbounded				 (g_China ? (g_Big5 ? "未綁定" : "未绑定") : "Unbounded")
@@ -138,6 +140,8 @@ extern "C" {
 #define ESID_Set_ExtenNo 				 (g_China ? (g_Big5 ? "分機" : "分机") : "EXT")
 #define ESID_Set_Online				     (g_China ? (g_Big5 ? "在線" : "在线") : "OnLine")
 #define ESID_Set_Offline 				 (g_China ? (g_Big5 ? "離線" : "离线") : "UnLine")
+#define ESID_Set_Bind_OK				 (g_China ? (g_Big5 ? "綁定成功" : "绑定成功") : "OK")
+#define ESID_Set_Bind_Fail				 (g_China ? (g_Big5 ? "綁定失敗" : "绑定失败") : "Failed")
 
 // 网络门前机文字
 #define ESID_Net_Door             		 (g_China ? (g_Big5 ? "網絡門前機" : "网络门前机") : "IP Camera")
@@ -203,6 +207,9 @@ extern "C" {
 #define ESID_Bj_Alarm_Cannot_Qc         (g_China ? (g_Big5 ? "正在報警，無法操作" : "正在报警，无法操作") : "Zone triggerred.Cannot operate!")
 #define ESID_Set_Enter_Alarm_Pwd        (g_China ? (g_Big5 ? "請輸入安防密碼" : "请输入安防密码") : "Enter Security Password")
 #define ESID_Bj_Alarm_Clear_data        (g_China ? (g_Big5 ? "是否清空數據" : "是否清空数据") : "Sure to empty data?")
+#define ESID_Bj_Mode_Unused             (g_China ? (g_Big5 ? "报警模块未啟用" : "报警模块未启用") : "Alarm module inactivated!")
+#define ESID_Bj_Set_Err                 (g_China ? (g_Big5 ? "主機不在撤防狀態，不能設置!" : "主机不在撤防状态，不能设置!") : "Please disarm the system first!")
+
 
 // 对讲文字
 #define ESID_MainMonitor_Door			 (g_China ? (g_Big5 ? "監視門前" : "监视门前") : "Doorway")
@@ -664,6 +671,7 @@ typedef enum
 	SID_Set_Data_Save_Err,
 	SID_Set_Rtsp_Port_Null,
 	SID_Set_Rtsp_Channel_Null,
+	SID_Set_Ring_Tips_Fail,
 	SID_Msg_Connect_Outtime,
 	SID_Msg_Save_OK,
 	SID_Msg_Save_Err,
@@ -677,7 +685,7 @@ typedef enum
 	SID_Msg_Param_Suer_Save,
 	SID_Msg_IP_Unline,
 	SID_Msg_Obtain_Jd_False,
-	SID_Set_Ring_Tips_Fail,
+	SID_Msg_JD_Mode_Unused,
 
 	// IP协议转换器
 	SID_Set_Unbounded,
@@ -686,7 +694,9 @@ typedef enum
 	SID_Set_Binding_Code,
 	SID_Set_ExtenNo,
 	SID_Set_Online,
-	SID_Set_Offline, 	
+	SID_Set_Offline, 
+	SID_Set_Bind_OK,
+	SID_Set_Bind_Fail,	
 
 
 	// 网络门前机文字
@@ -751,6 +761,8 @@ typedef enum
 	SID_Bj_Alarm_Cannot_Qc,
 	SID_Set_Enter_Alarm_Pwd,
 	SID_Bj_Alarm_Clear_data,
+	SID_Bj_Mode_Unused,
+	SID_Bj_Set_Err, 
 
 
 	// 对讲文字

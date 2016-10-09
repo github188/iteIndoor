@@ -37,12 +37,12 @@ static void OnNetDoorDeal(uint32 wParam)
 		{
 			if (2 == g_OperType)
 			{
-				ShowMsgFailHintSuccessLayer(2, SID_Msg_Operat_OK, 0); 
+				ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Msg_Operat_OK, "SetNetDoorLayer");
 			}
 		}
 		else
 		{
-			ShowMsgFailHintSuccessLayer(0, SID_Msg_Operat_Err, 0);
+			ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_ERROR, SID_Msg_Operat_Err, "SetNetDoorCardLayer");
 		}
 		break;
 	}
@@ -99,7 +99,7 @@ bool SetNetDoorCardButtonOnMouseUp(ITUWidget* widget, char* param)
 	}
 	else
 	{
-		ShowMsgFailHintSuccessLayer(1, SID_Net_Door_Card_Delet_All, 1);
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Operat_Err, "SetNetDoorCardLayer");
 	}
 	
 	return true;

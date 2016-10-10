@@ -94,6 +94,11 @@ void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
 		photoMsgBottomBarContainer0 = ituSceneFindWidget(&theScene, "photoMsgBottomBarContainer0");
 		assert(photoMsgBottomBarContainer0);
 	}
+	if (!photoMsgBottomBarContainer1)
+	{
+		photoMsgBottomBarContainer1 = ituSceneFindWidget(&theScene, "photoMsgBottomBarContainer1");
+		assert(photoMsgBottomBarContainer1);
+	}
 	if (!photoMsgNullContainer0)
 	{
 		photoMsgNullContainer0 = ituSceneFindWidget(&theScene, "photoMsgNullContainer0");
@@ -133,6 +138,7 @@ void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
 		ituWidgetSetVisible(photoMsgVideoDrawBackground, false);
 		ituWidgetSetVisible(photoMsgListCoverFlow, true);
 		ituWidgetSetVisible(photoMsgBottomBarContainer0, true);
+		ituWidgetSetVisible(photoMsgBottomBarContainer1, false);
 
 		ituWidgetSetVisible(photoMsgPauseContainer, false);
 		ituWidgetSetVisible(photoMsgPlayContainer, false);
@@ -144,6 +150,7 @@ void photoMsgLayerInit(PHOTOMSG_PAGE_e pageId)
 
 	case PHOTOMSG_CONTENT_PAGE:
 		ituWidgetSetVisible(photoMsgBottomBarContainer0, false);
+		ituWidgetSetVisible(photoMsgBottomBarContainer1, true);
 		ituWidgetSetVisible(photoMsgListCoverFlow, false);
 		ituWidgetSetVisible(photoMsgVideoDrawBackground, true);
 
@@ -466,6 +473,8 @@ void setPhotoMsgList()
 				default:
 					break;
 				}
+				printf("\n1111111111111111111 =%d =  %s \n", i, tmpAddr);
+
 				memset(tmpStr, 0, sizeof(tmpStr));
 				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
@@ -509,6 +518,7 @@ void setPhotoMsgList()
 				default:
 					break;
 				}
+				printf("\n1111111111111111111 =%d =  %s \n", i, tmpAddr);
 				memset(tmpStr, 0, sizeof(tmpStr));
 				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
@@ -573,6 +583,8 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	photoMsgListMiniPicIcon = ituSceneFindWidget(&theScene, tmpStr);
 	assert(photoMsgListMiniPicIcon);
 
+	printf("\n 22222222222222222222222222!  = %d   = %s \n", index, tmpStr);
+
 	// try to load minipic jpeg file if exists
 	tmpFile = fopen(iconAddr, "rb");
 	if (tmpFile)
@@ -591,7 +603,7 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	}
 	else
 	{
-		printf("open  minipic jepg icon icon failed!");
+		printf("\n open  minipic jepg icon icon failed!  = %d  \n", index);
 		ituWidgetSetVisible(photoMsgListMiniPicIcon, false);
 		return false;
 	}
@@ -599,10 +611,12 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	{
 		ituIconLoadJpegData((ITUIcon*)photoMsgListMiniPicIcon, gPhotoMsgListIconData, gPhotoMsgListIconSize);
 		photoMsgListMiniPicIcon->widget.flags |= ITU_EXTERNAL_IMAGE;
+		printf("\n 333333333333333333333333333!  = %d   = %d \n", gPhotoMsgListIconData, gPhotoMsgListIconSize);
+
 	}
 	else
 	{
-		printf("load minipic jepg icon failed!");
+		printf("\n load minipic jepg icon failed!  = %d \n ", index);
 		ituWidgetSetVisible(photoMsgListMiniPicIcon, false);
 		return false;
 	}

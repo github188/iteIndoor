@@ -65,7 +65,7 @@ void picManagerEditBtnOnClicked();
 void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId);
 void picManagerPageInit(PICMANAGER_PAGE_e pageId);
 void setPicManagerPicture();
-bool setPicManagerPictureContent(uint8_t index, char* addrStr);
+bool setPicManagerPictureContent(uint8_t index, char* addrStr, char* sendStr, char*	timeStr);
 void setPicManagerMiniPicList();
 void setMiniPicListIsChecked(MINIPIC_ICON_STATUS_e status);
 bool setMiniPicContent(uint8_t index, char* addrStr);

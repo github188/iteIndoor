@@ -28,6 +28,9 @@ static ITUWidget*		picManagerBottomBarContainer = NULL;
 static ITUWidget*		picManagerNullContainer3 = NULL;
 static ITUIcon*			picManagerMiniPicIcon = NULL;
 static ITUIcon*			picManagerPicContentIcon = NULL;
+static ITUWidget*		picManagerPicContentContainer = NULL;
+static ITUText*			picManagerPicTimeText = NULL;
+static ITUText*			picManagerPicSenderText = NULL;
 static ITUIcon*			picManagerMiniPicUnChenkIcon = NULL;
 static ITUIcon*			picManagerMiniPicChenkIcon = NULL;
 
@@ -182,6 +185,8 @@ bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 	bool  leftRightFlag = true;			//true  =  left
 	uint8_t i = 0;
 	char tmpFile[50] = { 0 };
+	char tmpTime[50] = { 0 };
+	char tmpSender[50] = { 0 };
 
 	if (gPictureNumCount <= PICMANAGER_CONTENT_NUM)
 	{
@@ -209,13 +214,17 @@ bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 				{
 					gPictureCurrentIndex[i] = 0;
 					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
-					setPicManagerPictureContent(i, tmpFile);
+					zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Time, tmpTime);
+					get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+					setPicManagerPictureContent(i, tmpFile, tmpSender, tmpTime);
 				}
 				else
 				{
 					gPictureCurrentIndex[i] = gPictureCurrentIndex[tmpCoverFlowIndex] + 1;
 					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
-					setPicManagerPictureContent(i, tmpFile);
+					zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Time, tmpTime);
+					get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+					setPicManagerPictureContent(i, tmpFile, tmpSender, tmpTime);
 				}
 			}
 		}
@@ -230,13 +239,17 @@ bool picManagerPictureOnChanged(ITUWidget* widget, char* param)
 				{
 					gPictureCurrentIndex[i] = gPictureCurrentIndex[tmpCoverFlowIndex] - 1;
 					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
-					setPicManagerPictureContent(i, tmpFile);
+					zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Time, tmpTime);
+					get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+					setPicManagerPictureContent(i, tmpFile, tmpSender, tmpTime);
 				}
 				else
 				{
 					gPictureCurrentIndex[i] = gPictureNumCount - 1;
 					get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]]).Time));
-					setPicManagerPictureContent(i, tmpFile);
+					zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Time, tmpTime);
+					get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[i]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+					setPicManagerPictureContent(i, tmpFile, tmpSender, tmpTime);
 				}
 			}
 		}
@@ -252,50 +265,77 @@ void setPicManagerPicture()
 {
 	uint8_t	i = 0;
 	char tmpFile[50] = { 0 };
+	char tmpTime[50] = { 0 };
+	char tmpSender[50] = { 0 };
 
 	ituCoverFlowGoto(picManagerPictureCoverFlow, 0);
 	gCoverFlowLastIndex = 0;
 
 	get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]]).Time));
-	setPicManagerPictureContent(0, tmpFile);
+	zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]].Time, tmpTime);
+	get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+	setPicManagerPictureContent(0, tmpFile, tmpSender, tmpTime);
 
 	if ((gPictureCurrentIndex[0] - 1) >= 0)
 	{
 		gPictureCurrentIndex[2] = gPictureCurrentIndex[0] - 1;
 		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]]).Time));
-		setPicManagerPictureContent(2, tmpFile);
+		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].Time, tmpTime);
+		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+		setPicManagerPictureContent(2, tmpFile, tmpSender, tmpTime);
 	}
 	else
 	{
 		gPictureCurrentIndex[2] = gPictureNumCount - 1;
 		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureNumCount - 1]).Time));
-		setPicManagerPictureContent(2, tmpFile);
+		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].Time, tmpTime);
+		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+		setPicManagerPictureContent(2, tmpFile, tmpSender, tmpTime);
 	}
 
 	if ((gPictureCurrentIndex[0] + 1) >= gPictureNumCount)
 	{
 		gPictureCurrentIndex[1] = 0;
 		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
-		setPicManagerPictureContent(1, tmpFile);
+		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Time, tmpTime);
+		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+		setPicManagerPictureContent(1, tmpFile, tmpSender, tmpTime);
 	}
 	else
 	{
 		gPictureCurrentIndex[1] = gPictureCurrentIndex[0] + 1;
 		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
-		setPicManagerPictureContent(1, tmpFile);
+		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Time, tmpTime);
+		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+		setPicManagerPictureContent(1, tmpFile, tmpSender, tmpTime);
 	}
 }
 
 
-bool setPicManagerPictureContent(uint8_t index, char* addrStr)
+bool setPicManagerPictureContent(uint8_t index, char* addrStr, char* sendStr, char*	timeStr)
 {
 	FILE* tmpFile;
-	char  tmpStr[50] = { 0 };
+	char  tmpStr[50] = { 0 }; 
+
+	memset(tmpStr, 0, sizeof(tmpStr));
+	sprintf(tmpStr, "%s%d", "picManagerPicContentContainer", index);
+	picManagerPicContentContainer = ituSceneFindWidget(&theScene, tmpStr);
+	assert(picManagerPicContentContainer);
 
 	memset(tmpStr, 0, sizeof(tmpStr));
 	sprintf(tmpStr, "%s%d", "picManagerPicContentIcon", index);
 	picManagerPicContentIcon = ituSceneFindWidget(&theScene, tmpStr);
 	assert(picManagerPicContentIcon);
+
+	memset(tmpStr, 0, sizeof(tmpStr));
+	sprintf(tmpStr, "%s%d", "picManagerPicTimeText", index);
+	picManagerPicTimeText = ituSceneFindWidget(&theScene, tmpStr);
+	assert(picManagerPicTimeText);
+
+	memset(tmpStr, 0, sizeof(tmpStr));
+	sprintf(tmpStr, "%s%d", "picManagerPicSenderText", index);
+	picManagerPicSenderText = ituSceneFindWidget(&theScene, tmpStr);
+	assert(picManagerPicSenderText);
 
 	// try to load minipic jpeg file if exists
 	tmpFile = fopen(addrStr, "rb");
@@ -317,7 +357,7 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr)
 	else
 	{
 		printf("open  minipic jepg icon icon failed!");
-		ituWidgetSetVisible(picManagerPicContentIcon, false);
+		ituWidgetSetVisible(picManagerPicContentContainer, false);
 		free(gPicManagerImageData);
 
 		return false;
@@ -325,11 +365,13 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr)
 	if (gPicManagerImageData)
 	{
 		ituIconLoadJpegData(picManagerPicContentIcon, gPicManagerImageData, gPicManagerImageSize);
+		ituTextSetString(picManagerPicTimeText, timeStr);
+		ituTextSetString(picManagerPicSenderText, sendStr);
 	}
 	else
 	{
 		printf("load minipic jepg icon failed!");
-		ituWidgetSetVisible(picManagerPicContentIcon, false);
+		ituWidgetSetVisible(picManagerPicContentContainer, false);
 		free(gPicManagerImageData);
 
 		return false;

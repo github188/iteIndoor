@@ -321,7 +321,8 @@ static void ipmodule_heart(const PRECIVE_PACKET recPacket)
 		return ;
 	}
 	//Ipad分机数量4B
-	
+	memset(&ipadList, 0, sizeof(IPAD_EXTENSION_LIST));
+	ipadList.count = 0;
 	memcpy(&(ipadList.count), data+6, 4);
 
 	if (ipadList.count > 0)

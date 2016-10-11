@@ -125,6 +125,7 @@ void set_ipmodule_info(PIPMODULE_INFO IpModule)
 *************************************************/
 int32 set_ipad_extension(IPAD_EXTENSION_LIST ipadList)
 {
+	memset(&g_ipadList, 0, sizeof(IPAD_EXTENSION_LIST));
 	memcpy(&g_ipadList, &ipadList, sizeof(IPAD_EXTENSION_LIST));
 
 	// add by chenbh 更新分机列表

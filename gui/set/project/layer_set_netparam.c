@@ -180,8 +180,10 @@ bool SetNetParamOnEnter(ITUWidget* widget, char* param)
 			ituWidgetSetVisible(SetNetParamHostListContainer, false);
 			ituWidgetSetVisible(SetNetParamContainer, true);
 		}
-		if (ituRadioBoxIsChecked(MsgFailHintSuccess0RadioBox))	//确认键
+		if (ituRadioBoxIsChecked(MsgFailHintSuccess0RadioBox))	//取消键
 		{
+			memset(g_ip_host, 0, sizeof(g_ip_host));
+			memcpy(g_ip_host, g_ip, sizeof(g_ip_host));
 			ituWidgetSetVisible(SetNetParamHostListContainer, false);
 			ituWidgetSetVisible(SetNetParamContainer, true);
 		}

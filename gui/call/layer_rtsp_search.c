@@ -249,8 +249,6 @@ Others:			无
 *************************************************/
 static void InitRTSPSWin(void)
 {
-	g_FenJiLoadTick = 0;
-	g_ShowLoadTick = 0;
 	ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, false);
 	if (0 == g_Type)
 	{
@@ -400,26 +398,13 @@ bool RTSPSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 	switch (btn_event)
 	{
 		case RTSPHomeEvent:
-			ituWidgetSetVisible(RTSPSearchBottomSearchContainer, false);
-			if (is_main_DeviceNo())
-			{
-				g_Type = 0;
-				ShowRtspWin(0);
-			}
-			else
-			{
-				g_FenJiLoadTick = 3;
-				ituWidgetDisable(RTSPSearchBackground);
-				ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, true);
-			}
+			g_Type = 0;
+			InitRTSPSWin();
 			break;
 
 		case RTSPPublicEvent:
-			ituWidgetSetVisible(RTSPSearchBottomSearchContainer, true);
 			g_Type = 1;
-			g_ShowLoadTick = 1;
-			ituWidgetDisable(RTSPSearchBackground);
-			ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, true);
+			InitRTSPSWin();
 			break;
 
 
@@ -452,6 +437,8 @@ bool RTSPSearchLayerOnEnter(ITUWidget* widget, char* param)
 {
 	uint8 i;
 
+	g_FenJiLoadTick = 0;
+	g_ShowLoadTick = 0;
 	InitRTSPSWin();
 
 	for (i = 0; i < 2; i++)

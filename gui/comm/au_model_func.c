@@ -750,6 +750,7 @@ void TouchMonitorKey(void)
 	}
 	else
 	{
-		MonitorWin(DEVICE_TYPE_STAIR, 0);		// 点击直接开始监视
+		uint8 count = storage_get_monitocount(DEVICE_TYPE_STAIR);
+		MonitorWin(DEVICE_TYPE_STAIR, 0, count);		// 点击直接开始监视
 	}
 }

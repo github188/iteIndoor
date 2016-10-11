@@ -1361,7 +1361,7 @@ void fill_devno_by_index(DEVICE_TYPE_E DevType, int8 index, char *devno)
   Return:		
   Others:		
 *************************************************/
-static uint32 get_monitor_sync_devlist (void)
+static void* get_monitor_sync_devlist (void *param)
 {
 	int32 ret = FALSE;
 
@@ -1384,7 +1384,7 @@ static uint32 get_monitor_sync_devlist (void)
 		default:	
 			MonitorListNotify(MONITOR_GETLIST, FALSE);
 			g_MonitorInfo.state = MONITOR_END;
-			return FALSE;
+			return NULL;
 	}
 
 	if (ret == TRUE)
@@ -1397,7 +1397,7 @@ static uint32 get_monitor_sync_devlist (void)
 	}
 	
 	g_MonitorInfo.state = MONITOR_END;
-	return ret;
+	return NULL;
 }
 
 /*************************************************
@@ -1411,8 +1411,14 @@ static uint32 get_monitor_sync_devlist (void)
 uint32 monitorlist_sync_devlist(DEVICE_TYPE_E DevType)
 {
 	g_MonitorInfo.DevType = DevType;
-	get_monitor_sync_devlist();
-	return 0;
+	struct ThreadInfo mThread;	
+	if (0 != inter_start_thread(&mThread, get_monitor_sync_devlist, NULL, 0))
+	{
+		g_MonitorInfo.state = MONITOR_END;
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 

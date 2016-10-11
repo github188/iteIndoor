@@ -333,19 +333,9 @@ static void SetBeCallLockAndSnap(BeCallButtonEvent event)
 		ituWidgetDisable(BeCallRightSnapButton);
 		ituWidgetSetVisible(BeCallRightSnapGrayBackground, true);
 		inter_video_snap();
+		// 超时判断使用，防止抓拍失败，无法再次抓拍
+		g_MSGSnapTicks = 5;
 	}
-}
-
-/*************************************************
-Function:		BeCallDestroyProc
-Description: 	销毁处理函数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void BeCallDestroyProc(void)
-{
 }
 
 /*************************************************
@@ -384,6 +374,20 @@ static void BeCallCalloutStart(void)
 		g_InterState = CALL_STATE_END;
 	}
 	DrawStringHint();
+}
+
+/*************************************************
+Function:		BeCallLayerOnLeave
+Description:	销毁处理函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool BeCallLayerOnLeave(ITUWidget* widget, char* param)
+{
+
+	return true;
 }
 
 /*************************************************
@@ -571,6 +575,10 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 
 		case CALL_STATE_END:
 			g_InterState = CALL_STATE_NONE;
+			if (TRUE == g_DrawVideo)
+			{
+				BackgroundDrawVideo_exit();
+			}
 			ituLayerGoto(MainLayer);
 			return true;
 			break;
@@ -648,6 +656,10 @@ bool BeCallCallOutState(ITUWidget* widget, char* param)
 
 		case CALL_STATE_END:
 			g_InterState = CALL_STATE_NONE;
+			if (TRUE == g_DrawVideo)
+			{
+				BackgroundDrawVideo_exit();
+			}
 			ituLayerGoto(MainLayer);
 			return true;
 			break;
@@ -859,7 +871,7 @@ bool BeCallLayerOnEnter(ITUWidget* widget, char* param)
 
 	if (TRUE == g_DrawVideo)
 	{
-		BackgroundDrawVideo("BeCallBackground");
+		BackgroundDrawVideo_init("BeCallBackground");
 	}
 	
 	return true;

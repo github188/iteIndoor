@@ -1045,7 +1045,7 @@ void sys_set_hint_state(SYS_HINT_TYPE HintType, uint8 flg)
 	// 设置全局变量	
 	g_SysHintRecord.syshint[HintType] = flg;
 	dprintf("sys_set_hint_state : HintType:%d, flg:%d\n", HintType, flg);
-
+#if 0	// 暂时注释掉 等驱动可用再开启
 	#ifdef _CP2526_TOUCH_KEY_
 	// 操作按键背光灯
 	for (i = SYS_HINT_INFO; i < SYS_HINT_MISSED_CALLS+1; i++)
@@ -1093,7 +1093,7 @@ void sys_set_hint_state(SYS_HINT_TYPE HintType, uint8 flg)
 		hw_alarm_led_off();
 	}
 	#endif
-	
+#endif	
 	return;
 }
 
@@ -1474,7 +1474,7 @@ void sys_sync_hint_state_ext(SYS_HINT_TYPE HintType)
 						}
 					}
 					g_SysHintRecord.syshintnum[SYS_HINT_MISSED_CALLS] = unread_num;
-					dprintf("MissUnReadList num: %d\n", g_SysHintRecord.MissUnReadList->CallCount);
+					dprintf("MissUnReadList num: %d, CallCount: %d\n", unread_num, g_SysHintRecord.MissUnReadList->CallCount);
 				}
 				if (unread_num)
 				{

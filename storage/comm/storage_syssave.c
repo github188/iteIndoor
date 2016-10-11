@@ -476,10 +476,16 @@ void storage_recover_factory(void)
 void storage_format_system(void)
 {
 	// 删除NAND1-2上的目录和文件
+#if 0
 	rmdir(MSG_DIR_PATH);
 	rmdir(SNAP_DIR_PATH);
 	rmdir(LYLY_DIR_PATH);
-	
+#else
+	ugDeleteDirectory(MSG_DIR_PATH);
+	ugDeleteDirectory(SNAP_DIR_PATH);
+	ugDeleteDirectory(LYLY_DIR_PATH);
+#endif
+
 	create_sys_dir();
 	sync_data();
 }

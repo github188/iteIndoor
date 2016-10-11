@@ -253,7 +253,7 @@ void get_timeofday(void)
 	struct timeval tv;
 	struct timezone tz;
 	gettimeofday (&tv , &tz);  // ÏµÍ³º¯Êý
-	dprintf("tv.tv_sec ,tv.tv_usec : %d:%ld \n", tv.tv_sec, tv.tv_usec);
+	debug_log("tv.tv_sec ,tv.tv_usec : %d:%ld \n", tv.tv_sec, tv.tv_usec);
 	//dprintf("tz.tz_minuteswest : %d , tz.tz_dsttime : %d \n", tz.tz_minuteswest, tz.tz_dsttime);
 }
 

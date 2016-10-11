@@ -31,6 +31,7 @@ bool AurineJDPowerButtonOnMouseUp(ITUWidget* widget, char* param);
 bool AurineJDGasButtonOnMouseUp(ITUWidget* widget, char* param);
 bool AurineJDLightOnChanged(ITUWidget* widget, char* param);
 bool AurineJDExitLightControlButtonOnMouseUp(ITUWidget* widget, char* param);
+bool AurineJDLayerOnLeave(ITUWidget* widget, char* param);
 void AurineJDWin(void);
 
 #ifdef __cplusplus

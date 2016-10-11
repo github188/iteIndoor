@@ -154,7 +154,8 @@ bool SetRingtoneOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(SetCallRingMsgBackground, false);
 		ituWidgetSetVisible(SetAlarmRingtoneMsgBackground, false);
 		ituWidgetSetVisible(SetLylyRingRecMsgBackground, false);
-		ituWidgetSetVisible(SetRingtoneBackground, true);
+		ituWidgetSetVisible(SetRingtoneBackground, true); 
+		ituWidgetSetVisible(SetRingtoneListContainer, true);
 		ituWidgetSetVisible(SetCallRingtoneListContainer, false);
 		if (!ituWidgetIsEnabled(SetRingtoneBackground))
 		{

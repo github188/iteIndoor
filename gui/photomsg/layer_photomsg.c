@@ -895,7 +895,7 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 		break;
 
 	case LYLY_TYPE_VIDEO:
-		BackgroundDrawVideo("photoMsgVideoDrawButton");
+		BackgroundDrawVideo_init("photoMsgVideoDrawButton");
 		get_lylyavi_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放视频文件！
 		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_VIDEO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);

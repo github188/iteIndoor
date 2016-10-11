@@ -82,6 +82,7 @@ ITUActionFunction actionFunctions[] =
 	"BeCallCallOutState", BeCallCallOutState,
 	"BeCallCallInState", BeCallCallInState,
 	"BeCallLayerKeyOnMouseUp", BeCallLayerKeyOnMouseUp,
+	"BeCallLayerOnLeave", BeCallLayerOnLeave,
 	
 	// MonitorSearch
 	"MonitorSearchLayerOnEnter", MonitorSearchLayerOnEnter,
@@ -101,6 +102,8 @@ ITUActionFunction actionFunctions[] =
 	"MonitorLayerOnTimer", MonitorLayerOnTimer,
 	"MonitorState", MonitorState,
 	"MonitorKeyOnMouseUp", MonitorKeyOnMouseUp,
+	"MonitorChangeCameraOnMouseUp", MonitorChangeCameraOnMouseUp,
+	"MonitorLayerOnLeave", MonitorLayerOnLeave,
 
 	// RTSPSearch
 	"RTSPSearchLayerStart", RTSPSearchLayerStart,
@@ -131,6 +134,7 @@ ITUActionFunction actionFunctions[] =
 	"AurineJDGasButtonOnMouseUp", AurineJDGasButtonOnMouseUp,
 	"AurineJDLightOnChanged", AurineJDLightOnChanged,
 	"AurineJDExitLightControlButtonOnMouseUp", AurineJDExitLightControlButtonOnMouseUp,
+	"AurineJDLayerOnLeave", AurineJDLayerOnLeave,
 
 	//Alarm
 	"AlarmOnEnter", AlarmOnEnter,

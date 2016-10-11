@@ -49,9 +49,12 @@
 /**************************************************************************/
 /*									报警								  */	
 /**************************************************************************/
-#define AF_DIR_PATH				CFG_TEMP_DRIVE":/ALARM"								// 安防路径
-#define AF_CZ_REC_PATH			CFG_TEMP_DRIVE":/ALARM/CZREC.BIN"						// 安防操作记录
-#define AF_BJ_REC_PATH			CFG_TEMP_DRIVE":/ALARM/BJBRE.BIN"						// 安防报警记录
+//#define AF_DIR_PATH				CFG_TEMP_DRIVE":/ALARM"								// 安防路径
+//#define AF_CZ_REC_PATH			CFG_TEMP_DRIVE":/ALARM/CZREC.BIN"						// 安防操作记录
+//#define AF_BJ_REC_PATH			CFG_TEMP_DRIVE":/ALARM/BJBRE.BIN"						// 安防报警记录
+#define AF_DIR_PATH				"D:/ALARM"								// 安防路径
+#define AF_CZ_REC_PATH			"D:/ALARM/CZREC.BIN"						// 安防操作记录
+#define AF_BJ_REC_PATH			"D:/ALARM/BJBRE.BIN"						// 安防报警记录
 
 // 中文提示音路径
 #define AF_YJ_PATH				CFG_PRIVATE_DRIVE":/res/rings/Alarm/YUJING.WAV"			// 预警声音路径

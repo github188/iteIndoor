@@ -986,6 +986,34 @@ PMONITORINFO storage_get_monitorinfo (DEVICE_TYPE_E devtype, int8 index)
 }
 
 /*************************************************
+Function:		storage_get_monitocount
+Description: 	获取监视列表个数
+Input:
+	1.devtype	类型
+Output:			无
+Return:			无
+Others:
+1.该指针外部释放
+*************************************************/
+uint8 storage_get_monitocount(DEVICE_TYPE_E devtype)
+{
+	uint8 count = 0;
+	PMONITORLISTINFO monitorlist = NULL;
+	monitorlist = storage_get_monitorlist(devtype);
+	if (monitorlist->MonitorCount == 0)
+	{
+		dprintf(" storage_get_monitorlist return 0 \n");
+		free_monitorlist_memory(&monitorlist);
+		return NULL;
+	}
+	count = monitorlist->MonitorCount;
+
+	free_monitorlist_memory(&monitorlist);
+
+	return count;
+}
+
+/*************************************************
   Function:		storage_get_monitorlist
   Description: 	 获取监视列表信息
   Input:		
@@ -1070,7 +1098,6 @@ ECHO_STORAGE storage_add_monitorlist (DEVICE_TYPE_E Type, int8 index, uint32 ip)
 	free_monitorlist_memory(&monitorlist);
 	return ret;
 }
-
 
 /*************************************************
   Function:		storage_clear_monitorlist

@@ -38,8 +38,7 @@ static ITUButton* MonitorSearchBottomNullButton[3] = { NULL };
 static PMONITORLISTINFO  g_MonitorList = NULL;
 static DEVICE_TYPE_E g_DevType = DEVICE_TYPE_NONE;
 static uint32 g_MonitorSearchLastTick = 0;					// 实时更新的tick
-static uint8 g_ShowLoadTick = 0;
-
+static uint8 g_MonitorSearchCallBak = true;
 typedef enum
 {
 	MonitorStairEvent = 0x00,
@@ -237,24 +236,20 @@ Return:			TRUE 是 FALSE 否
 Others:			无
 *************************************************/
 bool MonitorSearchLayerOnTimer(ITUWidget* widget, char* param)
-{
+{	
 	uint32 tick = SDL_GetTicks();
-	uint32 diff = tick - g_MonitorSearchLastTick;
-	if (diff >= 1000)
+	if (g_MonitorSearchCallBak == false)
 	{
-		g_MonitorSearchLastTick = tick;
-		// 搜索列表
-		if (g_ShowLoadTick)
+		if ((tick - g_MonitorSearchLastTick) >= 5000)
 		{
-			g_ShowLoadTick--;
-			if (0 == g_ShowLoadTick)
-			{
-				storage_clear_monitorlist(g_DevType);
-				monitorlist_sync_devlist(g_DevType);
-			}
+			g_MonitorSearchLastTick = tick;
+			g_MonitorSearchCallBak = true;
+			
+			// 搜索列表
+			ShowMonitorWin();
+			ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
 		}
 	}
-
 	return true;
 }
 
@@ -274,6 +269,7 @@ bool MonitorSearchListState(ITUWidget* widget, char* param)
 	if (pmonitorbak_data->InterState == MONITOR_GETLIST)
 	{
 		//ituAnimationStop(MonitorSearchMSGHitAnimation);
+		g_MonitorSearchCallBak = true;
 		ShowMonitorWin();
 		ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
 	}
@@ -296,7 +292,7 @@ bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param)
 	if (g_MonitorList && g_MonitorList->MonitorCount > 0)
 	{
 		g_DevType = g_MonitorList->pMonitorInfo[index].DeviceType;
-		MonitorWin(g_DevType, index);		// 点击直接开始监视
+		MonitorWin(g_DevType, index, g_MonitorList->MonitorCount);		// 点击直接开始监视
 	}
 	return true;
 }
@@ -346,7 +342,10 @@ bool MonitorSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 
 		case MonitorSearchEvent:
 			//ituAnimationPlay(MonitorSearchMSGHitAnimation);
-			g_ShowLoadTick = 1;
+			g_MonitorSearchLastTick = SDL_GetTicks();
+			g_MonitorSearchCallBak = false;
+			storage_clear_monitorlist(g_DevType);
+			monitorlist_sync_devlist(g_DevType);
 			ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, true);
 			break;
 
@@ -443,8 +442,8 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 			assert(MonitorSearchBottomNullButton[i]);
 		}
 	}
-	g_ShowLoadTick = 0;
 	g_DevType = DEVICE_TYPE_STAIR;
+	g_MonitorSearchCallBak = true;
 	ShowMonitorWin();
 	ituRadioBoxSetChecked(MonitorSearchRightStairRadioBox, true);
 	ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
@@ -453,8 +452,7 @@ bool MonitorSearchLayerOnEnter(ITUWidget* widget, char* param)
 	{
 		ituWidgetDisable(MonitorSearchBottomNullButton[i]);
 	}
-	g_MonitorSearchLastTick = SDL_GetTicks();
-
+	
 	return true;
 }
 

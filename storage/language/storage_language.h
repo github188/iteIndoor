@@ -131,7 +131,6 @@ extern "C" {
 #define ESID_Msg_Obtain_Jd_False        (g_China ? (g_Big5 ? "獲取家電信息失敗！" : "获取家电信息失败！") : "Obtain appliance info. failed!")
 #define ESID_Msg_JD_Mode_Unused         (g_China ? (g_Big5 ? "家電控制器未啟用" : "家电控制器未启用") : "Appliance controller disabled")
 
-
 // IP协议转换器
 #define ESID_Set_Unbounded				 (g_China ? (g_Big5 ? "未綁定" : "未绑定") : "Unbounded")
 #define ESID_Set_Bounded  				 (g_China ? (g_Big5 ? "已綁定" : "已绑定") : "Binding")

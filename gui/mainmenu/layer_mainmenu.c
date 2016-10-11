@@ -326,6 +326,11 @@ void mainLayerCornerNumReload()
 	setUnsolvedSecurityAlarmNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_ALARM_WARNING]);		//设置安防报警数
 	setUnreadMissedCallNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_MISSED_CALLS]);			//设置未接来电数
 
+	setNetworkStatus(getNetworkStatus());		//设置网络状态
+	setDeviceNo(getDeviceNo());					//设置设备编号
+	setDisturbStatus(getDisturbStatus());		//设置免打扰状态
+	setIpIconStatus(getIpIconStatus());			//设置IP模块启用与否
+
 	setMainBackgroundImg();												//设置主界面背景图
 }
 
@@ -400,13 +405,13 @@ bool setMainBackgroundImg()
 }
 
 
-bool getIpIconStatus()
+uint8_t getIpIconStatus()
 {
-	return (bool)get_ipmodule_bindstate();		//获取是否启用IP模块
+	return (uint8_t)get_ipmodule_bindstate();		//获取是否启用IP模块
 }
 
 
-void setIpIconStatus(bool status)
+void setIpIconStatus(uint8_t status)
 {
 	if (!mainIPSprite)
 	{

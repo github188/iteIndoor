@@ -239,6 +239,8 @@ void SceneSetQuitValue(QuitValue value);
  */
 QuitValue SceneGetQuitValue(void);
 
+void SceneEnterVideoState(void);
+void SceneLeaveVideoState(void);
 
 #ifdef __cplusplus
 }

@@ -541,6 +541,7 @@ uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 	{
 		level = 20+10*vol;
 	}
+	dprintf("level: %d\n", level);
 	leaf_set_play_level(g_LeafCall, level);
 	return TRUE;
 }
@@ -565,6 +566,7 @@ uint32 media_set_ring_volume(uint32 vol)
 	{
 		level = 20+10*vol;
 	}
+	dprintf("level: %d\n", level);
    	leaf_set_ring_level(g_LeafCall, level);	
 	return TRUE;
 }
@@ -589,6 +591,7 @@ uint32 media_set_mic_volume(uint8 vol)
 	{
 		level = 80+2*vol;
 	}
+	dprintf("level: %d\n", level);
 	leaf_set_rec_level(g_LeafCall, level);
 	return TRUE;
 }

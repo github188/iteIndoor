@@ -1678,27 +1678,18 @@ static void ShowDevType(AU_JD_DEV_TYPE dev)
 }
 
 /*************************************************
-Function:		DrawStringHint
-Description: 	画状态提示
+Function:		AurineJDLayerOnLeave
+Description:	销毁处理函数
 Input:			无
 Output:			无
-Return:			无
+Return:			TRUE 是 FALSE 否
 Others:			无
 *************************************************/
-static void DrawStringHint(void)
+bool AurineJDLayerOnLeave(ITUWidget* widget, char* param)
 {
-}
 
-/*************************************************
-Function:		AurineJDDestroyProc
-Description: 	销毁处理函数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void AurineJDDestroyProc(void)
-{
+	ituSpriteGoto(AurineJDBottomSprite[g_BtnEvent - 2], AurineJDButtomNoPressIcon);
+	return true;
 }
 
 /*************************************************

@@ -37,7 +37,7 @@ static void OnNetDoorDeal(uint32 wParam)
 		{
 			if (2 == g_OperType)
 			{
-				ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Msg_Operat_OK, "SetNetDoorLayer");
+				ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_OK, SID_Msg_Operat_OK, "SetNetDoorCardLayer");
 			}
 		}
 		else
@@ -47,7 +47,6 @@ static void OnNetDoorDeal(uint32 wParam)
 		break;
 	}
 }
-
 
 /*************************************************
 Function:		SetNetDoorCardOnEnter
@@ -99,7 +98,7 @@ bool SetNetDoorCardButtonOnMouseUp(ITUWidget* widget, char* param)
 	}
 	else
 	{
-		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Msg_Operat_Err, "SetNetDoorCardLayer");
+		ShowMsgFailHintSuccessLayer(HIT_SPRITE_TO_WARNNING, SID_Net_Door_Card_Delet_All, "SetNetDoorCardLayer");
 	}
 	
 	return true;

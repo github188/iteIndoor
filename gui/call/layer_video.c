@@ -29,7 +29,7 @@ void calledRemoteBackgroundDraw(ITUWidget* widget, ITUSurface* dest, int x, int 
 #endif
 
 
-int BackgroundDrawVideo(char *background)
+int BackgroundDrawVideo_init(char *background)
 {
 	if (background == NULL)
 	{
@@ -51,4 +51,13 @@ int BackgroundDrawVideo(char *background)
 	#ifdef CFG_VIDEO_ENABLE     
 	itv_set_video_window(x, y, width, height);
 	#endif
+
+	SceneEnterVideoState();
+	return TRUE;
 }
+
+void BackgroundDrawVideo_exit(void)
+{
+	SceneLeaveVideoState();
+}
+

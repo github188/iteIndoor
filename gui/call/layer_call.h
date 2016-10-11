@@ -43,6 +43,7 @@ bool BeCallLayerOnTimer(ITUWidget* widget, char* param);
 bool BeCallCallOutState(ITUWidget* widget, char* param);
 bool BeCallCallInState(ITUWidget* widget, char* param);
 bool BeCallLayerKeyOnMouseUp(ITUWidget* widget, char* param);
+bool BeCallLayerOnLeave(ITUWidget* widget, char* param);
 void BeCallWin(INTER_INFO_S* info);
 
 // MonitorSearchLayer
@@ -63,7 +64,9 @@ bool MonitorHideSoundOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorLayerOnTimer(ITUWidget* widget, char* param);
 bool MonitorState(ITUWidget* widget, char* param);
 bool MonitorKeyOnMouseUp(ITUWidget* widget, char* param);
-void MonitorWin(DEVICE_TYPE_E DevType, uint8 index);
+bool MonitorChangeCameraOnMouseUp(ITUWidget* widget, char* param);
+bool MonitorLayerOnLeave(ITUWidget* widget, char* param);
+void MonitorWin(DEVICE_TYPE_E DevType, uint8 index, uint8 count);
 
 // RTSPSearchLayer
 bool RTSPSearchLayerStart(ITUWidget* widget, char* param);
@@ -81,7 +84,8 @@ bool RTSPMonitorState(ITUWidget* widget, char* param);
 bool RTSPMonitorLayerShowBottomButtonOnMouseUp(ITUWidget* widget, char* param);
 void RTSPMonitorWin(PRtspDeviceList list, uint8 index);
 // video
-int BackgroundDrawVideo(char *background);
+int BackgroundDrawVideo_init(char *background);
+void BackgroundDrawVideo_exit(void);
 
 #ifdef __cplusplus
 }

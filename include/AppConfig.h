@@ -21,7 +21,7 @@
 #define LYLY_VIEW_VOL			8					// 留影留言播放声
 #define MSG_VIEW_VOL			4					// 信息查看声音大小
 #define JRLY_VOLUME				8					// 家人留言播放音量大小
-#define RING_OUT_VOL			8					// 回铃声大小
+#define RING_OUT_VOL			4					// 回铃声大小
 
 // ====定义记录存储条数======================================
 #define AF_REC_MAX 	  			20					// 安防事件最大记录数

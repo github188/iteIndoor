@@ -32,10 +32,13 @@ static ITUBackground* MonitorRightSnapGrayBackground = NULL;
 static ITUButton* MonitorRightSnapButton = NULL;
 static ITUButton* MonitorRightNullButton0 = NULL;
 static ITUTrackBar* MonitorSoundTrackBar = NULL;
+static ITUButton* MonitorPreButton = NULL;
+static ITUButton* MonitorNextButton = NULL;
 
 /*****************常量定义***********************/
 static DEVICE_TYPE_E g_DevType;
 static int32 g_index = -1;
+static uint8 g_Count = 0;
 static char g_DevNo[50];
 static MONITOR_STATE_E g_InterState = MONITOR_END;
 static int16 g_RemainTime = 0;
@@ -283,22 +286,20 @@ static void SetMonitorLockAndSnap(MonitorButtonEvent event)
 	}
 	else
 	{
+		if (g_InterState == MONITOR_MONITORING)
+		{
+			if (g_Count > 1)
+			{
+				ituWidgetSetVisible(MonitorPreButton, FALSE);
+				ituWidgetSetVisible(MonitorNextButton, FALSE);
+			}
+		}
 		ituWidgetDisable(MonitorRightSnapButton);
 		ituWidgetSetVisible(MonitorRightSnapGrayBackground, true);
 		monitor_video_snap();
+		// 超时判断使用，防止抓拍失败，无法再次抓拍
+		g_MSGSnapTicks = 5;
 	}
-}
-
-/*************************************************
-Function:		MonitorDestroyProc
-Description: 	销毁处理函数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void MonitorDestroyProc(void)
-{
 }
 
 /*************************************************
@@ -315,6 +316,20 @@ static void monitor_search_fail(void)
 	g_InterState = MONITOR_END;
 	g_ErrHintTicks = 3;
 	DrawStringHint();
+}
+
+/*************************************************
+Function:		MonitorLayerOnLeave
+Description:	销毁处理函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool MonitorLayerOnLeave(ITUWidget* widget, char* param)
+{
+
+	return true;
 }
 
 /*************************************************
@@ -358,6 +373,14 @@ bool MonitorLayerOnTimer(ITUWidget* widget, char* param)
 			g_MSGSnapTicks--;
 			if (0 == g_MSGSnapTicks)
 			{
+				if (g_InterState == MONITOR_MONITORING)
+				{
+					if (g_Count > 1)
+					{
+						ituWidgetSetVisible(MonitorPreButton, true);
+						ituWidgetSetVisible(MonitorNextButton, true);
+					}
+				}
 				ituWidgetSetVisible(MonitorHitBackground, false);
 				ituWidgetSetVisible(MonitorRightSnapGrayBackground, false);
 				ituWidgetEnable(MonitorRightSnapButton);
@@ -463,10 +486,25 @@ bool MonitorState(ITUWidget* widget, char* param)
 			else
 			{
 				g_InterState = MONITOR_MONITORING;
+				if (g_Count > 1)
+				{
+					ituWidgetSetVisible(MonitorPreButton, true);
+					ituWidgetSetVisible(MonitorNextButton, true);
+				}
+				else
+				{
+					ituWidgetSetVisible(MonitorPreButton, false);
+					ituWidgetSetVisible(MonitorNextButton, false);
+				}
 			}
 			break;
 
 		case MONITOR_TALKING:
+			if (g_Count > 1)
+			{
+				ituWidgetSetVisible(MonitorPreButton, false);
+				ituWidgetSetVisible(MonitorNextButton, false);
+			}
 			ituTextSetString(MonitorTimeText, NULL);
 			ituWidgetSetVisible(MonitorShowButtomContainer, true);
 			g_volume = storage_get_talkvolume();
@@ -522,7 +560,37 @@ bool MonitorState(ITUWidget* widget, char* param)
 }
 
 /*************************************************
-Function:		BeCallLayerKeyOnMouseUp
+Function:		MonitorChangeCameraOnMouseUp
+Description: 	监视上一个、下一个摄像头
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool MonitorChangeCameraOnMouseUp(ITUWidget* widget, char* param)
+{
+	int32 direct = TRUE;
+	uint8 btn_event = atoi(param);
+
+	if (0 == btn_event)
+	{
+		// 监视上一个
+		direct = FALSE;
+	}
+	else
+	{
+		// 监视下一个
+		direct = TRUE;
+	}
+	// 清空倒计时
+	ituTextSetString(MonitorTimeText, "");
+	monitor_next(direct);
+
+	return true;
+}
+
+/*************************************************
+Function:		MonitorKeyOnMouseUp
 Description: 	开锁、通话快捷键
 Input:			无
 Output:			无
@@ -710,7 +778,7 @@ bool MonitorLayerOnEnter(ITUWidget* widget, char* param)
 	SetMonitorInfo();
 	DrawStringHint();
 	g_StartMonitorTick = 1;
-	BackgroundDrawVideo("MonitorBackground");
+	BackgroundDrawVideo_init("MonitorBackground");
 
 	return true;
 }
@@ -777,6 +845,12 @@ static void InitMonitorLayer(void)
 
 		MonitorSoundTrackBar = ituSceneFindWidget(&theScene, "MonitorSoundTrackBar");
 		assert(MonitorSoundTrackBar);
+
+		MonitorPreButton = ituSceneFindWidget(&theScene, "MonitorPreButton");
+		assert(MonitorPreButton);
+
+		MonitorNextButton = ituSceneFindWidget(&theScene, "MonitorNextButton");
+		assert(MonitorNextButton);
 	}
 }
 
@@ -784,19 +858,21 @@ static void InitMonitorLayer(void)
 Function:		MonitorWin
 Description: 	监视界面
 Input:
-1.DevType		设备类型
-2.index			索引
+	1.DevType	设备类型
+	2.index		索引
+	3.count		搜索到的设备总数
 utput:			无
 Return:			无
 Others:			无
 *************************************************/
-void MonitorWin(DEVICE_TYPE_E DevType, uint8 index)
+void MonitorWin(DEVICE_TYPE_E DevType, uint8 index, uint8 count)
 {
 	int32 ret = ui_show_win_arbitration(SYS_OPER_MONITOR);
 	if (ret == TRUE)
 	{
 		g_index = index;
 		g_DevType = DevType;
+		g_Count = count;
 		InitMonitorLayer();
 		ituLayerGoto(MonitorLayer);
 	}

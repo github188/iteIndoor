@@ -56,8 +56,8 @@ void mainLayerShow();
 void zoneDateTimeToString(DATE_TIME time, char* tmpStr);
 
 //以下是需要定时器实时获取的状态值！！
-bool getIpIconStatus();
-void setIpIconStatus(bool status);
+uint8_t getIpIconStatus();
+void setIpIconStatus(uint8_t status);
 bool getNetworkStatus();
 void setNetworkStatus(bool status);
 char* getDeviceNo();

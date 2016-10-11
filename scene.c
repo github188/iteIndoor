@@ -12,18 +12,20 @@
 #include "logic_include.h"
 #include "gui_include.h"
 
-#define FPS_ENABLE
+//#define FPS_ENABLE
 
 #ifdef _WIN32
     #include <crtdbg.h>
 #endif
 
 //#define DOUBLE_KEY_ENABLE
+#define USE_ANDROID_MODE
 #define MS_PER_FRAME                17   
 #define MS_PER_FRAME_EXT            33
 #define MAX_COMMAND_QUEUE_SIZE      8
 #define GESTURE_THRESHOLD           40
 #define MOUSEDOWN_LONGPRESS_DELAY   1000
+#define ANDROID_PRESS_DELAY   		300
 
 #define _MAIN_MENU_LAYER_			"mainMenuLayer"
 
@@ -73,6 +75,7 @@ static mqd_t g_CommandQueue = -1;
 static ITUSurface* g_ScreenSurf = NULL;
 static SDL_Window *g_window = NULL;
 static bool g_LcdFuncNoDeal = false;
+static bool inVideoState = false;
 extern ITUActionFunction actionFunctions[];
 
 
@@ -910,7 +913,8 @@ int SceneRun(void)
     SDL_Event ev;
     int delay, frames, lastx, lasty, ret;
     uint32_t tick, dblclk, lasttick, mouseDownTick;
-
+	Uint32 pre_type = 0;
+	
     /* Watch keystrokes */
     dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
 
@@ -1114,10 +1118,18 @@ int SceneRun(void)
 					else
 					{
 						ScreenSaverRefresh();
+						#ifdef USE_ANDROID_MODE
+						if (mouseDownTick > 0 && pre_type == SDL_FINGERDOWN)
+			            {
+			                printf("ANDROID press: %d %d\n", lastx, lasty);
+							result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
+			            }
+						#endif
 	                	//printf("touch: move %d, %d\n", ev.tfinger.x, ev.tfinger.y);
 	                	result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEMOVE, 1, ev.tfinger.x, ev.tfinger.y);
 					}	
 					g_LcdFuncNoDeal = false;
+					pre_type = ev.type;
             	}
                 break;
 
@@ -1131,11 +1143,19 @@ int SceneRun(void)
 						break;
 					}
 
+					#ifdef USE_ANDROID_MODE
+					ScreenSaverRefresh();
+	                //printf("touch: down %d, %d\n", ev.tfinger.x, ev.tfinger.y);
+                    mouseDownTick = SDL_GetTicks();
+			 		dblclk = mouseDownTick;
+                    lastx = ev.tfinger.x;
+                    lasty = ev.tfinger.y;
+					pre_type = ev.type;
+					#else
 	                ScreenSaverRefresh();
 	                //printf("touch: down %d, %d\n", ev.tfinger.x, ev.tfinger.y);
-	                {
-	                    mouseDownTick = SDL_GetTicks();
-	                #ifdef DOUBLE_KEY_ENABLE
+                    mouseDownTick = SDL_GetTicks();
+                	#ifdef DOUBLE_KEY_ENABLE
 	                    if (mouseDownTick - dblclk <= 200)
 	                    {
 	                        printf("double touch!\n");
@@ -1143,7 +1163,7 @@ int SceneRun(void)
 	                        dblclk = mouseDownTick = 0;
 	                    }
 	                    else
-	                #endif // DOUBLE_KEY_ENABLE
+                	#endif // DOUBLE_KEY_ENABLE
 	                    {
 	                        result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, ev.tfinger.x, ev.tfinger.y);
 	                        dblclk = mouseDownTick;
@@ -1154,11 +1174,13 @@ int SceneRun(void)
 	                            sys_key_beep();	                            
 	                    }
 					
-	                #ifdef CFG_SCREENSHOT_ENABLE					
+					#endif
+
+					#ifdef CFG_SCREENSHOT_ENABLE					
 	                    if (ev.tfinger.x < 50 && ev.tfinger.y > CFG_LCD_HEIGHT - 50)
 	                        Screenshot(g_ScreenSurf);	                        
 	                #endif
-	                }
+
             	}
                 break;
 
@@ -1199,10 +1221,28 @@ int SceneRun(void)
 		                        }
 		                    }
 		                }
-		                result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, 1, ev.tfinger.x, ev.tfinger.y);
+
+						#ifdef USE_ANDROID_MODE
+						if (mouseDownTick > 0 && pre_type == SDL_FINGERDOWN)
+			            {
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
+							if (result && !ScreenIsOff())
+	                            sys_key_beep();	
+							
+							result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
+					        if (result)
+					        {
+					            ituSceneDraw(&theScene, g_ScreenSurf);
+					            ituFlip(g_ScreenSurf);
+					        }								
+			            }
+						#endif
+
+		                result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEUP, 1, ev.tfinger.x, ev.tfinger.y);						
 		                mouseDownTick = 0;
 					}
 					g_LcdFuncNoDeal = false;
+					pre_type = ev.type;
             	}
                 break;
             }
@@ -1213,6 +1253,14 @@ int SceneRun(void)
 		
         if (!ScreenIsOff())
         {
+        	#ifdef USE_ANDROID_MODE
+			if (mouseDownTick > 0 && (SDL_GetTicks() - mouseDownTick >= ANDROID_PRESS_DELAY) && pre_type == SDL_FINGERDOWN)
+            {
+                printf("ANDROID press: %d %d\n", lastx, lasty);
+				result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
+            }
+			#endif
+			
             if (mouseDownTick > 0 && (SDL_GetTicks() - mouseDownTick >= MOUSEDOWN_LONGPRESS_DELAY))
             {
                 printf("long press: %d %d\n", lastx, lasty);
@@ -1273,6 +1321,38 @@ int SceneRun(void)
     }
 
     return g_QuitValue;
+}
+
+void SceneEnterVideoState(void)
+{
+    if (inVideoState)
+    {
+        return;
+    }
+
+    ituFrameFuncInit();
+    g_ScreenSurf   = ituGetDisplaySurface();
+    inVideoState = true;   
+}
+
+void SceneLeaveVideoState(void)
+{
+    if (!inVideoState)
+    {
+        return;
+    }
+
+    ituFrameFuncExit();
+    ituLcdInit();
+
+    #ifdef CFG_M2D_ENABLE
+    ituM2dInit();
+    #else
+    ituSWInit();
+    #endif
+
+    g_ScreenSurf   = ituGetDisplaySurface();
+    inVideoState = false;
 }
 
 /*************************************************

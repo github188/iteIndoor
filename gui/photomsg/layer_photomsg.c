@@ -267,7 +267,7 @@ bool photoMsgMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	default:
 		break;
 	}
-	sys_sync_hint_state();
+	sys_sync_hint_state_ext(SYS_HINT_LEAVEWORD);
 
 	ituWidgetEnable(photoMsgBackground);
 	ituWidgetSetVisible(photoMsgTipsTransparencyBackground, false);
@@ -874,7 +874,7 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 	media_set_ring_volume(gPhotoMsgPlayVol);	//TODO:通知逻辑设置音量！！！！！！
 	setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
 	storage_set_lylyrecord_flag(index, false);	//设置为已读留言
-	sys_sync_hint_state();
+	sys_sync_hint_state_ext(SYS_HINT_LEAVEWORD);
 
 	switch (gPhotoMsgList->LylyInfo[index].LyType)
 	{

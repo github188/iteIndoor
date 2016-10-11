@@ -95,6 +95,8 @@ static uint8_t  gMainBackgroundIndex = 0;
 static uint8_t*	gMainBackgroundImageData;
 static int		gMainBackgroundImageSize;
 static PSysHintRecord	gMainScrollData= NULL;		//全局数据变量（公用一个）
+static AF_FLASH_DATA	gAlarmData;
+
 
 
 bool mainLayerOnEnter(ITUWidget* widget, char* param)
@@ -322,16 +324,16 @@ void mainLayerCornerNumReload()
 	setUnreadRecorderNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_FAMILY]);					//设置家人留言条数
 	setUnreadPhotoMsgNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_LEAVEWORD]);					//设置留影留言条数
 	setUnreadInformationNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_INFO]);					//设置信息条数
-	setSecurityStatus((MAIN_SECURITY_STATUS_e)gMainScrollData->syshintnum[SYS_HINT_ALARM_STATE]);	//设置安防状态
 	setUnsolvedSecurityAlarmNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_ALARM_WARNING]);		//设置安防报警数
 	setUnreadMissedCallNum((uint8_t)gMainScrollData->syshintnum[SYS_HINT_MISSED_CALLS]);			//设置未接来电数
+	setSecurityStatus(sys_get_hint_state(SYS_HINT_ALARM_STATE));									//设置安防状态
 
 	setNetworkStatus(getNetworkStatus());		//设置网络状态
 	setDeviceNo(getDeviceNo());					//设置设备编号
 	setDisturbStatus(getDisturbStatus());		//设置免打扰状态
 	setIpIconStatus(getIpIconStatus());			//设置IP模块启用与否
 
-	setMainBackgroundImg();												//设置主界面背景图
+	setMainBackgroundImg();						//设置主界面背景图
 }
 
 
@@ -341,6 +343,8 @@ void mainLayerScrollDataReload()
 	{
 		gMainScrollData = (PSysHintRecord)sys_get_hint_list();
 	}
+
+	logic_get_alarm_param((uint8 *)(&gAlarmData));
 }
 
 
@@ -407,12 +411,17 @@ bool setMainBackgroundImg()
 
 uint8_t getIpIconStatus()
 {
-	return (uint8_t)get_ipmodule_bindstate();		//获取是否启用IP模块
+	return (uint8_t)get_ipmodule_state();		//获取是否启用IP模块
 }
 
 
 void setIpIconStatus(uint8_t status)
 {
+	/*
+	IP_MODULE_UNBIND = 0,							// IP 模块未绑定
+	IP_MODULE_ONLINE = 1,							// IP 模块在线(已经绑定过)
+	IP_MODULE_OUTLINE = 2,							// IP 模块不在线(已经绑定过)
+	*/
 	if (!mainIPSprite)
 	{
 		mainIPSprite = ituSceneFindWidget(&theScene, "mainIPSprite");
@@ -1278,7 +1287,6 @@ void setUnsolvedSecurityAlarmNum(uint8_t num)
 		ituTextSetString(page0SecurityNumText, numstr);
 		ituWidgetSetVisible(page0SecurityIcon, false);
 		ituWidgetSetVisible(page0SecurityText, false);
-		ituWidgetSetVisible(page0SecuritySprite, false);
 		ituWidgetSetVisible(page0SecurityNumText, true);
 		ituWidgetSetVisible(page0SecurityNumIcon, true);
 		ituWidgetSetVisible(page0SecurityMiniIcon, true);
@@ -1322,17 +1330,13 @@ void setUnsolvedSecurityAlarmText(uint8_t index)
 	}
 
 	//TODO:读取存储设置文字内容！！
-	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "GAS", index);
-	ituTextSetString(page0SecurityScrollAlarmTypeText, tmpStr);
 
-	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "Triger", index);
-	ituTextSetString(page0SecurityScrollTriggerText, tmpStr);
+	ituTextSetString(page0SecurityScrollAlarmTypeText, get_str(SID_Bj_SOS + gAlarmData.area_type[gMainScrollData->AlarmUnReadList->pAlarmRec[index].TouchNum - 1]));
 
-	memset(tmpStr, 0, sizeof(tmpStr));
-	sprintf(tmpStr, "%s%d", "2016-08-03 17:03:1", index);
-	ituTextSetString(page0SecurityScrollTimeText, tmpStr);
+	ituTextSetString(page0SecurityScrollTriggerText, get_str(SID_Bj_Report_Type_Chufa));
+
+	ituTextSetString(page0SecurityScrollTimeText, gMainScrollData->AlarmUnReadList->pAlarmRec[index].time);
+
 }
 
 
@@ -1396,42 +1400,27 @@ void setUnsolvedSecurityAlarmScroll()
 }
 
 
-MAIN_SECURITY_STATUS_e	getSecurityStatus()
-{
-	if (storage_get_defend_state() == SET_DEFEND)
-	{
-		//布防！！（外出）
-		return (MAIN_SECURITY_STATUS_e)1;
-	}
-	else if (storage_get_defend_state() == PART_DEFEND)
-	{
-		//局防！！！（夜间）
-		return (MAIN_SECURITY_STATUS_e)0;
-	}
-	else
-	{
-		//撤防！！！（无图标）
-		return (MAIN_SECURITY_STATUS_e)2;
-	}
-}
-
-
-void setSecurityStatus(MAIN_SECURITY_STATUS_e status)
+void setSecurityStatus(DEFEND_STATE status)
 {
 	if (!page0SecuritySprite)
 	{
 		page0SecuritySprite = ituSceneFindWidget(&theScene, "page0SecuritySprite");
 		assert(page0SecuritySprite);
 	}
+
 	switch (status)
 	{
-	case MAIN_SECURITY_STATUS_NIGHT:
-	case MAIN_SECURITY_STATUS_OUTSIDE:
+	case PART_DEFEND:		//夜间
 		ituWidgetSetVisible(page0SecuritySprite, true);
-		ituSpriteGoto(page0SecuritySprite, (uint8_t)status);
+		ituSpriteGoto(page0SecuritySprite, 0);
 		break;
 
-	default:
+	case SET_DEFEND:		//外出
+		ituWidgetSetVisible(page0SecuritySprite, true);
+		ituSpriteGoto(page0SecuritySprite, 1);
+		break;
+
+	default:		//撤防
 		ituWidgetSetVisible(page0SecuritySprite, false);
 		break;
 	}

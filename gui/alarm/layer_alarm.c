@@ -363,7 +363,7 @@ static void ShowRecordWin(uint8 page_type)
 			{
 				storage_clear_afbj_unread_state();		
 				updata_unread_alarm_rec_data();
-				//sys_sync_hint_state();
+				sys_sync_hint_state_ext(SYS_HINT_ALARM_WARNING);
 			}
 		}
 	}

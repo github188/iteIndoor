@@ -490,7 +490,7 @@ uint8 storage_set_validate_code(uint32 validate_code);
   Return:			0: ³··À 1:²¼·À 2:±¨¾¯
   Others:           
 *************************************************/
-uint8 storage_get_alarm_state(void);
+DEFEND_STATE storage_get_alarm_state(void);
 
 /*************************************************
   Function:    		storage_get_alarm_undeal_num

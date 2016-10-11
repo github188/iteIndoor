@@ -17,6 +17,12 @@
 
 #include "logic_include.h"
 
+typedef enum
+{
+	IP_MODULE_UNBIND = 0,							// IP 模块未绑定
+	IP_MODULE_ONLINE = 1,							// IP 模块在线(已经绑定过)
+	IP_MODULE_OUTLINE = 2,							// IP 模块不在线(已经绑定过)
+}IP_MODULE_STATE;
 
 // 家电厂商
 typedef enum

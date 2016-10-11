@@ -53,7 +53,7 @@ typedef enum
 
 typedef struct _sys_hint_record
 {
-	uint8 syshint[SYS_HINT_MAX_NUM];				// 记录未读无处理状态
+	uint8 syshint[SYS_HINT_MAX_NUM];				// 记录未读无处理状态 状态实时去获取
 	uint8 syshintnum[SYS_HINT_MAX_NUM];				// 消息记录未读条数
 	MSGLIST *MsgUnReadList;							// 未读信息列表
 	LYLYLIST_INFO *LylyUnReadList;					// 未读留影留言列表

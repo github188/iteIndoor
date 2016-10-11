@@ -27,7 +27,7 @@
 #define AF_REC_MAX 	  			20					// 安防事件最大记录数
 #define MAX_RECORD_NUM  		20					// 通话记录最大条数
 #define MAX_JRLY_NUM  			5					// 家人留言最大记录数
-#define MAX_LYLY_NUM  			5					// 留影留言最大记录
+#define MAX_LYLY_NUM  			6					// 留影留言最大记录
 #define MAX_MSG_NUM				10					// 信息最大接收条数
 #define MAX_PHOTO_NUM  			10					// 最大抓拍记录数
 #define MAX_YUYUE_NUM			20					// 家电预约最大数

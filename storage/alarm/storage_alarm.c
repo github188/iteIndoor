@@ -994,13 +994,9 @@ uint8 storage_set_validate_code(uint32 validate_code)
   Return:			FLASE: ³··À TRUE:²¼·À 
   Others:           
 *************************************************/
-uint8 storage_get_alarm_state(void)
+DEFEND_STATE storage_get_alarm_state(void)
 {
-	if (DIS_DEFEND == gpAfParam->defend_state)
-	{
-		return FALSE;
-	}
-	return TRUE;
+	return gpAfParam->defend_state;	
 }
 
 /*************************************************

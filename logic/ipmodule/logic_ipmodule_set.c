@@ -33,7 +33,7 @@ static int g_count = 10;				    // 在线时计数
 *************************************************/
 uint8 get_ipmodule_state(void)
 {
-    uint8 state = 0;
+    IP_MODULE_STATE state = IP_MODULE_UNBIND;
 	
     if (get_ipmodule_bindstate())
     {
@@ -41,21 +41,21 @@ uint8 get_ipmodule_state(void)
     	{
 	        if (get_ipmodule_online())
 	        {
-	            state = 2;
+	            state = IP_MODULE_ONLINE;
 	        }
 	        else
 	        {
-	            state = 1;
+	            state = IP_MODULE_OUTLINE;
 	        }
     	}
 		else
 		{
-			state = 2;
+			state = IP_MODULE_ONLINE;
 		}
     }
     else
     {
-        state = 0;
+        state = IP_MODULE_UNBIND;
     }	
   return state;
 }
@@ -192,7 +192,7 @@ uint32 ipmodule_request_bind(void)
 	uint32 bindCode = get_ipmodule_bindcode();
 	uint32 ipModuleAddr = get_ipmodule_address();
 
-	//set_ipmodule_bindstate(0);
+	set_ipmodule_bindstate(0);
 	set_ipmodule_online(0);
 	set_ipmodule_errcode(IP_MODULE_CODE_UNLINE);	
 	
@@ -204,7 +204,7 @@ uint32 ipmodule_request_bind(void)
 		if (ret == FALSE)
 		{	
 			set_ipmodule_bindstate(0);
-			return 0;
+			return FALSE;
 		}
 		
 		if (EchoValue == ECHO_OK)
@@ -223,7 +223,7 @@ uint32 ipmodule_request_bind(void)
 			set_ipmodule_bindstate(0);
 		}
 	}
-	return 0;
+	return FALSE;
 }
 
 /*************************************************

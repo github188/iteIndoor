@@ -506,8 +506,8 @@ void recorderPlayingBtnOnClicked()
 		{
 			//TODO:设置存储为已读
 			setRecorderRecordStatus(gCurrentRecordIndex, RECORDER_RECORD_READ);
-			storage_set_jrlyrecord_flag(gCurrentRecordIndex, false);
-			sys_sync_hint_state();
+			storage_set_jrlyrecord_flag(gCurrentRecordIndex, false);			
+			sys_sync_hint_state_ext(SYS_HINT_FAMILY);
 		}
 		media_set_ring_volume(gRecorderPlayVol);	//TODO:通知逻辑设置音量！！！！！！
 
@@ -546,7 +546,7 @@ void recorderStopBtnOnClicked()
 		//TODO:录音停止
 		sys_stop_family_record();
 		storage_add_jrlyrecord(gNewRecorderTime);
-		sys_sync_hint_state();
+		sys_sync_hint_state_ext(SYS_HINT_FAMILY);
 		recorderLayerInit();
 
 		//if (gRecorderList != NULL)
@@ -708,7 +708,7 @@ bool recorderMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 		{
 			storage_del_jrlyrecord(gCurrentRecordIndex);
 			gCurrentRecordIndex = MAX_RECORDER_NUM;
-			sys_sync_hint_state();
+			sys_sync_hint_state_ext(SYS_HINT_FAMILY);
 			recorderLayerInit();
 		}
 		break;

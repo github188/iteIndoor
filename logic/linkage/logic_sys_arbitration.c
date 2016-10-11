@@ -1120,7 +1120,7 @@ uint8 sys_get_hint_state(SYS_HINT_TYPE HintType)
 	}
 	else if (SYS_HINT_ALARM_STATE == HintType)
 	{
-		g_SysHintRecord.syshintnum[HintType] = storage_get_alarm_state();
+		g_SysHintRecord.syshint[HintType] = storage_get_alarm_state();
 	}
 	
 	return g_SysHintRecord.syshint[HintType];
@@ -1309,7 +1309,7 @@ void sys_sync_hint_state(void)
 
 	{
 		flg = storage_get_alarm_state();	
-		if (flg == FALSE)						// ³··À
+		if (flg == DIS_DEFEND)					// ³··À
 		{
 			sys_set_hint_state(SYS_HINT_ALARM_STATE, FALSE);
 		}	
@@ -1469,8 +1469,7 @@ void sys_sync_hint_state_ext(SYS_HINT_TYPE HintType)
 					{
 						if (1 == g_SysHintRecord.MissUnReadList->CallInfo[i].UnRead)
 						{
-							unread_num++;
-							break;
+							unread_num++;							
 						}
 					}
 					g_SysHintRecord.syshintnum[SYS_HINT_MISSED_CALLS] = unread_num;
@@ -1506,11 +1505,11 @@ void sys_sync_hint_state_ext(SYS_HINT_TYPE HintType)
 		case SYS_HINT_ALARM_STATE:
 			{
 				flg = storage_get_alarm_state();	
-				if (flg == FALSE)						// ³··À
+				if (flg == DIS_DEFEND)					// ³··À
 				{
 					sys_set_hint_state(SYS_HINT_ALARM_STATE, FALSE);
 				}	
-				else									// ²¼·À
+				else									// ²¼·À ¾Ö·À
 				{
 					sys_set_hint_state(SYS_HINT_ALARM_STATE, TRUE);		
 				}	
@@ -1690,11 +1689,11 @@ void sys_init_hint_state(void)
 	
 	// »ñÈ¡°²·À×´Ì¬
 	flg = storage_get_alarm_state();	
-	if (flg == FALSE)						// ³··À
+	if (flg == DIS_DEFEND)					// ³··À
 	{
 		sys_set_hint_state(SYS_HINT_ALARM_STATE, FALSE);
 	}	
-	else									// ²¼·À
+	else									// ²¼·À ¾Ö·À
 	{
 		sys_set_hint_state(SYS_HINT_ALARM_STATE, TRUE);		
 	}	

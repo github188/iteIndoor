@@ -25,13 +25,6 @@ typedef enum
 }MAIN_BTN_e;
 
 
-typedef enum
-{
-	//Sprite按照顺序0：夜间 1：外出  其他为无安防状态（可根据具体参数调整itu顺序）
-	MAIN_SECURITY_STATUS_NIGHT,
-	MAIN_SECURITY_STATUS_OUTSIDE,
-}MAIN_SECURITY_STATUS_e;
-
 #define MAIN_MAX_RECORDER_NUM		5
 #define MAIN_MAX_MSG_NUM			20
 #define MAIN_MAX_SECURITY_NUM		20
@@ -64,8 +57,7 @@ char* getDeviceNo();
 void setDeviceNo(char* deviceno);
 bool getDisturbStatus();
 void setDisturbStatus(bool status);
-void setSecurityStatus(MAIN_SECURITY_STATUS_e status);
-MAIN_SECURITY_STATUS_e getSecurityStatus();
+void setSecurityStatus(DEFEND_STATE status);
 void setSOSBtnType(bool status);
 
 //以下是在界面重新进入时候读取一次就行

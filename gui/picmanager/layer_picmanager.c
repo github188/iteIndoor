@@ -276,38 +276,52 @@ void setPicManagerPicture()
 	get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[0]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
 	setPicManagerPictureContent(0, tmpFile, tmpSender, tmpTime);
 
-	if ((gPictureCurrentIndex[0] - 1) >= 0)
+	if (gPictureNumCount > 1)
 	{
-		gPictureCurrentIndex[2] = gPictureCurrentIndex[0] - 1;
-		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]]).Time));
-		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].Time, tmpTime);
-		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
-		setPicManagerPictureContent(2, tmpFile, tmpSender, tmpTime);
+		if ((gPictureCurrentIndex[0] + 1) >= gPictureNumCount)
+		{
+			gPictureCurrentIndex[1] = 0;
+			get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
+			zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Time, tmpTime);
+			get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+			setPicManagerPictureContent(1, tmpFile, tmpSender, tmpTime);
+		}
+		else
+		{
+			gPictureCurrentIndex[1] = gPictureCurrentIndex[0] + 1;
+			get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
+			zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Time, tmpTime);
+			get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+			setPicManagerPictureContent(1, tmpFile, tmpSender, tmpTime);
+		}
 	}
 	else
 	{
-		gPictureCurrentIndex[2] = gPictureNumCount - 1;
-		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureNumCount - 1]).Time));
-		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].Time, tmpTime);
-		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
-		setPicManagerPictureContent(2, tmpFile, tmpSender, tmpTime);
+		setPicManagerPictureContent(1, "", "", "");
 	}
 
-	if ((gPictureCurrentIndex[0] + 1) >= gPictureNumCount)
+	if (gPictureNumCount > 2)
 	{
-		gPictureCurrentIndex[1] = 0;
-		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
-		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Time, tmpTime);
-		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
-		setPicManagerPictureContent(1, tmpFile, tmpSender, tmpTime);
+		if ((gPictureCurrentIndex[0] - 1) >= 0)
+		{
+			gPictureCurrentIndex[2] = gPictureCurrentIndex[0] - 1;
+			get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]]).Time));
+			zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].Time, tmpTime);
+			get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[2]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+			setPicManagerPictureContent(2, tmpFile, tmpSender, tmpTime);
+		}
+		else
+		{
+			gPictureCurrentIndex[2] = gPictureNumCount - 1;
+			get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureNumCount - 1]).Time));
+			zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].Time, tmpTime);
+			get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[gPictureNumCount - 1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
+			setPicManagerPictureContent(2, tmpFile, tmpSender, tmpTime);
+		}
 	}
 	else
 	{
-		gPictureCurrentIndex[1] = gPictureCurrentIndex[0] + 1;
-		get_photo_path(tmpFile, &((gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]]).Time));
-		zoneDateTimeToString(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Time, tmpTime);
-		get_dev_description(gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].Type, gPicManagerList->PhotoInfo[gPictureCurrentIndex[1]].DevNo, tmpSender, sizeof(tmpSender)); // 获得设备描述
-		setPicManagerPictureContent(1, tmpFile, tmpSender, tmpTime);
+		setPicManagerPictureContent(2, "", "", "");
 	}
 }
 
@@ -356,9 +370,8 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr, char* sendStr, ch
 	}
 	else
 	{
-		printf("open  minipic jepg icon icon failed!");
+		printf("open  minipic jepg icon failed!");
 		ituWidgetSetVisible(picManagerPicContentContainer, false);
-		free(gPicManagerImageData);
 
 		return false;
 	}
@@ -367,18 +380,19 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr, char* sendStr, ch
 		ituIconLoadJpegData(picManagerPicContentIcon, gPicManagerImageData, gPicManagerImageSize);
 		ituTextSetString(picManagerPicTimeText, timeStr);
 		ituTextSetString(picManagerPicSenderText, sendStr);
+		ituWidgetSetVisible(picManagerPicContentContainer, true);
 	}
 	else
 	{
 		printf("load minipic jepg icon failed!");
 		ituWidgetSetVisible(picManagerPicContentContainer, false);
-		free(gPicManagerImageData);
+		//ituWidgetDisable(picManagerPicContentContainer);
 
+		free(gPicManagerImageData);
 		return false;
 	}
 
 	free(gPicManagerImageData);
-
 	return true;
 }
 
@@ -436,12 +450,12 @@ void picManagerMsgBoxShow(PICMANAGER_BTN_e btnId)
 	switch (btnId)
 	{
 	case PICMANAGER_BTN_EMPTY:
-		ituTextSetString(picManagerTipsText, "Empty Message");
+		ituTextSetString(picManagerTipsText, get_str(SID_Bj_Query_Del_Rec_All));
 		setMiniPicListIsChecked(MINIPIC_CORNER_ICON_CHECK);
 		break;
 
 	case PICMANAGER_BTN_DELETE:
-		ituTextSetString(picManagerTipsText, "Delete Message");
+		ituTextSetString(picManagerTipsText, get_str(SID_Bj_Query_Del_Rec_One));
 		break;
 
 	default:
@@ -658,6 +672,7 @@ bool setMiniPicContent(uint8_t index, char* addrStr)
 	{
 		ituIconLoadJpegData((ITUIcon*)picManagerMiniPicIcon, gPicManagerImageData, gPicManagerImageSize);
 		picManagerMiniPicIcon->widget.flags |= ITU_EXTERNAL_IMAGE;
+		ituWidgetSetVisible(picManagerMiniPicIcon, true);
 	}
 	else
 	{

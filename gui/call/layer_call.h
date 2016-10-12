@@ -18,6 +18,11 @@ extern "C" {
 #endif
 #include "gui_include.h"
 
+/*****************常量定义***********************/
+#define MAX_PAGE_NUM			6					// 每页最大条数
+#define LIST_ITEM_COUNT			2					// 列表模板条数
+
+/*****************函数定义***********************/
 // CallLayer
 bool CallLayerOnEnter(ITUWidget* widget, char* param);
 bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param);
@@ -27,10 +32,11 @@ bool CallKeyBordDelButtonOnMouseUp(ITUWidget* widget, char* param);
 bool CallLayerOnTimer(ITUWidget* widget, char* param);
 bool CallKeyBordDelButtonOnMouseLongPress(ITUWidget* widget, char* param);
 bool CallRecordListButtonOnMouseUp(ITUWidget* widget, char* param);
-bool CallCeterListButtonOnMouseUp(ITUWidget* widget, char* param);
+bool CallCenterListButtonOnMouseUp(ITUWidget* widget, char* param);
 bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param);
 bool CallCallRequestState(ITUWidget* widget, char* param);
 bool CalloutManager(ITUWidget* widget, char* param);
+bool CallLayerOnLeave(ITUWidget* widget, char* param);
 
 // BeCallLayer
 bool BeCallLayerOnEnter(ITUWidget* widget, char* param);
@@ -53,6 +59,7 @@ bool MonitorSearchListButtonOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorSearchMSGButtonOnMouseUp(ITUWidget* widget, char* param);
 bool MonitorSearchListState(ITUWidget* widget, char* param);
 bool MonitorSearchLayerOnTimer(ITUWidget* widget, char* param);
+bool MonitorSearchLayerOnLeave(ITUWidget* widget, char* param);
 
 // MonitorLayer
 bool MonitorLayerOnEnter(ITUWidget* widget, char* param);
@@ -75,6 +82,7 @@ bool RTSPSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param);
 bool RTSPSearchListButtonOnMouseUp(ITUWidget* widget, char* param);
 bool RTSPSearchListState(ITUWidget* widget, char* param);
 bool RTSPSearchLayerOnTimer(ITUWidget* widget, char* param);
+bool RTSPSearchLayerOnLeave(ITUWidget* widget, char* param);
 
 // RTSPMonitorLayer
 bool RTSPMonitorLayerOnEnter(ITUWidget* widget, char* param);
@@ -82,7 +90,9 @@ bool RTSPMonitorLayerButtonOnMouseUp(ITUWidget* widget, char* param);
 bool RTSPMonitorLayerOnTimer(ITUWidget* widget, char* param);
 bool RTSPMonitorState(ITUWidget* widget, char* param);
 bool RTSPMonitorLayerShowBottomButtonOnMouseUp(ITUWidget* widget, char* param);
+bool RTSPMonitorLayerOnLeave(ITUWidget* widget, char* param);
 void RTSPMonitorWin(PRtspDeviceList list, uint8 index);
+
 // video
 int BackgroundDrawVideo_init(char *background);
 void BackgroundDrawVideo_exit(void);

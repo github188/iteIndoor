@@ -13,11 +13,9 @@ Modification:
 #include "gui_include.h"
 
 /*****************常量定义***********************/
-#define MAX_RECORD_LIST_NUM				24
-#define MAX_PAGE_NUM					6					// 每页最大条数
-#define MAX_CENTER_LIST_NUM  			12					// 最大管理员机数
-#define MAX_RECORD_PAGE_NUM  			4					// 通话记录最大页数
-#define MAX_CENTER_PAGE_NUM  			2					// 管理员机最大页数
+#define MAX_MANAGER_NUM  		3					// 最大管理员机数
+#define MAX_FENJI_NUM  			8					// 最大分机数
+#define MAX_CENTER_NUM			MAX_FENJI_NUM		// 管理员机、分机最大条数
 
 /*****************变量定义***********************/
 static ITULayer* MainLayer = NULL;
@@ -28,31 +26,34 @@ static ITUTextBox* CallKeyBordTextBox = NULL;
 static ITUText* CallKeyBordHitText = NULL;
 static ITUKeyboard* CallKeyboard = NULL;
 static ITUButton* CallRightExitButton = NULL;
-static ITURadioBox* CallRightCeterRadioBox = NULL;
+static ITURadioBox* CallRightCenterRadioBox = NULL;
 static ITURadioBox* CallRightRecordRadioBox = NULL;
+static ITURadioBox* CallRightUserRadioBox = NULL;
 static ITURadioBox* CallBottomRecordMissRadioBox = NULL;
-static ITUBackground* CallBottomBackground0 = NULL;		// 纯色底部背景
-static ITUBackground* CallBottomBackground1 = NULL;		// 通话记录底部背景
-static ITUBackground* CallBottomBackground2 = NULL;		// 编辑底部背景
+static ITUBackground* CallBottomBackground0 = NULL;			// 纯色底部背景
+static ITUBackground* CallBottomBackground1 = NULL;			// 通话记录底部背景
+static ITUBackground* CallBottomBackground2 = NULL;			// 编辑底部背景
 static ITUCoverFlow* CallRecordListCoverFlow = NULL;
-static ITUCoverFlow* CallCeterListCoverFlow = NULL;
-static ITUBackground* CallRecordListBackgroundPage[MAX_RECORD_PAGE_NUM] = { NULL };
-static ITUBackground* CallCeterListBackgroundPage[MAX_CENTER_PAGE_NUM] = { NULL };
-static ITUText* CallRecordListDevTypeText[MAX_RECORD_LIST_NUM] = { NULL };
-static ITUText* CallRecordListTimeText[MAX_RECORD_LIST_NUM] = { NULL };
-static ITUSprite* CallRecordListSprite[MAX_RECORD_LIST_NUM] = { NULL };
-static ITUContainer* CallRecordListContainer[MAX_RECORD_LIST_NUM] = { NULL };
-static ITUButton* CallRecordListButton[MAX_RECORD_LIST_NUM] = { NULL };
-static ITUIcon* CallCeterListIcon[MAX_CENTER_LIST_NUM] = { NULL };
-static ITUText* CallCeterListDevTypeText[MAX_CENTER_LIST_NUM] = { NULL };
-static ITUContainer* CallCeterListContainer[MAX_CENTER_LIST_NUM] = { NULL };
-static ITUButton* CallCeterListButton[MAX_CENTER_LIST_NUM] = { NULL };
+static ITUCoverFlow* CallCenterListCoverFlow = NULL;
+static ITUText* CallRecordListDevTypeText[LIST_ITEM_COUNT] = { NULL };
+static ITUText* CallRecordListTimeText[LIST_ITEM_COUNT] = { NULL };
+static ITUSprite* CallRecordListSprite[LIST_ITEM_COUNT] = { NULL };
+static ITUContainer* CallRecordListContainer[LIST_ITEM_COUNT] = { NULL };
+static ITUButton* CallRecordListButton[LIST_ITEM_COUNT] = { NULL };
+static ITUIcon* CallCenterListIcon[LIST_ITEM_COUNT] = { NULL };
+static ITUText* CallCenterListDevTypeText[LIST_ITEM_COUNT] = { NULL };
+static ITUContainer* CallCenterListContainer[LIST_ITEM_COUNT] = { NULL };
+static ITUButton* CallCenterListButton[LIST_ITEM_COUNT] = { NULL };
 static ITUText* CallRecordMSGHitText = NULL;
 static ITUBackground* CallRecordMSGHitGrayBackground = NULL;
 static ITUButton* CallBottomNullButton0 = NULL;
 static ITUButton* CallBottomNullButton1 = NULL;
 
-/*****************常量定义***********************/
+static ITUButton* g_CallRecordListButton[MAX_RECORD_NUM] = { NULL };
+static ITUSprite* g_CallRecordListSprite[MAX_RECORD_NUM] = { NULL };
+static ITUButton* g_CallCenterListButton[MAX_CENTER_NUM] = { NULL };
+
+/*****************变量定义***********************/
 static char g_CallNo[50];							// 呼叫号码
 static uint8 g_CurPage = 0;							// 当前页面
 static uint8 g_CallType = 0;						// 呼叫类型 呼叫室内
@@ -71,7 +72,7 @@ static uint8 g_CenterType = 0;						//  0 管理员机 1 分机
 		
 typedef enum
 {
-	CallCeterEvent = 0x00,
+	CallCenterEvent = 0x00,
 	CallUserEvent,
 	CallFenJiEvent,
 	CallRecordEvent,
@@ -88,7 +89,7 @@ typedef enum
 // 呼叫列表中界面风格
 typedef enum
 {
-	CallCeterPage = 0x00,
+	CallCenterPage = 0x00,
 	CallUserPage,
 	CallRecordPage,
 	CallEditPage,
@@ -117,9 +118,9 @@ static void CallLayerPage(CallPage type)
 	g_CurPage = type;
 	switch (type)
 	{
-		case CallCeterPage:
+		case CallCenterPage:
 			ituWidgetSetVisible(CallKeyboard, false);
-			ituWidgetSetVisible(CallCeterListCoverFlow, true);
+			ituWidgetSetVisible(CallCenterListCoverFlow, true);
 			ituWidgetSetVisible(CallRecordListCoverFlow, false);
 			ituWidgetSetVisible(CallBottomBackground0, true);
 			ituWidgetSetVisible(CallBottomBackground1, false);
@@ -128,7 +129,7 @@ static void CallLayerPage(CallPage type)
 
 		case CallUserPage:
 			ituWidgetSetVisible(CallKeyboard, true);
-			ituWidgetSetVisible(CallCeterListCoverFlow, false);
+			ituWidgetSetVisible(CallCenterListCoverFlow, false);
 			ituWidgetSetVisible(CallRecordListCoverFlow, false);
 			ituWidgetSetVisible(CallBottomBackground0, true);
 			ituWidgetSetVisible(CallBottomBackground1, false);
@@ -137,7 +138,7 @@ static void CallLayerPage(CallPage type)
 
 		case CallRecordPage:
 			ituWidgetSetVisible(CallKeyboard, false);
-			ituWidgetSetVisible(CallCeterListCoverFlow, false);
+			ituWidgetSetVisible(CallCenterListCoverFlow, false);
 			ituWidgetSetVisible(CallRecordListCoverFlow, true);
 			ituWidgetSetVisible(CallBottomBackground0, false);
 			ituWidgetSetVisible(CallBottomBackground1, true);
@@ -146,7 +147,7 @@ static void CallLayerPage(CallPage type)
 
 		case CallEditPage:
 			ituWidgetSetVisible(CallKeyboard, false);
-			ituWidgetSetVisible(CallCeterListCoverFlow, false);
+			ituWidgetSetVisible(CallCenterListCoverFlow, false);
 			ituWidgetSetVisible(CallRecordListCoverFlow, true);
 			ituWidgetSetVisible(CallBottomBackground0, false);
 			ituWidgetSetVisible(CallBottomBackground1, false);
@@ -217,9 +218,9 @@ static uint8 WhetherMissUnRead(void)
 	if (g_CallRecord && g_CallRecord->CallCount > 0)
 	{
 		max = g_CallRecord->CallCount;
-		if (max > MAX_RECORD_LIST_NUM)
+		if (max > MAX_RECORD_NUM)
 		{
-			max = MAX_RECORD_LIST_NUM;
+			max = MAX_RECORD_NUM;
 		}
 
 		for (i = 0; i < max; i++)
@@ -235,93 +236,6 @@ static uint8 WhetherMissUnRead(void)
 }
 
 /*************************************************
-Function:		SetRecordShowInit
-Description: 	通话记录页面初始化
-Input:			无
-Output:			无
-Return:			TRUE 成功 FALSE 失败
-Others:
-*************************************************/
-static void SetRecordShowInit(void)
-{
-	uint8 i;
-
-	for (i = 0; i < MAX_RECORD_PAGE_NUM; i++)
-	{
-		ituWidgetSetVisible(CallRecordListBackgroundPage[i], true);
-	}
-
-	for (i = 0; i < MAX_RECORD_LIST_NUM; i++)
-	{
-		ituWidgetSetVisible(CallRecordListContainer[i], true);
-		ituWidgetDisable(CallRecordListButton[i]);
-		ituTextSetString(CallRecordListDevTypeText[i], "");
-		ituTextSetString(CallRecordListTimeText[i], "");
-		ituWidgetSetVisible(CallRecordListSprite[i], false);
-		ituSetColor(&((ITUWidget*)CallRecordListDevTypeText[i])->color, 255, 255, 255, 255);
-		ituSetColor(&((ITUWidget*)CallRecordListTimeText[i])->color, 255, 255, 255, 255);
-	}
-	// 初始化默认为首页
-	// 解决CallRecordListCoverFlow第一页是-1的情况
-	if (CallRecordListCoverFlow->frame == CallRecordListCoverFlow->totalframe)
-	{
-		ituCoverFlowGoto(CallRecordListCoverFlow, -1);
-	}
-	else
-	{
-		ituCoverFlowGoto(CallRecordListCoverFlow, 0);
-	}
-}
-
-/*************************************************
-Function:		SetRecordShowNum
-Description: 	显示通话记录具体条数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void SetRecordShowNum(uint8 max)
-{
-	uint8 i, count = 0;
-	uint8 pagenum = 0, rest = 0;
-
-	// 隐藏多余页
-	if (max <= MAX_PAGE_NUM)
-	{
-		pagenum = 1;
-	}
-	else
-	{
-		pagenum = max / MAX_PAGE_NUM;
-		rest = max % MAX_PAGE_NUM;
-		if (rest > 0)
-		{
-			pagenum++;
-		}
-	}
-	for (i = MAX_RECORD_PAGE_NUM; i > pagenum; i--)
-	{
-		ituWidgetSetVisible(CallRecordListBackgroundPage[i - 1], false);
-	}
-
-#if 0
-	// 隐藏多余行(目前通话记录只支持20条)
-	count = pagenum * MAX_PAGE_NUM;
-	if (count > MAX_RECORD_LIST_NUM)
-	{
-		count = MAX_RECORD_LIST_NUM;
-	}
-#endif
-
-	for (i = 0; i < max; i++)
-	{
-		ituWidgetEnable(CallRecordListButton[i]);
-	}
-	dprintf("SetRecordShowNum..:max %d\n", max);
-}
-
-/*************************************************
 Function:		ShowRecordWin
 Description: 	显示通话记录具体信息
 Input:			无
@@ -331,8 +245,15 @@ Others:			无
 *************************************************/
 static void ShowRecordWin(CALL_TYPE Calltype)
 {
-	uint8 i, max = 0;
-	char devtype[50], timestr[50];
+	uint32 ypos = 0;
+	uint8 i, max = 0, count = 0, result = 0;
+	char devtype[50], timestr[50], tmp[50];
+	ITUButton* CloneChildCallRecordListButton;
+	ITUText* CloneChildCallRecordListDevTypeText;
+	ITUText* CloneChildCallRecordListTimeText;
+	ITUSprite* CloneChildCallRecordListSprite;
+	ITUContainer* CloneCallRecordListContainer;
+	ITUContainer* OldCallRecordListContainer;
 	
 	if (g_CallRecord)
 	{
@@ -344,24 +265,118 @@ static void ShowRecordWin(CALL_TYPE Calltype)
 		free(g_CallRecord);
 		g_CallRecord = NULL;
 	}
-	SetRecordShowInit();
-	g_RecordType = Calltype;
 
+	// 删除已经Clone的List
+	for (i = LIST_ITEM_COUNT; i < MAX_RECORD_NUM; i++)
+	{
+		if (NULL != g_CallRecordListButton[i])
+		{
+			g_CallRecordListButton[i] = NULL;
+			OldCallRecordListContainer = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "CallRecordListContainer", i);
+			OldCallRecordListContainer = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldCallRecordListContainer);						// 删除已有的
+			ituWidgetExit(OldCallRecordListContainer);
+			dprintf("Remove CallRecordListContainer List!!!\n");
+		}
+
+	}
+	g_RecordType = Calltype;
 	g_CallRecord = storage_get_callrecord(Calltype);
 	if (g_CallRecord == NULL)
 	{
-		printf("g_CallRecord is NULL\n");
+		dprintf("g_CallRecord is NULL\n");
 		return;
 	}
+	// 默认显示从第一条开始显示
+	ituCoverFlowGoto(CallRecordListCoverFlow, 0);
 
-	if (g_CallRecord && g_CallRecord->CallCount > 0)
+	max = g_CallRecord->CallCount;
+	if (max > MAX_RECORD_NUM)
 	{
-		max = g_CallRecord->CallCount;
-		if (max > MAX_RECORD_LIST_NUM)
+		max = MAX_RECORD_NUM;
+	}
+
+	if (max <= MAX_PAGE_NUM)
+	{
+		count = MAX_PAGE_NUM;
+	}
+	else
+	{
+		count = max;
+	}
+
+	for (i = 0; i < count; i++)
+	{
+		CloneChildCallRecordListButton = NULL;
+		CloneChildCallRecordListDevTypeText = NULL;
+		CloneChildCallRecordListTimeText = NULL;
+		CloneChildCallRecordListSprite = NULL;
+		CloneCallRecordListContainer = NULL;
+
+		if (i < LIST_ITEM_COUNT)
 		{
-			max = MAX_RECORD_LIST_NUM;
+			// 前2条为Clone模板
+			CloneChildCallRecordListButton = CallRecordListButton[i];
+			CloneChildCallRecordListDevTypeText = CallRecordListDevTypeText[i];
+			CloneChildCallRecordListTimeText = CallRecordListTimeText[i];
+			CloneChildCallRecordListSprite = CallRecordListSprite[i];
+
+			// 模板初始化
+			ituWidgetEnable(CloneChildCallRecordListButton);
+			ituWidgetSetVisible(CloneChildCallRecordListSprite, true);
+			ituTextSetString(CloneChildCallRecordListDevTypeText, "");
+			ituTextSetString(CloneChildCallRecordListTimeText, "");
 		}
-		for (i = 0; i < max; i++)
+		else
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "CallRecordListContainer", i);
+			result = ituWidgetClone(CallRecordListContainer[1], &CloneCallRecordListContainer);
+			if (result)
+			{
+				ituWidgetSetName(CloneCallRecordListContainer, tmp);
+				ituWidgetSetX(CloneCallRecordListContainer, 0);
+				if (i < MAX_PAGE_NUM)
+				{
+					ypos = i * 62;
+				}
+				else
+				{
+					ypos = 0;
+				}
+				ituWidgetSetY(CloneCallRecordListContainer, ypos);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallRecordListButton = itcTreeGetChildAt(CloneCallRecordListContainer, 0);
+				sprintf(tmp, "%s%d", "CallRecordListButton", i);
+				ituWidgetSetName(CloneChildCallRecordListButton, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallRecordListDevTypeText = itcTreeGetChildAt(CloneCallRecordListContainer, 1);
+				sprintf(tmp, "%s%d", "CallRecordListDevTypeText", i);
+				ituWidgetSetName(CloneChildCallRecordListDevTypeText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallRecordListTimeText = itcTreeGetChildAt(CloneCallRecordListContainer, 2);
+				sprintf(tmp, "%s%d", "CallRecordListTimeText", i);
+				ituWidgetSetName(CloneChildCallRecordListTimeText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallRecordListSprite = itcTreeGetChildAt(CloneCallRecordListContainer, 3);
+				sprintf(tmp, "%s%d", "CallRecordListSprite", i);
+				ituWidgetSetName(CloneChildCallRecordListSprite, tmp);
+
+				ituWidgetAdd(CallRecordListCoverFlow, CloneCallRecordListContainer);
+			}
+			ituCoverFlowUpdate((ITUWidget*)CallRecordListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		}
+		// 记录按键指针、Sprite指针
+		g_CallRecordListButton[i] = CloneChildCallRecordListButton;
+		g_CallRecordListSprite[i] = CloneChildCallRecordListSprite;
+
+		if (i < max)
 		{
 			memset(devtype, 0, sizeof(devtype));
 			memset(timestr, 0, sizeof(timestr));
@@ -370,138 +385,58 @@ static void ShowRecordWin(CALL_TYPE Calltype)
 			sprintf(timestr, "%04d-%02d-%02d %02d:%02d:%02d", g_CallRecord->CallInfo[i].Time.year, g_CallRecord->CallInfo[i].Time.month, g_CallRecord->CallInfo[i].Time.day,
 				g_CallRecord->CallInfo[i].Time.hour, g_CallRecord->CallInfo[i].Time.min, g_CallRecord->CallInfo[i].Time.sec);
 
+			// 初始化为白色字体
+			ituSetColor(&((ITUWidget*)CloneChildCallRecordListDevTypeText)->color, 255, 255, 255, 255);
+			ituSetColor(&((ITUWidget*)CloneChildCallRecordListTimeText)->color, 255, 255, 255, 255);
+
 			// 如果是未接来电，且未读则字体颜色改为红色
 			if (Calltype == MISSED)
 			{
 				if (g_CallRecord->CallInfo[i].UnRead)
 				{
 					g_CallRecord->CallInfo[i].UnRead = 0;
-					ituSetColor(&((ITUWidget*)CallRecordListDevTypeText[i])->color, 255, 255, 0, 0);
-					ituSetColor(&((ITUWidget*)CallRecordListTimeText[i])->color, 255, 255, 0, 0);
+					ituSetColor(&((ITUWidget*)CloneChildCallRecordListDevTypeText)->color, 255, 255, 0, 0);
+					ituSetColor(&((ITUWidget*)CloneChildCallRecordListTimeText)->color, 255, 255, 0, 0);
 				}
 			}
 
-			ituTextSetString(CallRecordListDevTypeText[i], devtype);
-			ituTextSetString(CallRecordListTimeText[i], timestr);
+			ituTextSetString(CloneChildCallRecordListDevTypeText, devtype);
+			ituTextSetString(CloneChildCallRecordListTimeText, timestr);
+
 			// 如果处于编辑状态尾部小图标应改为未选中状态
 			if (g_CurPage == CallRecordPage)
 			{
 				if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_AREA || g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_STAIR
 					|| g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_DOOR_NET)
 				{
-					//ituWidgetSetVisible(CallRecordListSprite[i], false);
+					ituWidgetSetVisible(CloneChildCallRecordListSprite, false);
 				}
 				else
 				{
-					ituWidgetSetVisible(CallRecordListSprite[i], true);
-					ituSpriteGoto(CallRecordListSprite[i], CallCallIcon);
+					ituWidgetSetVisible(CloneChildCallRecordListSprite, true);
+					ituSpriteGoto(CloneChildCallRecordListSprite, CallCallIcon);
 				}
 			}
 			else if (g_CurPage == CallEditPage)
 			{
-				ituWidgetSetVisible(CallRecordListSprite[i], true);
-				ituSpriteGoto(CallRecordListSprite[i], CallUnChoseIcon);
+				ituWidgetSetVisible(CloneChildCallRecordListSprite, true);
+				ituSpriteGoto(CloneChildCallRecordListSprite, CallUnChoseIcon);
 			}
 		}
-
-		if (Calltype == MISSED)
+		else
 		{
-			storage_set_callrecord_state();
-			sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
-		}
-		SetRecordShowNum(max);
-	}
-	else
-	{
-		SetRecordShowNum(0);
-	}
-}
-
-/*************************************************
-Function:		SetCenterShowInit
-Description: 	显示页面初始化
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void SetCenterShowInit(void)
-{
-	uint8 i;
-
-	for (i = 0; i < MAX_CENTER_PAGE_NUM; i++)
-	{
-		ituWidgetSetVisible(CallCeterListBackgroundPage[i], true);
-	}
-
-	for (i = 0; i < MAX_CENTER_LIST_NUM; i++)
-	{
-		ituWidgetSetVisible(CallCeterListContainer[i], true);
-		ituWidgetDisable(CallCeterListButton[i]);
-		ituTextSetString(CallCeterListDevTypeText[i], "");
-		ituWidgetSetVisible(CallCeterListIcon[i], false);
-	}
-	// 初始化默认为首页
-	// 解决CallCeterListCoverFlow第一页是-1的情况
-	if (CallCeterListCoverFlow->frame == CallCeterListCoverFlow->totalframe)
-	{
-		ituCoverFlowGoto(CallCeterListCoverFlow, -1);
-	}
-	else
-	{
-		ituCoverFlowGoto(CallCeterListCoverFlow, 0);
-	}
-}
-
-/*************************************************
-Function:		SetCenterShowNum
-Description: 	显示管理员机或分机具体条数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void SetCenterShowNum(uint8 max)
-{
-	uint8 i, count = 0;
-	uint8 pagenum = 0, rest = 0;
-
-	// 隐藏多余页
-	if (max <= MAX_PAGE_NUM)
-	{
-		pagenum = 1;
-	}
-	else
-	{
-		pagenum = max / MAX_PAGE_NUM;
-		rest = max % MAX_PAGE_NUM;
-		if (rest > 0)
-		{
-			pagenum++;
+			ituWidgetDisable(CloneChildCallRecordListButton);
+			ituWidgetSetVisible(CloneChildCallRecordListSprite, false);
+			ituTextSetString(CloneChildCallRecordListDevTypeText, "");
+			ituTextSetString(CloneChildCallRecordListTimeText, "");
 		}
 	}
 
-	for (i = MAX_CENTER_PAGE_NUM; i > pagenum; i--)
+	if (Calltype == MISSED)
 	{
-		ituWidgetSetVisible(CallCeterListBackgroundPage[i - 1], false);
+		storage_set_callrecord_state();
+		sys_sync_hint_state_ext(SYS_HINT_MISSED_CALLS);
 	}
-
-#if 0
-	// 隐藏多余行(目前分机只支持8条)
-	count = pagenum * MAX_PAGE_NUM;
-	if (count > MAX_CENTER_LIST_NUM)
-	{
-		count = MAX_CENTER_LIST_NUM;
-	}
-#endif
-
-	for (i = 0; i < max; i++)
-	{
-		ituWidgetSetVisible(CallCeterListIcon[i], true);
-		ituWidgetEnable(CallCeterListButton[i]);
-	}
-
-	dprintf("SetCenterShowNum..:max %d\n", max);
 }
 
 /*************************************************
@@ -515,71 +450,168 @@ Others:			无
 *************************************************/
 static void ShowCenterWin(uint8 type)
 {
-	uint8 i, count = 0;
-	char devtype[50], devno[5];
+	uint32 ypos = 0;
+	uint8 i, max = 0, count = 0;
+	uint8 result = 0, managerflag = 0;
+	char devtype[50], devno[5], tmp[50];
+	ITUButton* CloneChildCallCenterListButton;
+	ITUText* CloneChildCallCenterListDevTypeText;
+	ITUIcon* CloneChildCallCenterListIcon;
+	ITUContainer* CloneCallCenterListContainer;
+	ITUContainer* OldCallCenterListContainer;
 
-	SetCenterShowInit();
+	// 删除已经Clone的List
+	for (i = LIST_ITEM_COUNT; i < MAX_CENTER_NUM; i++)
+	{
+		if (NULL != g_CallCenterListButton[i])
+		{
+			g_CallCenterListButton[i] = NULL;
+			OldCallCenterListContainer = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "CallCenterListContainer", i);
+			OldCallCenterListContainer = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldCallCenterListContainer);						// 删除已有的
+			ituWidgetExit(OldCallCenterListContainer);
+			dprintf("Remove CallCenterListContainer List!!!\n");
+		}
+	}
+	// 默认显示从第一条开始显示
+	ituCoverFlowGoto(CallCenterListCoverFlow, 0);
 	g_CenterType = type;
 	memset(g_Index, 0, sizeof(g_Index));
 
 	if (type == 0)
 	{
-		for (i = 0; i < 3; i++)
+		// 管理员机
+		for (i = 0; i < MAX_MANAGER_NUM; i++)
 		{
-			if (storage_get_manager_ip(i+1))
+			if (storage_get_manager_ip(i + 1))
 			{
-				g_Index[count] = i+ MANAGER_NUM + 1;
-				count++;
+				g_Index[max] = i + MANAGER_NUM + 1;
+				max++;
 			}
 		}
-
-		if (count)
+		
+		if (0 == max)
 		{
-			for (i = 0; i < count; i++)
-			{
-				memset(devno, 0, sizeof(devno));
-				memset(devtype, 0, sizeof(devtype));
-
-				sprintf(devno, "%d", g_Index[i]);
-				printf("devno : %s g_Index[%d] : %d\n", devno, i, g_Index[i]);
-				get_dev_description(DEVICE_TYPE_MANAGER, devno, devtype, 50);
-				ituTextSetString(CallCeterListDevTypeText[i], devtype);
-			}
-			SetCenterShowNum(count);
-		}
-		else
-		{
-			g_Index[0] = 0xFF;
-			ituTextSetString(CallCeterListDevTypeText[0], get_str(SID_DevManager));
-			SetCenterShowNum(1);
+			max = 1;
+			managerflag = 1;
 		}
 	}
 	else
 	{
-		for (i = 0; i < 8; i++)
+		// 分机
+		for (i = 0; i < MAX_FENJI_NUM; i++)
 		{
 			if (storage_get_subdev_ip(i))
 			{
-				g_Index[count] = i;
-				count++;
+				g_Index[max] = i;
+				max++;
 			}
 		}
-		if (count)
+	}
+
+	if (max <= MAX_PAGE_NUM)
+	{
+		count = MAX_PAGE_NUM;
+	}
+	else
+	{
+		count = max;
+	}
+
+	for (i = 0; i < count; i++)
+	{
+		CloneChildCallCenterListButton = NULL;
+		CloneChildCallCenterListDevTypeText = NULL;
+		CloneChildCallCenterListIcon = NULL;
+		CloneCallCenterListContainer = NULL;
+
+		if (i < LIST_ITEM_COUNT)
 		{
-			for (i = 0; i < count; i++)
+			CloneChildCallCenterListButton = CallCenterListButton[i];
+			CloneChildCallCenterListDevTypeText = CallCenterListDevTypeText[i];
+			CloneChildCallCenterListIcon = CallCenterListIcon[i];
+
+			// 模板初始化
+			ituWidgetEnable(CloneChildCallCenterListButton);
+			ituWidgetSetVisible(CloneChildCallCenterListIcon, true);
+			ituTextSetString(CloneChildCallCenterListDevTypeText, "");
+		}
+		else
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "CallCenterListContainer", i);
+			result = ituWidgetClone(CallCenterListContainer[1], &CloneCallCenterListContainer);
+			if (result)
+			{
+				ituWidgetSetName(CloneCallCenterListContainer, tmp);
+				ituWidgetSetX(CloneCallCenterListContainer, 0);
+				if (i < MAX_PAGE_NUM)
+				{
+					ypos = i * 62;
+				}
+				else
+				{
+					ypos = 0;
+				}
+				ituWidgetSetY(CloneCallCenterListContainer, ypos);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallCenterListButton = itcTreeGetChildAt(CloneCallCenterListContainer, 0);
+				sprintf(tmp, "%s%d", "CallCenterListButton", i);
+				ituWidgetSetName(CloneChildCallCenterListButton, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallCenterListDevTypeText = itcTreeGetChildAt(CloneCallCenterListContainer, 1);
+				sprintf(tmp, "%s%d", "CallCenterListDevTypeText", i);
+				ituWidgetSetName(CloneChildCallCenterListDevTypeText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildCallCenterListIcon = itcTreeGetChildAt(CloneCallCenterListContainer, 2);
+				sprintf(tmp, "%s%d", "CallCenterListIcon", i);
+				ituWidgetSetName(CloneChildCallCenterListIcon, tmp);
+
+				ituWidgetAdd(CallCenterListCoverFlow, CloneCallCenterListContainer);
+			}
+			ituCoverFlowUpdate((ITUWidget*)CallCenterListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		}
+		g_CallCenterListButton[i] = CloneChildCallCenterListButton;
+
+		if (i < max)
+		{
+			if (type == 0)
+			{
+				if (managerflag)
+				{
+					g_Index[0] = 0xFF;
+					ituTextSetString(CloneChildCallCenterListDevTypeText, get_str(SID_DevManager));
+				}
+				else
+				{
+					memset(devno, 0, sizeof(devno));
+					memset(devtype, 0, sizeof(devtype));
+
+					sprintf(devno, "%d", g_Index[i]);
+					get_dev_description(DEVICE_TYPE_MANAGER, devno, devtype, 50);
+					ituTextSetString(CloneChildCallCenterListDevTypeText, devtype);
+				}
+			}
+			else
 			{
 				memset(devno, 0, sizeof(devno));
 				memset(devtype, 0, sizeof(devtype));
 
 				sprintf(devno, "%d", g_Index[i]);
 				get_dev_description(DEVICE_TYPE_FENJI_NET, devno, devtype, 50);
-				ituTextSetString(CallCeterListDevTypeText[i], devtype);
+				ituTextSetString(CloneChildCallCenterListDevTypeText, devtype);
 			}
-			SetCenterShowNum(count);
 		}
 		else
 		{
-			SetCenterShowNum(0);
+			ituWidgetDisable(CloneChildCallCenterListButton);
+			ituWidgetSetVisible(CloneChildCallCenterListIcon, false);
+			ituTextSetString(CloneChildCallCenterListDevTypeText, "");
 		}
 	}
 }
@@ -642,11 +674,12 @@ static uint8 WhetherDelRecord(void)
 
 	for (i = 0; i < g_CallRecord->CallCount; i++)
 	{
-		if (CallChoseIcon == CallRecordListSprite[i]->frame)
+		if (CallChoseIcon == g_CallRecordListSprite[i]->frame)
 		{
 			return TRUE;
 		}
 	}
+
 	return FALSE;
 }
 
@@ -664,7 +697,7 @@ static void SetRecordChose(void)
 
 	for (i = 0; i < g_CallRecord->CallCount; i++)
 	{
-		ituSpriteGoto(CallRecordListSprite[i], CallChoseIcon);
+		ituSpriteGoto(g_CallRecordListSprite[i], CallChoseIcon);
 	}
 }
 
@@ -747,28 +780,6 @@ static void CalloutEventStart(void)
 }
 
 /*************************************************
-Function:		CallDestroyProc
-Description: 	销毁处理函数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void CallDestroyProc(void)
-{
-	if (g_CallRecord)
-	{
-		if (g_CallRecord->CallInfo)
-		{
-			free(g_CallRecord->CallInfo);
-			g_CallRecord->CallInfo = NULL;
-		}
-		free(g_CallRecord);
-		g_CallRecord = NULL;
-	}
-}
-
-/*************************************************
 Function:		CallCallRequestState
 Description: 	呼叫请求回调执行函数
 Input:			无
@@ -810,6 +821,30 @@ bool CallCallRequestState(ITUWidget* widget, char* param)
 
 		default:
 			break;
+	}
+
+	return true;
+}
+
+/*************************************************
+Function:		CallLayerOnLeave
+Description: 	退出执行函数
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool CallLayerOnLeave(ITUWidget* widget, char* param)
+{
+	if (g_CallRecord)
+	{
+		if (g_CallRecord->CallInfo)
+		{
+			free(g_CallRecord->CallInfo);
+			g_CallRecord->CallInfo = NULL;
+		}
+		free(g_CallRecord);
+		g_CallRecord = NULL;
 	}
 
 	return true;
@@ -960,53 +995,60 @@ Others:			无
 *************************************************/
 bool CallRecordListButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 index = atoi(param);
+	uint8 i;
 
-	dprintf("RecordList index......:%d\n", index);
-	if (g_CurPage == CallEditPage)
-	{	
-		if (CallChoseIcon == CallRecordListSprite[index]->frame)
-		{
-			ituSpriteGoto(CallRecordListSprite[index], CallUnChoseIcon);
-		}
-		else
-		{
-			ituSpriteGoto(CallRecordListSprite[index], CallChoseIcon);
-		}
-	}
-	else
+	for (i = 0; i < g_CallRecord->CallCount; i++)
 	{
-		if (g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_MANAGER || g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_ROOM ||
-			g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_FENJI_NET)
+		if (g_CallRecordListButton[i] == (ITUButton*)widget)
 		{
-			if (g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_ROOM)
+			if (g_CurPage == CallEditPage)
 			{
-				PFULL_DEVICE_NO dev = storage_get_devparam();
-
-				g_TimerRuning = TRUE;
-				SetCalloutInfo(CallUserEvent);
-				CallLayerPage(CallUserPage);
-				strncpy(g_CallNo, g_CallRecord->CallInfo[index].devno, dev->DevNoLen - 1);
-				g_CallLastTick = SDL_GetTicks();
-				ituTextBoxSetString(CallKeyBordTextBox, NULL);
-				CalloutEventStart();
-			}
-			else
-			{	
-				INTER_INFO_S CallInfo = { 0 };
-
-				CallInfo.InterType = INTER_CALLOUT_E;
-				if (g_CallRecord->CallInfo[index].Type == DEVICE_TYPE_MANAGER)
+				if (CallChoseIcon == g_CallRecordListSprite[i]->frame)
 				{
-					CallInfo.DevType = DEVICE_TYPE_MANAGER;
+					ituSpriteGoto(g_CallRecordListSprite[i], CallUnChoseIcon);
 				}
 				else
 				{
-					CallInfo.DevType = DEVICE_TYPE_FENJI_NET;
+					ituSpriteGoto(g_CallRecordListSprite[i], CallChoseIcon);
 				}
-				strcpy(CallInfo.DevStr, g_CallRecord->CallInfo[index].devno);
-				BeCallWin(&CallInfo);
 			}
+			else
+			{
+				if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_MANAGER || g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_ROOM ||
+					g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_FENJI_NET)
+				{
+					if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_ROOM)
+					{
+						PFULL_DEVICE_NO dev = storage_get_devparam();
+
+						g_TimerRuning = TRUE;
+						SetCalloutInfo(CallUserEvent);
+						CallLayerPage(CallUserPage);
+						ituRadioBoxSetChecked(CallRightUserRadioBox, true);
+						strncpy(g_CallNo, g_CallRecord->CallInfo[i].devno, dev->DevNoLen - 1);
+						g_CallLastTick = SDL_GetTicks();
+						ituTextBoxSetString(CallKeyBordTextBox, NULL);
+						CalloutEventStart();
+					}
+					else
+					{
+						INTER_INFO_S CallInfo = { 0 };
+
+						CallInfo.InterType = INTER_CALLOUT_E;
+						if (g_CallRecord->CallInfo[i].Type == DEVICE_TYPE_MANAGER)
+						{
+							CallInfo.DevType = DEVICE_TYPE_MANAGER;
+						}
+						else
+						{
+							CallInfo.DevType = DEVICE_TYPE_FENJI_NET;
+						}
+						strcpy(CallInfo.DevStr, g_CallRecord->CallInfo[i].devno);
+						BeCallWin(&CallInfo);
+					}
+				}
+			}
+			break;
 		}
 	}
 
@@ -1014,36 +1056,43 @@ bool CallRecordListButtonOnMouseUp(ITUWidget* widget, char* param)
 }
 
 /*************************************************
-Function:		CallCeterListButtonOnMouseUp
+Function:		CallCenterListButtonOnMouseUp
 Description: 	管理员机、分机按下执行函数
 Input:			无
 Output:			无
 Return:			TRUE 是 FALSE 否
 Others:			无
 *************************************************/
-bool CallCeterListButtonOnMouseUp(ITUWidget* widget, char* param)
+bool CallCenterListButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 index = atoi(param);
+	uint8 i;
 	INTER_INFO_S CallInfo = { 0 };
 
-	int32 ret = ui_show_win_arbitration(SYS_OPER_CALLOUT);
-	if (ret == TRUE)
+	for (i = 0; i < MAX_CENTER_NUM; i++)
 	{
-		CallInfo.InterType = INTER_CALLOUT_E;
-		if (g_CenterType == 0)
+		if (g_CallCenterListButton[i] == (ITUButton*)widget)
 		{
-			CallInfo.DevType = DEVICE_TYPE_MANAGER;
-			sprintf(CallInfo.DevStr, "%d", g_Index[index]);
-			BeCallWin(&CallInfo);
-		}
-		else
-		{
-			CallInfo.DevType = DEVICE_TYPE_FENJI_NET;
-			sprintf(CallInfo.DevStr, "%d", g_Index[index]);
-			BeCallWin(&CallInfo);
+			int32 ret = ui_show_win_arbitration(SYS_OPER_CALLOUT);
+			if (ret == TRUE)
+			{
+				CallInfo.InterType = INTER_CALLOUT_E;
+				if (g_CenterType == 0)
+				{
+					CallInfo.DevType = DEVICE_TYPE_MANAGER;
+					sprintf(CallInfo.DevStr, "%d", g_Index[i]);
+					BeCallWin(&CallInfo);
+				}
+				else
+				{
+					CallInfo.DevType = DEVICE_TYPE_FENJI_NET;
+					sprintf(CallInfo.DevStr, "%d", g_Index[i]);
+					BeCallWin(&CallInfo);
+				}
+			}
+			break;
 		}
 	}
-
+	
 	return true;
 }
 
@@ -1069,7 +1118,7 @@ bool CallRecordMSGButtonOnMouseUp(ITUWidget* widget, char* param)
 			memset(&DelList, 0, sizeof(DEL_LIST));
 			for (i = 0; i < g_CallRecord->CallCount; i++)
 			{
-				if (CallChoseIcon == CallRecordListSprite[i]->frame)
+				if (CallChoseIcon == g_CallRecordListSprite[i]->frame)
 				{
 					DelList.DelFlg[i] = 1;
 					DelList.Counts++;
@@ -1115,13 +1164,13 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 	dprintf("btn_event: %d\n", btn_event);
 	switch (btn_event)
 	{
-		case CallCeterEvent:
-			CallLayerPage(CallCeterPage);
+		case CallCenterEvent:
+			CallLayerPage(CallCenterPage);
 			ShowCenterWin(0);
 			break;
 
 		case CallFenJiEvent:
-			CallLayerPage(CallCeterPage);
+			CallLayerPage(CallCenterPage);
 			ShowCenterWin(1);
 			break;
 
@@ -1170,7 +1219,6 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			break;
 
 		case CallExitEvent:
-			printf(" Exit Press.........\n");
 			if (ituWidgetIsVisible(CallBottomBackground2))
 			{
 				ituRadioBoxSetChecked(CallBottomRecordMissRadioBox, true);
@@ -1179,7 +1227,6 @@ bool CallLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			}
 			else
 			{
-				CallDestroyProc();
 				ituLayerGoto(MainLayer);
 			}
 			break;
@@ -1217,8 +1264,11 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 		CallRightBackground = ituSceneFindWidget(&theScene, "CallRightBackground");
 		assert(CallRightBackground);
 
-		CallRightCeterRadioBox = ituSceneFindWidget(&theScene, "CallRightCeterRadioBox");
-		assert(CallRightCeterRadioBox);
+		CallRightCenterRadioBox = ituSceneFindWidget(&theScene, "CallRightCenterRadioBox");
+		assert(CallRightCenterRadioBox);
+
+		CallRightUserRadioBox = ituSceneFindWidget(&theScene, "CallRightUserRadioBox");
+		assert(CallRightUserRadioBox);
 
 		CallRightRecordRadioBox = ituSceneFindWidget(&theScene, "CallRightRecordRadioBox");
 		assert(CallRightRecordRadioBox);
@@ -1250,7 +1300,7 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 		CallRecordListCoverFlow = ituSceneFindWidget(&theScene, "CallRecordListCoverFlow");
 		assert(CallRecordListCoverFlow);
 
-		CallCeterListCoverFlow = ituSceneFindWidget(&theScene, "CallCeterListCoverFlow");
+		CallCenterListCoverFlow = ituSceneFindWidget(&theScene, "CallCenterListCoverFlow");
 		assert(CallKeyboard);
 
 		CallRecordMSGHitText = ituSceneFindWidget(&theScene, "CallRecordMSGHitText");
@@ -1259,23 +1309,7 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 		CallRecordMSGHitGrayBackground = ituSceneFindWidget(&theScene, "CallRecordMSGHitGrayBackground");
 		assert(CallRecordMSGHitGrayBackground);
 
-		for (i = 0; i < MAX_RECORD_PAGE_NUM; i++)
-		{
-			memset(callname, 0, sizeof(callname));
-			sprintf(callname, "%s%d", "CallRecordListBackgroundPage", i);
-			CallRecordListBackgroundPage[i] = ituSceneFindWidget(&theScene, callname);
-			assert(CallRecordListBackgroundPage[i]);
-		}
-
-		for (i = 0; i < MAX_CENTER_PAGE_NUM; i++)
-		{
-			memset(callname, 0, sizeof(callname));
-			sprintf(callname, "%s%d", "CallCeterListBackgroundPage", i);
-			CallCeterListBackgroundPage[i] = ituSceneFindWidget(&theScene, callname);
-			assert(CallCeterListBackgroundPage[i]);
-		}
-
-		for (i = 0; i < MAX_RECORD_LIST_NUM; i++)
+		for (i = 0; i < LIST_ITEM_COUNT; i++)
 		{
 			memset(callname, 0, sizeof(callname));
 			sprintf(callname, "%s%d", "CallRecordListContainer", i);
@@ -1301,31 +1335,27 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 			sprintf(callname, "%s%d", "CallRecordListSprite", i);
 			CallRecordListSprite[i] = ituSceneFindWidget(&theScene, callname);
 			assert(CallRecordListSprite[i]);
+
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "CallCenterListContainer", i);
+			CallCenterListContainer[i] = ituSceneFindWidget(&theScene, callname);
+			assert(CallCenterListContainer[i]);
+
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "CallCenterListButton", i);
+			CallCenterListButton[i] = ituSceneFindWidget(&theScene, callname);
+			assert(CallCenterListButton[i]);
+
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "CallCenterListDevTypeText", i);
+			CallCenterListDevTypeText[i] = ituSceneFindWidget(&theScene, callname);
+			assert(CallCenterListDevTypeText[i]);
+
+			memset(callname, 0, sizeof(callname));
+			sprintf(callname, "%s%d", "CallCenterListIcon", i);
+			CallCenterListIcon[i] = ituSceneFindWidget(&theScene, callname);
+			assert(CallCenterListIcon[i]);
 		}
-
-		for (i = 0; i < MAX_CENTER_LIST_NUM; i++)
-		{
-			memset(callname, 0, sizeof(callname));
-			sprintf(callname, "%s%d", "CallCeterListContainer", i);
-			CallCeterListContainer[i] = ituSceneFindWidget(&theScene, callname);
-			assert(CallCeterListContainer[i]);
-
-			memset(callname, 0, sizeof(callname));
-			sprintf(callname, "%s%d", "CallCeterListButton", i);
-			CallCeterListButton[i] = ituSceneFindWidget(&theScene, callname);
-			assert(CallCeterListButton[i]);
-
-			memset(callname, 0, sizeof(callname));
-			sprintf(callname, "%s%d", "CallCeterListDevTypeText", i);
-			CallCeterListDevTypeText[i] = ituSceneFindWidget(&theScene, callname);
-			assert(CallCeterListDevTypeText[i]);
-
-			memset(callname, 0, sizeof(callname));
-			sprintf(callname, "%s%d", "CallCeterListIcon", i);
-			CallCeterListIcon[i] = ituSceneFindWidget(&theScene, callname);
-			assert(CallCeterListIcon[i]);
-		}
-
 		CallBottomNullButton0 = ituSceneFindWidget(&theScene, "CallBottomNullButton0");
 		assert(CallBottomNullButton0);
 
@@ -1347,8 +1377,8 @@ bool CallLayerOnEnter(ITUWidget* widget, char* param)
 	}
 	else
 	{
-		CallLayerPage(CallCeterPage);
-		ituRadioBoxSetChecked(CallRightCeterRadioBox, true);
+		CallLayerPage(CallCenterPage);
+		ituRadioBoxSetChecked(CallRightCenterRadioBox, true);
 		ShowCenterWin(0);
 	}
 	CallKeyBordTextBox->text.layout = ITU_LAYOUT_MIDDLE_CENTER;
@@ -1366,33 +1396,6 @@ Others:			无
 *************************************************/
 bool CalloutManager(ITUWidget* widget, char* param)
 {
-#if 0
-	uint8 i = 0, tmp = 0;
-	INTER_INFO_S CallInfo = { 0 };
-
-	int32 ret = ui_show_win_arbitration(SYS_OPER_CALLOUT);
-	if (ret == TRUE)
-	{
-		CallInfo.InterType = INTER_CALLOUT_E;
-		CallInfo.DevType = DEVICE_TYPE_MANAGER;
-
-		for (i = 0; i < 3; i++)
-		{
-			if (storage_get_manager_ip(i + 1))
-			{
-				tmp = i + MANAGER_NUM + 1;
-				continue;
-			}
-		}
-
-		if (0 == tmp)
-		{
-			tmp = 0xFF;
-		}
-		sprintf(CallInfo.DevStr, "%d", tmp);
-		BeCallWin(&CallInfo);
-	}
-#endif
 	TouchManagerKey();
 
 	return true;

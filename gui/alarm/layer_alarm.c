@@ -337,6 +337,7 @@ static void ShowRecordWin(uint8 page_type)
 		if (NULL != BackgroundFlag)							//判断是否clone过
 		{
 			itcTreeRemove(BackgroundFlag);						// 删除已有的
+			ituWidgetExit(BackgroundFlag);
 			BackgroundFlag = NULL;
 			debug_log("Remove a clone list background!!!\n");
 		}
@@ -575,6 +576,7 @@ static void update_area_state(uint8 clone_flag)
 			if (NULL != free_sprite)							//判断是否clone过
 			{
 				itcTreeRemove(free_sprite);						// 删除已有的
+				ituWidgetExit(free_sprite);
 				free_sprite = NULL;
 				debug_log("Remove a clone sprite!!!\n");
 			}
@@ -1114,7 +1116,7 @@ bool AlarmBottomButtonOnMouseUp(ITUWidget* widget, char* param)
 			{
 				storage_clear_afbj_unread_state();
 				updata_unread_alarm_rec_data();
-				//sys_sync_hint_state();
+				sys_sync_hint_state_ext(SYS_HINT_ALARM_WARNING);
 			}
 		}
 		show_alarm_main_hit();
@@ -1396,10 +1398,6 @@ bool AlarmKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param)
 			update_area_state(FALSE);
 			show_alarm_main_bottom();
 		}
-		else
-		{
-			show_alarm_main_bottom();
-		}
 		break;
 
 	case MSG_EVENT_XIECHI:
@@ -1409,14 +1407,9 @@ bool AlarmKeyBordYesButtonOnMouseUp(ITUWidget* widget, char* param)
 			update_area_state(FALSE);
 			show_alarm_main_bottom();
 		}
-		else
-		{
-			show_alarm_main_bottom();
-		}
 		break;
 
 	case MSG_EVENT_NO:
-		show_alarm_main_bottom();
 		ituTextSetString(AlarmKeyBordTextBox, NULL);
 		ituTextSetString(AlarmKeyBordHitText, get_str(SID_Set_Pwd_Err));
 		return true;

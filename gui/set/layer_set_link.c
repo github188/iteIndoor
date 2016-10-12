@@ -235,6 +235,15 @@ bool SetLinkCallButtonOnMouseUp(ITUWidget* widget, char* param)
 		assert(SetLinkEnableLylySprite);
 	}
 
+	if (FALSE == is_main_DeviceNo())		// edit by txl 111013 修改分机不显示留影留言菜单
+	{
+		if (g_lyly_param->Enable)
+		{
+			g_lyly_param->Enable = FALSE;
+			storage_set_lyly_param(g_lyly_param);
+		}
+	}
+
 	if (g_lyly_param->Enable)
 	{
 		ituSpriteGoto(SetLinkEnableLylySprite, 1);
@@ -301,60 +310,57 @@ bool SetLinkEnableLylyButtonOnMouseUp(ITUWidget* widget, char* param)
 {
 	uint8 i = 0;
 
-	if (g_lyly_param->Enable)
+	if (is_main_DeviceNo())		// edit by txl 111013 修改分机不显示留影留言菜单
 	{
-		g_lyly_param->Enable = FALSE;
+		if (g_lyly_param->Enable)
+		{
+			g_lyly_param->Enable = FALSE;
 
-		ituSpriteGoto(SetLinkEnableLylySprite, 0);
-		for (i = 0; i < 4; i++)
-		{
-			ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 128, 138, 135);//冷灰
-			ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 192, 192, 192);//灰色
-			ituWidgetDisable(SetLinkCallContainerEnable[i]);
-		}
+			ituSpriteGoto(SetLinkEnableLylySprite, 0);
+			for (i = 0; i < 4; i++)
+			{
+				ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 128, 138, 135);//冷灰
+				ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 192, 192, 192);//灰色
+				ituWidgetDisable(SetLinkCallContainerEnable[i]);
+			}
 
-		for (i = 0; i < 3; i++)
-		{
-			if (g_lyly_param->Link[i])
+			for (i = 0; i < 3; i++)
 			{
-				ituSpriteGoto(SetLinkCallSprite[i], 2);
-			}
-			else
-			{
-				ituSpriteGoto(SetLinkCallSprite[i], 0);
-			}
-		}
-	}
-	else
-	{
-		g_lyly_param->Enable = TRUE;
-		ituSpriteGoto(SetLinkEnableLylySprite, 1);
-		for (i = 0; i < 4; i++)
-		{
-			ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 255, 255, 255);
-			ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 255, 255, 255);
-			ituWidgetEnable(SetLinkCallContainerEnable[i]);
-		}
-
-		for (i = 0; i < 3; i++)
-		{
-			if (g_lyly_param->Link[i])
-			{
-				ituSpriteGoto(SetLinkCallSprite[i], 1);
-			}
-			else
-			{
-				ituSpriteGoto(SetLinkCallSprite[i], 0);
+				if (g_lyly_param->Link[i])
+				{
+					ituSpriteGoto(SetLinkCallSprite[i], 2);
+				}
+				else
+				{
+					ituSpriteGoto(SetLinkCallSprite[i], 0);
+				}
 			}
 		}
-	}
+		else
+		{
+			g_lyly_param->Enable = TRUE;
+			ituSpriteGoto(SetLinkEnableLylySprite, 1);
+			for (i = 0; i < 4; i++)
+			{
+				ituSetColor(&((ITUWidget*)SetLinkCallContainer1Text[i])->color, 255, 255, 255, 255);
+				ituSetColor(&((ITUWidget*)SetLinkCallContainer2Text[i])->color, 255, 255, 255, 255);
+				ituWidgetEnable(SetLinkCallContainerEnable[i]);
+			}
 
-	uint8 ret = FALSE;
-	ret = storage_set_lyly_param(g_lyly_param);
-	if (ret)
-	{
-		// del by chenbh 
-		//sys_sync_hint_state();
+			for (i = 0; i < 3; i++)
+			{
+				if (g_lyly_param->Link[i])
+				{
+					ituSpriteGoto(SetLinkCallSprite[i], 1);
+				}
+				else
+				{
+					ituSpriteGoto(SetLinkCallSprite[i], 0);
+				}
+			}
+		}
+
+		storage_set_lyly_param(g_lyly_param);
 	}
 
 	return true;

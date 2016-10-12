@@ -1242,11 +1242,13 @@ int32 rtsp_monitor_start(uint32 index, uint32 type)
 	if (g_RtspMonItorInfo.state != MONITOR_END)
 	{
 		dprintf("monitor start : busy state: %d\n", g_RtspMonItorInfo.state);
+		sys_set_monitor_state(FALSE);		// add by chenbh 2016-10-12 解决搜索列表失败时，重置媒体状态
 		return FALSE;
 	}
 	
 	if (NULL == g_RtspMonItoRDevList || NULL == g_RtspMonItoRDevList->Devinfo || g_RtspMonItoRDevList->DevNum == 0)
 	{
+		sys_set_monitor_state(FALSE);		// add by chenbh 2016-10-12 解决搜索列表失败时，重置媒体状态
 		return FALSE;	
 	}
 
@@ -1263,6 +1265,7 @@ int32 rtsp_monitor_start(uint32 index, uint32 type)
 	if (0 != inter_start_thread(&g_RtspMonItorInfo.mThread, rtsp_monitor_proc, (void*)&g_RtspMonItorInfo, index))
 	{
 		g_RtspMonItorInfo.state = MONITOR_END;
+		sys_set_monitor_state(FALSE);		// add by chenbh 2016-10-12 解决搜索列表失败时，重置媒体状态
 		return FALSE;
 	}
 

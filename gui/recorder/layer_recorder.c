@@ -670,7 +670,7 @@ void recorderDeleteBtnOnClicked()
 	}
 	//TODO:ÃÌº””Ô—‘∑≠“Î£°
 
-	ituTextSetString(recorderTipsText, "Delete Message");
+	ituTextSetString(recorderTipsText, get_str(SID_Bj_Query_Del_Rec_One));
 
 	ituWidgetDisable(recorderBackground);
 	ituWidgetSetVisible(recorderTipsTransparencyBackground, true);

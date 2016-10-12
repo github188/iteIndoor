@@ -26,7 +26,7 @@ static ITUCalendar* SetIpProtocolFJInfoContainer[MAX_SHOW_FENJI_NUM] = { NULL };
 
 static uint32 g_ip = 0;
 static uint32 g_maincode = 0;					// 存放主机绑定码
-static uint32 g_bindstatus; 					// 0 : 未绑定; 1 :已绑定 
+static uint32 g_bindstatus = 0; 					// 0 : 未绑定; 1 :已绑定 
 static IPMODULE_INFO ipmoduleinfo;
 
 /*************************************************
@@ -47,11 +47,11 @@ static void show_win_bind()
 	memset(ip_tmp, 0, sizeof(ip_tmp));
 
 	g_bindstatus = get_ipmodule_bindstate();
+	g_maincode = get_ipmodule_bindcode();
 
 	if (g_bindstatus)
 	{
 		text_id = SID_Set_Bounded;
-		g_maincode = get_ipmodule_bindcode();
 		sprintf(bind_tmp, "%d", g_maincode);
 		sprintf(ip_tmp, "%s", UlongtoIP(get_ipmodule_addr()));
 	}
@@ -219,13 +219,13 @@ bool SetIpProtocolHostOnEnter(ITUWidget* widget, char* param)
 			SetIpProtocolFJInfoContainer[i] = ituSceneFindWidget(&theScene, tmp);
 			assert(SetIpProtocolFJInfoContainer[i]);
 		}
-
-		g_maincode = 0;
-		g_ip = 0;
-		show_win_bind();
-		show_win_fenji();
-		ituCoverFlowGoto(SetIpProtocolCoverFlow, 0);
 	}
+
+	g_maincode = 0;
+	g_ip = 0;
+	show_win_bind();
+	show_win_fenji();
+	ituCoverFlowGoto(SetIpProtocolCoverFlow, 0);
 
 	return true;
 }
@@ -266,8 +266,7 @@ bool SetIpProtocolBindNumButtonOnMouseUp(ITUWidget* widget, char* param)
 	ipmoduleinfo.IpAddr = 0;
 	set_ipmodule_info(&ipmoduleinfo);
 
-	sprintf(tmp, "%d", g_maincode);
-	ituTextSetString(SetIpProtocolBindNum2Text, tmp);
+	show_win_bind();
 
 	return true;
 }

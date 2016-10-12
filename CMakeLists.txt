@@ -254,6 +254,7 @@ gui/set/user/layer_set_alarm_area_list.c
 gui/set/user/layer_set_alarm_remote.c
 gui/set/user/layer_set_jd_scence.c
 gui/set/user/layer_set_jd_scence_param.c
+gui/set/user/layer_set_jd_yuyue.c
 gui/set/project/layer_set_alarm.c
 gui/set/project/layer_set_netparam.c
 gui/set/project/layer_set_extmodule.c

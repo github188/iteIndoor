@@ -41,9 +41,9 @@ static ITUIcon*			photoMsgVoiceOffIcon = NULL;
 static ITUIcon*			photoMsgVoiceOnIcon = NULL;
 
 
-static uint8_t*	gPhotoMsgListIconData;
+static uint8_t*	gPhotoMsgListIconData = NULL;
 static int		gPhotoMsgListIconSize;
-static uint8_t*	gPhotoMsgVideoBackgroundData;
+static uint8_t*	gPhotoMsgVideoBackgroundData = NULL;
 static int		gPhotoMsgVideoBackgroundSize;
 static uint8_t	gPhotoMsgPlayVol;
 static uint8_t  gPhotoMsgNum;
@@ -67,6 +67,12 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 bool photoMsgLayerOnLeave(ITUWidget* widget, char* param)
 {
 	printf("\photoMsgLayerOnLeave!!!!!!!!!\n");
+
+	//if (gPhotoMsgListIconData)
+	//{
+	//	free(gPhotoMsgListIconData);
+	//	gPhotoMsgListIconData = NULL;
+	//}
 
 	if (gPhotoMsgVideoMode != PHOTOMSG_VIDEOPLAY_STOP)
 	{
@@ -297,11 +303,11 @@ void photoMsgBoxShow(PHOTOMSG_BTN_e btnId)
 	switch (btnId)
 	{
 	case PHOTOMSG_BTN_EMPTY:
-		ituTextSetString(photoMsgTipsText, "Empty Message");
+		ituTextSetString(photoMsgTipsText, get_str(SID_Bj_Query_Del_Rec_All));
 		break;
 
 	case PHOTOMSG_BTN_DELETE:
-		ituTextSetString(photoMsgTipsText, "Delete Message");
+		ituTextSetString(photoMsgTipsText, get_str(SID_Bj_Query_Del_Rec_One));
 		break;
 
 	default:
@@ -473,8 +479,6 @@ void setPhotoMsgList()
 				default:
 					break;
 				}
-				printf("\n1111111111111111111 =%d =  %s \n", i, tmpAddr);
-
 				memset(tmpStr, 0, sizeof(tmpStr));
 				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
@@ -518,7 +522,6 @@ void setPhotoMsgList()
 				default:
 					break;
 				}
-				printf("\n1111111111111111111 =%d =  %s \n", i, tmpAddr);
 				memset(tmpStr, 0, sizeof(tmpStr));
 				zoneDateTimeToString(gPhotoMsgList->LylyInfo[i].Time, tmpStr);
 				setPhotoMsgListTime(i, tmpStr, gPhotoMsgList->LylyInfo[i].UnRead);
@@ -583,8 +586,6 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	photoMsgListMiniPicIcon = ituSceneFindWidget(&theScene, tmpStr);
 	assert(photoMsgListMiniPicIcon);
 
-	printf("\n 22222222222222222222222222!  = %d   = %s \n", index, tmpStr);
-
 	// try to load minipic jpeg file if exists
 	tmpFile = fopen(iconAddr, "rb");
 	if (tmpFile)
@@ -611,8 +612,7 @@ bool setPhotoMsgListMiniIcon(uint8_t index, char* iconAddr)
 	{
 		ituIconLoadJpegData((ITUIcon*)photoMsgListMiniPicIcon, gPhotoMsgListIconData, gPhotoMsgListIconSize);
 		photoMsgListMiniPicIcon->widget.flags |= ITU_EXTERNAL_IMAGE;
-		printf("\n 333333333333333333333333333!  = %d   = %d \n", gPhotoMsgListIconData, gPhotoMsgListIconSize);
-
+		ituWidgetSetVisible(photoMsgListMiniPicIcon, true);
 	}
 	else
 	{
@@ -706,6 +706,7 @@ void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 		//sys_stop_play_audio(SYS_MEDIA_MUSIC);
 		sys_stop_play_leaveword();
 		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
+		BackgroundDrawVideo_exit();
 		break;
 
 	default:
@@ -880,6 +881,8 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 	{
 	case LYLY_TYPE_AUDIO:
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
+		sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_audio_bg.jpg");
+		setPhotoMsgAudioPlayPicture(tmpAddr); 
 		//开始播放纯音频文件！！！！！！
 		//sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_AUDIO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);

@@ -97,7 +97,7 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 				dprintf("SYS_MEDIA_MONITOR monitor\n");
 				monitor_stop();
 				// 监视转呼叫 延迟等待监视线程退出
-				usleep(1000*1000);
+				usleep(2000*1000);
 			}
 			break;
 			

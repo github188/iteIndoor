@@ -518,6 +518,11 @@ bool SetRtspParamListButtonOnMouseUp(ITUWidget* widget, char* param)
 		{
 			ituRadioBoxSetChecked(SetRtspFactoryMsg1RadioBox, true);
 		}
+		else
+		{
+			ituRadioBoxSetChecked(SetRtspFactoryMsg0RadioBox, false);
+			ituRadioBoxSetChecked(SetRtspFactoryMsg1RadioBox, false);
+		}
 		ituWidgetDisable(SetRtspBackground);
 		ituWidgetSetVisible(SetRtspFactoryMsgBackground, true);
 		break;
@@ -562,9 +567,9 @@ bool SetRtspFactoryMsgRadioBoxOnMouseUp(ITUWidget* widget, char* param)
 		break;
 	}
 
+	save_rtsp_param();
 	ShowSetCameraParamList(1);
 	ShowSetCameraParamList(6);
-	save_rtsp_param();
 
 	ituWidgetSetVisible(SetRtspFactoryMsgBackground, false);
 	ituWidgetEnable(SetRtspBackground);

@@ -620,11 +620,12 @@ LabChange:
 	}
 	
 	dprintf("monitor proc : AS_MONITOR_END : g_ErrType : %d\n", g_ErrType);
-	sys_set_monitor_state(FALSE);
+	//sys_set_monitor_state(FALSE);
 	dprintf("monitor proc end!\n");
 	g_MonitorInfo.state = MONITOR_END;
 	g_PreMonitorState = MONITOR_END;
 	GuiNotify(g_MonitorInfo.state, g_ErrType);
+	sys_set_monitor_state(FALSE);
 	g_ErrType = MONITOR_OK;
 	inter_SetThread(&g_MonitorInfo.mThread);
 
@@ -947,6 +948,7 @@ int32 monitor_start(DEVICE_TYPE_E DevType, int8 index)
 			if (0 != inter_start_thread(&g_MonitorInfo.mThread, phone_monitor_proc, (void*)&g_MonitorInfo, index))
 			{
 				g_MonitorInfo.state = MONITOR_END;
+				sys_set_monitor_state(FALSE);	// add by chenbh 2016-10-12 解决搜索列表失败时，重置媒体状态
 				return FALSE;
 			}
 			break;
@@ -960,6 +962,7 @@ int32 monitor_start(DEVICE_TYPE_E DevType, int8 index)
 			if (0 != inter_start_thread(&g_MonitorInfo.mThread, monitor_proc, (void*)&g_MonitorInfo, index))
 			{
 				g_MonitorInfo.state = MONITOR_END;
+				sys_set_monitor_state(FALSE);	// add by chenbh 2016-10-12 解决搜索列表失败时，重置媒体状态
 				return FALSE;
 			}
 			break;
@@ -967,6 +970,7 @@ int32 monitor_start(DEVICE_TYPE_E DevType, int8 index)
 
 		default:
 			dprintf(" monitor devtype is not support!!!!!! \n");
+			sys_set_monitor_state(FALSE);		// add by chenbh 2016-10-12 解决搜索列表失败时，重置媒体状态
 			return FALSE;
 	}
 	return TRUE;

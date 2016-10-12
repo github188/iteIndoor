@@ -13,9 +13,7 @@ Modification:
 #include "gui_include.h"
 
 /*****************常量定义***********************/
-#define MAX_PAGE_NUM			6					// 每页最大条数
-#define MAX_RTSP_NUM  			24					// 最大管理员机数
-#define MAX_RTSP_PAGE_NUM  		4					// 管理员机最大页数
+#define MAX_RTSP_NUM  			IPC_DEVICE_NUM		// 最大IPC数
 
 /*****************变量定义***********************/
 static ITULayer* MainLayer = NULL;
@@ -25,20 +23,19 @@ static ITURadioBox* RTSPSearchRightHomeRadioBox = NULL;
 static ITURadioBox* RTSPSearchRightPublicRadioBox = NULL;
 static ITUBackground* RTSPSearchBottomBackground = NULL;
 static ITUCoverFlow* RTSPSearchListCoverFlow = NULL;
-static ITUBackground* RTSPSearchListBackgroundPage[MAX_RTSP_PAGE_NUM] = { NULL };
-static ITUContainer* RTSPSearchListContainer[MAX_RTSP_NUM] = { NULL };
-static ITUButton* RTSPSearchListButton[MAX_RTSP_NUM] = { NULL };
-static ITUSprite* RTSPSearchListSprite[MAX_RTSP_NUM] = { NULL };
-static ITUText* RTSPSearchListDevNameText[MAX_RTSP_NUM] = { NULL };
-static ITUText* RTSPSearchListOnLineText[MAX_RTSP_NUM] = { NULL };
+static ITUContainer* RTSPSearchListContainer[LIST_ITEM_COUNT] = { NULL };
+static ITUButton* RTSPSearchListButton[LIST_ITEM_COUNT] = { NULL };
+static ITUSprite* RTSPSearchListSprite[LIST_ITEM_COUNT] = { NULL };
+static ITUText* RTSPSearchListDevNameText[LIST_ITEM_COUNT] = { NULL };
+static ITUText* RTSPSearchListOnLineText[LIST_ITEM_COUNT] = { NULL };
 static ITUBackground* RTSPSearchMSGHitGrayBackground = NULL;
-static ITUAnimation* RTSPSearchMSGHitAnimation = NULL;
 static ITUContainer* RTSPSearchBottomSearchContainer = NULL;
 static ITUBackground* RTSPSearchBackground = NULL;
 static ITUContainer* RTSPSearchBottomNullContainer0 = NULL;
 static ITUButton* RTSPSearchBottomNullButton[4] = { NULL };
 static ITUButton* RTSPSearchRightNullButton[2] = { NULL };
 
+static ITUButton* g_RTSPSearchListButton[MAX_RTSP_NUM] = { NULL };
 /*****************常量定义***********************/
 static PRtspDeviceList  g_RTSPList = NULL;
 static uint8  g_Type = 0;							// 0 家居监视 1 社区监视
@@ -64,137 +61,251 @@ typedef enum
 }RTSPIconType;
 
 /*************************************************
-Function:		SetRTSPShowInit
-Description: 	显示页面初始化
-Input:			无
+Function:		ShowRTSPNoneWin
+Description: 	显示空的rtsp列表，分机搜索时显示为空
+Input:			
+	1.count		空列表条数
 Output:			无
 Return:			无
 Others:			无
 *************************************************/
-static void SetRTSPShowInit(void)
+static void ShowRTSPNoneWin(uint8 count)
 {
-	uint8 i;
+	char tmp[50];
+	uint32 ypos = 0;
+	uint8 i, result = 0;
+	ITUButton* CloneChildRTSPSearchListButton;
+	ITUText* CloneChildRTSPSearchListDevNameText;
+	ITUText* CloneChildRTSPSearchListOnLineText;
+	ITUSprite* CloneChildRTSPSearchListSprite;
+	ITUContainer* CloneRTSPSearchListContainer;
+	ITUContainer* OldRTSPSearchListContainer;
 
-	for (i = 0; i < MAX_RTSP_PAGE_NUM; i++)
+	// 删除已经Clone的List
+	for (i = LIST_ITEM_COUNT; i < count; i++)
 	{
-		ituWidgetSetVisible(RTSPSearchListBackgroundPage[i], true);
-	}
-
-	for (i = 0; i < MAX_RTSP_NUM; i++)
-	{
-		ituWidgetSetVisible(RTSPSearchListContainer[i], true);
-		ituWidgetDisable(RTSPSearchListButton[i]);
-		ituTextSetString(RTSPSearchListDevNameText[i], "");
-		ituWidgetSetVisible(RTSPSearchListOnLineText[i], true);
-		ituTextSetString(RTSPSearchListOnLineText[i], "");
-		ituWidgetSetVisible(RTSPSearchListSprite[i], false);
-	}
-
-	// 初始化默认为首页
-	// 解决RTSPSearchListCoverFlow第一页是-1的情况
-	if (RTSPSearchListCoverFlow->frame == RTSPSearchListCoverFlow->totalframe)
-	{
-		ituCoverFlowGoto(RTSPSearchListCoverFlow, -1);
-	}
-	else
-	{
-		ituCoverFlowGoto(RTSPSearchListCoverFlow, 0);
-	}
-}
-
-/*************************************************
-Function:		SetRTSPShowNum
-Description: 	显示监视列表具体条数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void SetRTSPShowNum(uint8 max)
-{
-	uint8 i, count = 0;
-	uint8 pagenum = 0, rest = 0;
-
-	// 隐藏多余页
-	if (max <= MAX_PAGE_NUM)
-	{
-		pagenum = 1;
-	}
-	else
-	{
-		pagenum = max / MAX_PAGE_NUM;
-		rest = max % MAX_PAGE_NUM;
-		if (rest > 0)
+		if (NULL != g_RTSPSearchListButton[i])
 		{
-			pagenum++;
+			g_RTSPSearchListButton[i] = NULL;
+			OldRTSPSearchListContainer = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "RTSPSearchListContainer", i);
+			OldRTSPSearchListContainer = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldRTSPSearchListContainer);						// 删除已有的
+			ituWidgetExit(OldRTSPSearchListContainer);
+			dprintf("Remove RTSPSearchListContainer List!!!\n");
 		}
 	}
+	// 默认显示从第一条开始显示
+	ituCoverFlowGoto(RTSPSearchListCoverFlow, 0);
 
-	for (i = MAX_RTSP_PAGE_NUM; i > pagenum; i--)
+	for (i = 0; i < count; i++)
 	{
-		ituWidgetSetVisible(RTSPSearchListBackgroundPage[i - 1], false);
-	}
+		CloneChildRTSPSearchListButton = NULL;
+		CloneChildRTSPSearchListDevNameText = NULL;
+		CloneChildRTSPSearchListOnLineText = NULL;
+		CloneChildRTSPSearchListSprite = NULL;
+		CloneRTSPSearchListContainer = NULL;
 
-#if 0
-	// 隐藏多余行
-	count = pagenum * MAX_PAGE_NUM;
-	if (count > MAX_RTSP_NUM)
-	{
-		count = MAX_RTSP_NUM;
-	}
-#endif
+		if (i < LIST_ITEM_COUNT)
+		{
+			CloneChildRTSPSearchListButton = RTSPSearchListButton[i];
+			CloneChildRTSPSearchListDevNameText = RTSPSearchListDevNameText[i];
+			CloneChildRTSPSearchListOnLineText = RTSPSearchListOnLineText[i];
+			CloneChildRTSPSearchListSprite = RTSPSearchListSprite[i];
 
-	for (i = 0; i < max; i++)
-	{
-		ituWidgetEnable(RTSPSearchListButton[i]);
-	}
+			// 模板初始化
+			ituWidgetDisable(CloneChildRTSPSearchListButton);
+			ituWidgetSetVisible(CloneChildRTSPSearchListSprite, false);
+			ituTextSetString(CloneChildRTSPSearchListDevNameText, "");
+			ituTextSetString(CloneChildRTSPSearchListOnLineText, "");
+		}
+		else
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "RTSPSearchListContainer", i);
+			result = ituWidgetClone(RTSPSearchListContainer[1], &CloneRTSPSearchListContainer);
+			if (result)
+			{
+				ituWidgetSetName(CloneRTSPSearchListContainer, tmp);
+				ituWidgetSetX(CloneRTSPSearchListContainer, 0);
+				if (i < MAX_PAGE_NUM)
+				{
+					ypos = i * 62;
+				}
+				else
+				{
+					ypos = 0;
+				}
+				ituWidgetSetY(CloneRTSPSearchListContainer, ypos);
 
-	printf("SetRTSPShowNum..:count %d\n", count);
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListButton = itcTreeGetChildAt(CloneRTSPSearchListContainer, 0);
+				sprintf(tmp, "%s%d", "RTSPSearchListButton", i);
+				ituWidgetSetName(CloneChildRTSPSearchListButton, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListDevNameText = itcTreeGetChildAt(CloneRTSPSearchListContainer, 1);
+				sprintf(tmp, "%s%d", "RTSPSearchListDevNameText", i);
+				ituWidgetSetName(CloneChildRTSPSearchListDevNameText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListOnLineText = itcTreeGetChildAt(CloneRTSPSearchListContainer, 2);
+				sprintf(tmp, "%s%d", "RTSPSearchListOnLineText", i);
+				ituWidgetSetName(CloneChildRTSPSearchListOnLineText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListSprite = itcTreeGetChildAt(CloneRTSPSearchListContainer, 3);
+				sprintf(tmp, "%s%d", "RTSPSearchListSprite", i);
+				ituWidgetSetName(CloneChildRTSPSearchListSprite, tmp);
+
+				ituWidgetAdd(RTSPSearchListCoverFlow, CloneRTSPSearchListContainer);
+			}
+			ituCoverFlowUpdate((ITUWidget*)RTSPSearchListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		}
+		g_RTSPSearchListButton[i] = CloneChildRTSPSearchListButton;
+	}
 }
 
 /*************************************************
-Function:		ShowRtspWin
+Function:		ShowRTSPWin
 Description: 	显示rtsp列表
 Input:			无
 Output:			无
 Return:			无
 Others:			无
 *************************************************/
-static void ShowRtspWin(uint8 type)
+static void ShowRTSPWin(uint8 type)
 {
-	uint8 i, max = 0;
-	uint32 strid = 0;
+	char tmp[50];
+	uint32 strid = 0, ypos = 0;
+	uint8 i, max = 0, count = 0, result = 0;
 	RTSPIconType icontype = RTSPHomeIcon;
+	ITUButton* CloneChildRTSPSearchListButton;
+	ITUText* CloneChildRTSPSearchListDevNameText;
+	ITUText* CloneChildRTSPSearchListOnLineText;
+	ITUSprite* CloneChildRTSPSearchListSprite;
+	ITUContainer* CloneRTSPSearchListContainer;
+	ITUContainer* OldRTSPSearchListContainer;
 
-	SetRTSPShowInit();
+	// 删除已经Clone的List
+	for (i = LIST_ITEM_COUNT; i < MAX_RTSP_NUM; i++)
+	{
+		if (NULL != g_RTSPSearchListButton[i])
+		{
+			g_RTSPSearchListButton[i] = NULL;
+			OldRTSPSearchListContainer = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "RTSPSearchListContainer", i);
+			OldRTSPSearchListContainer = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldRTSPSearchListContainer);						// 删除已有的
+			ituWidgetExit(OldRTSPSearchListContainer);
+			dprintf("Remove RTSPSearchListContainer List!!!\n");
+		}
+	}
+
 	g_RTSPList = rtsp_monitor_get_devlist(type);
 	if (NULL == g_RTSPList)
 	{
 		return;
 	}
+	// 默认显示从第一条开始显示
+	ituCoverFlowGoto(RTSPSearchListCoverFlow, 0);
 
-	if (g_RTSPList && g_RTSPList->DevNum)
+	max = g_RTSPList->DevNum;
+	if (max > MAX_RTSP_NUM)
 	{
-		max = g_RTSPList->DevNum;
-		if (max > MAX_RTSP_NUM)
-		{
-			max = MAX_RTSP_NUM;
-		}
-		// 图标类型
-		if (0 == type)
-		{
-			icontype = RTSPHomeIcon;
-		}
-		else 
-		{
-			icontype = RTSPPublicIcon;
-		}
+		max = MAX_RTSP_NUM;
+	}
+	if (max <= MAX_PAGE_NUM)
+	{
+		count = MAX_PAGE_NUM;
+	}
+	else
+	{
+		count = max;
+	}
 
-		for (i = 0; i < max; i++)
+	// 图标类型
+	if (0 == type)
+	{
+		icontype = RTSPHomeIcon;
+	}
+	else 
+	{
+		icontype = RTSPPublicIcon;
+	}
+
+	for (i = 0; i < count; i++)
+	{
+		CloneChildRTSPSearchListButton = NULL;
+		CloneChildRTSPSearchListDevNameText = NULL;
+		CloneChildRTSPSearchListOnLineText = NULL;
+		CloneChildRTSPSearchListSprite = NULL;
+		CloneRTSPSearchListContainer = NULL;
+
+		if (i < LIST_ITEM_COUNT)
 		{
-			ituWidgetSetVisible(RTSPSearchListSprite[i], true);
-			ituSpriteGoto(RTSPSearchListSprite[i], icontype);
-			ituTextSetString(RTSPSearchListDevNameText[i], g_RTSPList->Devinfo[i].DeviceName);
+			CloneChildRTSPSearchListButton = RTSPSearchListButton[i];
+			CloneChildRTSPSearchListDevNameText = RTSPSearchListDevNameText[i];
+			CloneChildRTSPSearchListOnLineText = RTSPSearchListOnLineText[i];
+			CloneChildRTSPSearchListSprite = RTSPSearchListSprite[i];
+
+			// 模板初始化
+			ituWidgetEnable(CloneChildRTSPSearchListButton);
+			ituWidgetSetVisible(CloneChildRTSPSearchListSprite, true);
+			ituTextSetString(CloneChildRTSPSearchListDevNameText, "");
+			ituTextSetString(CloneChildRTSPSearchListOnLineText, "");
+		}
+		else
+		{
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "RTSPSearchListContainer", i);
+			result = ituWidgetClone(RTSPSearchListContainer[1], &CloneRTSPSearchListContainer);
+			if (result)
+			{
+				ituWidgetSetName(CloneRTSPSearchListContainer, tmp);
+				ituWidgetSetX(CloneRTSPSearchListContainer, 0);
+				if (i < MAX_PAGE_NUM)
+				{
+					ypos = i * 62;
+				}
+				else
+				{
+					ypos = 0;
+				}
+				ituWidgetSetY(CloneRTSPSearchListContainer, ypos);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListButton = itcTreeGetChildAt(CloneRTSPSearchListContainer, 0);
+				sprintf(tmp, "%s%d", "RTSPSearchListButton", i);
+				ituWidgetSetName(CloneChildRTSPSearchListButton, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListDevNameText = itcTreeGetChildAt(CloneRTSPSearchListContainer, 1);
+				sprintf(tmp, "%s%d", "RTSPSearchListDevNameText", i);
+				ituWidgetSetName(CloneChildRTSPSearchListDevNameText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListOnLineText = itcTreeGetChildAt(CloneRTSPSearchListContainer, 2);
+				sprintf(tmp, "%s%d", "RTSPSearchListOnLineText", i);
+				ituWidgetSetName(CloneChildRTSPSearchListOnLineText, tmp);
+
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildRTSPSearchListSprite = itcTreeGetChildAt(CloneRTSPSearchListContainer, 3);
+				sprintf(tmp, "%s%d", "RTSPSearchListSprite", i);
+				ituWidgetSetName(CloneChildRTSPSearchListSprite, tmp);
+
+				ituWidgetAdd(RTSPSearchListCoverFlow, CloneRTSPSearchListContainer);
+			}
+			ituCoverFlowUpdate((ITUWidget*)RTSPSearchListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		}
+		g_RTSPSearchListButton[i] = CloneChildRTSPSearchListButton;
+
+		if (i < max)
+		{
+			ituSpriteGoto(CloneChildRTSPSearchListSprite, icontype);
+			ituTextSetString(CloneChildRTSPSearchListDevNameText, g_RTSPList->Devinfo[i].DeviceName);
 			#ifdef _NEW_SELF_IPC_
 			if (0 == strcmp(g_RTSPList->Devinfo[i].FactoryName, "SelfIPC")
 				|| 0 == strcmp(g_RTSPList->Devinfo[i].FactoryName, "SELFIPC"))
@@ -213,7 +324,6 @@ static void ShowRtspWin(uint8 type)
 				}
 				else
 				{
-					dprintf("g_RTSPList->Devinfo[%d].DeviceIP...: %x\n", i, g_RTSPList->Devinfo[i].DeviceIP);
 					if (get_commdev_state(g_RTSPList->Devinfo[i].DeviceIP))
 					{
 						strid = SID_Set_Online;
@@ -223,31 +333,33 @@ static void ShowRtspWin(uint8 type)
 						strid = SID_Set_Offline;
 					}
 				}
-				ituTextSetString(RTSPSearchListOnLineText[i], get_str(strid));
+				ituTextSetString(CloneChildRTSPSearchListOnLineText, get_str(strid));
 			}
 			else
 			#endif
 			{
-				ituWidgetSetVisible(RTSPSearchListOnLineText[i], false);
+				ituTextSetString(CloneChildRTSPSearchListOnLineText, "");
 			}
 		}
-		SetRTSPShowNum(max);
-	}
-	else
-	{
-		SetRTSPShowNum(0);
+		else
+		{
+			ituWidgetDisable(CloneChildRTSPSearchListButton);
+			ituWidgetSetVisible(CloneChildRTSPSearchListSprite, false);
+			ituTextSetString(CloneChildRTSPSearchListDevNameText, "");
+			ituTextSetString(CloneChildRTSPSearchListOnLineText, "");
+		}
 	}
 }
 
 /*************************************************
-Function:		InitRTSPSWin
+Function:		InitRTSPWin
 Description: 	搜索RTSP页面初始化
 Input:			无
 Output:			无
 Return:			无
 Others:			无
 *************************************************/
-static void InitRTSPSWin(void)
+static void InitRTSPWin(void)
 {
 	ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, false);
 	if (0 == g_Type)
@@ -257,17 +369,20 @@ static void InitRTSPSWin(void)
 		ituWidgetSetVisible(RTSPSearchBottomSearchContainer, false);
 		ituWidgetSetVisible(RTSPSearchBottomNullContainer0, true);
 		ituWidgetDisable(RTSPSearchBottomNullButton[0]);
+		ShowRTSPWin(0);
+		#if 0
 		if (is_main_DeviceNo())
 		{
-			ShowRtspWin(0);
+			ShowRTSPWin(0);
 		}
 		else
 		{
-			SetRTSPShowNum(0);
 			g_FenJiLoadTick = 3;
 			ituWidgetDisable(RTSPSearchBackground);
 			ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, true);
+			ShowRTSPNoneWin(MAX_PAGE_NUM);
 		}
+		#endif
 	}
 	else
 	{
@@ -275,25 +390,24 @@ static void InitRTSPSWin(void)
 		ituRadioBoxSetChecked(RTSPSearchRightPublicRadioBox, true);
 		ituWidgetSetVisible(RTSPSearchBottomSearchContainer, true);
 		ituWidgetSetVisible(RTSPSearchBottomNullContainer0, false);
-		SetRTSPShowNum(0);
-		g_ShowLoadTick = 1;
-		ituWidgetDisable(RTSPSearchBackground);
-		ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, true);
+		ShowRTSPWin(1);
 	}
 	g_RTSPSearchLastTick = SDL_GetTicks();
 }
 
 /*************************************************
-Function:		RTSPSearchDestroyProc
+Function:		RTSPSearchLayerOnLeave
 Description: 	销毁处理函数
 Input:			无
 Output:			无
 Return:			无
 Others:			无
 *************************************************/
-static void RTSPSearchDestroyProc(void)
+bool RTSPSearchLayerOnLeave(ITUWidget* widget, char* param)
 {
-	rtsp_monitor_list_free(); 
+	rtsp_monitor_list_free();
+
+	return true;
 }
 
 /*************************************************
@@ -315,11 +429,18 @@ bool RTSPSearchLayerOnTimer(ITUWidget* widget, char* param)
 		if (g_ShowLoadTick)
 		{
 			g_ShowLoadTick--;
-			if (0 == g_ShowLoadTick)
+			if (4 == g_ShowLoadTick)
 			{
 				rtsp_monitor_sync_devlist();
 			}
+			else if (0 == g_ShowLoadTick)
+			{
+				// 超时自动停止搜索
+				ituWidgetEnable(RTSPSearchBackground);
+				ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, false);
+			}
 		}
+		#if 0
 		// 分机同步
 		if (g_FenJiLoadTick)
 		{
@@ -332,9 +453,10 @@ bool RTSPSearchLayerOnTimer(ITUWidget* widget, char* param)
 			{
 				ituWidgetEnable(RTSPSearchBackground);
 				ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, false);
-				ShowRtspWin(0);
+				ShowRTSPWin(0);
 			}
 		}
+		#endif
 	}
 
 	return true;
@@ -355,9 +477,10 @@ bool RTSPSearchListState(ITUWidget* widget, char* param)
 	dprintf("prtspbak_data->InterState.......%d\n", prtspbak_data->InterState);
 	if (prtspbak_data->InterState == MONITOR_GETLIST)
 	{
+		g_ShowLoadTick = 0;
 		ituWidgetEnable(RTSPSearchBackground);
 		ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, false);
-		ShowRtspWin(1);
+		ShowRTSPWin(1);
 	}
 
 	return true;
@@ -373,11 +496,15 @@ Others:			无
 *************************************************/
 bool RTSPSearchListButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-	uint8 index = atoi(param);
+	uint8 i;
 
-	if (g_RTSPList && g_RTSPList->Devinfo)
+	for (i = 0; i < g_RTSPList->DevNum; i++)
 	{
-		RTSPMonitorWin(g_RTSPList, index);
+		if (g_RTSPSearchListButton[i] == (ITUButton*)widget)
+		{
+			RTSPMonitorWin(g_RTSPList, i);
+			break;
+		}
 	}
 
 	return true;
@@ -399,23 +526,21 @@ bool RTSPSearchLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 	{
 		case RTSPHomeEvent:
 			g_Type = 0;
-			InitRTSPSWin();
+			InitRTSPWin();
 			break;
 
 		case RTSPPublicEvent:
 			g_Type = 1;
-			InitRTSPSWin();
+			InitRTSPWin();
 			break;
 
-
 		case RTSPSearchEvent:
-			g_ShowLoadTick = 1;
+			g_ShowLoadTick = 5;
 			ituWidgetDisable(RTSPSearchBackground);
 			ituWidgetSetVisible(RTSPSearchMSGHitGrayBackground, true);
 			break;
 
 		case RTSPExitEvent:
-			RTSPSearchDestroyProc();
 			ituLayerGoto(MainLayer);
 			break;
 
@@ -439,8 +564,7 @@ bool RTSPSearchLayerOnEnter(ITUWidget* widget, char* param)
 
 	g_FenJiLoadTick = 0;
 	g_ShowLoadTick = 0;
-	InitRTSPSWin();
-
+	InitRTSPWin();
 	for (i = 0; i < 2; i++)
 	{
 		ituWidgetDisable(RTSPSearchRightNullButton[i]);
@@ -496,9 +620,6 @@ bool RTSPSearchLayerStart(ITUWidget* widget, char* param)
 			RTSPSearchMSGHitGrayBackground = ituSceneFindWidget(&theScene, "RTSPSearchMSGHitGrayBackground");
 			assert(RTSPSearchMSGHitGrayBackground);
 
-			RTSPSearchMSGHitAnimation = ituSceneFindWidget(&theScene, "RTSPSearchMSGHitAnimation");
-			assert(RTSPSearchMSGHitAnimation);
-
 			RTSPSearchBottomSearchContainer = ituSceneFindWidget(&theScene, "RTSPSearchBottomSearchContainer");
 			assert(RTSPSearchBottomSearchContainer);
 
@@ -508,15 +629,7 @@ bool RTSPSearchLayerStart(ITUWidget* widget, char* param)
 			RTSPSearchBottomNullContainer0 = ituSceneFindWidget(&theScene, "RTSPSearchBottomNullContainer0");
 			assert(RTSPSearchBottomNullContainer0);
 
-			for (i = 0; i < MAX_RTSP_PAGE_NUM; i++)
-			{
-				memset(callname, 0, sizeof(callname));
-				sprintf(callname, "%s%d", "RTSPSearchListBackgroundPage", i);
-				RTSPSearchListBackgroundPage[i] = ituSceneFindWidget(&theScene, callname);
-				assert(RTSPSearchListBackgroundPage[i]);
-			}
-
-			for (i = 0; i < MAX_RTSP_NUM; i++)
+			for (i = 0; i < LIST_ITEM_COUNT; i++)
 			{
 				memset(callname, 0, sizeof(callname));
 				sprintf(callname, "%s%d", "RTSPSearchListContainer", i);
@@ -579,4 +692,3 @@ void RTSPSearchReset(void)
 {
 	RTSPSearchLayer = NULL;
 }
-

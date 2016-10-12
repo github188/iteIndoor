@@ -1687,8 +1687,8 @@ Others:			无
 *************************************************/
 bool AurineJDLayerOnLeave(ITUWidget* widget, char* param)
 {
-
 	ituSpriteGoto(AurineJDBottomSprite[g_BtnEvent - 2], AurineJDButtomNoPressIcon);
+
 	return true;
 }
 

@@ -17,7 +17,6 @@
 #include "storage_include.h"
 //#include "storage_types.h"
 
-#define MAX_HOME_NUM  			16					
 
 #define HOME_CAMERA				0
 #define COMMUNITY_CAMERA		1

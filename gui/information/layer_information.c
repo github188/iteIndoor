@@ -554,11 +554,11 @@ void informationMsgBoxShow(INFORMATION_BTN_e index)
 	switch (index)
 	{
 	case INFORMATION_BTN_EMPTY:
-		ituTextSetString(informationTipsText, "Empty Message");
+		ituTextSetString(informationTipsText, get_str(SID_Bj_Query_Del_Rec_All));
 		break;
 
 	case INFORMATION_BTN_DELETE:
-		ituTextSetString(informationTipsText, "Delete Message");
+		ituTextSetString(informationTipsText, get_str(SID_Bj_Query_Del_Rec_One));
 		break;
 
 	default:

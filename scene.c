@@ -747,6 +747,7 @@ static void ProcessCommand(void)
 				{
 					return FALSE;
 				}
+				sys_sync_hint_state_ext(SYS_HINT_ALARM_WARNING);
 				AlarmLayerOnGoto(NULL, NULL);
 				break;
 				
@@ -1123,6 +1124,7 @@ int SceneRun(void)
 			            {
 			                printf("ANDROID press: %d %d\n", lastx, lasty);
 							result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
+							usleep(20*1000);
 			            }
 						#endif
 	                	//printf("touch: move %d, %d\n", ev.tfinger.x, ev.tfinger.y);
@@ -1223,7 +1225,7 @@ int SceneRun(void)
 		                }
 
 						#ifdef USE_ANDROID_MODE
-						if (mouseDownTick > 0 && pre_type == SDL_FINGERDOWN)
+						if (pre_type == SDL_FINGERDOWN)
 			            {
 							result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
 							if (result && !ScreenIsOff())
@@ -1258,6 +1260,7 @@ int SceneRun(void)
             {
                 printf("ANDROID press: %d %d\n", lastx, lasty);
 				result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
+				mouseDownTick = 0;
             }
 			#endif
 			

@@ -328,7 +328,7 @@ Others:			无
 *************************************************/
 bool MonitorLayerOnLeave(ITUWidget* widget, char* param)
 {
-
+	BackgroundDrawVideo_exit();
 	return true;
 }
 
@@ -572,6 +572,9 @@ bool MonitorChangeCameraOnMouseUp(ITUWidget* widget, char* param)
 	int32 direct = TRUE;
 	uint8 btn_event = atoi(param);
 
+	ituWidgetSetVisible(MonitorPreButton, false);
+	ituWidgetSetVisible(MonitorNextButton, false);
+	ituTextSetString(MonitorTimeText, "");
 	if (0 == btn_event)
 	{
 		// 监视上一个
@@ -582,8 +585,6 @@ bool MonitorChangeCameraOnMouseUp(ITUWidget* widget, char* param)
 		// 监视下一个
 		direct = TRUE;
 	}
-	// 清空倒计时
-	ituTextSetString(MonitorTimeText, "");
 	monitor_next(direct);
 
 	return true;
@@ -772,9 +773,11 @@ bool MonitorLayerOnEnter(ITUWidget* widget, char* param)
 	ituWidgetSetVisible(MonitorHitBackground, false);
 	ituWidgetSetVisible(MonitorBottomBackground, false);
 	ituWidgetSetVisible(MonitorShowButtomContainer, false);
+	ituWidgetSetVisible(MonitorPreButton, false);
+	ituWidgetSetVisible(MonitorNextButton, false);
 	ituWidgetDisable(MonitorRightNullButton0);
-	ituTextSetString(MonitorTimeText, NULL);
-	ituTextSetString(MonitorCallNoText, NULL);
+	ituTextSetString(MonitorTimeText, "");
+	ituTextSetString(MonitorCallNoText, "");
 	SetMonitorInfo();
 	DrawStringHint();
 	g_StartMonitorTick = 1;

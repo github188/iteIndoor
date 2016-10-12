@@ -386,7 +386,10 @@ Others:			无
 *************************************************/
 bool BeCallLayerOnLeave(ITUWidget* widget, char* param)
 {
-
+	if (TRUE == g_DrawVideo)
+	{
+		BackgroundDrawVideo_exit();
+	}
 	return true;
 }
 
@@ -574,11 +577,7 @@ bool BeCallCallInState(ITUWidget* widget, char* param)
 			break;
 
 		case CALL_STATE_END:
-			g_InterState = CALL_STATE_NONE;
-			if (TRUE == g_DrawVideo)
-			{
-				BackgroundDrawVideo_exit();
-			}
+			g_InterState = CALL_STATE_NONE;			
 			ituLayerGoto(MainLayer);
 			return true;
 			break;
@@ -655,11 +654,7 @@ bool BeCallCallOutState(ITUWidget* widget, char* param)
 			break;
 
 		case CALL_STATE_END:
-			g_InterState = CALL_STATE_NONE;
-			if (TRUE == g_DrawVideo)
-			{
-				BackgroundDrawVideo_exit();
-			}
+			g_InterState = CALL_STATE_NONE;			
 			ituLayerGoto(MainLayer);
 			return true;
 			break;

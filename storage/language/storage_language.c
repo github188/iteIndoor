@@ -1620,6 +1620,15 @@ const char * get_str(STRID_E id)
 	case SID_Jd_KongTiao_Close:
 		return ESID_Jd_KongTiao_Close;
 
+//主界面文字
+	case SID_Main_Missed_Call:
+		return ESID_Main_Missed_Call;
+
+	case SID_Main_Photo_Msg:
+		return ESID_Main_Photo_Msg;
+
+	case SID_Main_Recorder:
+		return ESID_Main_Recorder;
 
 // 公共文字
 	case SID_Bj_Query_Del_Rec_One:

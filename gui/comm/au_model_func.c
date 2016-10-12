@@ -715,7 +715,7 @@ void TouchManagerKey(void)
 			if (storage_get_manager_ip(i + 1))
 			{
 				tmp = i + MANAGER_NUM + 1;
-				continue;
+				break;
 			}
 		}
 

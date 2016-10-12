@@ -58,6 +58,11 @@ int BackgroundDrawVideo_init(char *background)
 
 void BackgroundDrawVideo_exit(void)
 {
-	SceneLeaveVideoState();
+	if (calledRemoteBackground != NULL)
+	{
+		SceneLeaveVideoState();
+		ituWidgetSetDraw(calledRemoteBackground, ituBackgroundDraw);
+		calledRemoteBackground = NULL;
+	}
 }
 

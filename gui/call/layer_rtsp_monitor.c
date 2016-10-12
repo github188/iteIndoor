@@ -54,7 +54,6 @@ typedef enum
 	RTSPMonitorMaxEvent,
 }RTSPMonitorButtonEvent;
 
-
 /*************************************************
 Function:		DrawStringHint
 Description: 	画状态提示
@@ -75,19 +74,7 @@ static void DrawStringHint(void)
 }
 
 /*************************************************
-Function:		RTSPMonitorDestroyProc
-Description: 	销毁处理函数
-Input:			无
-Output:			无
-Return:			无
-Others:			无
-*************************************************/
-static void RTSPMonitorDestroyProc(void)
-{
-}
-
-/*************************************************
-Function:		monitor_search_fail
+Function:		RTSPMonitorSearchFail
 Description: 	监视失败
 Input:			无
 Output:			无
@@ -99,6 +86,19 @@ static void RTSPMonitorSearchFail(void)
 	g_ErrHintTxtID = SID_Inter_SearchFailed;
 	g_InterState = MONITOR_END;
 	g_ErrHintTicks = 3;
+}
+
+/*************************************************
+Function:		RTSPMonitorLayerOnLeave
+Description: 	销毁处理函数
+Input:			无
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+bool RTSPMonitorLayerOnLeave(ITUWidget* widget, char* param)
+{
+	return true;
 }
 
 /*************************************************
@@ -175,9 +175,7 @@ bool RTSPMonitorState(ITUWidget* widget, char* param)
 	{
 		pmonitorbak_data->InterState = MONITOR_END;
 	}
-	dprintf("pmonitorbak_data->InterState......:%d\n", pmonitorbak_data->InterState);
-	dprintf("pmonitorbak_data->len......:%d\n", pmonitorbak_data->DataLen);
-	dprintf("pmonitorbak_data->buf......:%d\n", atoi(pmonitorbak_data->Buf));
+
 	switch (pmonitorbak_data->InterState)
 	{
 		case MONITOR_SEARCH:
@@ -314,17 +312,11 @@ bool RTSPMonitorLayerOnEnter(ITUWidget* widget, char* param)
 	g_MonitorLastTick = SDL_GetTicks();
 	g_StartMonitorTick = 1;
 	ituTextSetString(RTSPMonitorTimeText, NULL);
-#if 1
 	ituWidgetSetVisible(RTSPMonitorMSGErrBackground, false);
 	ituWidgetSetVisible(RTSPMonitorMSGHitBackground, true);
 	ituWidgetSetVisible(RTSPMonitorMSGHitGrayBackground, true);
-#else
-	g_StartMonitorTick = 0;
-	ituWidgetSetVisible(RTSPMonitorMSGHitGrayBackground, false);
-	g_RtspList->Devinfo[g_Index].CanControlPTZ = 1;
-#endif
-
-	if (g_RtspList->Devinfo[g_Index].CanControlPTZ)
+	//if (g_RtspList->Devinfo[g_Index].CanControlPTZ)
+	if (0)
 	{
 		ituWidgetSetVisible(RTSPMonitorShowBottomButton, true);
 	}

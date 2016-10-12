@@ -17,11 +17,6 @@
 
 #include "logic_include.h"
 
-
-#define DOOR_DEVICE_NUM			2					// 门前机最大数
-#define STAIR_DEVICE_NUM		20					// 梯口分机最大数
-#define AREA_DEVICE_NUM			99					// 区口机最大数 
-
 #define CALL_AUDIO_PT			PT_G711A			// 默认呼叫音频格式
 #define CALL_VIDEO_PT			PT_H264				// 默认呼叫视频格式
 

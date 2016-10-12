@@ -51,6 +51,7 @@ static ITUIcon*		page0SecurityIcon = NULL;
 static ITUIcon*		page0PhotoMsgNumIcon = NULL;
 static ITUText*		page0PhotoMsgNumText = NULL;
 static ITUText*		page0PhotoMsgScrollTimeText = NULL;
+static ITUText*		page0PhotoMsgScrollTittleText = NULL;
 static ITUIcon*		page0PhotoMsgMiniIcon = NULL;
 static ITUIcon*		page0PhotoMsgIcon = NULL;
 static ITUText*		page0PhotoMsgText = NULL;
@@ -66,6 +67,7 @@ static ITUIcon*		page0MissedCallNumIcon = NULL;
 static ITUText*		page0MissedCallNumText = NULL;
 static ITUText*		page0IntercomScrollFromText = NULL;
 static ITUText*		page0IntercomScrollTimeText = NULL;
+static ITUText*		page0IntercomScrollTittleText = NULL;
 static ITUIcon*		page0IntercomMiniIcon = NULL;
 static ITUText*		page0IntercomText = NULL;
 static ITUIcon*		page0IntercomIcon = NULL;
@@ -273,9 +275,8 @@ bool mainBtnOnClicked(ITUWidget* widget, char* param)
 				mainBackground = ituSceneFindWidget(&theScene, "mainBackground");
 				assert(mainBackground);
 			}
-			//TODO:添加语言翻译！
-
-			ituTextSetString(mainTipsText, "Automation No Used!");
+			//TODO:添加语言翻译！！
+			ituTextSetString(mainTipsText, get_str(SID_Set_Prj_ExtJD_Unused));
 
 			ituWidgetDisable(mainBackground);
 			ituWidgetSetVisible(mainTipsTransparencyBackground, true);
@@ -666,7 +667,16 @@ void setUnreadRecorderText(uint8_t index)
 		page1RecorderScrollTimeText = ituSceneFindWidget(&theScene, "page1RecorderScrollTimeText");
 		assert(page1RecorderScrollTimeText);
 	}
+
+	if (!page1RecorderScrollTittleText)
+	{
+		page1RecorderScrollTittleText = ituSceneFindWidget(&theScene, "page1RecorderScrollTittleText");
+		assert(page1RecorderScrollTittleText);
+	}
 	//TODO:读取存储设置文字内容！！
+
+	ituTextSetString(page1RecorderScrollTittleText, get_str(SID_Main_Recorder));
+
 	memset(tmpStr, 0, sizeof(tmpStr));
 	zoneDateTimeToString(gMainScrollData->JrlyUnReadList->JrlyInfo[index].Time, tmpStr);
 	ituTextSetString(page1RecorderScrollTimeText, tmpStr);
@@ -821,7 +831,15 @@ void setUnreadPhotoMsgText(uint8_t index)
 		page0PhotoMsgScrollTimeText = ituSceneFindWidget(&theScene, "page0PhotoMsgScrollTimeText");
 		assert(page0PhotoMsgScrollTimeText);
 	}
+	if (!page0PhotoMsgScrollTittleText)
+	{
+		page0PhotoMsgScrollTittleText = ituSceneFindWidget(&theScene, "page0PhotoMsgScrollTittleText");
+		assert(page0PhotoMsgScrollTittleText);
+	}
 	//TODO:读取存储设置文字内容！！
+
+	ituTextSetString(page0PhotoMsgScrollTittleText, get_str(SID_Main_Photo_Msg));
+
 	memset(tmpStr, 0, sizeof(tmpStr));
 	zoneDateTimeToString(gMainScrollData->LylyUnReadList->LylyInfo[index].Time, tmpStr);
 	ituTextSetString(page0PhotoMsgScrollTimeText, tmpStr);
@@ -1148,15 +1166,16 @@ void setUnreadMissedCallText(uint8_t index)
 		page0IntercomScrollTimeText = ituSceneFindWidget(&theScene, "page0IntercomScrollTimeText");
 		assert(page0IntercomScrollTimeText);
 	}
-
-
-	if (!page1RecorderScrollTimeText)
+	if (!page0IntercomScrollTittleText)
 	{
-		page1RecorderScrollTimeText = ituSceneFindWidget(&theScene, "page1RecorderScrollTimeText");
-		assert(page1RecorderScrollTimeText);
+		page0IntercomScrollTittleText = ituSceneFindWidget(&theScene, "page0IntercomScrollTittleText");
+		assert(page0IntercomScrollTittleText);
 	}
 
 	//TODO:读取存储设置文字内容！！
+
+	ituTextSetString(page0IntercomScrollTittleText, get_str(SID_Main_Missed_Call));
+
 	get_dev_description(gMainScrollData->MissUnReadList->CallInfo[index].Type, gMainScrollData->MissUnReadList->CallInfo[index].devno, tmpStr, sizeof(tmpStr)); // 获得设备描述
 	ituTextSetString(page0IntercomScrollFromText, tmpStr);
 

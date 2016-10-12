@@ -23,11 +23,20 @@
 #define JRLY_VOLUME				8					// 家人留言播放音量大小
 #define RING_OUT_VOL			4					// 回铃声大小
 
+// ====定义设备最大数目======================================
+#define DOOR_DEVICE_NUM			2					// 门前机最大数
+#define STAIR_DEVICE_NUM		20					// 梯口分机最大数
+#define AREA_DEVICE_NUM			99					// 区口机最大数 
+#define ROOM_DEVICE_NUM			10					// 室内分机最大数 
+#define MANAGE_DEVICE_NUM		99					// 管理中心最大数 
+#define IPC_DEVICE_NUM			99					// 社区IPC设备最大数 
+#define MAX_HOME_NUM  			16					// 家居IPC设备最大数
+
 // ====定义记录存储条数======================================
 #define AF_REC_MAX 	  			20					// 安防事件最大记录数
 #define MAX_RECORD_NUM  		20					// 通话记录最大条数
 #define MAX_JRLY_NUM  			5					// 家人留言最大记录数
-#define MAX_LYLY_NUM  			6					// 留影留言最大记录
+#define MAX_LYLY_NUM  			5					// 留影留言最大记录
 #define MAX_MSG_NUM				10					// 信息最大接收条数
 #define MAX_PHOTO_NUM  			10					// 最大抓拍记录数
 #define MAX_YUYUE_NUM			20					// 家电预约最大数

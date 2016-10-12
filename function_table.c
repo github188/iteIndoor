@@ -66,12 +66,13 @@ ITUActionFunction actionFunctions[] =
 	"CallLayerOnTimer", CallLayerOnTimer,
 	"CallKeyBordDelButtonOnMouseLongPress", CallKeyBordDelButtonOnMouseLongPress,
 	"CallRecordListButtonOnMouseUp", CallRecordListButtonOnMouseUp,
-	"CallCeterListButtonOnMouseUp", CallCeterListButtonOnMouseUp,
+	"CallCenterListButtonOnMouseUp", CallCenterListButtonOnMouseUp,
 	"CallRecordMSGButtonOnMouseUp", CallRecordMSGButtonOnMouseUp,
 	"CallCallRequestState", CallCallRequestState,
 	"CalloutManager", CalloutManager,
+	"CallLayerOnLeave", CallLayerOnLeave,
 
-	// BeCall
+	// BeCallLayer
 	"BeCallLayerOnEnter", BeCallLayerOnEnter,
 	"BeCallLayerButtonOnMouseUp", BeCallLayerButtonOnMouseUp,
 	"BeCallShowButtomBackgroundOnMouseUp", BeCallShowButtomBackgroundOnMouseUp,
@@ -84,15 +85,16 @@ ITUActionFunction actionFunctions[] =
 	"BeCallLayerKeyOnMouseUp", BeCallLayerKeyOnMouseUp,
 	"BeCallLayerOnLeave", BeCallLayerOnLeave,
 	
-	// MonitorSearch
+	// MonitorSearchLayer
 	"MonitorSearchLayerOnEnter", MonitorSearchLayerOnEnter,
 	"MonitorSearchLayerButtonOnMouseUp", MonitorSearchLayerButtonOnMouseUp,
 	"MonitorSearchListButtonOnMouseUp", MonitorSearchListButtonOnMouseUp,
 	"MonitorSearchMSGButtonOnMouseUp", MonitorSearchMSGButtonOnMouseUp,
 	"MonitorSearchListState", MonitorSearchListState,
 	"MonitorSearchLayerOnTimer", MonitorSearchLayerOnTimer,
+	"MonitorSearchLayerOnLeave", MonitorSearchLayerOnLeave,
 
-	// Monitor
+	// MonitorLayer
 	"MonitorLayerOnEnter", MonitorLayerOnEnter,
 	"MonitorLayerButtonOnMouseUp", MonitorLayerButtonOnMouseUp,
 	"MonitorShowButtomBackgroundOnMouseUp", MonitorShowButtomBackgroundOnMouseUp,
@@ -112,6 +114,7 @@ ITUActionFunction actionFunctions[] =
 	"RTSPSearchListButtonOnMouseUp", RTSPSearchListButtonOnMouseUp,
 	"RTSPSearchListState", RTSPSearchListState,
 	"RTSPSearchLayerOnTimer", RTSPSearchLayerOnTimer,
+	"RTSPSearchLayerOnLeave", RTSPSearchLayerOnLeave,
 
 	// RTSPMonitorLayer
 	"RTSPMonitorLayerOnEnter", RTSPMonitorLayerOnEnter,
@@ -119,6 +122,7 @@ ITUActionFunction actionFunctions[] =
 	"RTSPMonitorLayerOnTimer", RTSPMonitorLayerOnTimer,
 	"RTSPMonitorState", RTSPMonitorState,
 	"RTSPMonitorLayerShowBottomButtonOnMouseUp", RTSPMonitorLayerShowBottomButtonOnMouseUp,
+	"RTSPMonitorLayerOnLeave", RTSPMonitorLayerOnLeave,
 
 	// AurineJDLayer
 	"AurineJDWin", AurineJDWin,

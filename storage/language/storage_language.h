@@ -568,6 +568,10 @@ extern "C" {
 #define ESID_Jd_KongTiao_Sleep           (g_China ? (g_Big5 ? "睡眠" : "睡眠") : "Sleep")
 #define ESID_Jd_KongTiao_Close           (g_China ? (g_Big5 ? "關閉" : "关闭") : "OFF")
 
+//主界面文字
+#define ESID_Main_Missed_Call			 (g_China ? (g_Big5 ? "未接來電" : "未接来电") : "MissedCall")
+#define ESID_Main_Photo_Msg				 (g_China ? (g_Big5 ? "留影留言" : "留影留言") : "Video MSG")
+#define ESID_Main_Recorder			     (g_China ? (g_Big5 ? "家人留言" : "家人留言") : "Recorder")
 
 
 // 公共文字
@@ -1122,6 +1126,10 @@ typedef enum
 	SID_Jd_KongTiao_Sleep,
 	SID_Jd_KongTiao_Close,
 
+	//主界面文字
+	SID_Main_Missed_Call,
+	SID_Main_Photo_Msg,
+	SID_Main_Recorder,
 
 	// 公共文字
 	SID_Bj_Query_Del_Rec_One,

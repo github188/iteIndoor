@@ -50,6 +50,7 @@ static uint8_t  gPhotoMsgNum;
 static int8_t  gPhotoMsgCurrentIndex;
 static PLYLYLIST_INFO gPhotoMsgList = NULL;
 static PHOTOMSG_VIDEOPLAY_STATUS_e	gPhotoMsgVideoMode;		//记录当前的界面的播放状态
+static LYLY_TYPE gPhotoMsgMediaType;
 
 bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 {
@@ -693,7 +694,7 @@ void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 	case PHOTOMSG_BTN_START:
 		//暂停时候，继续播放留影留言、停止时候，重新播放留影留言
 		setPhotoMsgVideoPlayByIndex(gPhotoMsgCurrentIndex);
-		//setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_PLAYING);
+		ituWidgetUpdate(photoMsgVideoDrawBackground, ITU_EVENT_LAYOUT, 0, 0, 0);
 		break;
 
 	case PHOTOMSG_BTN_PAUSE:
@@ -703,10 +704,17 @@ void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 
 	case PHOTOMSG_BTN_STOP:
 		//停止播放，重置界面
-		//sys_stop_play_audio(SYS_MEDIA_MUSIC);
 		sys_stop_play_leaveword();
 		setPhotoMsgVideoPlayStatusSetting(PHOTOMSG_VIDEOPLAY_STOP);
 		BackgroundDrawVideo_exit();
+		if (gPhotoMsgMediaType == LYLY_TYPE_VIDEO)
+		{
+			memset(photoMsgVideoDrawBackground->icon.surf, 0, sizeof(photoMsgVideoDrawBackground->icon.surf));
+			if (photoMsgVideoDrawBackground->icon.staticSurf)
+			{
+				memcpy(photoMsgVideoDrawBackground->icon.surf, photoMsgVideoDrawBackground->icon.staticSurf, sizeof(photoMsgVideoDrawBackground->icon.staticSurf));
+			}
+		}
 		break;
 
 	default:
@@ -863,6 +871,7 @@ void setPhotoMsgPreNextVideo(PHOTOMSG_BTN_e btnId)
 		break;
 	}
 	setPhotoMsgVideoPlayByIndex(gPhotoMsgCurrentIndex);
+	ituWidgetUpdate(photoMsgVideoDrawBackground, ITU_EVENT_LAYOUT, 0, 0, 0);
 }
 
 
@@ -880,6 +889,7 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 	switch (gPhotoMsgList->LylyInfo[index].LyType)
 	{
 	case LYLY_TYPE_AUDIO:
+		gPhotoMsgMediaType = LYLY_TYPE_AUDIO;
 		sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_audio_bg.jpg");
 		setPhotoMsgAudioPlayPicture(tmpAddr);
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
@@ -889,6 +899,7 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 		break;
 
 	case LYLY_TYPE_PIC_AUDIO:
+		gPhotoMsgMediaType = LYLY_TYPE_PIC_AUDIO;
 		get_lylypic_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		setPhotoMsgAudioPlayPicture(tmpAddr);
 		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
@@ -898,7 +909,8 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 		break;
 
 	case LYLY_TYPE_VIDEO:
-		BackgroundDrawVideo_init("photoMsgVideoDrawButton");
+		gPhotoMsgMediaType = LYLY_TYPE_VIDEO;
+		BackgroundDrawVideo_init("photoMsgVideoDrawBackground");
 		get_lylyavi_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放视频文件！
 		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_VIDEO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);

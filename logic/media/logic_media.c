@@ -916,7 +916,7 @@ uint32 media_pause_video_lyly(void)
 *************************************************/
 uint32 media_play_video_lyly (char *filename, void * proc)
 {
-	leaf_start_video_memo_playback(g_LeafCall, filename);
+	leaf_start_video_memo_playback(g_LeafCall, filename, proc);
 	return TRUE;
 }
 

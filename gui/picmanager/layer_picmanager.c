@@ -372,7 +372,7 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr, char* sendStr, ch
 	{
 		printf("open  minipic jepg icon failed!");
 		ituWidgetSetVisible(picManagerPicContentContainer, false);
-
+		ituWidgetUpdate(picManagerPicContentContainer, ITU_EVENT_LAYOUT, 0, 0, 0);
 		return false;
 	}
 	if (gPicManagerImageData)
@@ -381,12 +381,13 @@ bool setPicManagerPictureContent(uint8_t index, char* addrStr, char* sendStr, ch
 		ituTextSetString(picManagerPicTimeText, timeStr);
 		ituTextSetString(picManagerPicSenderText, sendStr);
 		ituWidgetSetVisible(picManagerPicContentContainer, true);
+		ituWidgetUpdate(picManagerPicContentContainer, ITU_EVENT_LAYOUT, 0, 0, 0);
 	}
 	else
 	{
 		printf("load minipic jepg icon failed!");
 		ituWidgetSetVisible(picManagerPicContentContainer, false);
-		//ituWidgetDisable(picManagerPicContentContainer);
+		ituWidgetUpdate(picManagerPicContentContainer, ITU_EVENT_LAYOUT, 0, 0, 0);
 
 		free(gPicManagerImageData);
 		return false;

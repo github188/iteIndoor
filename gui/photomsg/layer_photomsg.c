@@ -689,6 +689,8 @@ void setPhotoMsgListSender(uint8_t index, char* senderStr, bool isUnread)
 
 void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 {
+	char tmpAddr[50] = { 0 };
+
 	switch (btnId)
 	{
 	case PHOTOMSG_BTN_START:
@@ -709,11 +711,16 @@ void photoMsgVideoStatusBtnOnClicked(PHOTOMSG_BTN_e btnId)
 		BackgroundDrawVideo_exit();
 		if (gPhotoMsgMediaType == LYLY_TYPE_VIDEO)
 		{
-			memset(photoMsgVideoDrawBackground->icon.surf, 0, sizeof(photoMsgVideoDrawBackground->icon.surf));
-			if (photoMsgVideoDrawBackground->icon.staticSurf)
+			//sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_video_bg.jpg");
+			//setPhotoMsgAudioPlayPicture(tmpAddr);
+			if (photoMsgVideoDrawBackground->icon.surf)
 			{
-				memcpy(photoMsgVideoDrawBackground->icon.surf, photoMsgVideoDrawBackground->icon.staticSurf, sizeof(photoMsgVideoDrawBackground->icon.staticSurf));
+				memset(photoMsgVideoDrawBackground->icon.surf, 0, sizeof(photoMsgVideoDrawBackground->icon.surf));
 			}
+			//if (photoMsgVideoDrawBackground->icon.staticSurf)
+			//{
+			//	memcpy(photoMsgVideoDrawBackground->icon.surf, photoMsgVideoDrawBackground->icon.staticSurf, sizeof(photoMsgVideoDrawBackground->icon.staticSurf));
+			//}			
 		}
 		break;
 

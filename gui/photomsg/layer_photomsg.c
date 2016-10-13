@@ -880,9 +880,9 @@ void setPhotoMsgVideoPlayByIndex(uint8_t index)
 	switch (gPhotoMsgList->LylyInfo[index].LyType)
 	{
 	case LYLY_TYPE_AUDIO:
-		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		sprintf(tmpAddr, "%s%s", PHOTO_MSG_DIR_PATH, "photomsg_audio_bg.jpg");
-		setPhotoMsgAudioPlayPicture(tmpAddr); 
+		setPhotoMsgAudioPlayPicture(tmpAddr);
+		get_lylywav_path(tmpAddr, &gPhotoMsgList->LylyInfo[index].Time);
 		//开始播放纯音频文件！！！！！！
 		//sys_start_play_audio(SYS_MEDIA_MUSIC, tmpAddr, false, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);
 		sys_start_play_leaveword(tmpAddr, LYLY_TYPE_AUDIO, storage_get_ringvolume(), photoMsgPlayingCallback, photoMsgPlayingStopCallback);

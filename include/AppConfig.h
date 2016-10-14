@@ -18,17 +18,17 @@
 #define MIC_VOLUME				4					// 咪头输入音量
 #define MSG_HIT_VOL				4					// 信息通知提示音大小
 #define AF_HIT_VOL				4					// 安防报警提示音大小
-#define LYLY_VIEW_VOL			8					// 留影留言播放声
+#define LYLY_VIEW_VOL			4					// 留影留言播放声
 #define MSG_VIEW_VOL			4					// 信息查看声音大小
-#define JRLY_VOLUME				8					// 家人留言播放音量大小
+#define JRLY_VOLUME				4					// 家人留言播放音量大小
 #define RING_OUT_VOL			4					// 回铃声大小
 
 // ====定义设备最大数目======================================
 #define DOOR_DEVICE_NUM			2					// 门前机最大数
 #define STAIR_DEVICE_NUM		20					// 梯口分机最大数
 #define AREA_DEVICE_NUM			99					// 区口机最大数 
-#define ROOM_DEVICE_NUM			10					// 室内分机最大数 
-#define MANAGE_DEVICE_NUM		99					// 管理中心最大数 
+#define ROOM_DEVICE_NUM			8					// 室内分机最大数 
+#define MANAGE_DEVICE_NUM		3					// 管理中心最大数 
 #define IPC_DEVICE_NUM			99					// 社区IPC设备最大数 
 #define MAX_HOME_NUM  			16					// 家居IPC设备最大数
 
@@ -36,9 +36,9 @@
 #define AF_REC_MAX 	  			20					// 安防事件最大记录数
 #define MAX_RECORD_NUM  		20					// 通话记录最大条数
 #define MAX_JRLY_NUM  			5					// 家人留言最大记录数
-#define MAX_LYLY_NUM  			5					// 留影留言最大记录
+#define MAX_LYLY_NUM  			6					// 留影留言最大记录
 #define MAX_MSG_NUM				10					// 信息最大接收条数
-#define MAX_PHOTO_NUM  			10					// 最大抓拍记录数
+#define MAX_PHOTO_NUM  			16					// 最大抓拍记录数
 #define MAX_YUYUE_NUM			20					// 家电预约最大数
 
 // ====定义执行时间最大值====================================
@@ -54,32 +54,6 @@
 
 #define RECORD_TIME_MAX			30					// 留言最大时间(家人留言、留影留言、留言录制音)
 
-// ====定义结构件============================================
-#define ML8_V1					1
-#define ML8_V6					2
-#define TF8_A1					3
-#define AH8_E81					4
-#define ML8_V7					5
-#define ML8_V5					6
-
-// ====定义硬件类型=========================================
-#define ML8_N32926_V1S			1					// ML8-V1S室内机
-#define ML8_N32926_V6S			2					// ML8-V6S室内机
-#define TF8_N32926_A1S			3					// TF8-A1S室内机
-#define AH8_N32926_E81M			4					// AH8-E81/E91/F91M室内机
-#define ML8_N32926_V7M			5					// ML8-V7M室内机
-
-// ====版本定义================================================
-#define V1_JHB_VER				1					// ML8-V1S简化版,采用机械按键和4.3寸液晶屏
-#define V6_JHB_VER				2					// ML8-V6S简化版,采用机械按键和7寸液晶屏
-#define A1_JHB_VER				3					// TF8-A1S简化版,采用机械按键和4.3寸液晶屏
-#define E81_BZB_VER				4					// AH8-E81/E91/F91M标准版室内机,采用感应按键,电容屏和7寸液晶屏
-#define V7_BZB_VER				5					// ML8-V7M标准版室内机,采用感应按键,电容屏和7寸液晶屏
-#define V5_BZB_VER				6					// ML8-V5M标准版室内机,采用感应按键,电容屏和7寸液晶屏
-#define V6_BZB_VER				7					// ML8-V6M标准版室内机,采用感应按键,电容屏和7寸液晶屏
-#define V8_BZB_VER				8					// ML8-V8M标准版室内机,采用感应按键,电容屏和7寸液晶屏
-
-#define SYS_TYPE				V7_BZB_VER
 
 // ====各版本功能定义============================================
 //-----------公共功能------------------
@@ -103,7 +77,7 @@
 #define _IP_MODULE_JD_								// IP模块家电
 //#define _IP_MODULE_RTSP_							// RTSP注册
 #endif
-
+#define _USE_FOR_SHOW_								// 展会临时版本
 
 // 硬件加密码也就是厂商代码
 #define _ML_HWENCRYPT_			0X00004753			// 米立使用的硬件加密码
@@ -127,52 +101,48 @@
 #define _SD_PROTOCOL_ENCRYPT_   0xA0				// 索迪协议加密类型
 #define _HY_PROTOCOL_ENCRYPT_   0xA1				// 华鹰协议加密类型
 
+// ====定义结构件============================================
+#define ML8_V1					1					
+#define ML8_V6					2
+#define TF8_A1					3
+#define AH8_E81					4
+#define ML8_V7					5
+#define ML8_V5					6
+
+// ====版本定义================================================
+#define E81_AH_VER				1					// 冠林E81版本
+#define V5M_ML_VER				2					// 米粒V5M版本
+#define V5M_TF_VER				3					// 天富V5M版本
+#define V7M_ML_VER				4					// 米粒V7M版本
+#define V7M_TF_VER				5					// 天富V7M版本
+
+#define VER_TYPE				V7M_ML_VER
+
+
+
 //-----------各版本差异功能-------------
-#if (SYS_TYPE == E81_BZB_VER)
-#if 1
+#if (VER_TYPE == E81_AH_VER)
 #define _AU_PROTOCOL_									// 使用冠林协议
 #define _USE_X10_JD_									// 使用X10家电
 #undef _USE_NEW_CENTER_									// 不使用新的中心机
-#else
-#define _HW_ENCRYPT_			_ML_HWENCRYPT_			// 该版本使用的硬件加密码
-#define _PROTOCOL_VER_			_ML_PROTOCOL_VER_		// 该版本使用的协议版本
-#define _SUB_PROTOCOL_ENCRYPT_  _NO_PROTOCOL_ENCRYPT_	// 协议加密类型,米立版本不加密
-#endif
 
-#define	SOFTSUBVER				"_AH8-E81M"
-#define HARDSUBVER				"E81M-V2.0"
-#define BOARD_TYPE				AH8_N32926_E81M
-#define JIEGOU_TYPE				ML8_V1
-#define _TFT_7_											// 7寸屏
+#define HARD_VER_COMM		    "AH8-E81M"
+#define JIEGOU_TYPE				AH8_E81
 #define _ALARM_IO_										// 报警直接用IO口
 #define _CP2526_TOUCH_KEY_								// 启用感应按键
-#define _CP_7INCH_TOUCH_								// 启用7寸电容屏
 #define _TIMER_REBOOT_NO_LCD_           				// 定时重启时不开背光
 
-#elif (SYS_TYPE == V7_BZB_VER)
-#if 1
+#elif (VER_TYPE == V7M_ML_VER)
 #define _HW_ENCRYPT_			_ML_HWENCRYPT_			// 该版本使用的硬件加密码
 #define _PROTOCOL_VER_			_ML_PROTOCOL_VER_		// 该版本使用的协议版本
 #define _SUB_PROTOCOL_ENCRYPT_  _NO_PROTOCOL_ENCRYPT_	// 协议加密类型,米立版本不加密
-#else
-#define _HW_ENCRYPT_			_TF_HWENCRYPT_			// 该版本使用的硬件加密码
-#define _PROTOCOL_VER_			_TF_PROTOCOL_VER_		// 该版本使用的协议版本
-#define _SUB_PROTOCOL_ENCRYPT_  _TF_PROTOCOL_ENCRYPT_	// 协议加密类型
-#endif
-#ifdef _USE_NEW_CENTER_
-#define HARD_VER_COMM		    "SNV792-100101"
-#else
-#define	SOFTSUBVER				"_ML8-V7M"
-#define HARDSUBVER				"ML8-V2.0"
-#endif
-#define BOARD_TYPE				ML8_N32926_V7M
+
+#define HARD_VER_COMM		    "SNVX98-100101"
 #define JIEGOU_TYPE				ML8_V7
-#define _TFT_7_											// 7寸屏
 #define _ALARM_IO_										// 报警直接用IO口
 #define _CP2526_TOUCH_KEY_								// 启用感应按键
-#define _CP_7INCH_TOUCH_								// 启用7寸电容屏
-#define _NO_LOGO_										// 不显示logo
 #define _NEW_SELF_IPC_									// 使用新的本公司IPC家居监视
+//#define _TIMER_REBOOT_NO_LCD_           				// 定时重启时不开背光
 
 #endif
 
@@ -180,7 +150,7 @@
 // ====定义版本号============================================
 //-----------硬件版本------------------
 #ifndef HARD_VER_COMM
-#define HARD_VER_COMM		    "ITE-"
+#define HARD_VER_COMM		    "ITE9856-"
 #endif
 
 //----------软件版本---------------------

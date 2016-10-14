@@ -127,7 +127,11 @@ int ScreenSaverCheck(void)
 		g_ScreenLcdPowerDown -= (float)diff / 1000.0f;
 		if (g_ScreenLcdPowerDown <= 0.0f)
 		{
+			#ifdef _USE_FOR_SHOW_
+			return -1;		// 展会版本不关屏
+			#else
 			return -2;
+			#endif			
 		}
 
 		uint8 enable = storage_get_screen_enable();

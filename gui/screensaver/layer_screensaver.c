@@ -14,7 +14,7 @@ Modification:
 
 #include "layer_screensaver.h"
 
-#define PER_PICT_TIME		3000
+#define PER_PICT_TIME		10000
 
 static FileList *g_List = NULL;
 static FileList *g_CurNode = NULL;
@@ -115,7 +115,6 @@ Others:
 *************************************************/
 void ScreenSaverLayerInit(void)
 {	
-	printf("ScreenSaverLayerInit !!!\n");
 	if (!ScreenSaverLayer)
 	{
 		ScreenSaverLayer = ituSceneFindWidget(&theScene, "ScreenSaverLayer");

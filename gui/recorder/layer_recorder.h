@@ -19,7 +19,6 @@ Modification:
 
 #define MS_PER_SECOND			1000
 #define MAX_RECORDER_NUM		5
-#define DEFAULT_PLAYVOL			4
 
 
 typedef enum

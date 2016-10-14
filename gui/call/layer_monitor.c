@@ -235,14 +235,24 @@ Others:
 *************************************************/
 static void ChangeVolume(void)
 {
+	uint8 flag = FALSE;
+
 	g_volumeticks = 4;
 	// 音量为0时，自动为静音
-	if (g_volume == 0)
+	if (g_mute)
 	{
-		g_mute = TRUE;
+		flag = TRUE;
+	}
+	else if (0 == g_volume)
+	{
+		flag = TRUE;
+	}
+	else
+	{
+		flag = FALSE;
 	}
 
-	if (g_mute == TRUE)
+	if (TRUE == flag)
 	{
 		// 设置静音音量
 		media_set_talk_volume(g_DevType, 0);

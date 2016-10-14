@@ -18,7 +18,6 @@ Modification:
 #include "../gui_include.h"
 
 
-#define PHOTOMSG_PLAY_VOL			4
 #define MAX_POOTOMSG_LIST_NUM		20
 #define PHOTOMSG_NUM_PER_PAGE		6
 #define MAX_PHOTOMSG_PAGE_NUM		4

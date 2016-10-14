@@ -53,7 +53,7 @@ bool recorderLayerOnEnter(ITUWidget* widget, char* param)
 	recorderLayerInit();
 
 	//TODO:获取系统当前音量
-	gRecorderPlayVol = DEFAULT_PLAYVOL;
+	gRecorderPlayVol = JRLY_VOLUME;
 	setRecorderPlayVol(gRecorderPlayVol);
 	media_set_ring_volume(gRecorderPlayVol);
 	
@@ -689,7 +689,7 @@ void recorderVoiceBtnOnClicked()
 	}
 	else
 	{
-		gRecorderPlayVol = DEFAULT_PLAYVOL;
+		gRecorderPlayVol = JRLY_VOLUME;
 		setRecorderPlayVol(gRecorderPlayVol);
 	}
 	media_set_ring_volume(gRecorderPlayVol);	//TODO:通知逻辑设置音量！！！！！！

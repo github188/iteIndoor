@@ -77,7 +77,8 @@ static SDL_Window *g_window = NULL;
 static bool g_LcdFuncNoDeal = false;
 static bool inVideoState = false;
 extern ITUActionFunction actionFunctions[];
-
+static ITUButton*	mainSOSOffButton = NULL;
+static ITULayer*	mainLayer = NULL;
 
 /*************************************************
   Function:			af_callback_gui
@@ -1228,8 +1229,38 @@ int SceneRun(void)
 						if (pre_type == SDL_FINGERDOWN)
 			            {
 							result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
+							//added by WuZ in 2016-10-13
+							if (!mainLayer)
+							{
+								mainLayer = ituSceneFindWidget(&theScene, "mainLayer");
+								assert(mainLayer);
+							}
+
 							if (result && !ScreenIsOff())
-	                            sys_key_beep();	
+							{
+								if (ituWidgetIsVisible(mainLayer))
+								{
+									if (!mainSOSOffButton)
+									{
+										mainSOSOffButton = ituSceneFindWidget(&theScene, "mainSOSOffButton");
+										assert(mainSOSOffButton);
+									}
+									if (((lastx > mainSOSOffButton->bg.icon.widget.rect.x && lastx < (mainSOSOffButton->bg.icon.widget.rect.x + mainSOSOffButton->bg.icon.widget.rect.width)) &&
+										(lasty > mainSOSOffButton->bg.icon.widget.rect.y && lasty < (mainSOSOffButton->bg.icon.widget.rect.y + mainSOSOffButton->bg.icon.widget.rect.height))))
+									{
+										//如果当前mainLayer显示，并且按下的区域在SOS按钮范围在之内，则不响应按键音
+									}
+									else
+									{
+										sys_key_beep();
+
+									}
+								}
+								else
+								{
+									sys_key_beep();
+								}
+							}
 							
 							result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
 					        if (result)

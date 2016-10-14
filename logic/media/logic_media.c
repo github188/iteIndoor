@@ -53,13 +53,26 @@ MEDIA_LYLY_CTRL g_LylyRecordCtrl =
 };
 
 // modi by luofl 2014-08-28 铃声音量最大级超过标准85DB
-uint8 AudioVolumeLevel[9] = {0, 7, 10, 13, 15, 17, 19, 20, 21};
+uint8 AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
 
-// ============V5室内机(其它款室内机都共用这个参数)========================
-uint8 V5_STAIR_AudioVolumeLevel[9] = {0, 10, 16, 21, 22, 23, 24, 25, 26};
-uint8 V5_CENTER_AudioVolumeLevel[9] = {0, 10, 13, 16, 18, 20, 21, 22, 23};
-uint8 V5_NETDOOR_AudioVolumeLevel[9] = {0, 10, 16, 18, 20, 22, 24, 25, 26};
-uint8 V5_ROOM_AudioVolumeLevel[9] = {0, 10, 15, 19, 21, 22, 23, 24, 25};
+// add by chenbh 2016-10-13 mic输入音量等级
+uint8 MicVolumeLevel[9] = {0, 65, 67, 69, 72, 74, 76, 78, 80};
+
+#if (JIEGOU_TYPE == AH8_E81)
+uint8 STAIR_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 CENTER_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 NETDOOR_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 ROOM_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 DEFAULT_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+
+#elif (JIEGOU_TYPE == ML8_V7)
+uint8 STAIR_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 CENTER_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 NETDOOR_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 ROOM_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+uint8 DEFAULT_AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
+
+#endif
 
 static struct ThreadInfo VideoPreviewThread;		// 模拟门前机视频预览线程
 
@@ -533,14 +546,35 @@ void media_del_audio_send_addr(uint32 IP, uint16 AudioPort)
 uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 {
 	int level;
-	if (vol == 0)
+	if (vol < 0 || vol > 8)
 	{
-		level = 0;
+		vol = 4;
 	}
-	else
+
+	switch (devtype)
 	{
-		level = 20+10*vol;
+		case DEVICE_TYPE_CENTER:
+			level = CENTER_AudioVolumeLevel[vol];
+			break;
+
+		case DEVICE_TYPE_AREA:	
+		case DEVICE_TYPE_STAIR:
+			level = STAIR_AudioVolumeLevel[vol];
+			break;
+
+		case DEVICE_TYPE_ROOM:
+			level = ROOM_AudioVolumeLevel[vol];
+			break;
+
+		case DEVICE_TYPE_DOOR_NET:
+			level = NETDOOR_AudioVolumeLevel[vol];
+			break;
+			
+		default :
+			level = DEFAULT_AudioVolumeLevel[vol];
+			break;
 	}
+	
 	dprintf("level: %d\n", level);
 	leaf_set_play_level(g_LeafCall, level);
 	return TRUE;
@@ -558,14 +592,12 @@ uint32 media_set_talk_volume(DEVICE_TYPE_E devtype, uint32 vol)
 uint32 media_set_ring_volume(uint32 vol)
 {
 	int level;
-	if (vol == 0)
+	if (vol < 0 || vol > 8)
 	{
-		level = 0;
+		vol = 4;
 	}
-	else
-	{
-		level = 20+10*vol;
-	}
+
+	level = AudioVolumeLevel[vol];
 	dprintf("level: %d\n", level);
    	leaf_set_ring_level(g_LeafCall, level);	
 	return TRUE;
@@ -583,14 +615,12 @@ uint32 media_set_ring_volume(uint32 vol)
 uint32 media_set_mic_volume(uint8 vol)
 {
 	int level;
-	if (vol == 0)
+	if (vol < 0 || vol > 8)
 	{
-		level = 0;
+		vol = 4;
 	}
-	else
-	{
-		level = 80+2*vol;
-	}
+
+	level = MicVolumeLevel[vol];
 	dprintf("level: %d\n", level);
 	leaf_set_rec_level(g_LeafCall, level);
 	return TRUE;

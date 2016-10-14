@@ -30,12 +30,14 @@
 
 #define DHCP_TIMEOUT_MSEC       (60 * 1000) //60sec
 
-static bool networkIsReady;
-static bool networkHeartbeatIsReady;
+static bool networkIsReady = false;
+static bool networkHeartbeatIsReady = false;
 static time_t networkLastRecvTime;
-static int networkSocket;
-static bool networkToReset, networkQuit;
-static bool networkbindflg;								// 与门口机绑定 临时设置IP
+static int networkSocket = -1;
+static bool networkToReset = false;
+static bool networkQuit = false;
+static bool networkbindflg = false ;					// 与门口机绑定 临时设置IP
+static bool need_reboot = false;
 static NET_PARAM g_BindNetParam;						// 绑定设置的网络参数
 
 bool NetworkIsReady(void)
@@ -283,6 +285,11 @@ static void* NetworkTask(void* arg)
 				ResetEthernet();
 			}			
             networkToReset = false;
+			
+			if (need_reboot == true)
+			{
+				hw_stop_feet_dog();	
+			}
         }
 
         sleep(1);
@@ -582,6 +589,7 @@ uint32 net_set_local_mac(uint8 *mac)
 	if (TRUE == ret)
 	{
 		net_set_ipaddr();
+		need_reboot = true;
 	}
 	return ret;
 }

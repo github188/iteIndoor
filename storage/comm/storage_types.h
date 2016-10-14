@@ -126,8 +126,8 @@ typedef struct
 	uint32	DNS1;									// DNS1服务器IP  DHCP与DNS1同IP
 	uint32	DNS2;									// DNS2服务器IP  预留上网用
 	uint32	CenterIP;								// 中心服务器IP
-	uint32	ManagerIP[3];							// 管理员机IP
-	uint32	SubDevIP[8];							// 分机设备IP
+	uint32	ManagerIP[MANAGE_DEVICE_NUM];			// 管理员机IP
+	uint32	SubDevIP[ROOM_DEVICE_NUM];				// 分机设备IP
 	uint32	SipProxyServer;							// SIP代理服务器, DNS1负责解析域名, 下同
 	uint32	AurineServer;							// 冠林服务器
 	uint32	StunServer;								// Stun服务器

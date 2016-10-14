@@ -32,7 +32,7 @@ static ITULayer* MainLayer = NULL;
 static ITULayer* AurineJDLayer = NULL;
 static ITURadioBox* AurineJDRightHomeRadioBox = NULL;
 static ITUBackground* AurineJDRightBackground = NULL;
-static ITUButton* AurineJDExitButton = NULL;
+static ITUContainer* AurineJDExitContainer = NULL;
 static ITUCoverFlow* AurineJDBottomCoverFlow = NULL;
 static ITUSprite* AurineJDBottomSprite[JD_ALL] = { NULL };
 // 情景
@@ -561,6 +561,83 @@ static void ReadDevStateOnce(void)
 	}
 	// 注意需添加批量查询标志
 }
+/*************************************************
+Function:		SetSampleVisible
+Description: 	调节灯状态时设置其余不可触控控件
+Input:
+	1.flag		TRUE: Enable FALSE: Disable
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+static void SetLightControlEnable(uint8 flag)
+{
+	if (true == flag)
+	{
+		ituWidgetEnable(AurineJDLightCoverFlow);
+		ituWidgetEnable(AurineJDBottomCoverFlow);
+		ituWidgetEnable(AurineJDRightBackground);
+		ituWidgetEnable(AurineJDExitContainer);
+		ituWidgetSetVisible(AurineJDControlLightGrayBackground, false);
+	}
+	else
+	{
+		ituWidgetDisable(AurineJDLightCoverFlow);
+		ituWidgetDisable(AurineJDBottomCoverFlow);
+		ituWidgetDisable(AurineJDRightBackground);
+		ituWidgetDisable(AurineJDExitContainer);
+		ituWidgetSetVisible(AurineJDControlLightGrayBackground, true);
+	}
+}
+
+/*************************************************
+Function:		SetSampleVisible
+Description: 	设置设备模板是否可见
+Input:
+	1.type		设备类型风格
+	2.flag		TRUE: 可见 FALSE: 不可见
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+static void SetSampleVisible(AU_JD_DEV_TYPE type, uint8 flag)
+{
+	switch (type)
+	{
+		case JD_SCENE_TYPE:
+			ituWidgetSetVisible(AurineJDSceneBackground, flag);
+			break;
+
+		case JD_DEV_LIGHT:
+			ituWidgetSetVisible(AurineJDLightBackground, flag);
+			ituWidgetSetVisible(AurineJDPowerBackground, false);
+			ituWidgetSetVisible(AurineJDGasBackground, false);
+			break;
+
+		case JD_DEV_POWER:
+			ituWidgetSetVisible(AurineJDPowerBackground, flag);
+			ituWidgetSetVisible(AurineJDLightBackground, false);
+			ituWidgetSetVisible(AurineJDGasBackground, false);
+			break;
+
+		case JD_DEV_GAS:
+			ituWidgetSetVisible(AurineJDGasBackground, flag);
+			ituWidgetSetVisible(AurineJDLightBackground, false);
+			ituWidgetSetVisible(AurineJDPowerBackground, false);
+			break;
+
+		case JD_DEV_KONGTIAO:
+			ituWidgetSetVisible(AurineJDAirBackground, flag);
+			break;
+
+		case JD_DEV_WINDOW:
+			ituWidgetSetVisible(AurineJDCurtainBackground, flag);
+			break;
+
+		default:
+			break;
+	}
+}
 
 /*************************************************
 Function:		ShowPageType
@@ -662,6 +739,7 @@ static void DrawScene(uint8 num)
 	{
 		ituWidgetSetVisible(AurineJDSceneBackgroundPage[i], false);
 	}
+	SetSampleVisible(JD_SCENE_TYPE, true);
 
 	xindex = 1;
 	yindex = 1;
@@ -762,6 +840,7 @@ static void DrawScene(uint8 num)
 			xindex++;
 		}
 	}
+	SetSampleVisible(JD_SCENE_TYPE, false);
 }
 
 /*************************************************
@@ -817,6 +896,7 @@ static void DrawLight(uint8 num)
 	{
 		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], false);
 	}
+	SetSampleVisible(JD_DEV_LIGHT, true);
 
 	xindex = 0;
 	yindex = 0;
@@ -957,6 +1037,7 @@ static void DrawLight(uint8 num)
 			xindex++;
 		}
 	}
+	SetSampleVisible(JD_DEV_LIGHT, false);
 }
 
 /*************************************************
@@ -1011,8 +1092,8 @@ static void DrawAir(uint8 num)
 	{
 		ituWidgetSetVisible(AurineJDAirBackgroundPage[i], false);
 	}
+	SetSampleVisible(JD_DEV_KONGTIAO, true);
 
-	dprintf("num....:%d\n", num);
 	// clone总空调个数
 	for (i = 0; i < num; i++)
 	{
@@ -1049,6 +1130,7 @@ static void DrawAir(uint8 num)
 				sprintf(tmp, "%s%d%d", "AurineJDAirtContainer", i, j);
 				ituWidgetSetName(CloneChildAurineJDAirtContainer[j], tmp);
 			}
+			ituWidgetDisable(CloneChildAurineJDAirtContainer[0]);
 
 			// clone 显示状态、模式Sprite
 			memset(tmp, 0, sizeof(tmp));
@@ -1207,6 +1289,7 @@ static void DrawAir(uint8 num)
 		}
 		ituWidgetUpdate(AurineJDAirBackgroundPage[i], ITU_EVENT_LAYOUT, 0, 0, 0);
 	}
+	SetSampleVisible(JD_DEV_KONGTIAO, false);
 }
 
 /*************************************************
@@ -1263,6 +1346,7 @@ static void DrawCurtain(uint8 num)
 	{
 		ituWidgetSetVisible(AurineJDCurtainBackgroundPage[i], false);
 	}
+	SetSampleVisible(JD_DEV_WINDOW, true);
 
 	index = 0;
 	// clone总窗帘个数
@@ -1295,6 +1379,7 @@ static void DrawCurtain(uint8 num)
 				sprintf(tmp, "%s%d%d", "AurineJDCurtainContainer", i, j);
 				ituWidgetSetName(CloneChildAurineJDCurtainContainer[j], tmp);
 			}
+			ituWidgetDisable(CloneChildAurineJDCurtainContainer[0]);
 
 			// clone Sprite
 			memset(tmp, 0, sizeof(tmp));
@@ -1360,6 +1445,7 @@ static void DrawCurtain(uint8 num)
 		ituWidgetUpdate(AurineJDCurtainBackgroundPage[pagenum - 1], ITU_EVENT_LAYOUT, 0, 0, 0);
 		index = !index;
 	}
+	SetSampleVisible(JD_DEV_WINDOW, false);
 }
 
 /*************************************************
@@ -1393,6 +1479,7 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 			g_AurineJDPowerButton[i] = NULL;
 			g_AurineJDPowerSprite[i] = NULL;
 		}
+		SetSampleVisible(JD_DEV_POWER, true);
 	}
 	else
 	{
@@ -1403,6 +1490,7 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 			g_AurineJDGasButton[i] = NULL;
 			g_AurineJDGasSprite[i] = NULL;
 		}
+		SetSampleVisible(JD_DEV_GAS, true);
 	}
 
 	for (i = maxpage; i < JD_LIGHT_PAGE_NUM; i++)
@@ -1563,6 +1651,14 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 		{
 			xindex++;
 		}
+	}
+	if (devtype == JD_DEV_POWER)
+	{
+		SetSampleVisible(JD_DEV_POWER, false);
+	}
+	else
+	{
+		SetSampleVisible(JD_DEV_GAS, false);
 	}
 }
 
@@ -1792,7 +1888,6 @@ bool AurineJDLightOnChanged(ITUWidget* widget, char* param)
 		jd_aurine_light_close(g_DevList->pjd_dev_info[g_LightIndex].Index, g_DevList->pjd_dev_info[g_LightIndex].Address);
 	}
 	jd_aurine_set_dev_state_param(JD_DEV_LIGHT, g_LightIndex, value * 10);
-	dprintf("value..........%d\n", value);
 
 	return true;
 }
@@ -1807,12 +1902,7 @@ Others:			无
 *************************************************/
 bool AurineJDExitLightControlButtonOnMouseUp(ITUWidget* widget, char* param)
 {
-#if 0
-	ituWidgetEnable(AurineJDExitButton);
-	ituWidgetSetVisible(AurineJDRightBackground, true);
-	ituWidgetSetVisible(AurineJDBottomCoverFlow, true);
-#endif
-	ituWidgetSetVisible(AurineJDControlLightGrayBackground, false);
+	SetLightControlEnable(true);
 
 	return true;
 }
@@ -1908,7 +1998,8 @@ bool AurineJDLightControlButtonOnMouseUp(ITUWidget* widget, char* param)
 					{
 						value = lastvalue;
 					}
-					ituWidgetSetVisible(AurineJDControlLightGrayBackground, true);
+
+					SetLightControlEnable(false);
 					ituTrackBarSetValue(AurineJDControlLightTrackBar, value);
 
 					// 设备名称和位置
@@ -2483,7 +2574,7 @@ bool AurineJDLayerOnEnter(ITUWidget* widget, char* param)
 	uint8 i;
 
 	g_BtnEvent = AurineJDSceneEvent;
-	ituWidgetSetVisible(AurineJDControlLightGrayBackground, false);
+	SetLightControlEnable(true);
 	ituRadioBoxSetChecked(AurineJDRightHomeRadioBox, true);
 	ituCoverFlowGoto(AurineJDBottomCoverFlow, 0);
 	ituSpriteGoto(AurineJDBottomSprite[g_BtnEvent - 2], AurineJDButtomPressIcon);
@@ -2525,8 +2616,8 @@ static void InitAurineJDLayer(void)
 		AurineJDRightBackground = ituSceneFindWidget(&theScene, "AurineJDRightBackground");
 		assert(AurineJDRightBackground);
 
-		AurineJDExitButton = ituSceneFindWidget(&theScene, "AurineJDExitButton");
-		assert(AurineJDExitButton);
+		AurineJDExitContainer = ituSceneFindWidget(&theScene, "AurineJDExitContainer");
+		assert(AurineJDExitContainer);
 
 		AurineJDBottomCoverFlow = ituSceneFindWidget(&theScene, "AurineJDBottomCoverFlow");
 		assert(AurineJDBottomCoverFlow);

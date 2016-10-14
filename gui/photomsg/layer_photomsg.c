@@ -58,7 +58,7 @@ bool photoMsgLayerOnEnter(ITUWidget* widget, char* param)
 	ituCoverFlowGoto(photoMsgListCoverFlow, 0);
 	setPhotoMsgList();
 
-	gPhotoMsgPlayVol = PHOTOMSG_PLAY_VOL;
+	gPhotoMsgPlayVol = LYLY_VIEW_VOL;
 	gPhotoMsgCurrentIndex = MAX_POOTOMSG_LIST_NUM;	//当前播放index，任意数值大于总条数即可
 
 	return true;
@@ -351,7 +351,7 @@ void photoMsgVoiceBtnOnClicked()
 	}
 	else
 	{
-		gPhotoMsgPlayVol = PHOTOMSG_PLAY_VOL;
+		gPhotoMsgPlayVol = LYLY_VIEW_VOL;
 		setPhotoMsgPlayVol(gPhotoMsgPlayVol);
 	}
 }

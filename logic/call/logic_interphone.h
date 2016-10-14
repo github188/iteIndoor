@@ -23,14 +23,6 @@
 #define CALL_RTP_AUDIO_PT		8					// RTP音频类型
 #define CALL_RTP_VIDEO_PT		98					// RTP视频类型
 
-#ifdef _TFT_7_
-#define SNAP_PIC_WIDTH			640
-#define SNAP_PIC_HEIGHT			480
-#else
-#define SNAP_PIC_WIDTH			380
-#define SNAP_PIC_HEIGHT			272
-#endif
-
 #if 0
 #define	INTER_TPRI				TPRI_NORMAL		// 对讲监视线程优先级
 #define	INTER_MB				MBGUI			// 对讲监视线程邮箱

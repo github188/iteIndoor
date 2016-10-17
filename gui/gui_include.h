@@ -41,6 +41,7 @@
 #include "photomsg/layer_photomsg.h"
 #include "recorder/layer_recorder.h"
 #include "picmanager/layer_picmanager.h"
+#include "tempdetection\layer_tempdetection.h"
 #include "call/layer_call.h"
 #include "jd/layer_aurine_jd.h"
 #include "set/layer_set.h"

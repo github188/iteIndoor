@@ -1053,10 +1053,10 @@ int SceneRun(void)
 	                        dblclk = mouseDownTick;
 	                        lastx = ev.button.x;
 	                        lasty = ev.button.y;
-							
-	                        if (result && !ScreenIsOff())
-	                            sys_key_beep();
-	                           
+
+							if (result && !ScreenIsOff())
+								sys_key_beep();
+
 	                    }
 					
 	                #ifdef CFG_SCREENSHOT_ENABLE					
@@ -1229,7 +1229,7 @@ int SceneRun(void)
 						if (pre_type == SDL_FINGERDOWN)
 			            {
 							result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
-							//added by WuZ in 2016-10-13
+							//added by WuZ in 2016-10-14
 							if (!mainLayer)
 							{
 								mainLayer = ituSceneFindWidget(&theScene, "mainLayer");

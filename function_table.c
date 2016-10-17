@@ -57,6 +57,9 @@ ITUActionFunction actionFunctions[] =
 	"picManagerMiniPicBtnClicked", picManagerMiniPicBtnClicked,
 	"picManagerPictureOnChanged", picManagerPictureOnChanged,
 
+	//tempdetection
+	"tempDetectionDateMeterOnChanged", tempDetectionDateMeterOnChanged,
+
 	// CallLayer
 	"CallLayerOnEnter", CallLayerOnEnter,
 	"CallLayerButtonOnMouseUp", CallLayerButtonOnMouseUp,

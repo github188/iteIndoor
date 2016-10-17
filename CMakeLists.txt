@@ -219,6 +219,8 @@ gui/elevator/layer_elevator.c
 gui/elevator/layer_elevator.h
 gui/picmanager/layer_picmanager.c
 gui/picmanager/layer_picmanager.h
+gui/tempdetection/layer_tempdetection.c
+gui/tempdetection/layer_tempdetection.h
 gui/call/layer_call.h
 gui/call/layer_call.c
 gui/call/layer_becall.c

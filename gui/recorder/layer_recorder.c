@@ -80,18 +80,13 @@ void recorderLayerInit()
 {
 	uint8_t i = 0;
 
-	if (gRecorderList != NULL)
-	{
-		free(gRecorderList);
-		gRecorderList = NULL;
-	}
-
 	if (!recorderTipsTransparencyBackground)
 	{
 		recorderTipsTransparencyBackground = ituSceneFindWidget(&theScene, "recorderTipsTransparencyBackground");
 		assert(recorderTipsTransparencyBackground);
 	}
 
+	storage_free_jrly_memory(&gRecorderList);
 	storage_get_jrlyrecord(&gRecorderList);
 	gRecordNumCount = gRecorderList->Count;
 

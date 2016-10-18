@@ -30,6 +30,13 @@ typedef struct
 	PPHOTO_INFO PhotoInfo;				    		// 照片结构
 }PHOTOLIST_INFO, * PPHOTOLIST_INFO;
 
+// 多条删除使用结构体
+typedef struct 
+{
+	uint8 Counts;									// 删除条数
+	uint8 DelFlg[MAX_PHOTO_NUM];					// flg里面值为1则需要删除
+}PHOTO_DEL_LIST, *PPHOTO_DEL_LIST;
+
 /*************************************************
   Function:		storage_free_photo_memory
   Description: 	释放存储内存
@@ -85,6 +92,17 @@ void storage_get_photo(PPHOTOLIST_INFO *photolist);
   Others:
 *************************************************/
 ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, DATE_TIME Time);
+
+/*************************************************
+  Function:		storage_del_photos
+  Description: 	删除多条照片记录
+  Input:		
+  	1.Index		索引
+  Output:		无
+  Return:		ECHO_STORAGE
+  Others:
+*************************************************/
+ECHO_STORAGE storage_del_photos (PPHOTO_DEL_LIST DelList);
 
 /*************************************************
   Function:		storage_del_photo

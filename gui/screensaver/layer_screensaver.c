@@ -22,6 +22,9 @@ static uint8 g_SaverPictCounts = 0;
 static uint32 ScreenSaverLastTimeTick = 0;
 static ITUIcon* ScreenSaverIcon = NULL;
 static ITULayer* ScreenSaverLayer = NULL;
+#ifdef _USE_FOR_SHOW_
+static uint8 g_CurIndex = 1;
+#endif
 
 /*************************************************
 Function:		ituLoadJpegFileOnIcon
@@ -55,6 +58,65 @@ static void ituLoadJpegFileOnIcon(ITUIcon* icon, char* filepath)
 	}
 }
 
+#ifdef _USE_FOR_SHOW_
+bool ScreenSaverLayerOnEnter(ITUWidget* widget, char* param)
+{
+	ScreenSaverLastTimeTick = SDL_GetTicks();
+	g_SaverPictCounts = get_filelist(SCREEN_SAVER_DIR_PATH, &g_List);
+	printf("g_SaverPictCounts: %d\n", g_SaverPictCounts);
+	if (g_SaverPictCounts == 0 || g_List == NULL)
+	{
+		return false;
+	}
+	if (!ScreenSaverIcon)
+	{
+		ScreenSaverIcon = ituSceneFindWidget(&theScene, "ScreenSaverIcon");
+		assert(ScreenSaverIcon);
+	}
+	
+	g_CurIndex = 1;
+	char filename[100] = {0};
+	sprintf(filename, "%s%d%s", SCREEN_SAVER_DIR_PATH, g_CurIndex, ".jpg");
+	dprintf("filename: %s\n", filename);
+	ituLoadJpegFileOnIcon(ScreenSaverIcon, filename);
+}
+
+bool ScreenSaverLayerOnTimer(ITUWidget* widget, char* param)
+{	
+	if (g_SaverPictCounts > 0)
+	{	
+		uint32_t duration;
+		uint32_t curtime = SDL_GetTicks();
+		if (curtime >= ScreenSaverLastTimeTick)
+		{
+			duration = curtime - ScreenSaverLastTimeTick;
+		}
+		else
+		{
+			duration = 0xFFFFFFFF - ScreenSaverLastTimeTick + curtime;
+		}
+
+		if (duration >= PER_PICT_TIME)
+		{
+			g_CurIndex++;
+			if (g_CurIndex > g_SaverPictCounts)
+			{
+				g_CurIndex = 1;
+			}
+			
+			char filename[100] = {0};
+			sprintf(filename, "%s%d%s", SCREEN_SAVER_DIR_PATH, g_CurIndex, ".jpg");
+			dprintf("filename: %s\n", filename);
+			ituLoadJpegFileOnIcon(ScreenSaverIcon, filename);
+	
+			ScreenSaverLastTimeTick = curtime;
+			return true;
+		}
+	}
+	
+	return false;
+}
+#else
 bool ScreenSaverLayerOnEnter(ITUWidget* widget, char* param)
 {
 	ScreenSaverLastTimeTick = SDL_GetTicks();
@@ -104,6 +166,7 @@ bool ScreenSaverLayerOnTimer(ITUWidget* widget, char* param)
 	
 	return false;
 }
+#endif
 
 /*************************************************
 Function:		ScreenSaverLayerInit

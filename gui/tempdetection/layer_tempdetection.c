@@ -23,7 +23,6 @@ bool tempDetectionDateMeterOnChanged(ITUWidget* widget, char* param)
 	uint16_t tmpPosX = atoi(param);
 
 	printf("22222222222222222222  = %d \n", atoi(param));
-	
 
 	if (!tempDetectionTempBackground)
 	{

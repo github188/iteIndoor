@@ -72,8 +72,8 @@ static void save_rtsp_param()
 }
 
 /*************************************************
-Function:		KeyBordGotoRtspParam
-Description: 	键盘进入本页面
+Function:		ShowRtspEnable
+Description: 	获取rtsp存储以及显示是否启用
 Input:		无
 Output:		无
 Return:		TRUE 是 FALSE 否
@@ -82,14 +82,24 @@ Others:
 static void ShowRtspEnable()
 {
 	uint8 i;
-	for (i = 0; i < MAX_HOME_NUM; i++)
+
+	storage_free_monitordev_memory(&g_list);
+	storage_get_monitordev(&g_list);
+	if (NULL == g_list)
 	{
-		int used = 0;
-		if (i < g_list->Homenum)
+		return false;
+	}
+	else
+	{
+		for (i = 0; i < MAX_HOME_NUM; i++)
 		{
-			used = g_list->Homedev[i].EnableOpen;
+			int used = 0;
+			if (i < g_list->Homenum)
+			{
+				used = g_list->Homedev[i].EnableOpen;
+			}
+			ituTextSetString(SetCamera2Text[i], get_str(SID_Set_UnUsed + used));
 		}
-		ituTextSetString(SetCamera2Text[i], get_str(SID_Set_UnUsed + used));
 	}
 }
 
@@ -333,16 +343,7 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 
 	if (strcmp(param, "SetProjectLayer") == 0)
 	{
-		storage_free_monitordev_memory(&g_list);
-		storage_get_monitordev(&g_list);
-		if (NULL == g_list)
-		{
-			return false;
-		}
-		else
-		{
-			ShowRtspEnable();
-		}
+		ShowRtspEnable();
 
 		ituCoverFlowGoto(SetRtspCoverFlow, 0);
 		ituWidgetSetVisible(SetRtspParamCoverFlow, false);

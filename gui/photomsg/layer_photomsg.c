@@ -445,11 +445,7 @@ void setPhotoMsgList()
 	char tmpStr[50] = { 0 };
 	char tmpAddr[50] = { 0 };
 
-	if (gPhotoMsgList != NULL)
-	{
-		free(gPhotoMsgList);
-		gPhotoMsgList = NULL;
-	}
+	storage_free_lyly_memory(&gPhotoMsgList);
 	storage_get_lylyrecord(&gPhotoMsgList);
 	gPhotoMsgNum = gPhotoMsgList->Count;
 	

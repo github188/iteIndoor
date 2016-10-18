@@ -49,6 +49,7 @@ typedef struct
 	uint8 Counts;									// 删除条数
 	uint8 DelFlg[MAX_RECORD_NUM];					// flg里面值为1则需要删除
 }DEL_LIST, *PDEL_LIST;
+
 /**************************  以下监视列表信息  ***********************************/
 #define MAX_MONITOR_NUM  		20					// 最大记录
 

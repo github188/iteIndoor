@@ -218,6 +218,49 @@ ECHO_STORAGE storage_add_photo (DEVICE_TYPE_E Type, char* DevNo, DATE_TIME Time)
 }
 
 /*************************************************
+  Function:		storage_del_photos
+  Description: 	É¾³ý¶àÌõÕÕÆ¬¼ÇÂ¼
+  Input:		
+  	1.Index		Ë÷Òý
+  Output:		ÎÞ
+  Return:		ECHO_STORAGE
+  Others:
+*************************************************/
+ECHO_STORAGE storage_del_photos (PPHOTO_DEL_LIST DelList)
+{
+	uint8 i;
+	PPHOTOLIST_INFO photolist = NULL;
+	PPHOTOLIST_INFO photolistnew = NULL;
+	ECHO_STORAGE ret = ECHO_STORAGE_ERR;
+
+	storage_malloc_photo_memory(&photolist, MAX_PHOTO_NUM);
+	get_photo_from_storage(photolist);
+	
+	if (photolist && photolist->PhotoInfo && photolist->Count>0)
+	{
+		storage_malloc_photo_memory(&photolistnew, MAX_PHOTO_NUM);
+		
+		for (i=0; i<photolist->Count; i++)
+		{
+			if (DelList->DelFlg[i] == 0)
+			{
+				memcpy(photolistnew->PhotoInfo+photolistnew->Count, photolist->PhotoInfo+i, PHOTOINFO_SIZE);
+				photolistnew->Count++;
+			}
+			else
+			{
+				del_photo_file(photolist->PhotoInfo+i);
+			}
+		}
+		ret = save_photo_storage(photolistnew);
+		storage_free_photo_memory(&photolistnew);
+	}
+	
+	storage_free_photo_memory(&photolist);	
+	return ret;
+}
+
+/*************************************************
   Function:		storage_del_photo
   Description: 	É¾³ýÕÕÆ¬¼ÇÂ¼
   Input:		

@@ -53,6 +53,7 @@ static ITULayer* SetJdParamLayer = NULL;				// 家电参数设置
 static ITULayer* SetJDLearnIRLayer = NULL;				// 空调红外学习
 static ITULayer* SetJdScenceLayer = NULL;				// 情景设置
 static ITULayer* SetJdScenceParamLayer = NULL;			// 情景参数设置
+static ITULayer* SetJdYuYueLayer = NULL;				// 家电预约界面
 
 
 /*************************************************
@@ -186,6 +187,9 @@ bool SetBottonReturnOnEnter(ITUWidget* widget, char* param)
 
 		SetJdScenceParamLayer = ituSceneFindWidget(&theScene, "SetJdScenceParamLayer");
 		assert(SetJdScenceParamLayer);
+
+		SetJdYuYueLayer = ituSceneFindWidget(&theScene, "SetJdYuYueLayer");
+		assert(SetJdYuYueLayer);
 	}
 
 	return true;
@@ -453,7 +457,15 @@ bool SetBottonReturnButtonOnPress(ITUWidget* widget, char* param)
 		SetJDSceneParamLayerOnReturn();
 		return true;
 	}
-	
 
+	if (g_NowLayer == SetJdYuYueLayer)
+	{
+		if (!ituWidgetIsVisible(SetProjectLayer))
+		{
+			ituLayerGoto(SetProjectLayer);
+		}
+		return true;
+	}
+	
 	return false;
 }

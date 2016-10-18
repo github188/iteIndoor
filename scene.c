@@ -914,11 +914,11 @@ int SceneRun(void)
 {
     SDL_Event ev;
     int delay, frames, lastx, lasty, ret;
-    uint32_t tick, dblclk, lasttick, mouseDownTick;
+    uint32_t tick, dblclk, lasttick, mouseDownTick, feetdogtick;
 	Uint32 pre_type = 0;
 	
     /* Watch keystrokes */
-    dblclk = frames = lasttick = lastx = lasty = mouseDownTick = 0;
+    dblclk = frames = lasttick = lastx = lasty = mouseDownTick = feetdogtick = 0;
 
     for (;;)
     {
@@ -934,6 +934,13 @@ int SceneRun(void)
 
         tick = SDL_GetTicks();
 
+		// add by chenbh 2016-10-17 feet dog 2s pertimes		
+		if (tick - feetdogtick >= 2000)
+		{
+			feetdogtick = tick;
+			feetdog_task();
+		}
+		
     #ifdef FPS_ENABLE
         frames++;
         if (tick - lasttick >= 1000)
@@ -1053,10 +1060,10 @@ int SceneRun(void)
 	                        dblclk = mouseDownTick;
 	                        lastx = ev.button.x;
 	                        lasty = ev.button.y;
-
-							if (result && !ScreenIsOff())
-								sys_key_beep();
-
+							
+	                        if (result && !ScreenIsOff())
+	                            sys_key_beep();
+	                           
 	                    }
 					
 	                #ifdef CFG_SCREENSHOT_ENABLE					
@@ -1229,7 +1236,7 @@ int SceneRun(void)
 						if (pre_type == SDL_FINGERDOWN)
 			            {
 							result |= ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
-							//added by WuZ in 2016-10-14
+							//added by WuZ in 2016-10-13
 							if (!mainLayer)
 							{
 								mainLayer = ituSceneFindWidget(&theScene, "mainLayer");

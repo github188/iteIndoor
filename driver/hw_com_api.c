@@ -34,7 +34,7 @@ const ITPDevice *ItpDevice = &itpDeviceUart2;
 #define UART_DEVICE				1
 #endif
 
-static uint8 FeetDog = 0;
+static uint8 FeetDog = 1;
 static uint8 InitFeetDogFlag = 0;
 static uint8 InitAlarmFlag = 0;
 static uint8 InitJdFlag = 0;
@@ -330,9 +330,9 @@ void hw_stop_feet_dog(void)
 	jd_stop_feet_dog(buf, sizeof(buf));
 	jd_stop_feet_dog(buf, sizeof(buf));
 	jd_stop_feet_dog(buf, sizeof(buf));
-	FeetDog = 1;
+	FeetDog = 0;
 	#else
-	FeetDog = 1;
+	FeetDog = 0;
 	#endif
 }
 
@@ -422,6 +422,26 @@ int8 send_485_pack(char * data, uint8 len)
 }
 
 /*************************************************
+  Function:		feetdog_task
+  Description: 	喂狗
+  Input: 		无
+  Output:		无
+  Return:		无
+  Others:		由UI线程调用 可以解决UI卡死重启不了的问题
+*************************************************/
+void feetdog_task(void)
+{
+	if (FeetDog)
+	{
+		send_feetdog_cmd();
+	}
+	else
+	{
+		send_disable_dog();						// 停止喂狗,让单片机立即重启
+	}
+}
+
+/*************************************************
   Function:		feetdog_thread
   Description: 	喂狗线程
   Input: 		无
@@ -433,7 +453,7 @@ static void * feetdog_thread(void* data)
 {
 	while (1)
 	{		
-		if (!FeetDog)
+		if (FeetDog)
 		{
 			send_feetdog_cmd();
 		}
@@ -623,6 +643,7 @@ int hw_start_com_dog(void)
 		}
 
 		InitFeetDogFlag = 1;
+		#if 0	// modi by chenbh 2016-10-17 喂狗放到scene.c 的UI线程中处理 可以避免ui死机重启不了的问题
 		pthread_attr_init(&attr);
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 		//pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
@@ -632,6 +653,9 @@ int hw_start_com_dog(void)
 
 		// 不用此命令,只要有发心跳,单片机就使能看门狗
 		//send_enable_dog();
+		#else
+		feetdog_task();
+		#endif
 	}
 #endif
 	return 0;

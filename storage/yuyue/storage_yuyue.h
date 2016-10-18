@@ -98,6 +98,13 @@ typedef struct
 	PBE_COMM 	be_comm;
 }BE_COMM_LIST, * PBE_COMM_LIST;
 
+// 多条删除使用结构体
+typedef struct 
+{
+	uint8 Counts;									// 删除条数
+	uint8 DelFlg[MAX_YUYUE_NUM];					// flg里面值为1则需要删除
+}BE_DEL_LIST, *PBE_DEL_LIST;
+
 #if 0
 // 提示音的链表信息
 typedef struct __TIPLIST
@@ -145,6 +152,17 @@ PBE_COMM_LIST storage_get_yuyue (void);
   Others:
 *************************************************/
 ECHO_STORAGE storage_add_yuyue (PBE_COMM yuyue);
+
+/*************************************************
+  Function:		storage_del_yuyues
+  Description: 	删除预约
+  Input:		
+  	1.DelList	
+  Output:		无
+  Return:		ECHO_STORAGE
+  Others:
+*************************************************/
+ECHO_STORAGE storage_del_yuyues (PBE_DEL_LIST DelList);
 
 /*************************************************
   Function:		storage_del_yuyue

@@ -95,6 +95,7 @@ bool SetLinkOnEnter(ITUWidget* widget, char* param)
 	ituWidgetSetVisible(SetLinkJDListContainer, false);
 	ituWidgetSetVisible(SetLinkAFListContainer, false); 
 	ituWidgetSetVisible(SetLinkCallListContainer, false);
+	ituWidgetSetVisible(SetLinkContainer, true);
 	if (!ituWidgetIsEnabled(SetLinkBackground))
 	{
 		ituWidgetEnable(SetLinkBackground);

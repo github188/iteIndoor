@@ -478,17 +478,27 @@ bool picManagerMsgBoxBtnOnClicked(ITUWidget* widget, char* param)
 	switch (tmpId)
 	{
 	case PICMANAGER_MSG_BTN_CONFIRM:
-		for (i = 0; i < PICMANAGER_MINIPIC_MAX; i++)
 		{
-			if (getMiniPicIsChecked(i) == MINIPIC_CORNER_ICON_CHECK)
+			PHOTO_DEL_LIST DelList;
+			memset(DelList.DelFlg, 0, sizeof(DelList.DelFlg));
+			DelList.Counts = 0;
+			for (i = 0; i < MAX_PHOTO_NUM; i++)
 			{
-				//TODO:这里写删除所选照片的操作，删除完重新绘制内容界面！！！！！！！
-				storage_del_photo(i - delCount);
-				delCount++;
+				if (getMiniPicIsChecked(i) == MINIPIC_CORNER_ICON_CHECK)
+				{
+					//TODO:这里写删除所选照片的操作，删除完重新绘制内容界面！！！！！！！
+					DelList.DelFlg[i] = 1;
+					DelList.Counts++;
+				}
+				else
+				{
+					DelList.DelFlg[i] = 0;
+				}
 			}
+			storage_del_photos(&DelList);
+			picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
+			setPicManagerMiniPicList();
 		}
-		picManagerPageInit(PICMANAGER_PAGE_MINIPIC);
-		setPicManagerMiniPicList();
 		break;
 
 	default:
@@ -694,12 +704,7 @@ void setPicManagerMiniPicList()
 	char tmpStr[50] = { 0 };
 	char tmpFile[50] = { 0 };
 
-	if (gPicManagerList != NULL)
-	{
-		free(gPicManagerList);
-		gPicManagerList = NULL;
-	}
-
+	storage_free_photo_memory(&gPicManagerList);
 	storage_get_photo(&gPicManagerList);
 	gPictureNumCount = gPicManagerList->Count;
 

@@ -181,6 +181,53 @@ ECHO_STORAGE storage_add_yuyue (PBE_COMM yuyue)
 }
 
 /*************************************************
+  Function:		storage_del_yuyues
+  Description: 	É¾³ýÔ¤Ô¼
+  Input:		
+  	1.DelList	
+  Output:		ÎÞ
+  Return:		ECHO_STORAGE
+  Others:
+*************************************************/
+ECHO_STORAGE storage_del_yuyues (PBE_DEL_LIST DelList)
+{
+	uint8 i;
+	PBE_COMM be_comm = NULL;
+	PBE_COMM_LIST YuyueList = NULL;
+	ECHO_STORAGE ret = ECHO_STORAGE_ERR;
+
+	if (DelList == NULL)
+	{
+		warn_log("DelList == null !!\n");
+		return ret;
+	}
+		
+	YuyueList = storage_get_yuyue();
+	if (YuyueList && YuyueList->be_comm)
+	{
+		PBE_COMM_LIST YuyueListNew = NULL;	
+		malloc_yuyue_memory(&YuyueListNew, MAX_YUYUE_NUM);
+	
+		for (i=0; i<YuyueList->nCount; i++)
+		{
+			be_comm = YuyueList->be_comm + i;
+			if (DelList->DelFlg[i] == 0)
+			{
+				memcpy(YuyueListNew->be_comm+YuyueListNew->nCount, be_comm, YUYUEINFO_SIZE);
+				YuyueListNew->nCount++;
+			}
+		}
+				
+		save_yuyue_storage(YuyueListNew);
+		free_yuyue_memory(&YuyueListNew);
+		ret = ECHO_STORAGE_OK;
+	}
+
+	free_yuyue_memory(&YuyueList);
+	return ret;
+}
+
+/*************************************************
   Function:		storage_del_yuyue
   Description: 	É¾³ýÔ¤Ô¼
   Input:		

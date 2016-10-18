@@ -76,5 +76,15 @@ int32 init_jd_callbackt(JdCallBack func);
   Others:
 *************************************************/
 void hw_set_lcd_pwm0(uint8 flag);
+
+/*************************************************
+  Function:		feetdog_task
+  Description: 	喂狗
+  Input: 		无
+  Output:		无
+  Return:		无
+  Others:		由UI线程调用 可以解决UI卡死重启不了的问题
+*************************************************/
+void feetdog_task(void);
 #endif
 

@@ -141,6 +141,7 @@ ITUActionFunction actionFunctions[] =
 	"AurineJDGasButtonOnMouseUp", AurineJDGasButtonOnMouseUp,
 	"AurineJDLightOnChanged", AurineJDLightOnChanged,
 	"AurineJDExitLightControlButtonOnMouseUp", AurineJDExitLightControlButtonOnMouseUp,
+	"AurineJDCoverFlowOnChange", AurineJDCoverFlowOnChange,
 	"AurineJDLayerOnLeave", AurineJDLayerOnLeave,
 
 	//Alarm

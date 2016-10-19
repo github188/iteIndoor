@@ -12,8 +12,6 @@ Modification:
 *************************************************/
 #include "gui_include.h"
 
-/*****************常量定义***********************/
-
 /*****************变量定义***********************/
 static ITULayer* MainLayer = NULL;
 static ITULayer* BeCallLayer = NULL;
@@ -54,7 +52,7 @@ static uint32 g_BeCallLastTick = 0;					// 实时更新的tick
 static uint32 g_ErrHintTxtID = 0;					// 错误提示文字ID
 static uint8 g_ErrHintTicks = 0;					// 错误提示计时
 static uint8 g_StartCalloutTick = 0;				// 开始呼叫tick
-static uint8 g_HandupDelay = 2;						// 接听需延时才可挂断
+static uint8 g_HandupDelay = 0;						// 接听需延时才可挂断
 
 typedef enum
 {
@@ -380,7 +378,7 @@ static void BeCallCalloutStart(void)
 	else
 	{
 		g_ErrHintTxtID = SID_Inter_ConnFailed;
-		g_ErrHintTicks = 3;
+		g_ErrHintTicks = 1;
 		g_InterState = CALL_STATE_END;
 	}
 	DrawStringHint();

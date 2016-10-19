@@ -24,8 +24,6 @@ bool tempDetectionDateMeterOnChanged(ITUWidget* widget, char* param)
 	uint16_t tmpPosX = atoi(param);
 	char tmpStr[50] = { 0 };
 
-	printf("22222222222222222222  = %d \n", atoi(param));
-
 	if (!tempDetectionTempBackground)
 	{
 		tempDetectionTempBackground = ituSceneFindWidget(&theScene, "tempDetectionTempBackground");

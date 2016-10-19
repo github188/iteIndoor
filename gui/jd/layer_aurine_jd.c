@@ -17,6 +17,14 @@ Modification:
 #define BUTTON_ICON_H			153									// 按键高
 #define BUTTON_CUITAIN_ICON_W	304									// 窗帘宽
 #define BUTTON_CUITAIN_ICON_H	305									// 窗帘高
+#define COVWERFLOW_W			608									// Coverflow 宽
+#define COVWERFLOW_H			305									// Coverflow 高
+#define COVWERFLOW_XPOS			16									// Coverflow 起始位置
+#define COVWERFLOW_YPOS			18									// Coverflow 起始位置
+#define	PAGEINDEX_ICON_W		8									// 页数图标
+#define	PAGEINDEX_ICON_H		8									// 页数图标
+#define	PAGEINDEX_DIS			12									// 页数间距
+
 #define JD_PAGE_NUM				8									// 每页个数
 #define JD_CUITAIN_NUM			2									// 窗帘宽
 #define JD_SCENE_PAGE_NUM		MAX_JD_SCENE_NUM/JD_PAGE_NUM		// 情景页数
@@ -24,9 +32,8 @@ Modification:
 #define JD_AIR_PAGE_NUM			MAX_JD_KONGTIAO						// 空调页数（每页一个）
 #define JD_CURTAIN_PAGE_NUM		MAX_JD_WINDOW/JD_CUITAIN_NUM		// 窗帘页数（每页两个）
 #define JD_POWER_PAGE_NUM		MAX_JD_POWER/JD_PAGE_NUM			// 电源页数
-#define JD_GAS_PAGE_NUM			MAX_JD_GAS/JD_PAGE_NUM				// 煤气页数
+#define JD_GAS_PAGE_NUM			1									// 煤气页数
 #define JD_SCENE_TYPE			JD_DEV_MAX							// 情景类型
-
 /*****************变量定义***********************/
 static ITULayer* MainLayer = NULL;
 static ITULayer* AurineJDLayer = NULL;
@@ -35,6 +42,8 @@ static ITUBackground* AurineJDRightBackground = NULL;
 static ITUContainer* AurineJDExitContainer = NULL;
 static ITUCoverFlow* AurineJDBottomCoverFlow = NULL;
 static ITUSprite* AurineJDBottomSprite[JD_ALL] = { NULL };
+static ITUSprite* AurineJDPageIndexSprite = NULL;
+static ITUBackground* AurineJDBackground = NULL;
 // 情景
 static ITUCoverFlow* AurineJDSceneCoverFlow = NULL;
 static ITUBackground* AurineJDSceneBackgroundPage[JD_SCENE_PAGE_NUM] = { NULL };
@@ -63,19 +72,20 @@ static ITUBackground* AurineJDGasBackground = NULL;
 static ITUButton* g_AurineJDSceneButton[MAX_JD_SCENE_NUM] = { NULL };
 static ITUButton* g_AurineJDLightButton[MAX_JD_LIGHT] = { NULL };
 static ITUSprite* g_AurineJDLightSprite[MAX_JD_LIGHT] = { NULL };
-static ITUButton* g_AurineJDAirButton[JD_AIR_PAGE_NUM][10] = { NULL };					// 空调按键
-static ITUSprite* g_AurineJDAirShowModeSprite[JD_AIR_PAGE_NUM] = { NULL };				// 显示各种状态或模式图标
-static ITUText* g_AurineJDAirShowModeText[JD_AIR_PAGE_NUM] = { NULL };					// 显示各种模式名称
-static ITUContainer* g_AurineJDAirNumContainer[JD_AIR_PAGE_NUM] = { NULL };				// 显示温度或状态
-static ITUSprite* g_AurineJDAirIndexNumSprite[JD_AIR_PAGE_NUM][3] = { NULL };			// 三段式显示温度或状态
-static ITUButton* g_AurineJDCurtainButton[JD_CURTAIN_PAGE_NUM][3] = { NULL };			// 窗帘按键
-static ITUSprite* g_AurineJDCurtainSateSprite[JD_CURTAIN_PAGE_NUM] = { NULL };			// 显示开关状态图标
+static ITUButton* g_AurineJDAirButton[MAX_JD_KONGTIAO][10] = { NULL };					// 空调按键
+static ITUSprite* g_AurineJDAirShowModeSprite[MAX_JD_KONGTIAO] = { NULL };				// 显示各种状态或模式图标
+static ITUText* g_AurineJDAirShowModeText[MAX_JD_KONGTIAO] = { NULL };					// 显示各种模式名称
+static ITUContainer* g_AurineJDAirNumContainer[MAX_JD_KONGTIAO] = { NULL };				// 显示温度或状态
+static ITUSprite* g_AurineJDAirIndexNumSprite[MAX_JD_KONGTIAO][3] = { NULL };			// 三段式显示温度或状态
+static ITUButton* g_AurineJDCurtainButton[MAX_JD_WINDOW][3] = { NULL };					// 窗帘按键
+static ITUSprite* g_AurineJDCurtainSateSprite[MAX_JD_WINDOW] = { NULL };				// 显示开关状态图标
 static ITUButton* g_AurineJDPowerButton[MAX_JD_POWER] = { NULL };
 static ITUSprite* g_AurineJDPowerSprite[MAX_JD_POWER] = { NULL };
 static ITUButton* g_AurineJDGasButton[MAX_JD_GAS] = { NULL };
 static ITUSprite* g_AurineJDGasSprite[MAX_JD_GAS] = { NULL };
 
-/*****************常量定义***********************/
+static ITUSprite* g_AurineJDPageIndexSprite[MAX_JD_KONGTIAO] = { NULL };				// 页标
+/*****************变量定义***********************/
 static uint32 g_JDLastTick = 0;										// 实时更新的tick
 static uint8 g_Index = 0;
 static uint8 g_BtnEvent = 0;										// 设备类型按键事件
@@ -86,12 +96,22 @@ static AU_JD_DEV_TYPE g_DevType = JD_DEV_LIGHT;						// 设备类型
 static JD_STATE_INFO g_JDState;
 static uint8 g_DevCount = 0;										// 批量查询时的设备总数
 static uint8 g_LightIndex = 0;										// 可调灯的索引
+static uint8 g_PageCount = 0;										// 设备的CoverFlow总页数
+static uint8 g_PageIndex = 0;										// 设备的CoverFlow当前页数
 static uint8 g_LightValue[MAX_JD_LIGHT] = { 0 };					// 某一盏灯的当前亮度
 static uint8 g_DevIndex[MAX_JD_LIGHT] = { 0 };						// 批量查询时所有索引
 static uint16 g_DevAddr[MAX_JD_LIGHT] = { 0 };						// 批量查询时的设备地址
 static uint8 g_AirValue[MAX_JD_KONGTIAO] = { 0 };					// 某一台空调的当前温度
 static uint8 g_AirColdHot[MAX_JD_KONGTIAO] = { 0 };					// 某一台空调的当前制冷制暖状态
 static uint8 g_AirLastMode[MAX_JD_KONGTIAO] = { 0 };				// 某一台空调的当前模式
+
+static uint8 g_CloneSceneFlag[MAX_JD_SCENE_NUM] = { NULL };
+static uint8 g_CloneLightFlag[MAX_JD_LIGHT] = { NULL };
+static uint8 g_CloneAirFlag[MAX_JD_KONGTIAO] = { NULL };
+static uint8 g_CloneCurtainFlag[MAX_JD_WINDOW] = { NULL };
+static uint8 g_ClonePowerFlag[MAX_JD_POWER] = { NULL };
+// 煤气未满一页按一页算
+static uint8 g_CloneGasFlag[JD_PAGE_NUM] = { NULL };
 
 typedef enum
 {
@@ -201,6 +221,14 @@ typedef enum
 	AurineJDDevOpenIcon,
 	AurineJDDevMAXIcon,
 }AurineJDDevStateIcon;
+
+// 页数图标
+typedef enum
+{
+	AurineJDPageIndexUnSelectIcon = 0x00,
+	AurineJDPageIndexSelectIcon,
+	AurineJDPageIndexMAXIcon,
+}AurineJDPageIndexStateIcon;
 
 /*************************************************
 Function:		GetDevState
@@ -689,6 +717,76 @@ static void ShowPageType(AU_JD_DEV_TYPE type)
 }
 
 /*************************************************
+Function:		DrawPageIndex
+Description: 	画页标
+Input:
+	1.count		页数
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+static void DrawPageIndex(uint8 count)
+{
+	char tmp[50];
+	uint8 i, result = 0;
+	uint32 xpos = 0, ypos = 0;
+	ITUSprite* CloneAurineJDPageIndexSprite;
+	ITUSprite* OldAurineJDPageIndexSprite;
+
+	// 删除已经Clone的控件
+	if (g_PageCount > 1)
+	{
+		for (i = 0; i < g_PageCount; i++)
+		{
+			g_AurineJDPageIndexSprite[i] = NULL;
+			OldAurineJDPageIndexSprite = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDPageIndexSprite", i);
+			OldAurineJDPageIndexSprite = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDPageIndexSprite);						// 删除已Clone的
+			ituWidgetExit(OldAurineJDPageIndexSprite);
+			//dprintf("Delete Clone AurineJDPageIndexSprite!!!\n");
+		}
+	}
+
+	g_PageCount = count;
+	if (g_PageCount > 1)
+	{
+		ituWidgetSetVisible(AurineJDPageIndexSprite, true);
+		xpos = COVWERFLOW_XPOS + ((COVWERFLOW_W - (PAGEINDEX_ICON_W * g_PageCount + PAGEINDEX_DIS *(g_PageCount - 1))) / 2);
+		ypos = COVWERFLOW_YPOS + COVWERFLOW_H + 10;
+		
+		for (i = 0; i < g_PageCount; i++)
+		{
+			result = FALSE;
+			CloneAurineJDPageIndexSprite = NULL;
+
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDPageIndexSprite", i);
+			result = ituWidgetClone(AurineJDPageIndexSprite, &CloneAurineJDPageIndexSprite);
+			if (result)
+			{
+				ituWidgetSetName(CloneAurineJDPageIndexSprite, tmp);
+				ituWidgetSetX(CloneAurineJDPageIndexSprite, xpos);
+				ituWidgetSetY(CloneAurineJDPageIndexSprite, ypos);
+				g_AurineJDPageIndexSprite[i] = CloneAurineJDPageIndexSprite;
+
+				ituWidgetAdd(AurineJDBackground, CloneAurineJDPageIndexSprite);
+			}
+			ituWidgetUpdate(AurineJDBackground, ITU_EVENT_LAYOUT, 0, 0, 0);
+
+			if (0 == i)
+			{
+				ituSpriteGoto(CloneAurineJDPageIndexSprite, AurineJDPageIndexSelectIcon);
+			}
+			xpos += (PAGEINDEX_ICON_W + PAGEINDEX_DIS);
+		}
+	}
+	g_PageIndex = 0;
+	ituWidgetSetVisible(AurineJDPageIndexSprite, false);
+}
+
+/*************************************************
 Function:		DrawScene
 Description: 	画情景界面
 Input:			无
@@ -706,10 +804,23 @@ static void DrawScene(uint8 num)
 	ITUButton* CloneChildAurineJDSceneButton;
 	ITUContainer* CloneChildAurineJDSceneContainer[2];
 	ITUBackground* CloneAurineJDSceneBackground;
+	ITUBackground* OldAurineJDSceneBackground;
 
-	// 情景按键指针初始化
+	// 删除已经Clone的控件
 	for (i = 0; i < MAX_JD_SCENE_NUM; i++)
 	{
+		if (1 == g_CloneSceneFlag[i])
+		{
+			g_CloneSceneFlag[i] = 0;
+			OldAurineJDSceneBackground = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDSceneBackground", i);
+			OldAurineJDSceneBackground = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDSceneBackground);						// 删除已有的
+			ituWidgetExit(OldAurineJDSceneBackground);
+			//dprintf("Delete Clone AurineJDSceneBackground!!!\n");
+		}
+		// 情景按键指针初始化
 		g_AurineJDSceneButton[i] = NULL;
 	}
 
@@ -733,12 +844,15 @@ static void DrawScene(uint8 num)
 			pagenum++;
 		}
 	}
+	// 画页标
+	DrawPageIndex(pagenum);
 
 	// 隐藏多余情景页
 	for (i = pagenum; i < JD_SCENE_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(AurineJDSceneBackgroundPage[i], false);
 	}
+	ituCoverFlowGoto(AurineJDSceneCoverFlow, 0);
 	SetSampleVisible(JD_SCENE_TYPE, true);
 
 	xindex = 1;
@@ -773,46 +887,20 @@ static void DrawScene(uint8 num)
 				sprintf(tmp, "%s%d%d", "AurineJDSceneContainer", i, j);
 				ituWidgetSetName(CloneChildAurineJDSceneContainer[j], tmp);
 			}
+
 			// clone Button
 			memset(tmp, 0, sizeof(tmp));
 			CloneChildAurineJDSceneButton = itcTreeGetChildAt(CloneChildAurineJDSceneContainer[1], 0);
 			sprintf(tmp, "%s%d%d", "AurineJDSceneButton", i, 1);
 			ituWidgetSetName(CloneChildAurineJDSceneButton, tmp);
 			g_AurineJDSceneButton[i] = CloneChildAurineJDSceneButton;
+
 			// clone Text
 			memset(tmp, 0, sizeof(tmp));
 			CloneChildAurineJDSceneText = itcTreeGetChildAt(CloneChildAurineJDSceneContainer[1], 1);
 			sprintf(tmp, "%s%d%d", "AurineJDSceneText", i, 1);
 			ituWidgetSetName(CloneChildAurineJDSceneText, tmp);
 			ituTextSetString(CloneChildAurineJDSceneText, "");
-			
-			// 判断情景是否已启用
-			if (g_SceneList && g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].IsUsed)
-			{
-				ituWidgetSetVisible(CloneChildAurineJDSceneContainer[0], false);
-				ituWidgetSetVisible(CloneChildAurineJDSceneContainer[1], true);
-				// 设备名称和位置
-				memset(tmp, 0, sizeof(tmp));
-				#ifdef _IP_MODULE_JD_
-				if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY) && get_ipmodule())
-				{
-					strcpy(tmp, g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].SceneName);
-				}
-				else
-				#endif
-				{
-					char tmp2[50] = {0};
-					memcpy(tmp, get_str(g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].TextIDPos), 50);
-					memcpy(tmp2, get_str(g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].TextIDName), 50);
-					strcat(tmp, tmp2);
-				}
-				ituTextSetString(CloneChildAurineJDSceneText, tmp);
-			}
-			else
-			{
-				ituWidgetSetVisible(CloneChildAurineJDSceneContainer[0], true);
-				ituWidgetSetVisible(CloneChildAurineJDSceneContainer[1], false);
-			}
 
 			if ((i + JD_SCENE_MAX + 1) <= JD_PAGE_NUM)
 			{
@@ -821,15 +909,44 @@ static void DrawScene(uint8 num)
 			else
 			{
 				pagenum = (i + JD_SCENE_MAX + 1) / JD_PAGE_NUM;
-				rest = (i + JD_SCENE_MAX+1) % JD_PAGE_NUM;
+				rest = (i + JD_SCENE_MAX + 1) % JD_PAGE_NUM;
 				if (rest > 0)
 				{
 					pagenum++;
 				}
 			}
-			ituWidgetAdd(AurineJDSceneBackgroundPage[pagenum-1], CloneAurineJDSceneBackground);
+			g_CloneSceneFlag[i] = 1;
+			ituWidgetAdd(AurineJDSceneBackgroundPage[pagenum - 1], CloneAurineJDSceneBackground);
 		}
-		ituWidgetUpdate(AurineJDSceneBackgroundPage[pagenum-1], ITU_EVENT_LAYOUT, 0, 0, 0);
+		ituCoverFlowUpdate((ITUWidget*)AurineJDSceneCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		// 判断情景是否已启用
+		if (g_SceneList && g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].IsUsed)
+		{
+			ituWidgetSetVisible(CloneChildAurineJDSceneContainer[0], false);
+			ituWidgetSetVisible(CloneChildAurineJDSceneContainer[1], true);
+			// 设备名称和位置
+			memset(tmp, 0, sizeof(tmp));
+			#ifdef _IP_MODULE_JD_
+			if (JD_FACTORY_ACBUS == storage_get_extmode(EXT_MODE_JD_FACTORY) && get_ipmodule())
+			{
+				strcpy(tmp, g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].SceneName);
+			}
+			else
+			#endif
+			{
+				char tmp2[50] = {0};
+				memcpy(tmp, get_str(g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].TextIDPos), 50);
+				memcpy(tmp2, get_str(g_SceneList->pjd_scene_info[i + JD_SCENE_MAX].TextIDName), 50);
+				strcat(tmp, tmp2);
+			}
+			ituTextSetString(CloneChildAurineJDSceneText, tmp);
+		}
+		else
+		{
+			ituWidgetSetVisible(CloneChildAurineJDSceneContainer[0], true);
+			ituWidgetSetVisible(CloneChildAurineJDSceneContainer[1], false);
+		}
+
 		if (xindex > 2)
 		{
 			xindex = 0;
@@ -862,10 +979,23 @@ static void DrawLight(uint8 num)
 	ITUSprite* CloneChildAurineJDLightSprite[2];
 	ITUContainer* CloneChildAurineJDLightContainer[3];
 	ITUBackground* CloneAurineJDLightBackground;
+	ITUBackground* OldAurineJDLightBackground;
 
-	// 灯光按键指针初始化
+	// 删除已经Clone的控件
 	for (i = 0; i < MAX_JD_LIGHT; i++)
 	{
+		if (1 == g_CloneLightFlag[i])
+		{
+			g_CloneLightFlag[i] = 0;
+			OldAurineJDLightBackground = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDLightBackground", i);
+			OldAurineJDLightBackground = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDLightBackground);						// 删除已有的
+			ituWidgetExit(OldAurineJDLightBackground);
+			//dprintf("Delete Clone AurineJDLightBackground!!!\n");
+		}
+		// 灯光按键指针初始化
 		g_AurineJDLightButton[i] = NULL;
 		g_AurineJDLightSprite[i] = NULL;
 	}
@@ -890,12 +1020,15 @@ static void DrawLight(uint8 num)
 			pagenum++;
 		}
 	}
+	// 画页标
+	DrawPageIndex(pagenum);
 
 	// 隐藏多余灯光页
 	for (i = pagenum; i < JD_LIGHT_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], false);
 	}
+	ituCoverFlowGoto(AurineJDLightCoverFlow, 0);
 	SetSampleVisible(JD_DEV_LIGHT, true);
 
 	xindex = 0;
@@ -936,7 +1069,7 @@ static void DrawLight(uint8 num)
 				sprintf(tmp, "%s%d%d", "AurineJDLightContainer", i, j);
 				ituWidgetSetName(CloneChildAurineJDLightContainer[j], tmp);
 			}
-			
+
 			for (j = 0; j < 2; j++)
 			{
 				// clone Button
@@ -959,58 +1092,6 @@ static void DrawLight(uint8 num)
 				ituWidgetSetName(CloneChildAurineJDLightSprite[j], tmp);
 			}
 
-			if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
-			{
-				ituWidgetSetVisible(CloneChildAurineJDLightContainer[0], false);
-				if (g_DevList->pjd_dev_info[i].IsTune)
-				{
-					ituWidgetSetVisible(CloneChildAurineJDLightContainer[1], false);
-					ituWidgetSetVisible(CloneChildAurineJDLightContainer[2], true);
-					// 显示调节灯状态
-					if (JD_STATE_OPEN == GetDevState(JD_DEV_LIGHT, i))
-					{
-						uint8 value = GetDevValue(JD_DEV_LIGHT, i);
-						ituSpriteGoto(CloneChildAurineJDLightSprite[1], AurineJDReturn1LightIcon + value);
-					}
-					else
-					{
-						ituSpriteGoto(CloneChildAurineJDLightSprite[1], AurineJDReturn0LightIcon);
-					}
-					g_AurineJDLightButton[i] = CloneChildAurineJDLightButton[1];
-					g_AurineJDLightSprite[i] = CloneChildAurineJDLightSprite[1];
-				}
-				else
-				{
-					ituWidgetSetVisible(CloneChildAurineJDLightContainer[1], true);
-					ituWidgetSetVisible(CloneChildAurineJDLightContainer[2], false);
-					// 显示灯状态
-					if (JD_STATE_OPEN == GetDevState(JD_DEV_LIGHT, i))
-					{
-						ituSpriteGoto(CloneChildAurineJDLightSprite[0], AurineJDOpenLightIcon);
-					}
-					else
-					{
-						ituSpriteGoto(CloneChildAurineJDLightSprite[0], AurineJDCloseLightIcon);
-					}
-					g_AurineJDLightButton[i] = CloneChildAurineJDLightButton[0];
-					g_AurineJDLightSprite[i] = CloneChildAurineJDLightSprite[0];
-				}
-
-				// 设备名称和位置
-				memset(tmp, 0, sizeof(tmp));
-				GetDevText(i, tmp);
-				for (j = 0; j < 2; j++)
-				{
-					ituTextSetString(CloneChildAurineJDLightText[j], tmp);
-				}
-			}
-			else
-			{
-				ituWidgetSetVisible(CloneChildAurineJDLightContainer[0], true);
-				ituWidgetSetVisible(CloneChildAurineJDLightContainer[1], false);
-				ituWidgetSetVisible(CloneChildAurineJDLightContainer[2], false);
-			}
-
 			if ((i + 1) <= JD_PAGE_NUM)
 			{
 				pagenum = 1;
@@ -1024,9 +1105,63 @@ static void DrawLight(uint8 num)
 					pagenum++;
 				}
 			}
+			g_CloneLightFlag[i] = 1;
 			ituWidgetAdd(AurineJDLightBackgroundPage[pagenum - 1], CloneAurineJDLightBackground);
 		}
-		ituWidgetUpdate(AurineJDLightBackgroundPage[pagenum - 1], ITU_EVENT_LAYOUT, 0, 0, 0);
+		ituCoverFlowUpdate((ITUWidget*)AurineJDLightCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+
+		if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
+		{
+			ituWidgetSetVisible(CloneChildAurineJDLightContainer[0], false);
+			if (g_DevList->pjd_dev_info[i].IsTune)
+			{
+				ituWidgetSetVisible(CloneChildAurineJDLightContainer[1], false);
+				ituWidgetSetVisible(CloneChildAurineJDLightContainer[2], true);
+				// 显示调节灯状态
+				if (JD_STATE_OPEN == GetDevState(JD_DEV_LIGHT, i))
+				{
+					uint8 value = GetDevValue(JD_DEV_LIGHT, i);
+					ituSpriteGoto(CloneChildAurineJDLightSprite[1], AurineJDReturn1LightIcon + value);
+				}
+				else
+				{
+					ituSpriteGoto(CloneChildAurineJDLightSprite[1], AurineJDReturn0LightIcon);
+				}
+				g_AurineJDLightButton[i] = CloneChildAurineJDLightButton[1];
+				g_AurineJDLightSprite[i] = CloneChildAurineJDLightSprite[1];
+			}
+			else
+			{
+				ituWidgetSetVisible(CloneChildAurineJDLightContainer[1], true);
+				ituWidgetSetVisible(CloneChildAurineJDLightContainer[2], false);
+				// 显示灯状态
+				if (JD_STATE_OPEN == GetDevState(JD_DEV_LIGHT, i))
+				{
+					ituSpriteGoto(CloneChildAurineJDLightSprite[0], AurineJDOpenLightIcon);
+				}
+				else
+				{
+					ituSpriteGoto(CloneChildAurineJDLightSprite[0], AurineJDCloseLightIcon);
+				}
+				g_AurineJDLightButton[i] = CloneChildAurineJDLightButton[0];
+				g_AurineJDLightSprite[i] = CloneChildAurineJDLightSprite[0];
+			}
+
+			// 设备名称和位置
+			memset(tmp, 0, sizeof(tmp));
+			GetDevText(i, tmp);
+			for (j = 0; j < 2; j++)
+			{
+				ituTextSetString(CloneChildAurineJDLightText[j], tmp);
+			}
+		}
+		else
+		{
+			ituWidgetSetVisible(CloneChildAurineJDLightContainer[0], true);
+			ituWidgetSetVisible(CloneChildAurineJDLightContainer[1], false);
+			ituWidgetSetVisible(CloneChildAurineJDLightContainer[2], false);
+		}
+			
 		if (xindex > 2)
 		{
 			xindex = 0;
@@ -1051,7 +1186,7 @@ Others:			无
 static void DrawAir(uint8 num)
 {
 	char tmp[100];
-	uint8 i, j, result;
+	uint8 i, j, count, result;
 	ITUText* CloneChildAurineJDAirDevNameText;
 	ITUSprite* CloneChildAurineJDAirIndexNumSprite[3];
 	ITUContainer* CloneChildAurineJDAirNumContainer;
@@ -1059,10 +1194,23 @@ static void DrawAir(uint8 num)
 	ITUSprite* CloneChildAurineJDAirShowModeSprite;
 	ITUContainer* CloneChildAurineJDAirtContainer[2];
 	ITUBackground* CloneAurineJDAirBackground;
+	ITUBackground* OldAurineJDAirBackground;
 
-	// 空调指针初始化
-	for (i = 0; i < JD_AIR_PAGE_NUM; i++)
+	// 删除已经Clone的控件
+	for (i = 0; i < MAX_JD_KONGTIAO; i++)
 	{
+		if (1 == g_CloneAirFlag[i])
+		{
+			g_CloneAirFlag[i] = 0;
+			OldAurineJDAirBackground = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDAirBackground", i);
+			OldAurineJDAirBackground = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDAirBackground);						// 删除已有的
+			ituWidgetExit(OldAurineJDAirBackground);
+			//dprintf("Delete Clone AurineJDAirBackground!!!\n");
+		}
+		// 空调指针初始化
 		g_AurineJDAirShowModeSprite[i] = NULL;
 		g_AurineJDAirShowModeText[i] = NULL;
 		g_AurineJDAirNumContainer[i] = NULL;
@@ -1078,8 +1226,14 @@ static void DrawAir(uint8 num)
 
 	if (0 == num)
 	{
-		num = 1;
+		count = 1;
 	}
+	else
+	{
+		count = num;
+	}
+	// 画页标
+	DrawPageIndex(count);
 
 	// 空调页面初始化
 	for (i = 0; i < JD_AIR_PAGE_NUM; i++)
@@ -1088,17 +1242,17 @@ static void DrawAir(uint8 num)
 	}
 
 	// 隐藏多余空调页
-	for (i = num; i < JD_AIR_PAGE_NUM; i++)
+	for (i = count; i < JD_AIR_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(AurineJDAirBackgroundPage[i], false);
 	}
+	ituCoverFlowGoto(AurineJDAirCoverFlow, 0);
 	SetSampleVisible(JD_DEV_KONGTIAO, true);
 
 	// clone总空调个数
-	for (i = 0; i < num; i++)
+	for (i = 0; i < count; i++)
 	{
 		result = FALSE;
-
 		CloneChildAurineJDAirDevNameText = NULL;
 		CloneChildAurineJDAirNumContainer = NULL;
 		CloneChildAurineJDAirShowModeText = NULL;
@@ -1161,7 +1315,10 @@ static void DrawAir(uint8 num)
 			// 记录按键指针
 			for (j = 0; j < 10; j++)
 			{
+				memset(tmp, 0, sizeof(tmp));
 				g_AurineJDAirButton[i][j] = itcTreeGetChildAt(CloneChildAurineJDAirtContainer[1], 5 + j);
+				sprintf(tmp, "%s%d%d", "AurineJDAirButton", i, j);
+				ituWidgetSetName(g_AurineJDAirButton[i][j], tmp);
 			}
 
 			// clone 显示状态、温度Sprite
@@ -1172,36 +1329,66 @@ static void DrawAir(uint8 num)
 				sprintf(tmp, "%s%d%d", "AurineJDAirIndexNumSprite", i, j);
 				ituWidgetSetName(CloneChildAurineJDAirIndexNumSprite[j], tmp);
 			}
-
-			// 判断空调是否已启用
-			dprintf("g_DevList->pjd_dev_info[%d].IsUsed....:%d\n", i, g_DevList->pjd_dev_info[i].IsUsed);
-			if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
+			g_CloneAirFlag[i] = 1;
+			ituWidgetAdd(AurineJDAirBackgroundPage[i], CloneAurineJDAirBackground);
+		}
+		ituCoverFlowUpdate((ITUWidget*)AurineJDAirCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		// 判断空调是否已启用
+		if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
+		{
+			ituWidgetSetVisible(CloneChildAurineJDAirtContainer[0], false);
+			ituWidgetSetVisible(CloneChildAurineJDAirtContainer[1], true);
+			if (JD_STATE_CLOSE == GetDevState(JD_DEV_KONGTIAO, i))
 			{
-				ituWidgetSetVisible(CloneChildAurineJDAirtContainer[0], false);
-				ituWidgetSetVisible(CloneChildAurineJDAirtContainer[1], true);
-
-				dprintf(" GetDevState(JD_DEV_KONGTIAO, i)....:%d\n", GetDevState(JD_DEV_KONGTIAO, i));
-				if (JD_STATE_CLOSE == GetDevState(JD_DEV_KONGTIAO, i))
+				// 显示关状态
+				ituSpriteGoto(CloneChildAurineJDAirShowModeSprite, AurineJDAirShowCloseIcon);
+				ituWidgetSetVisible(CloneChildAurineJDAirShowModeText, false);
+				ituWidgetSetVisible(CloneChildAurineJDAirNumContainer, true);
+						
+				ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[0], AurineJDAirIndex0OIcon);
+				ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[1], AurineJDAirIndex1FIcon);
+				ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[2], AurineJDAirIndex2FIcon);
+			}
+			else
+			{
+				uint8 mode = GetDevLastMode(i);
+				uint8 value = GetDevValue(JD_DEV_KONGTIAO, i);
+				uint8 lastvalue = GetAirLastValue(i);
+				uint8 ColdHot = GetDevColdHot(i);
+				if (0 == mode)
 				{
-					// 显示关状态
-					ituSpriteGoto(CloneChildAurineJDAirShowModeSprite, AurineJDAirShowCloseIcon);
+					// 最初制冷、制暖模式
+					ituSpriteGoto(CloneChildAurineJDAirShowModeSprite, AurineJDAirShowColdIcon + ColdHot);
+					if (value == 0 && lastvalue == 0)
+					{
+						value = 5;
+					}
+					else
+					{
+						value = lastvalue;
+					}
+					// 显示温度
 					ituWidgetSetVisible(CloneChildAurineJDAirShowModeText, false);
 					ituWidgetSetVisible(CloneChildAurineJDAirNumContainer, true);
-						
-					ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[0], AurineJDAirIndex0OIcon);
-					ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[1], AurineJDAirIndex1FIcon);
-					ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[2], AurineJDAirIndex2FIcon);
+
+					if (value == 10)
+					{
+						ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[0], AurineJDAirIndex0Num3Icon);
+						ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[1], AurineJDAirIndex1Num0Icon);
+					}
+					else
+					{
+						ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[0], AurineJDAirIndex0Num2Icon);
+						ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[1], AurineJDAirIndex1Num0Icon + value);
+					}
+					ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[2], AurineJDAirIndex2SXDIcon);
 				}
 				else
 				{
-					uint8 mode = GetDevLastMode(i);
-					uint8 value = GetDevValue(JD_DEV_KONGTIAO, i);
-					uint8 lastvalue = GetAirLastValue(i);
-					uint8 ColdHot = GetDevColdHot(i);
-					if (0 == mode)
+					// 最后显示模式
+					ituSpriteGoto(CloneChildAurineJDAirShowModeSprite, AurineJDAirShowColdIcon + mode - 1);
+					if (mode > 0 && mode <= 2)
 					{
-						// 最初制冷、制暖模式
-						ituSpriteGoto(CloneChildAurineJDAirShowModeSprite, AurineJDAirShowColdIcon + ColdHot);
 						if (value == 0 && lastvalue == 0)
 						{
 							value = 5;
@@ -1226,68 +1413,35 @@ static void DrawAir(uint8 num)
 						}
 						ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[2], AurineJDAirIndex2SXDIcon);
 					}
-					else
+					else if (mode > 2 && mode < 7)
 					{
-						// 最后显示模式
-						ituSpriteGoto(CloneChildAurineJDAirShowModeSprite, AurineJDAirShowColdIcon + mode - 1);
-						if (mode > 0 && mode <= 2)
-						{
-							if (value == 0 && lastvalue == 0)
-							{
-								value = 5;
-							}
-							else
-							{
-								value = lastvalue;
-							}
-							// 显示温度
-							ituWidgetSetVisible(CloneChildAurineJDAirShowModeText, false);
-							ituWidgetSetVisible(CloneChildAurineJDAirNumContainer, true);
+						// 显示模式
+						uint32 textid[4] = {SID_Jd_KongTiao_Refre, SID_Jd_KongTiao_Warm, SID_Jd_KongTiao_Leisure, SID_Jd_KongTiao_Sleep};
 
-							if (value == 10)
-							{
-								ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[0], AurineJDAirIndex0Num3Icon);
-								ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[1], AurineJDAirIndex1Num0Icon);
-							}
-							else
-							{
-								ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[0], AurineJDAirIndex0Num2Icon);
-								ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[1], AurineJDAirIndex1Num0Icon + value);
-							}
-							ituSpriteGoto(CloneChildAurineJDAirIndexNumSprite[2], AurineJDAirIndex2SXDIcon);
-						}
-						else if (mode > 2 && mode < 7)
-						{
-							// 显示模式
-							uint32 textid[4] = {SID_Jd_KongTiao_Refre, SID_Jd_KongTiao_Warm, SID_Jd_KongTiao_Leisure, SID_Jd_KongTiao_Sleep};
-
-							ituWidgetSetVisible(CloneChildAurineJDAirNumContainer, false);
-							ituWidgetSetVisible(CloneChildAurineJDAirShowModeText, true);
-							ituTextSetString(CloneChildAurineJDAirShowModeText, get_str(textid[mode-3]));
-						}
+						ituWidgetSetVisible(CloneChildAurineJDAirNumContainer, false);
+						ituWidgetSetVisible(CloneChildAurineJDAirShowModeText, true);
+						ituTextSetString(CloneChildAurineJDAirShowModeText, get_str(textid[mode-3]));
 					}
 				}
-				// 设备名称和位置
-				memset(tmp, 0, sizeof(tmp));
-				GetDevText(i, tmp);
-				ituTextSetString(CloneChildAurineJDAirDevNameText, tmp);
+			}
+			// 设备名称和位置
+			memset(tmp, 0, sizeof(tmp));
+			GetDevText(i, tmp);
+			ituTextSetString(CloneChildAurineJDAirDevNameText, tmp);
 
-				g_AurineJDAirShowModeSprite[i] = CloneChildAurineJDAirShowModeSprite;
-				g_AurineJDAirShowModeText[i] = CloneChildAurineJDAirShowModeText;
-				g_AurineJDAirNumContainer[i] = CloneChildAurineJDAirNumContainer;
-				for (j = 0; j < 3; j++)
-				{
-					g_AurineJDAirIndexNumSprite[i][j] = CloneChildAurineJDAirIndexNumSprite[j];
-				}			
-			}
-			else
+			g_AurineJDAirShowModeSprite[i] = CloneChildAurineJDAirShowModeSprite;
+			g_AurineJDAirShowModeText[i] = CloneChildAurineJDAirShowModeText;
+			g_AurineJDAirNumContainer[i] = CloneChildAurineJDAirNumContainer;
+			for (j = 0; j < 3; j++)
 			{
-				ituWidgetSetVisible(CloneChildAurineJDAirtContainer[0], true);
-				ituWidgetSetVisible(CloneChildAurineJDAirtContainer[1], false);
-			}
-			ituWidgetAdd(AurineJDAirBackgroundPage[i], CloneAurineJDAirBackground);
+				g_AurineJDAirIndexNumSprite[i][j] = CloneChildAurineJDAirIndexNumSprite[j];
+			}			
 		}
-		ituWidgetUpdate(AurineJDAirBackgroundPage[i], ITU_EVENT_LAYOUT, 0, 0, 0);
+		else
+		{
+			ituWidgetSetVisible(CloneChildAurineJDAirtContainer[0], true);
+			ituWidgetSetVisible(CloneChildAurineJDAirtContainer[1], false);
+		}
 	}
 	SetSampleVisible(JD_DEV_KONGTIAO, false);
 }
@@ -1309,10 +1463,23 @@ static void DrawCurtain(uint8 num)
 	ITUSprite* CloneChildAurineJDCurtainSateSprite;
 	ITUContainer* CloneChildAurineJDCurtainContainer[2];
 	ITUBackground* CloneAurineJDCurtainBackground;
+	ITUBackground* OldAurineJDCurtainBackground;
 
-	// 窗帘指针初始化
-	for (i = 0; i < JD_CURTAIN_PAGE_NUM; i++)
+	// 删除已经Clone的控件
+	for (i = 0; i < MAX_JD_WINDOW; i++)
 	{
+		if (1 == g_CloneCurtainFlag[i])
+		{
+			g_CloneCurtainFlag[i] = 0;
+			OldAurineJDCurtainBackground = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDCurtainBackground", i);
+			OldAurineJDCurtainBackground = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDCurtainBackground);						// 删除已有的
+			ituWidgetExit(OldAurineJDCurtainBackground);
+			//dprintf("Delete Clone AurineJDCurtainBackground!!!\n");
+		}
+		// 窗帘指针初始化
 		g_AurineJDCurtainSateSprite[i] = NULL;
 		for (j = 0; j < 3; j++)
 		{
@@ -1340,12 +1507,15 @@ static void DrawCurtain(uint8 num)
 			pagenum++;
 		}
 	}
+	// 画页标
+	DrawPageIndex(pagenum);
 
 	// 隐藏多余窗帘页
 	for (i = pagenum; i < JD_CURTAIN_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(AurineJDCurtainBackgroundPage[i], false);
 	}
+	ituCoverFlowGoto(AurineJDCurtainCoverFlow, 0);
 	SetSampleVisible(JD_DEV_WINDOW, true);
 
 	index = 0;
@@ -1390,7 +1560,10 @@ static void DrawCurtain(uint8 num)
 			// 记录按键指针
 			for (j = 0; j < 3; j++)
 			{
+				memset(tmp, 0, sizeof(tmp));
 				g_AurineJDCurtainButton[i][j] = itcTreeGetChildAt(CloneChildAurineJDCurtainContainer[1], j + 1);
+				sprintf(tmp, "%s%d%d", "AurineJDCurtainButton", i, j);
+				ituWidgetSetName(g_AurineJDCurtainButton[i][j], tmp);
 			}
 
 			// clone Text
@@ -1399,34 +1572,7 @@ static void DrawCurtain(uint8 num)
 			sprintf(tmp, "%s%d%d", "AurineJDCurtainDevNameText", i, 1);
 			ituWidgetSetName(CloneChildAurineJDCurtainDevNameText, tmp);
 			ituTextSetString(CloneChildAurineJDCurtainDevNameText, "");
-
-			if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
-			{
-				ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[0], false);
-				ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[1], true);
-
-				// 显示灯状态
-				if (JD_STATE_OPEN == GetDevState(JD_DEV_WINDOW, i))
-				{
-					ituSpriteGoto(CloneChildAurineJDCurtainSateSprite, AurineJDCurtainOpenIcon);
-				}
-				else
-				{
-					ituSpriteGoto(CloneChildAurineJDCurtainSateSprite, AurineJDCurtainCloseIcon);
-				}
-				g_AurineJDCurtainSateSprite[i] = CloneChildAurineJDCurtainSateSprite;
-
-				// 设备名称和位置
-				memset(tmp, 0, sizeof(tmp));
-				GetDevText(i, tmp);
-				ituTextSetString(CloneChildAurineJDCurtainDevNameText, tmp);
-			}
-			else
-			{
-				ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[0], true);
-				ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[1], false);
-			}
-
+			
 			if ((i + 1) <= JD_CUITAIN_NUM)
 			{
 				pagenum = 1;
@@ -1440,66 +1586,275 @@ static void DrawCurtain(uint8 num)
 					pagenum++;
 				}
 			}
+			g_CloneCurtainFlag[i] = 1;
 			ituWidgetAdd(AurineJDCurtainBackgroundPage[pagenum - 1], CloneAurineJDCurtainBackground);
 		}
-		ituWidgetUpdate(AurineJDCurtainBackgroundPage[pagenum - 1], ITU_EVENT_LAYOUT, 0, 0, 0);
+		ituCoverFlowUpdate((ITUWidget*)AurineJDCurtainCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+
+		if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
+		{
+			ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[0], false);
+			ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[1], true);
+
+			// 显示灯状态
+			if (JD_STATE_OPEN == GetDevState(JD_DEV_WINDOW, i))
+			{
+				ituSpriteGoto(CloneChildAurineJDCurtainSateSprite, AurineJDCurtainOpenIcon);
+			}
+			else
+			{
+				ituSpriteGoto(CloneChildAurineJDCurtainSateSprite, AurineJDCurtainCloseIcon);
+			}
+			g_AurineJDCurtainSateSprite[i] = CloneChildAurineJDCurtainSateSprite;
+
+			// 设备名称和位置
+			memset(tmp, 0, sizeof(tmp));
+			GetDevText(i, tmp);
+			ituTextSetString(CloneChildAurineJDCurtainDevNameText, tmp);
+		}
+		else
+		{
+			ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[0], true);
+			ituWidgetSetVisible(CloneChildAurineJDCurtainContainer[1], false);
+		}
 		index = !index;
 	}
 	SetSampleVisible(JD_DEV_WINDOW, false);
 }
 
 /*************************************************
-Function:		DrawPowerORGas
-Description: 	电源或煤气界面
+Function:		DrawPower
+Description: 	电源界面
 Input:			无
 Output:			无
 Return:			无
 Others:			无
 *************************************************/
-static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
+static void DrawPower(uint8 num)
+{
+	char tmp[100];
+	uint8 rest = 0;
+	uint32 xpos, ypos;
+	uint8 i, j, result, count, xindex, yindex, pagenum;
+	ITUText* CloneChildAurineJDPowerText;
+	ITUSprite* CloneChildAurineJDPowerSprite;
+	ITUButton* CloneChildAurineJDPowerButton;
+	ITUContainer* CloneChildAurineJDPowerContainer[2];
+	ITUBackground* CloneAurineJDPowerBackground;
+	ITUBackground* OldAurineJDPowerBackground;
+
+	// 删除已经Clone的控件
+	for (i = 0; i < MAX_JD_POWER; i++)
+	{
+		if (1 == g_ClonePowerFlag[i])
+		{
+			g_ClonePowerFlag[i] = 0;
+			OldAurineJDPowerBackground = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDPowerBackground", i);
+			OldAurineJDPowerBackground = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDPowerBackground);						// 删除已有的
+			ituWidgetExit(OldAurineJDPowerBackground);
+			//dprintf("Delete Clone AurineJDPowerBackground!!!\n");
+		}
+		// 插座指针初始化
+		g_AurineJDPowerButton[i] = NULL;
+		g_AurineJDPowerSprite[i] = NULL;
+	}
+
+	// 灯光页面初始化
+	for (i = 0; i < JD_POWER_PAGE_NUM; i++)
+	{
+		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], true);
+	}
+
+	// 插座总页数
+	if (num <= JD_PAGE_NUM)
+	{
+		pagenum = 1;
+	}
+	else
+	{
+		pagenum = num / JD_PAGE_NUM;
+		rest = num % JD_PAGE_NUM;
+		if (rest > 0)
+		{
+			pagenum++;
+		}
+	}
+	// 画页标
+	DrawPageIndex(pagenum);
+
+	// 隐藏多余设备页
+	for (i = pagenum; i < JD_LIGHT_PAGE_NUM; i++)
+	{
+		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], false);
+	}	
+	ituCoverFlowGoto(AurineJDLightCoverFlow, 0);
+	SetSampleVisible(JD_DEV_POWER, true);
+
+	xindex = 0;
+	yindex = 0;
+	// clone插座个数
+	count = pagenum * JD_PAGE_NUM;
+	for (i = 0; i < count; i++)
+	{
+		result = FALSE;
+		for (j = 0; j < 2; j++)
+		{
+			CloneChildAurineJDPowerContainer[j] = NULL;
+		}
+		CloneChildAurineJDPowerText = NULL;
+		CloneChildAurineJDPowerSprite = NULL;
+		CloneChildAurineJDPowerButton = NULL;
+		CloneAurineJDPowerBackground = NULL;
+
+		// 计算当前clone位置
+		xpos = BUTTON_ICON_W * xindex;
+		ypos = BUTTON_ICON_H * yindex;
+
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AurineJDPowerBackground", i);
+		result = ituWidgetClone(AurineJDPowerBackground, &CloneAurineJDPowerBackground);
+		if (result)
+		{
+			ituWidgetSetName(CloneAurineJDPowerBackground, tmp);
+			ituWidgetSetX(CloneAurineJDPowerBackground, xpos);
+			ituWidgetSetY(CloneAurineJDPowerBackground, ypos);
+
+			for (j = 0; j < 2; j++)
+			{
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildAurineJDPowerContainer[j] = itcTreeGetChildAt(CloneAurineJDPowerBackground, j);
+				sprintf(tmp, "%s%d%d", "AurineJDPowerContainer", i, j);
+				ituWidgetSetName(CloneChildAurineJDPowerContainer[j], tmp);
+			}
+
+			// Clone Button
+			memset(tmp, 0, sizeof(tmp));
+			CloneChildAurineJDPowerButton = itcTreeGetChildAt(CloneChildAurineJDPowerContainer[1], 0);
+			sprintf(tmp, "%s%d%d", "AurineJDPowerButton", i, 1);
+			ituWidgetSetName(CloneChildAurineJDPowerButton, tmp);
+
+			// clone Text
+			memset(tmp, 0, sizeof(tmp));
+			CloneChildAurineJDPowerText = itcTreeGetChildAt(CloneChildAurineJDPowerContainer[1], 1);
+			sprintf(tmp, "%s%d%d", "AurineJDPowerText", i, 1);
+			ituWidgetSetName(CloneChildAurineJDPowerText, tmp);
+			ituTextSetString(CloneChildAurineJDPowerText, "");
+
+			// clone Sprite
+			memset(tmp, 0, sizeof(tmp));
+			CloneChildAurineJDPowerSprite = itcTreeGetChildAt(CloneChildAurineJDPowerContainer[1], 2);
+			sprintf(tmp, "%s%d%d", "AurineJDPowerSprite", i, 1);
+			ituWidgetSetName(CloneChildAurineJDPowerSprite, tmp);
+
+			if ((i + 1) <= JD_PAGE_NUM)
+			{
+				pagenum = 1;
+			}
+			else
+			{
+				pagenum = (i + 1) / JD_PAGE_NUM;
+				rest = (i + 1) % JD_PAGE_NUM;
+				if (rest > 0)
+				{
+					pagenum++;
+				}
+			}
+			g_ClonePowerFlag[i] = 1;
+			ituWidgetAdd(AurineJDLightBackgroundPage[pagenum - 1], CloneAurineJDPowerBackground);
+		}
+		ituCoverFlowUpdate((ITUWidget*)AurineJDLightCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+		
+		if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
+		{
+			ituWidgetSetVisible(CloneChildAurineJDPowerContainer[0], false);
+			ituWidgetSetVisible(CloneChildAurineJDPowerContainer[1], true);
+			// 显示灯状态
+			if (JD_STATE_OPEN == GetDevState(JD_DEV_POWER, i))
+			{
+				ituSpriteGoto(CloneChildAurineJDPowerSprite, AurineJDDevOpenIcon);
+			}
+			else
+			{
+				ituSpriteGoto(CloneChildAurineJDPowerSprite, AurineJDDevCloseIcon);
+			}
+
+			g_AurineJDPowerButton[i] = CloneChildAurineJDPowerButton;
+			g_AurineJDPowerSprite[i] = CloneChildAurineJDPowerSprite;
+	
+			// 设备名称和位置
+			memset(tmp, 0, sizeof(tmp));
+			GetDevText(i, tmp);
+			ituTextSetString(CloneChildAurineJDPowerText, tmp);
+		}
+		else
+		{
+			ituWidgetSetVisible(CloneChildAurineJDPowerContainer[0], true);
+			ituWidgetSetVisible(CloneChildAurineJDPowerContainer[1], false);
+		}
+
+		if (xindex > 2)
+		{
+			xindex = 0;
+			yindex = !yindex;
+		}
+		else
+		{
+			xindex++;
+		}
+	}
+	SetSampleVisible(JD_DEV_POWER, false);
+}
+
+/*************************************************
+Function:		DrawGas
+Description: 	煤气界面
+Input:			无
+Output:			无
+Return:			无
+Others:			无
+*************************************************/
+static void DrawGas(uint8 num)
 {
 	char tmp[100];
 	uint8 rest = 0;
 	uint32 xpos, ypos;
 	uint8 maxpage = 0;
 	uint8 i, j, result, count, xindex, yindex, pagenum;
-	ITUText* CloneChildAurineJDDevText;
-	ITUSprite* CloneChildAurineJDDevSprite;
-	ITUButton* CloneChildAurineJDDevButton;
-	ITUContainer* CloneChildAurineJDDevContainer[2];
-	ITUBackground* CloneAurineJDDevBackground;
-	ITUBackground* TempAurineJDDevBackground = NULL;
+	ITUText* CloneChildAurineJDGasText;
+	ITUSprite* CloneChildAurineJDGasSprite;
+	ITUButton* CloneChildAurineJDGasButton;
+	ITUContainer* CloneChildAurineJDGasContainer[2];
+	ITUBackground* CloneAurineJDGasBackground;
+	ITUBackground* OldAurineJDGasBackground;
 
-	if (devtype == JD_DEV_POWER)
+	// 删除已经Clone的控件
+	for (i = 0; i < JD_PAGE_NUM; i++)
 	{
-		maxpage = JD_POWER_PAGE_NUM;
-		TempAurineJDDevBackground = AurineJDPowerBackground;
-		for (i = 0; i < MAX_JD_POWER; i++)
+		if (1 == g_CloneGasFlag[i])
 		{
-			g_AurineJDPowerButton[i] = NULL;
-			g_AurineJDPowerSprite[i] = NULL;
+			g_CloneGasFlag[i] = 0;
+			OldAurineJDGasBackground = NULL;
+			memset(tmp, 0, sizeof(tmp));
+			sprintf(tmp, "%s%d", "AurineJDGasBackground", i);
+			OldAurineJDGasBackground = (ITUContainer*)ituSceneFindWidget(&theScene, tmp);
+			itcTreeRemove(OldAurineJDGasBackground);						// 删除已有的
+			ituWidgetExit(OldAurineJDGasBackground);
+			//dprintf("Delete Clone AurineJDGasBackground!!!\n");
 		}
-		SetSampleVisible(JD_DEV_POWER, true);
 	}
-	else
+	
+	// 煤气指针初始化
+	for (i = 0; i < MAX_JD_GAS; i++)
 	{
-		maxpage = 1;
-		TempAurineJDDevBackground = AurineJDGasBackground;
-		for (i = 0; i < MAX_JD_GAS; i++)
-		{
-			g_AurineJDGasButton[i] = NULL;
-			g_AurineJDGasSprite[i] = NULL;
-		}
-		SetSampleVisible(JD_DEV_GAS, true);
-	}
-
-	for (i = maxpage; i < JD_LIGHT_PAGE_NUM; i++)
-	{
-		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], false);
+		g_AurineJDGasButton[i] = NULL;
+		g_AurineJDGasSprite[i] = NULL;
 	}
 
 	// 灯光页面初始化
-	for (i = 0; i < maxpage; i++)
+	for (i = 0; i < JD_GAS_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], true);
 	}
@@ -1518,12 +1873,16 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 			pagenum++;
 		}
 	}
+	// 画页标
+	DrawPageIndex(pagenum);
 
 	// 隐藏多余设备页
-	for (i = pagenum; i < maxpage; i++)
+	for (i = pagenum; i < JD_LIGHT_PAGE_NUM; i++)
 	{
 		ituWidgetSetVisible(AurineJDLightBackgroundPage[i], false);
 	}
+	ituCoverFlowGoto(AurineJDLightCoverFlow, 0);
+	SetSampleVisible(JD_DEV_GAS, true);
 
 	xindex = 0;
 	yindex = 0;
@@ -1534,98 +1893,53 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 		result = FALSE;
 		for (j = 0; j < 2; j++)
 		{
-			CloneChildAurineJDDevContainer[j] = NULL;
+			CloneChildAurineJDGasContainer[j] = NULL;
 		}
-		CloneChildAurineJDDevText = NULL;
-		CloneChildAurineJDDevSprite = NULL;
-		CloneChildAurineJDDevButton = NULL;
-		CloneAurineJDDevBackground = NULL;
+		CloneChildAurineJDGasText = NULL;
+		CloneChildAurineJDGasSprite = NULL;
+		CloneChildAurineJDGasButton = NULL;
+		CloneAurineJDGasBackground = NULL;
 
 		// 计算当前clone位置
 		xpos = BUTTON_ICON_W * xindex;
 		ypos = BUTTON_ICON_H * yindex;
 
-		result = ituWidgetClone(TempAurineJDDevBackground, &CloneAurineJDDevBackground);
+		memset(tmp, 0, sizeof(tmp));
+		sprintf(tmp, "%s%d", "AurineJDGasBackground", i);
+		result = ituWidgetClone(AurineJDGasBackground, &CloneAurineJDGasBackground);
 		if (result)
 		{
-			ituWidgetSetX(CloneAurineJDDevBackground, xpos);
-			ituWidgetSetY(CloneAurineJDDevBackground, ypos);
+			ituWidgetSetName(CloneAurineJDGasBackground, tmp);
+			ituWidgetSetX(CloneAurineJDGasBackground, xpos);
+			ituWidgetSetY(CloneAurineJDGasBackground, ypos);
 
 			for (j = 0; j < 2; j++)
 			{
-				CloneChildAurineJDDevContainer[j] = itcTreeGetChildAt(CloneAurineJDDevBackground, j);
+				memset(tmp, 0, sizeof(tmp));
+				CloneChildAurineJDGasContainer[j] = itcTreeGetChildAt(CloneAurineJDGasBackground, j);
+				sprintf(tmp, "%s%d%d", "AurineJDGasContainer", i, j);
+				ituWidgetSetName(CloneChildAurineJDGasContainer[j], tmp);
 			}
 
 			// Clone Button
-			CloneChildAurineJDDevButton = itcTreeGetChildAt(CloneChildAurineJDDevContainer[1], 0);
+			memset(tmp, 0, sizeof(tmp));
+			CloneChildAurineJDGasButton = itcTreeGetChildAt(CloneChildAurineJDGasContainer[1], 0);
+			sprintf(tmp, "%s%d%d", "AurineJDGasButton", i, 1);
+			ituWidgetSetName(CloneChildAurineJDGasButton, tmp);
 
 			// clone Text
-			CloneChildAurineJDDevText = itcTreeGetChildAt(CloneChildAurineJDDevContainer[1], 1);
-			ituTextSetString(CloneChildAurineJDDevText, "");
+			memset(tmp, 0, sizeof(tmp));
+			CloneChildAurineJDGasText = itcTreeGetChildAt(CloneChildAurineJDGasContainer[1], 1);
+			sprintf(tmp, "%s%d%d", "AurineJDGasText", i, 1);
+			ituWidgetSetName(CloneChildAurineJDGasText, tmp);
+			ituTextSetString(CloneChildAurineJDGasText, "");
 
 			// clone Sprite
-			CloneChildAurineJDDevSprite = itcTreeGetChildAt(CloneChildAurineJDDevContainer[1], 2);
+			memset(tmp, 0, sizeof(tmp));
+			CloneChildAurineJDGasSprite = itcTreeGetChildAt(CloneChildAurineJDGasContainer[1], 2);
+			sprintf(tmp, "%s%d%d", "AurineJDGasSprite", i, 1);
+			ituWidgetSetName(CloneChildAurineJDGasSprite, tmp);
 
-			if (devtype == JD_DEV_GAS)
-			{
-				ituWidgetSetVisible(CloneChildAurineJDDevContainer[0], true);
-				ituWidgetSetVisible(CloneChildAurineJDDevContainer[1], false);
-				if (i < MAX_JD_GAS)
-				{
-					if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
-					{
-						ituWidgetSetVisible(CloneChildAurineJDDevContainer[0], false);
-						ituWidgetSetVisible(CloneChildAurineJDDevContainer[1], true);
-						// 显示灯状态
-						if (JD_STATE_OPEN == GetDevState(devtype, i))
-						{
-							ituSpriteGoto(CloneChildAurineJDDevSprite, AurineJDDevOpenIcon);
-						}
-						else
-						{
-							ituSpriteGoto(CloneChildAurineJDDevSprite, AurineJDDevCloseIcon);
-						}
-
-						g_AurineJDGasButton[i] = CloneChildAurineJDDevButton;
-						g_AurineJDGasSprite[i] = CloneChildAurineJDDevSprite;
-
-						// 设备名称和位置
-						memset(tmp, 0, sizeof(tmp));
-						GetDevText(i, tmp);
-						ituTextSetString(CloneChildAurineJDDevText, tmp);
-					}
-				}
-			}
-			else
-			{
-				if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
-				{
-					ituWidgetSetVisible(CloneChildAurineJDDevContainer[0], false);
-					ituWidgetSetVisible(CloneChildAurineJDDevContainer[1], true);
-					// 显示灯状态
-					if (JD_STATE_OPEN == GetDevState(devtype, i))
-					{
-						ituSpriteGoto(CloneChildAurineJDDevSprite, AurineJDDevOpenIcon);
-					}
-					else
-					{
-						ituSpriteGoto(CloneChildAurineJDDevSprite, AurineJDDevCloseIcon);
-					}
-
-					g_AurineJDPowerButton[i] = CloneChildAurineJDDevButton;
-					g_AurineJDPowerSprite[i] = CloneChildAurineJDDevSprite;
-	
-					// 设备名称和位置
-					memset(tmp, 0, sizeof(tmp));
-					GetDevText(i, tmp);
-					ituTextSetString(CloneChildAurineJDDevText, tmp);
-				}
-				else
-				{
-					ituWidgetSetVisible(CloneChildAurineJDDevContainer[0], true);
-					ituWidgetSetVisible(CloneChildAurineJDDevContainer[1], false);
-				}
-			}
 			if ((i + 1) <= JD_PAGE_NUM)
 			{
 				pagenum = 1;
@@ -1639,9 +1953,39 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 					pagenum++;
 				}
 			}
-			ituWidgetAdd(AurineJDLightBackgroundPage[pagenum - 1], CloneAurineJDDevBackground);
+			g_CloneGasFlag[i] = 1;
+			ituWidgetAdd(AurineJDLightBackgroundPage[pagenum - 1], CloneAurineJDGasBackground);
 		}
-		ituWidgetUpdate(AurineJDLightBackgroundPage[pagenum - 1], ITU_EVENT_LAYOUT, 0, 0, 0);
+		ituCoverFlowUpdate((ITUWidget*)AurineJDLightCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
+
+		ituWidgetSetVisible(CloneChildAurineJDGasContainer[0], true);
+		ituWidgetSetVisible(CloneChildAurineJDGasContainer[1], false);
+		if (i < MAX_JD_GAS)
+		{
+			if (g_DevList && g_DevList->pjd_dev_info[i].IsUsed)
+			{
+				ituWidgetSetVisible(CloneChildAurineJDGasContainer[0], false);
+				ituWidgetSetVisible(CloneChildAurineJDGasContainer[1], true);
+				// 显示灯状态
+				if (JD_STATE_OPEN == GetDevState(JD_DEV_GAS, i))
+				{
+					ituSpriteGoto(CloneChildAurineJDGasSprite, AurineJDDevOpenIcon);
+				}
+				else
+				{
+					ituSpriteGoto(CloneChildAurineJDGasSprite, AurineJDDevCloseIcon);
+				}
+
+				g_AurineJDGasButton[i] = CloneChildAurineJDGasButton;
+				g_AurineJDGasSprite[i] = CloneChildAurineJDGasSprite;
+
+				// 设备名称和位置
+				memset(tmp, 0, sizeof(tmp));
+				GetDevText(i, tmp);
+				ituTextSetString(CloneChildAurineJDGasText, tmp);
+			}
+		}
+
 		if (xindex > 2)
 		{
 			xindex = 0;
@@ -1652,14 +1996,7 @@ static void DrawPowerORGas(AU_JD_DEV_TYPE devtype, uint8 num)
 			xindex++;
 		}
 	}
-	if (devtype == JD_DEV_POWER)
-	{
-		SetSampleVisible(JD_DEV_POWER, false);
-	}
-	else
-	{
-		SetSampleVisible(JD_DEV_GAS, false);
-	}
+	SetSampleVisible(JD_DEV_GAS, false);
 }
 
 /*************************************************
@@ -1763,8 +2100,11 @@ static void ShowDevType(AU_JD_DEV_TYPE dev)
 				break;
 
 			case JD_DEV_POWER:
+				DrawPower(g_DevList->nCount);
+				break;
+
 			case JD_DEV_GAS:
-				DrawPowerORGas(dev, g_DevList->nCount);
+				DrawGas(g_DevList->nCount);
 				break;
 
 			default:
@@ -1808,6 +2148,65 @@ bool AurineJDLayerOnTimer(ITUWidget* widget, char* param)
 }
 
 /*************************************************
+Function:		AurineJDCoverFlowOnChange
+Description: 	设备翻页时，画当前焦点页标
+Input:			无
+Output:			无
+Return:			TRUE 是 FALSE 否
+Others:			无
+*************************************************/
+bool AurineJDCoverFlowOnChange(ITUWidget* widget, char* param)
+{
+	uint8 index = 0;
+	dprintf("g_PageCount..............:%d\n", g_PageCount);
+
+	if (g_PageCount <= 1)
+	{
+		dprintf("g_PageCount num is 1!!!\n");
+		return false;
+	}
+
+	switch (g_DevType)
+	{
+		case JD_SCENE_TYPE:
+			index = AurineJDSceneCoverFlow->focusIndex;
+			ituSpriteGoto(g_AurineJDPageIndexSprite[g_PageIndex], AurineJDPageIndexUnSelectIcon);
+			ituSpriteGoto(g_AurineJDPageIndexSprite[index], AurineJDPageIndexSelectIcon);
+			g_PageIndex = index;
+			break;
+
+		case JD_DEV_LIGHT:
+		case JD_DEV_POWER:
+		case JD_DEV_GAS:
+			index = AurineJDLightCoverFlow->focusIndex;
+			ituSpriteGoto(g_AurineJDPageIndexSprite[g_PageIndex], AurineJDPageIndexUnSelectIcon);
+			ituSpriteGoto(g_AurineJDPageIndexSprite[index], AurineJDPageIndexSelectIcon);
+			g_PageIndex = index;
+			break;
+
+		case JD_DEV_KONGTIAO:
+			index = AurineJDAirCoverFlow->focusIndex;
+			dprintf("index............:%d\n", index);
+			ituSpriteGoto(g_AurineJDPageIndexSprite[g_PageIndex], AurineJDPageIndexUnSelectIcon);
+			ituSpriteGoto(g_AurineJDPageIndexSprite[index], AurineJDPageIndexSelectIcon);
+			g_PageIndex = index;
+			break;
+
+		case JD_DEV_WINDOW:
+			index = AurineJDCurtainCoverFlow->focusIndex;
+			ituSpriteGoto(g_AurineJDPageIndexSprite[g_PageIndex], AurineJDPageIndexUnSelectIcon);
+			ituSpriteGoto(g_AurineJDPageIndexSprite[index], AurineJDPageIndexSelectIcon);
+			g_PageIndex = index;
+			break;
+
+		default:
+			break;
+	}
+
+	return true;
+}
+
+/*************************************************
 Function:		AurineJDState
 Description: 	监视回调执行函数
 Input:			无
@@ -1817,7 +2216,6 @@ Others:			无
 *************************************************/
 bool AurineJDState(ITUWidget* widget, char* param)
 {
-
 	return true;
 }
 
@@ -2050,7 +2448,6 @@ static void AurineJDControlAir(uint8 index, uint8 btn)
 		case 1:
 			{
 				SetDevState(JD_DEV_KONGTIAO, index, JD_STATE_OPEN);
-				dprintf("mode.......:%d  value: %d\n", mode, value);
 				if (0 == mode)
 				{
 					// 最初制冷、制暖模式
@@ -2132,7 +2529,7 @@ static void AurineJDControlAir(uint8 index, uint8 btn)
 
 						ituWidgetSetVisible(g_AurineJDAirNumContainer[index], false);
 						ituWidgetSetVisible(g_AurineJDAirShowModeText[index], true);
-						ituTextSetString(g_AurineJDAirShowModeText, get_str(textid[mode - 3]));
+						ituTextSetString(g_AurineJDAirShowModeText[index], get_str(textid[mode - 3]));
 						jd_aurine_send_ir_to_dev(g_DevList->pjd_dev_info[index].Index, g_DevList->pjd_dev_info[index].Address, mode - 2 + 21);
 					}
 				}
@@ -2530,29 +2927,51 @@ bool AurineJDLayerButtonOnMouseUp(ITUWidget* widget, char* param)
 			break;
 
 		case AurineJDSceneEvent:
-			ShowPageType(JD_SCENE_TYPE);
-			ShowSceneType();
+			if (JD_SCENE_TYPE != g_DevType)
+			{
+				ShowPageType(JD_SCENE_TYPE);
+				ShowSceneType();
+			}
 			break;
 
 		case AurineJDLightEvent:
-			ShowPageType(JD_DEV_LIGHT);
-			ShowDevType(JD_DEV_LIGHT);
+			if (JD_DEV_LIGHT != g_DevType)
+			{
+				ShowPageType(JD_DEV_LIGHT);
+				ShowDevType(JD_DEV_LIGHT);
+			}
 			break;
 
 		case AurineJDAirEvent:
-			ShowPageType(JD_DEV_KONGTIAO);
-			ShowDevType(JD_DEV_KONGTIAO);
+			if (JD_DEV_KONGTIAO != g_DevType)
+			{
+				ShowPageType(JD_DEV_KONGTIAO);
+				ShowDevType(JD_DEV_KONGTIAO);
+			}
 			break;
 
 		case AurineJDCurtainEvent:
-			ShowPageType(JD_DEV_WINDOW);
-			ShowDevType(JD_DEV_WINDOW);
+			if (JD_DEV_WINDOW != g_DevType)
+			{
+				ShowPageType(JD_DEV_WINDOW);
+				ShowDevType(JD_DEV_WINDOW);
+			}
 			break;
 
 		case AurineJDPowerEvent:
+			if (JD_DEV_POWER != g_DevType)
+			{
+				ShowPageType(JD_DEV_POWER);
+				ShowDevType(JD_DEV_POWER);
+			}
+			break;
+
 		case AurineJDGasEvent:
-			ShowPageType(btn_event - 3);
-			ShowDevType(btn_event - 3);
+			if (JD_DEV_GAS != g_DevType)
+			{
+				ShowPageType(JD_DEV_GAS);
+				ShowDevType(JD_DEV_GAS);
+			}
 			break;
 
 		default:
@@ -2660,6 +3079,12 @@ static void InitAurineJDLayer(void)
 
 		AurineJDGasBackground = ituSceneFindWidget(&theScene, "AurineJDGasBackground");
 		assert(AurineJDGasBackground);
+
+		AurineJDPageIndexSprite = ituSceneFindWidget(&theScene, "AurineJDPageIndexSprite");
+		assert(AurineJDPageIndexSprite);
+
+		AurineJDBackground = ituSceneFindWidget(&theScene, "AurineJDBackground");
+		assert(AurineJDBackground);
 
 		for (i = 0; i < 3; i++)
 		{

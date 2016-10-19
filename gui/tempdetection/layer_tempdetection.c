@@ -15,12 +15,14 @@ Modification:
 
 #include "layer_tempdetection.h"
 
-static ITUBackground*		tempDetectionTempBackground = NULL;
+static ITUBackground*	tempDetectionTempBackground = NULL;
+static ITUText*			tempDetectionDateText = NULL;
 
 
 bool tempDetectionDateMeterOnChanged(ITUWidget* widget, char* param)
 {
 	uint16_t tmpPosX = atoi(param);
+	char tmpStr[50] = { 0 };
 
 	printf("22222222222222222222  = %d \n", atoi(param));
 
@@ -29,9 +31,18 @@ bool tempDetectionDateMeterOnChanged(ITUWidget* widget, char* param)
 		tempDetectionTempBackground = ituSceneFindWidget(&theScene, "tempDetectionTempBackground");
 		assert(tempDetectionTempBackground);
 	}
+	if (!tempDetectionDateText)
+	{
+		tempDetectionDateText = ituSceneFindWidget(&theScene, "tempDetectionDateText");
+		assert(tempDetectionDateText);
+	}
 
 	ituWidgetSetX(tempDetectionTempBackground, -(tmpPosX * 9));
 
+	memset(tmpStr, 0, sizeof(tmpStr));
+	sprintf(tmpStr, "%s%d", "2016-10-2", tmpPosX / 70);
+
+	ituTextSetString(tempDetectionDateText, tmpStr);
 
 	return true;
 }

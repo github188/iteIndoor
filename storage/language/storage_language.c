@@ -666,6 +666,9 @@ const char * get_str(STRID_E id)
 	case SID_Inter_SearchFailed:
 		return ESID_Inter_SearchFailed;
 
+	case SID_Dev_Busy:
+		return ESID_Dev_Busy;
+
 // 家電文字
 	case SID_Jd_Set:
 		return ESID_Jd_Set;

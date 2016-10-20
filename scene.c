@@ -1298,7 +1298,7 @@ int SceneRun(void)
             {
                 printf("ANDROID press: %d %d\n", lastx, lasty);
 				result = ituSceneUpdate(&theScene, ITU_EVENT_MOUSEDOWN, 1, lastx, lasty);
-				mouseDownTick = 0;
+				//mouseDownTick = 0;
             }
 			#endif
 			

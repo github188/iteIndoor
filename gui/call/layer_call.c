@@ -774,6 +774,8 @@ static void CalloutEventStart(void)
 		}
 		else
 		{
+			g_HintStrID = SID_Dev_Busy;
+			ituTextSetString(CallKeyBordHitText, get_str(g_HintStrID));
 			dprintf("media is not null\n");
 		}
 	}
@@ -868,7 +870,7 @@ bool CallLayerOnTimer(ITUWidget* widget, char* param)
 		{
 			g_CallLastTick = tick;
 			// 输入号码错误、查无此号 两个提示显示2s后显示输入号码提示或输入号码
-			if (g_HintStrID == SID_Inter_WrongNo || g_HintStrID == SID_Inter_NoNotFound)
+			if (g_HintStrID == SID_Inter_WrongNo || g_HintStrID == SID_Inter_NoNotFound || g_HintStrID == SID_Dev_Busy)
 			{
 				if (g_ticks == 2)
 				{

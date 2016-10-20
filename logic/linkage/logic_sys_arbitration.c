@@ -78,7 +78,8 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 		case SYS_MEDIA_INTERCOM:
 			{
 				// 停止对讲
-				inter_hand_down();
+				//inter_hand_down();
+				arbi_inter_hand_down();
 				// mody by chenbh 解决对讲转报警声音出不来问题
 				usleep(500*1000);
 			}
@@ -95,9 +96,10 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 			else
 			{
 				dprintf("SYS_MEDIA_MONITOR monitor\n");
-				monitor_stop();
+				//monitor_stop();
+				arbi_monitor_stop();	// modi by chenbh 2016-10-19
 				// 监视转呼叫 延迟等待监视线程退出
-				usleep(2000*1000);
+				usleep(200*1000);
 			}
 			break;
 			

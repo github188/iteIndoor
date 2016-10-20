@@ -158,6 +158,16 @@ int32 inter_answer_call(int32 * VideoSendrecv);
 void inter_hand_down(void);
 
 /*************************************************
+  Function:			inter_hand_down
+  Description:		挂断
+  Input: 			无
+  Output:			无
+  Return:			成功与否 TRUE/FALSE
+  Others:
+*************************************************/
+void arbi_inter_hand_down(void);
+
+/*************************************************
   Function:			phone_hand_down
   Description:		门口挂断室内
   Input: 			无

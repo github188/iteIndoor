@@ -99,7 +99,7 @@ int32 ui_show_win_arbitration(SYS_ASYN_OPER_TYPE OperType)
 		{
 			return TRUE;
 		}
-		//sys_stop_cur_media();
+		sys_stop_cur_media();
 		return TRUE;
 	}
 	else

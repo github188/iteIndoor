@@ -538,6 +538,8 @@ static void * callout_proc(void *arg)
 	int32 times = 0;
 	uint32 temp = 0;
 	int32 ret = FALSE;
+	g_CallInfo.IsStartAudio = FALSE;
+	g_CallInfo.IsStartVideo = FALSE;
 	
 	dprintf(" ********** callout_proc start ****************  \n");
 	if (CALL_STATE_REQUEST == g_CallInfo.state)
@@ -852,6 +854,7 @@ static void * callout_proc(void *arg)
 					
 		// 开启网络音频
 		media_start_net_audio(g_CallInfo.address);
+		g_CallInfo.IsStartAudio = TRUE;
 		media_disable_audio_send();
 		media_enable_audio_recv();
 		
@@ -971,7 +974,11 @@ static void * callout_proc(void *arg)
 		if (g_CallInfo.LocalVideoSendrecv != _NONE)
 		{
 			ret = media_start_net_video(g_CallInfo.address, _RECVONLY);
-			if (ret == FALSE)
+			if (ret == TRUE)
+			{
+				g_CallInfo.IsStartVideo = TRUE;
+			}
+			else if (ret == FALSE)
 			{
 				dprintf("callout proc : AS_INTER_TALK : start net video err\n");	
 			}	
@@ -1045,22 +1052,19 @@ static void * callout_proc(void *arg)
 		media_stop_sound();
 	}
 
-	if (g_PreCallOutState == CALL_STATE_RECORDHINT
-		|| g_PreCallOutState == CALL_STATE_RECORDING
-		|| g_PreCallOutState == CALL_STATE_TALK)
+	if (TRUE == g_CallInfo.IsStartAudio)
 	{
+		g_CallInfo.IsStartAudio = FALSE;
 		media_del_audio_send_addr(g_CallInfo.address, MEDIA_AUDIO_PORT);	
 		usleep(10*1000);
-		media_stop_net_audio();
+		media_stop_net_audio();		
 		usleep(100*1000);
 	}
 
-	if (CALL_STATE_TALK == g_PreCallOutState)
+	if (TRUE == g_CallInfo.IsStartVideo)
 	{
-		if (g_CallInfo.LocalVideoSendrecv != _NONE)
-		{
-			media_stop_net_video(_RECVONLY);
-		}
+		g_CallInfo.IsStartVideo = FALSE;
+		media_stop_net_video(_RECVONLY);		
 	}
 
 	// 取消对讲状态
@@ -1109,6 +1113,7 @@ static void * becall_proc(void *arg)
 
 	g_LylyFlg = FALSE;
 	g_BeCallInfo.IsStartAudio = FALSE;
+	g_BeCallInfo.IsStartVideo = FALSE;
 	HeartParam.ID = g_BeCallInfo.ID;
 	memcpy(data, (char *)&g_BeCallInfo.ID, 4);
 	strcpy(CallNo, g_BeCallInfo.CallNo1);
@@ -1126,6 +1131,7 @@ static void * becall_proc(void *arg)
 		{
 			dprintf("g_BeCallInfo.LocalVideoSendrecv : 0X%x\n", g_BeCallInfo.LocalVideoSendrecv);
 			media_start_net_video(g_BeCallInfo.address, g_BeCallInfo.LocalVideoSendrecv);	
+			g_BeCallInfo.IsStartVideo = TRUE;
 			usleep(500*1000);						// mody by chenbh 解决有时候视频出不来问题
 		}
 		
@@ -1265,6 +1271,7 @@ static void * becall_proc(void *arg)
 			{
 				media_add_audio_sendaddr(g_BeCallInfo.address, g_BeCallInfo.RemoteAudioPort);
 				media_enable_audio_send();
+				g_BeCallInfo.IsStartAudio = TRUE;
 			}
 			else
 				g_BeCallInfo.state = CALL_STATE_RECORDING;
@@ -1335,7 +1342,7 @@ static void * becall_proc(void *arg)
 		else
 		{		
 			media_enable_audio_recv();
-			
+			g_BeCallInfo.IsStartAudio = TRUE;
 			data[4] = CALL_STATE_RECORDING; 
 			set_nethead(g_CallDestNo, PRIRY_DEFAULT);
 			net_direct_send(CMD_CALL_ANSWER, data, 5, g_BeCallInfo.address, g_BeCallInfo.port);
@@ -1487,39 +1494,44 @@ static void * becall_proc(void *arg)
 		// 关闭振铃铃音
 		media_stop_sound();
 	}	
-				
-	if (g_PreBeCallState == CALL_STATE_RECORDHINT)
-	{
-		media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
-		usleep(10*1000);
-		meida_stop_net_hint();	
-	}
 
-	if (g_PreBeCallState == CALL_STATE_RECORDING)
+	if (TRUE == g_BeCallInfo.IsStartAudio)
 	{
-		if (g_ErrType == END_BY_USER_HANDDOW)
+		g_BeCallInfo.IsStartAudio = FALSE;
+		if (g_PreBeCallState == CALL_STATE_RECORDHINT)
 		{
-			// 取消录制
-			media_stop_net_leave_rec(FALSE);
+			media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
+			usleep(10*1000);
+			meida_stop_net_hint();	
 		}
-		else
+
+		if (g_PreBeCallState == CALL_STATE_RECORDING)
 		{
-			// 关闭并保存录制
-			g_LylyFlg = TRUE;
-			media_stop_net_leave_rec(TRUE);
+			if (g_ErrType == END_BY_USER_HANDDOW)
+			{
+				// 取消录制
+				media_stop_net_leave_rec(FALSE);
+			}
+			else
+			{
+				// 关闭并保存录制
+				g_LylyFlg = TRUE;
+				media_stop_net_leave_rec(TRUE);
+			}
 		}
-	}
 
-	if (g_PreBeCallState == CALL_STATE_TALK)
-	{
-		media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
-		usleep(10*1000);
-		media_stop_net_audio();	
+		if (g_PreBeCallState == CALL_STATE_TALK)
+		{
+			media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
+			usleep(10*1000);
+			media_stop_net_audio();	
+		}		
 	}
-
-	if (g_BeCallInfo.LocalVideoSendrecv != _NONE)
+	
+	if (TRUE == g_BeCallInfo.IsStartVideo)
 	{
-		media_stop_net_video(g_BeCallInfo.LocalVideoSendrecv);
+		g_BeCallInfo.IsStartVideo = FALSE;
+		media_stop_net_video(g_BeCallInfo.LocalVideoSendrecv);		
 	}
 
 	// 未接记录
@@ -3159,6 +3171,149 @@ void inter_hand_down(void)
 					net_direct_send(CMD_CALL_HANDDOWN, (char*)&g_BeCallInfo.ID, 4, g_BeCallInfo.address, g_BeCallInfo.port);
 				}
 			}
+			g_BeCallInfo.state = CALL_STATE_END;
+		}
+	}
+}
+
+/*************************************************
+  Function:			arbi_stop_call_media
+  Description:		关闭媒体
+  Input: 			无
+  Output:			无
+  Return:			成功与否 TRUE/FALSE
+  Others:
+*************************************************/
+static void arbi_stop_call_media(void)
+{	
+	dprintf("inter hand down : call state:%d, becall state:%d\n", g_CallInfo.state, g_BeCallInfo.state);
+	if (g_CallInfo.state != CALL_STATE_NONE)
+	{
+		if (g_CallInfo.mThread.running != 0)
+		{
+			if (TRUE == g_CallInfo.IsStartAudio)
+			{
+				media_del_audio_send_addr(g_CallInfo.address, MEDIA_AUDIO_PORT);	
+				usleep(10*1000);
+				media_stop_net_audio();
+				g_CallInfo.IsStartAudio = FALSE;
+				usleep(100*1000);
+			}
+
+			if (TRUE == g_CallInfo.IsStartVideo)
+			{
+				media_stop_net_video(_RECVONLY);
+				g_CallInfo.IsStartVideo = FALSE;
+			}
+		}
+	}
+	else if (g_BeCallInfo.state != CALL_STATE_NONE)
+	{
+		if (g_BeCallInfo.mThread.running != 0)
+		{
+			if (TRUE == g_BeCallInfo.IsStartAudio)
+			{
+				g_BeCallInfo.IsStartAudio = FALSE;
+				if (g_PreBeCallState == CALL_STATE_RECORDHINT)
+				{
+					media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
+					usleep(10*1000);
+					meida_stop_net_hint();	
+				}
+
+				if (g_PreBeCallState == CALL_STATE_RECORDING)
+				{
+					if (g_ErrType == END_BY_USER_HANDDOW)
+					{
+						// 取消录制
+						media_stop_net_leave_rec(FALSE);
+					}
+					else
+					{
+						// 关闭并保存录制
+						g_LylyFlg = TRUE;
+						media_stop_net_leave_rec(TRUE);
+					}
+				}
+
+				if (g_PreBeCallState == CALL_STATE_TALK)
+				{
+					media_del_audio_send_addr(g_BeCallInfo.address, MEDIA_AUDIO_PORT);
+					usleep(10*1000);
+					media_stop_net_audio();	
+				}		
+			}
+	
+			if (TRUE == g_BeCallInfo.IsStartVideo)
+			{
+				g_BeCallInfo.IsStartVideo = FALSE;
+				media_stop_net_video(g_BeCallInfo.LocalVideoSendrecv);		
+			}
+		}
+	}
+}
+
+/*************************************************
+  Function:			inter_hand_down
+  Description:		挂断
+  Input: 			无
+  Output:			无
+  Return:			成功与否 TRUE/FALSE
+  Others:
+*************************************************/
+void arbi_inter_hand_down(void)
+{	
+	dprintf("inter hand down : call state:%d, becall state:%d\n", g_CallInfo.state, g_BeCallInfo.state);
+	g_ErrType = END_BY_USER_HANDDOW;
+	if (g_CallInfo.state != CALL_STATE_NONE)
+	{
+		if (g_CallInfo.mThread.running != 0)
+		{
+			if (g_CallInfo.state == CALL_STATE_CALLING)
+			{
+				int32 i;
+				for (i = 0; i < g_CallListNum; i++)
+				{
+					net_direct_send(CMD_CALL_HANDDOWN, (char*)&g_CallInfo.ID, 4, g_CallList[i].address, g_CallList[i].port);
+				}
+			}
+			else if (g_CallInfo.state == CALL_STATE_REQUEST)
+			{
+				dprintf("inter hand down : call request state\n");
+			}
+			else
+			{
+				net_direct_send(CMD_CALL_HANDDOWN, (char*)&g_CallInfo.ID, 4, g_CallInfo.address, g_CallInfo.port);
+			}				
+			arbi_stop_call_media();
+			g_CallInfo.state = CALL_STATE_END;
+		}
+		else
+		{
+			dprintf("inter hand down : call thread handle is NULL\n");
+		}
+	}
+	else if (g_BeCallInfo.state != CALL_STATE_NONE)
+	{
+		if (g_BeCallInfo.mThread.running != 0)
+		{
+			#ifdef _DOOR_PHONE_
+			if (g_BeCallInfo.RemoteDeviceType == DEVICE_TYPE_DOOR_PHONE)
+			{
+				// 关闭操作在线程里面处理
+				g_BeCallInfo.state = CALL_STATE_END;
+			}
+			else
+			#endif
+			{
+				net_direct_send(CMD_CALL_HANDDOWN, (char*)&g_BeCallInfo.ID, 4, g_BeCallInfo.address, g_BeCallInfo.port);
+				if (g_BeCallInfo.state == CALL_STATE_CALLING)
+				{			
+					// 再发一次挂断，避免呼叫方收不到命令再次呼入
+					net_direct_send(CMD_CALL_HANDDOWN, (char*)&g_BeCallInfo.ID, 4, g_BeCallInfo.address, g_BeCallInfo.port);
+				}
+			}
+			arbi_stop_call_media();
 			g_BeCallInfo.state = CALL_STATE_END;
 		}
 	}

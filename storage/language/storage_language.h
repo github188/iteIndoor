@@ -209,7 +209,6 @@ extern "C" {
 #define ESID_Bj_Mode_Unused             (g_China ? (g_Big5 ? "报警模块未啟用" : "报警模块未启用") : "Alarm module inactivated!")
 #define ESID_Bj_Set_Err                 (g_China ? (g_Big5 ? "主機不在撤防狀態，不能設置!" : "主机不在撤防状态，不能设置!") : "Please disarm the system first!")
 
-
 // 对讲文字
 #define ESID_MainMonitor_Door			 (g_China ? (g_Big5 ? "監視門前" : "监视门前") : "Doorway")
 #define ESID_MainMonitor_Stair			 (g_China ? (g_Big5 ? "監視梯口" : "监视梯口") : "Sec.Entry")
@@ -247,6 +246,7 @@ extern "C" {
 #define ESID_Inter_busy                  (g_China ? (g_Big5 ? "對方忙" : "对方忙") : "The line is busy.")
 #define ESID_Inter_ConnFailed            (g_China ? (g_Big5 ? "連接失敗" : "连接失败") : "Connection failed")
 #define ESID_Inter_SearchFailed          (g_China ? (g_Big5 ? "未搜索到設備" : "未搜索到设备") : "Failed")
+#define ESID_Dev_Busy					 (g_China ? (g_Big5 ? "正在報警,無法呼叫" : "正在报警,无法呼叫") : "Device Busy")
 
 // 家电文字
 #define ESID_Jd_Set						 (g_China ? (g_Big5 ? "家電設置" : "家电设置") : "Home Appliances")

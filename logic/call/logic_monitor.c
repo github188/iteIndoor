@@ -1213,6 +1213,48 @@ int32 monitor_stop(void)
 	return TRUE;
 }
 
+/*************************************************
+  Function:			arbi_monitor_stop
+  Description:		结束监视或通话
+  Input: 	
+  Output:			无
+  Return:			成功与否, TRUE / FALSE
+  Others:			监视切其他状态 防止媒体没有完全关闭而导致状态错误
+*************************************************/
+int32 arbi_monitor_stop(void)
+{
+	if (g_MonitorInfo.state != MONITOR_END)
+	{
+		g_ErrType = MONITOR_OK;
+
+		if (g_MonitorInfo.DevType == DEVICE_TYPE_DOOR_PHONE)
+		{
+			g_MonitorInfo.state = MONITOR_END;
+		}
+		else
+		{
+			set_nethead(g_MoniDestDeviceNo, PRIRY_DEFAULT);
+			net_direct_send(CMD_STOP_MONITOR, NULL, 0, g_MonitorInfo.address, g_MonitorInfo.port);		
+		}
+
+		
+		if (g_Audio_Start == 1)
+		{
+			media_del_audio_send_addr(g_MonitorInfo.address, MEDIA_AUDIO_PORT);
+			usleep(10*1000);
+			media_stop_net_audio();		
+		}
+
+		// 关闭视频接口
+		if (g_Video_Start == 1)
+		{
+			g_Video_Start = 0;
+			media_stop_net_video(_RECVONLY);	
+		}
+		g_MonitorInfo.state = MONITOR_END;
+	}
+	return TRUE;
+}
 
 /*************************************************
   Function:			monitor_video_snap_callback

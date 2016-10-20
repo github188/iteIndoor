@@ -84,6 +84,16 @@ int32 test_monitor_start(void);
 int32 monitor_stop(void);
 
 /*************************************************
+  Function:			arbi_monitor_stop
+  Description:		结束监视或通话
+  Input: 	
+  Output:			无
+  Return:			成功与否, TRUE / FALSE
+  Others:			监视切其他状态 防止媒体没有完全关闭而导致状态错误
+*************************************************/
+int32 arbi_monitor_stop(void);
+
+/*************************************************
   Function:				monitor_ini
   Description:			监视初始化
   Input: 	

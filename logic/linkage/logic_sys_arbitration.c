@@ -73,15 +73,24 @@ static void set_curplay_state(SYS_MEDIA_TYPE MediaType, MediaPlayCallback Progre
 *************************************************/
 static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 {
+	int times;
 	switch (MediaType)
 	{		
 		case SYS_MEDIA_INTERCOM:
 			{
 				// 停止对讲
-				//inter_hand_down();
-				arbi_inter_hand_down();
+				inter_hand_down();
 				// mody by chenbh 解决对讲转报警声音出不来问题
-				usleep(500*1000);
+				times = 30;
+				while (times > 0)
+				{
+					if (call_get_media_ifover() == TRUE)
+					{
+						break;
+					}
+					usleep(100*1000);
+					times--;
+				}
 			}
 			break;
 			
@@ -96,10 +105,18 @@ static int32 arbi_stop_media(SYS_MEDIA_TYPE MediaType)
 			else
 			{
 				dprintf("SYS_MEDIA_MONITOR monitor\n");
-				//monitor_stop();
-				arbi_monitor_stop();	// modi by chenbh 2016-10-19
+				monitor_stop();
 				// 监视转呼叫 延迟等待监视线程退出
-				usleep(200*1000);
+				times = 30;
+				while (times > 0)
+				{
+					if (monitor_get_media_ifover() == TRUE)
+					{
+						break;
+					}
+					usleep(100*1000);
+					times--;
+				}				
 			}
 			break;
 			
@@ -189,9 +206,8 @@ static int32 arbi_play_alarm(void)
 			if (SYS_MEDIA_INTERCOM == MediaType ||
 				SYS_MEDIA_MONITOR == MediaType)
 			{
-				sleep(1);
+				usleep(500*1000);
 			}
-			//arbi_stop_media(g_CurMediaType);
 			break;
 		case SYS_MEDIA_NONE:
 			break;

@@ -250,9 +250,10 @@ bool MonitorSearchLayerOnTimer(ITUWidget* widget, char* param)
 			// 搜索列表
 			ShowMonitorWin();
 			ituWidgetSetVisible(MonitorSearchMSGHitGrayBackground, false);
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 /*************************************************

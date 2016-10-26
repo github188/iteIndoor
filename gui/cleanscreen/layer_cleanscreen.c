@@ -16,7 +16,6 @@ Modification:
 #include "layer_cleanscreen.h"
 
 //itu
-static ITULayer*	mainLayer = NULL;
 static ITUText*		cleanScreenTimeText = NULL;
 
 // status
@@ -53,6 +52,7 @@ bool cleanScreenLayerOnLeave(ITUWidget* widget, char* param)
 
 bool cleanScreenTimeoutOnTimer(ITUWidget* widget, char* param)
 {
+	bool ret = false;
 	if (gCleanScreenTimeoutCount > 0)
 	{
 		uint32_t duration;
@@ -78,24 +78,20 @@ bool cleanScreenTimeoutOnTimer(ITUWidget* widget, char* param)
 			{
 				sprintf(buf, "%d", (int)gCleanScreenTimeoutCount);
 				ituTextSetString(cleanScreenTimeText, buf);
+				ret = true;
 			}
 		}
 		if (gCleanScreenTimeoutCount <= 0)
 		{
-			if (!mainLayer)
-			{
-				mainLayer = ituSceneFindWidget(&theScene, "mainLayer");
-				assert(mainLayer);
-			}
-			ituLayerGoto(mainLayer);
+			mainLayerShow();
+			ret = true;
 		}
 	}
 
-	return true;
+	return ret;
 }
 
 void cleanScreenReset(void)
 {
-	mainLayer = NULL;
 	cleanScreenTimeText = NULL;
 }

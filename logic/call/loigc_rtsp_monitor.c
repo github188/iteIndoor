@@ -885,10 +885,13 @@ int32 rtsp_monitor_connect(void)
 		memset(serverIPstr,0,sizeof(serverIPstr));
 		sprintf(serverIPstr, "%s",UlongtoIP(ServerIP));
 
-		// modi by chenbh 2016-04-06 由于新塘libnemesi库解析问题 需要将':'改为'#'
-		//sprintf(serverportstr, "%c%d", ':', Serverprot);
-		sprintf(serverportstr, "%c%d", '#', Serverprot);				
-
+		#if 0
+		// modi by chenbh 2016-04-06 由于新塘libnemesi库解析问题 需要将':'改为'#'		
+		sprintf(serverportstr, "%c%d", '#', Serverprot);		
+		#else
+		sprintf(serverportstr, "%c%d", ':', Serverprot);
+		#endif
+		
 		dprintf("serverportstr : %s\n",serverportstr);
 		#if 1
 		dprintf("***********************************************\n");

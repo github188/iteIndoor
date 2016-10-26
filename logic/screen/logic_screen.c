@@ -57,6 +57,7 @@ void ScreenOff(void)
 
 		// add by chenbh back to mainlayer
 		mainLayerShow();
+		SceneRefresh();
 	}
 }
 
@@ -66,7 +67,7 @@ void ScreenOn(void)
 	{
 		hw_lcd_power_on();							// 开屏电源
 		sys_set_hint_state(SYS_HINT_OPERATING, TRUE);
-		g_ScreenState = LCD_STATE_OPEN;
+		g_ScreenState = LCD_STATE_OPEN;		
 		usleep(200*1000);
 		hw_lcd_back_on();							// 开屏背光
 		//hw_speak_on();							// 开喇叭

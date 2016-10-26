@@ -42,14 +42,6 @@ extern "C" {
 		HIT_SPRITE_TO_WARNNING	= 1,					// “！”
 		HIT_SPRITE_TO_OK		= 2,					// “√”
 	}HIT_ICON_TYPE;
-#if 0
-	//calendarflag:	显示一个按键还是两个按键
-	typedef enum
-	{
-		HIT_BUTTON_OK = 0,					// 确认				
-		HIT_BUTTON_OK_NO = 1,					// 确认，取消
-	}HIT_BUTTON_TYPE;
-#endif
 
 	//Set_Botton_Return_Layer
 	bool SetBottonReturnOnEnter(ITUWidget* widget, char* param);
@@ -353,6 +345,36 @@ extern "C" {
 	void MsgWaitHitLayerOnShow(char* old_layer);
 	void MsgWaitHitLayerOnHide();
 	bool MsgWaitHitLayerOnTimer(ITUWidget* widget, char* param);
+
+	// JiaDian_Yuyue_Layer
+	bool SetJdYuYueOnEnter(ITUWidget* widget, char* param);
+	bool SetJdYuYueAddButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueDelButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetDelJdYuYueListDataListButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetDelJdYuYueDelButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueListDataButtonOnMouseUp(ITUWidget* widget, char* param);
+	void SetJdYuYueLayerOnReturn(void);
+
+	// JiaDian_Yuyue_Param_Layer
+	bool SetJdYuYueParamOnEnter(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamYuyueTypeButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuyueTypeRadioBoxOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamDeviceButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuyueDeviceListButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamOperaButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamBrightnessButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamBrightnessProgressBarOnChanged(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamBrightnessTureButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeTypeButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeTypeListRadioBoxOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeDateButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeDateOKButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeTimeButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeTimeOKButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeWeekButtonOnMouseUp(ITUWidget* widget, char* param);
+	bool SetJdYuYueParamTimeWeekListButtonOnMouseUp(ITUWidget* widget, char* param);
+	void SetJdYuYueParamLayerOnShow(uint8 index);
+	void SetJdYuYueParamLayerOnReturn(void);
 
 
 #ifdef __cplusplus

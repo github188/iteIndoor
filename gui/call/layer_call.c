@@ -881,11 +881,12 @@ bool CallLayerOnTimer(ITUWidget* widget, char* param)
 					ituTextSetString(CallKeyBordHitText, get_str(g_MainStrID));
 				}
 				g_ticks++;
+				return true;
 			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 /*************************************************

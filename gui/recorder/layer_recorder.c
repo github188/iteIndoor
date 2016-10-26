@@ -200,11 +200,13 @@ bool recorderTimingOnTimer(ITUWidget* widget, char* param)
 					//TODO:超时停止录音，设置界面状态
 					recorderStopBtnOnClicked();
 				}
+
+				return true;
 			}
 		}	
 	}
 
-	return true;
+	return false;
 }
 
 

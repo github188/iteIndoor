@@ -724,8 +724,8 @@ Others:
 *************************************************/
 static void show_light_id(int index)
 {
-	uint32 text_start[SID_Jd_ZhuanshiDEng - SID_Jd_Deng + 2] = { SID_Jd_Deng1, SID_Jd_TiaoGuangDeng1, SID_Jd_BaiChiDeng1, SID_Jd_GuangGuan1, SID_Jd_DiaoDeng1, SID_Jd_HuaDeng1, SID_Jd_BiDeng1, SID_Jd_SheDeng1, \
-		SID_Jd_TaiDeng1, SID_Jd_LouDiDeng1, SID_Jd_ZhaoMingDeng1, SID_Jd_ShiYingDeng1, SID_Jd_ShiYingDeng1, SID_Jd_YeDeng1, SID_Jd_ZhuanshiDEng1 };
+	uint32 text_start[SID_Jd_ZhuanshiDEng - SID_Jd_Deng + 1] = { SID_Jd_Deng1, SID_Jd_TiaoGuangDeng1, SID_Jd_BaiChiDeng1, SID_Jd_GuangGuan1, SID_Jd_DiaoDeng1, SID_Jd_HuaDeng1, SID_Jd_BiDeng1, SID_Jd_SheDeng1, \
+		SID_Jd_TaiDeng1, SID_Jd_LouDiDeng1, SID_Jd_ZhaoMingDeng1, SID_Jd_ShiYingDeng1, SID_Jd_YeDeng1, SID_Jd_ZhuanshiDEng1 };
 
 	uint32 i = 0;
 	uint32 text_num = 10;
@@ -848,8 +848,8 @@ Others:
 *************************************************/
 static void JDDevLightIDPageBtn(int index)
 {
-	uint32 text_start[SID_Jd_ZhuanshiDEng - SID_Jd_Deng + 2] = { SID_Jd_Deng1, SID_Jd_TiaoGuangDeng1, SID_Jd_BaiChiDeng1, SID_Jd_GuangGuan1, SID_Jd_DiaoDeng1, SID_Jd_HuaDeng1, SID_Jd_BiDeng1, SID_Jd_SheDeng1, \
-		SID_Jd_TaiDeng1, SID_Jd_LouDiDeng1, SID_Jd_ZhaoMingDeng1, SID_Jd_ShiYingDeng1, SID_Jd_ShiYingDeng1, SID_Jd_YeDeng1, SID_Jd_ZhuanshiDEng1 };
+	uint32 text_start[SID_Jd_ZhuanshiDEng - SID_Jd_Deng + 1] = { SID_Jd_Deng1, SID_Jd_TiaoGuangDeng1, SID_Jd_BaiChiDeng1, SID_Jd_GuangGuan1, SID_Jd_DiaoDeng1, SID_Jd_HuaDeng1, SID_Jd_BiDeng1, SID_Jd_SheDeng1, \
+		SID_Jd_TaiDeng1, SID_Jd_LouDiDeng1, SID_Jd_ZhaoMingDeng1, SID_Jd_ShiYingDeng1, SID_Jd_YeDeng1, SID_Jd_ZhuanshiDEng1 };
 	
 	uint32 id = g_device_name_old[2] - SID_Jd_Deng;
 

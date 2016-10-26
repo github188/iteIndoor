@@ -425,6 +425,32 @@ ITUActionFunction actionFunctions[] =
 	// Msg_Wait_Hit_Layer
 	"MsgWaitHitLayerOnTimer", MsgWaitHitLayerOnTimer,
 
+	// JiaDian_Yuyue_Layer
+	"SetJdYuYueOnEnter", SetJdYuYueOnEnter,
+	"SetJdYuYueAddButtonOnMouseUp", SetJdYuYueAddButtonOnMouseUp,
+	"SetJdYuYueDelButtonOnMouseUp", SetJdYuYueDelButtonOnMouseUp,
+	"SetDelJdYuYueListDataListButtonOnMouseUp", SetDelJdYuYueListDataListButtonOnMouseUp,
+	"SetDelJdYuYueDelButtonOnMouseUp", SetDelJdYuYueDelButtonOnMouseUp,
+	"SetJdYuYueListDataButtonOnMouseUp", SetJdYuYueListDataButtonOnMouseUp,
+
+	// JiaDian_Yuyue_Param_Layer
+	"SetJdYuYueParamOnEnter", SetJdYuYueParamOnEnter,
+	"SetJdYuYueParamYuyueTypeButtonOnMouseUp", SetJdYuYueParamYuyueTypeButtonOnMouseUp,
+	"SetJdYuyueTypeRadioBoxOnMouseUp", SetJdYuyueTypeRadioBoxOnMouseUp,
+	"SetJdYuYueParamDeviceButtonOnMouseUp", SetJdYuYueParamDeviceButtonOnMouseUp,
+	"SetJdYuyueDeviceListButtonOnMouseUp", SetJdYuyueDeviceListButtonOnMouseUp,
+	"SetJdYuYueParamOperaButtonOnMouseUp", SetJdYuYueParamOperaButtonOnMouseUp,
+	"SetJdYuYueParamBrightnessButtonOnMouseUp", SetJdYuYueParamBrightnessButtonOnMouseUp,
+	"SetJdYuYueParamBrightnessProgressBarOnChanged",SetJdYuYueParamBrightnessProgressBarOnChanged,
+	"SetJdYuYueParamBrightnessTureButtonOnMouseUp", SetJdYuYueParamBrightnessTureButtonOnMouseUp,
+	"SetJdYuYueParamTimeTypeButtonOnMouseUp", SetJdYuYueParamTimeTypeButtonOnMouseUp,
+	"SetJdYuYueParamTimeTypeListRadioBoxOnMouseUp", SetJdYuYueParamTimeTypeListRadioBoxOnMouseUp,
+	"SetJdYuYueParamTimeDateButtonOnMouseUp", SetJdYuYueParamTimeDateButtonOnMouseUp,
+	"SetJdYuYueParamTimeDateOKButtonOnMouseUp", SetJdYuYueParamTimeDateOKButtonOnMouseUp,
+	"SetJdYuYueParamTimeTimeButtonOnMouseUp", SetJdYuYueParamTimeTimeButtonOnMouseUp,
+	"SetJdYuYueParamTimeTimeOKButtonOnMouseUp", SetJdYuYueParamTimeTimeOKButtonOnMouseUp,
+	"SetJdYuYueParamTimeWeekButtonOnMouseUp", SetJdYuYueParamTimeWeekButtonOnMouseUp,
+	"SetJdYuYueParamTimeWeekListButtonOnMouseUp", SetJdYuYueParamTimeWeekListButtonOnMouseUp,
 
     NULL, NULL
 };

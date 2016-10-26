@@ -22,7 +22,6 @@ static ITUText* SetNetDoorNetParamGateWay2Text = NULL;
 static ITUText* SetNetDoorNetParamMac2Text = NULL;
 static ITUText* SetNumKeyBordTextBox = NULL;
 static ITULayer* SetNetDoorLayer = NULL;
-static ITURadioBox* MsgFailHintSuccess0RadioBox = NULL;
 static ITURadioBox* MsgFailHintSuccess1RadioBox = NULL;
 
 static int g_devIndex = 1;		//	1：门前机1；   2：门前机2
@@ -238,9 +237,6 @@ bool SetNetDoorNetParamOnEnter(ITUWidget* widget, char* param)
 
 		SetNetDoorLayer = ituSceneFindWidget(&theScene, "SetNetDoorLayer");
 		assert(SetNetDoorLayer);
-
-		MsgFailHintSuccess0RadioBox = ituSceneFindWidget(&theScene, "MsgFailHintSuccess0RadioBox");
-		assert(MsgFailHintSuccess0RadioBox);
 
 		MsgFailHintSuccess1RadioBox = ituSceneFindWidget(&theScene, "MsgFailHintSuccess1RadioBox");
 		assert(MsgFailHintSuccess1RadioBox);

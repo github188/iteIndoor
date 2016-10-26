@@ -801,6 +801,10 @@ static void on_alarm_timer(void * arg)
 			alarm_deal(AS_ALARM_PROC, 0);
 		}
 	}
+	else
+	{
+		g_sos_time = 0;		
+	}
 
 	// 停止报警声处理
 	if (ALARM_SOUND_TYPE == g_sound_type)
@@ -1575,6 +1579,9 @@ void port_status_callback(uint8 PortLevel)
 				// 局防无效的防区，预警不处理
 				if ((PART_DEFEND == gpAfParam->defend_state) && (0 ==((gpAfParam->part_valid>>i)&0x01)))
 				{
+					//局防无效防区的闪烁处理add by wufn 2016.5.11
+					gpAfParam->show_state[i] = ALARM_SHOW_STATE;
+					g_Alarm_No24touch |= (1<<i);
 					touch &= ~(1<<i);
 					continue;
 				}
@@ -1623,6 +1630,21 @@ void port_status_callback(uint8 PortLevel)
 					if(0 == ((gpAfParam->is_24_hour>>i)&0x01))
 					{
 						if (0 == ((g_single_defend>>i) & 0x01))
+						{
+							gpAfParam->show_state[i] = NORM_SHOW_STATE;
+						}
+					}
+				}
+			}
+			
+			//局防无效防区的闪烁处理add by wufn 2016.5.11
+			if (PART_DEFEND == gpAfParam->defend_state)
+			{
+				if (1 == ((un_use>>i) & 0x01))
+				{
+					if(0 == ((gpAfParam->is_24_hour>>i)&0x01))
+					{
+						if(0 ==((gpAfParam->part_valid>>i)&0x01))
 						{
 							gpAfParam->show_state[i] = NORM_SHOW_STATE;
 						}
@@ -1702,7 +1724,7 @@ static void deal_alarm_func(uint8 num)
 
 	if (1 == ((gpAfParam->can_hear>>num) & 0x01))	// 可听
 	{
-		if((1 == g_can_hear>>num)& 0x01)
+		if(1 == ((g_can_hear>>num)& 0x01))
 		{
 			g_can_hear &= ~(1<<num);
 		}
@@ -1710,13 +1732,14 @@ static void deal_alarm_func(uint8 num)
 	}
 	else
 	{
-		if((0 == g_can_hear>>num)& 0x01)
+		if(0 == ((g_can_hear>>num)& 0x01))
 		{
 			g_can_hear |= (1<<num);//不可听
 		}
 		sound_arbistrator(ALARM_SOUND_TYPE, gpAfParam->alarm_time, num);
 	}
-	
+
+	sys_sync_hint_state_ext(SYS_HINT_ALARM_WARNING);
 	if (1 == ((gpAfParam->can_see>>num) & 0x01))	// 可见
 	{
 		alarm_gui_callback(BAOJING_SHOW, 0);
@@ -1724,7 +1747,7 @@ static void deal_alarm_func(uint8 num)
 	else
 	{
 		alarm_gui_callback(BAOJING_FRESH, 0);
-	}
+	}	
 }
 
 /*************************************************

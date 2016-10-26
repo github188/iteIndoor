@@ -863,6 +863,7 @@ int32 hw_get_zone_status(void)
 		return -1;
 	}
 
+	ioctl(ITP_DEVICE_IOCTRL, ITP_IOCTL_GET_ZONE_STATUS, NULL);
 	//sleep(1);
 	//ioctl(Fd, GET_ZONE_STATUS, 0);
 	

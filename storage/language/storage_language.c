@@ -305,6 +305,7 @@ const char * get_str(STRID_E id)
 	case SID_Set_Ring_Tips_Fail:
 		return ESID_Set_Ring_Tips_Fail;
 
+//设置提示框
 	case SID_Msg_Connect_Outtime:
 		return ESID_Msg_Connect_Outtime;
 
@@ -322,9 +323,6 @@ const char * get_str(STRID_E id)
 
 	case SID_Msg_Operat_Err:
 		return ESID_Msg_Operat_Err;
-
-	case SID_Net_Door_Card_Delet_All:
-		return ESID_Net_Door_Card_Delet_All;
 
 	case SID_Msg_Format:
 		return ESID_Msg_Format;
@@ -347,6 +345,66 @@ const char * get_str(STRID_E id)
 	case SID_Msg_JD_Mode_Unused:
 		return ESID_Msg_JD_Mode_Unused;
 
+	case SID_Msg_JD_Yuyue_UnDevice:
+		return ESID_Msg_JD_Yuyue_UnDevice;
+
+// 预约文字
+	case SID_Jd_Yuyue:
+		return ESID_Jd_Yuyue;
+
+	case SID_Jd_Yuyue_Del:
+		return ESID_Jd_Yuyue_Del;
+
+	case SID_Jd_Yuyue_EveryDay:
+		return ESID_Jd_Yuyue_EveryDay;
+
+	case SID_Jd_Yuyue_EveryWeek:
+		return ESID_Jd_Yuyue_EveryWeek;
+
+	case SID_Jd_Yuyue_EveryMonth:
+		return ESID_Jd_Yuyue_EveryMonth;
+
+	case SID_Jd_Yuyue_Day:
+		return ESID_Jd_Yuyue_Day;
+
+	case SID_Jd_Yuyue_Week_Sun:
+		return ESID_Jd_Yuyue_Week_Sun;
+
+	case SID_Jd_Yuyue_Week_Mon:
+		return ESID_Jd_Yuyue_Week_Mon;
+
+	case SID_Jd_Yuyue_Week_Tue:
+		return ESID_Jd_Yuyue_Week_Tue;
+
+	case SID_Jd_Yuyue_Week_Wed:
+		return ESID_Jd_Yuyue_Week_Wed;
+
+	case SID_Jd_Yuyue_Week_Thu:
+		return ESID_Jd_Yuyue_Week_Thu;
+
+	case SID_Jd_Yuyue_Week_Fri:
+		return ESID_Jd_Yuyue_Week_Fri;
+
+	case SID_Jd_Yuyue_Week_Sat:
+		return ESID_Jd_Yuyue_Week_Sat;
+
+	case SID_Jd_Yuyue_Action_Open:
+		return ESID_Jd_Yuyue_Action_Open;
+
+	case SID_Jd_Yuyue_Action_Close:
+		return ESID_Jd_Yuyue_Action_Close;
+
+	case SID_Jd_Yuyue_Dev_None:
+		return ESID_Jd_Yuyue_Dev_None;
+
+	case SID_Jd_Dev_Set_Attr:
+		return ESID_Jd_Dev_Set_Attr;
+
+	case SID_Jd_Dev_Set_Light:
+		return ESID_Jd_Dev_Set_Light;
+
+	case SID_Jd_Dev_Set_Temp:
+		return ESID_Jd_Dev_Set_Temp;
 
 // IP协议转换器
 	case SID_Set_Unbounded:
@@ -394,6 +452,9 @@ const char * get_str(STRID_E id)
 
 	case SID_Net_Door_Save_Reboot_Door:
 		return ESID_Net_Door_Save_Reboot_Door;
+
+	case SID_Net_Door_Card_Delet_All:
+		return ESID_Net_Door_Card_Delet_All;
 
 // 报警文字
 	case SID_Bj_Report_Type_Chufa:
@@ -1622,6 +1683,21 @@ const char * get_str(STRID_E id)
 
 	case SID_Jd_KongTiao_Close:
 		return ESID_Jd_KongTiao_Close;
+
+	case SID_Jd_Light_Control:
+		return ESID_Jd_Light_Control;
+
+	case SID_Jd_Kongtiao_Control:
+		return ESID_Jd_Kongtiao_Control;
+
+	case SID_Jd_Chuanlian_Control:
+		return ESID_Jd_Chuanlian_Control;
+
+	case SID_Jd_Dianyuan_Control:
+		return ESID_Jd_Dianyuan_Control;
+
+	case SID_Jd_Meiqi_Control:
+		return ESID_Jd_Meiqi_Control;
 
 //主界面文字
 	case SID_Main_Missed_Call:

@@ -117,6 +117,8 @@ bool mainLayerOnEnter(ITUWidget* widget, char* param)
 	setDeviceNo(tmpLan);
 #endif
 
+	printf("22222222222222222222222222222222222222222\n");
+
 	gSOSBtnIsPress = false;
 	gSOSIsAlarm = false;
 	gMainLayerLastTimeTick = SDL_GetTicks();		//开启定时器前要先获取一次当前时间以便对比

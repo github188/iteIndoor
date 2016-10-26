@@ -77,7 +77,7 @@
 #define _IP_MODULE_JD_								// IP模块家电
 //#define _IP_MODULE_RTSP_							// RTSP注册
 #endif
-#define _USE_FOR_SHOW_								// 展会临时版本
+//#define _USE_FOR_SHOW_								// 展会临时版本
 
 // 硬件加密码也就是厂商代码
 #define _ML_HWENCRYPT_			0X00004753			// 米立使用的硬件加密码

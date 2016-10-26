@@ -53,7 +53,9 @@ typedef enum
     CMD_GOTO_MAINMENU,
 	CMD_GOTO_BECALL,
     CMD_CHANGE_LANG,
-    CMD_PREDRAW
+    CMD_PREDRAW,
+    CMD_REFRESH,
+    CMD_SYNC_MAINMENU
 } CommandID;
 
 #define MAX_STRARG_LEN 50
@@ -119,6 +121,7 @@ int32 af_callback_gui(int32 Param1,int32 Param2)
 		return TRUE;
 
 	case BAOJING_FRESH:
+		
 		break;
 
 	case BAOJING_KEY:
@@ -542,6 +545,37 @@ void rtsp_state_callbak(uint32 param1, uint32 param2)
 void show_sys_event_hint(uint16 EventType)
 {
 	ScreenSaverRefresh();
+	SyncMainMenu();
+	if (AS_NEW_MSG == EventType)
+	{		
+		sys_start_play_audio(SYS_MEDIA_OPER_HINT, (char *)storage_get_msg_hit(), FALSE, MSG_HIT_VOL, NULL, NULL);
+		// do show msg 
+		
+	}
+	else if (AS_CALLIN == EventType)
+	{
+		SYS_MEDIA_TYPE CurState = sys_get_media_state();
+		if (CurState == SYS_MEDIA_ALARM)
+		{
+			// do show msg
+		}
+	}
+	else if (AS_ENTER_YUJING == EventType)
+	{
+		// do show msg
+		
+	}
+}
+
+void SyncMainMenu(void)
+{
+    Command cmd;
+
+    if (g_CommandQueue == -1)
+        return;
+
+    cmd.id     = CMD_SYNC_MAINMENU;
+    mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 }
 
 /*************************************************
@@ -659,6 +693,19 @@ static void ProcessCommand(void)
 	        	}
 	            break;
 
+			case CMD_REFRESH:
+				{
+					ituSceneDraw(&theScene, g_ScreenSurf);
+	            	ituFlip(g_ScreenSurf);
+				}
+				break;
+
+			case CMD_SYNC_MAINMENU:
+				{
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM0_STATE_UPDATE, NULL);
+				}
+				break;
+				
 			case CMD_CALLIN_CALLBAK:
 				{	
 					char buf[MAX_STRARG_LEN];
@@ -740,7 +787,10 @@ static void ProcessCommand(void)
 				break;
 
 			case CMD_ALARM_CALLBAK:
-				UpdataAlarmLayerOnShow(NULL, NULL);
+				{
+					ituSceneSendEvent(&theScene, EVENT_CUSTOM0_STATE_UPDATE, NULL);
+					UpdataAlarmLayerOnShow(NULL, NULL);					
+				}
 				break;
 
 			case CMD_GOTO_ALARM:
@@ -748,7 +798,6 @@ static void ProcessCommand(void)
 				{
 					return FALSE;
 				}
-				sys_sync_hint_state_ext(SYS_HINT_ALARM_WARNING);
 				AlarmLayerOnGoto(NULL, NULL);
 				break;
 				
@@ -801,6 +850,17 @@ void ScenePredraw(int arg)
         return;
 
     cmd.id     = CMD_PREDRAW;
+    mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
+}
+
+void SceneRefresh(void)
+{
+    Command cmd;
+
+    if (g_CommandQueue == -1)
+        return;
+
+    cmd.id     = CMD_REFRESH;
     mq_send(g_CommandQueue, (const char*)&cmd, sizeof (Command), 0);
 }
 
@@ -1310,7 +1370,7 @@ int SceneRun(void)
             }
             result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
 
-			//printf("%d\n", result);
+			//printf("aaaaaaaaaaaaaaaaaa %d\n", result);
         	#ifndef _WIN32
             if (result)
         	#endif
@@ -1332,15 +1392,6 @@ int SceneRun(void)
 				}
 			}
         }
-		else	// add by chenbh 
-		{
-			result |= ituSceneUpdate(&theScene, ITU_EVENT_TIMER, 0, 0, 0);
-	        if (result)
-	        {
-	            ituSceneDraw(&theScene, g_ScreenSurf);
-	            ituFlip(g_ScreenSurf);
-	        }
-		}
 		
 		// add by chenbh 
 		if ((sys_get_media_state() == SYS_MEDIA_INTERCOM) ||

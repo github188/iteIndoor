@@ -52,7 +52,6 @@ MEDIA_LYLY_CTRL g_LylyRecordCtrl =
 	NULL
 };
 
-// modi by luofl 2014-08-28 铃声音量最大级超过标准85DB
 uint8 AudioVolumeLevel[9] = {0, 30, 40, 50, 60, 65, 70, 75, 80};
 
 // add by chenbh 2016-10-13 mic输入音量等级

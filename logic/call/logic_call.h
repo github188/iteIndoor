@@ -60,6 +60,16 @@ struct ThreadInfo
 
 
 /*************************************************
+  Function:			call_get_media_ifover
+  Description: 		音视频媒体是否已经关闭
+  Input: 			
+  Output:			无
+  Return:			
+  Others:
+*************************************************/
+uint8 call_get_media_ifover(void);
+
+/*************************************************
   Function:			get_fenji_ipaddr
   Description:		获取分机IP
   Input: 	
@@ -156,16 +166,6 @@ int32 inter_answer_call(int32 * VideoSendrecv);
   Others:
 *************************************************/
 void inter_hand_down(void);
-
-/*************************************************
-  Function:			inter_hand_down
-  Description:		挂断
-  Input: 			无
-  Output:			无
-  Return:			成功与否 TRUE/FALSE
-  Others:
-*************************************************/
-void arbi_inter_hand_down(void);
 
 /*************************************************
   Function:			phone_hand_down

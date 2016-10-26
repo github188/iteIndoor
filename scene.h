@@ -201,6 +201,16 @@ void show_sys_event_hint(uint16 EventType);
 *************************************************/
 void ScenePredraw(int arg);
 
+/**
+ * updata mainmenu data
+ */
+void SyncMainMenu(void);
+
+/**
+ * Refresh screen.
+ */
+void SceneRefresh(void);
+
 // scene
 /**
  * Initializes scene module.

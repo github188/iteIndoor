@@ -117,6 +117,8 @@ extern "C" {
 #define ESID_Set_Rtsp_Port_Null			(g_China ? (g_Big5 ? "端口號不能為空" : "端口号不能为空") : "Pls enter port number!")
 #define ESID_Set_Rtsp_Channel_Null		(g_China ? (g_Big5 ? "視頻通道不能為空" : "视频通道不能为空") : "Pls enter channel number!")
 #define ESID_Set_Ring_Tips_Fail		    (g_China ? (g_Big5 ? "請錄製留言提示音" : "请录制留言提示音") : "Please record messages prompt tone.")	
+
+//设置提示框
 #define ESID_Msg_Connect_Outtime        (g_China ? (g_Big5 ? "連接超時..." : "连接超时...") : "Connection timeout!")
 #define ESID_Msg_Save_OK				(g_China ? (g_Big5 ? "保存成功" : "保存成功") : "OK!")
 #define ESID_Msg_Save_Err				(g_China ? (g_Big5 ? "保存失敗" : "保存失败") : "Failed!")
@@ -130,6 +132,29 @@ extern "C" {
 #define ESID_Msg_IP_Unline              (g_China ? (g_Big5 ? "IP協議轉換器未在線" : "IP协议转换器未在线") : "IP Converter Offline.")
 #define ESID_Msg_Obtain_Jd_False        (g_China ? (g_Big5 ? "獲取家電信息失敗！" : "获取家电信息失败！") : "Obtain appliance info. failed!")
 #define ESID_Msg_JD_Mode_Unused         (g_China ? (g_Big5 ? "家電控制器未啟用" : "家电控制器未启用") : "Appliance controller disabled")
+#define ESID_Msg_JD_Yuyue_UnDevice      (g_China ? (g_Big5 ? "未選中設備，保存失敗！" : "未选中设备，保存失败！") : "Device has not been chosen and cannot be saved.")
+
+
+// 预约文字
+#define ESID_Jd_Yuyue		            (g_China ? (g_Big5 ? "家電預約" : "家电预约") : "Households Reservation")	
+#define ESID_Jd_Yuyue_Del		        (g_China ? (g_Big5 ? "刪除預約" : "删除预约") : "Delete reservation")
+#define ESID_Jd_Yuyue_EveryDay          (g_China ? (g_Big5 ? "每天" : "每天") : "Daily")
+#define ESID_Jd_Yuyue_EveryWeek         (g_China ? (g_Big5 ? "每週" : "每周") : "Weekly")
+#define ESID_Jd_Yuyue_EveryMonth        (g_China ? (g_Big5 ? "每月" : "每月") : "Monthly")
+#define ESID_Jd_Yuyue_Day               (g_China ? (g_Big5 ? "號" : "号") : "Day")
+#define ESID_Jd_Yuyue_Week_Sun          (g_China ? (g_Big5 ? "星期日" : "星期日") : "Sun.")
+#define ESID_Jd_Yuyue_Week_Mon          (g_China ? (g_Big5 ? "星期一" : "星期一") : "Mon.")
+#define ESID_Jd_Yuyue_Week_Tue          (g_China ? (g_Big5 ? "星期二" : "星期二") : "Tues.")
+#define ESID_Jd_Yuyue_Week_Wed          (g_China ? (g_Big5 ? "星期三" : "星期三") : "Wed.")
+#define ESID_Jd_Yuyue_Week_Thu          (g_China ? (g_Big5 ? "星期四" : "星期四") : "Thur.")
+#define ESID_Jd_Yuyue_Week_Fri          (g_China ? (g_Big5 ? "星期五" : "星期五") : "Fri.")
+#define ESID_Jd_Yuyue_Week_Sat          (g_China ? (g_Big5 ? "星期六" : "星期六") : "Sat.")
+#define ESID_Jd_Yuyue_Action_Open       (g_China ? (g_Big5 ? "开启" : "开启") : "ON")
+#define ESID_Jd_Yuyue_Action_Close      (g_China ? (g_Big5 ? "關閉" : "关闭") : "OFF")
+#define ESID_Jd_Yuyue_Dev_None          (g_China ? (g_Big5 ? "無設備" : "无设备") : "None")
+#define ESID_Jd_Dev_Set_Attr            (g_China ? (g_Big5 ? "屬性" : "属性") : "Property")
+#define ESID_Jd_Dev_Set_Light           (g_China ? (g_Big5 ? "亮度" : "亮度") : "Brightness")
+#define ESID_Jd_Dev_Set_Temp            (g_China ? (g_Big5 ? "溫度" : "温度") : "Temperature")
 
 // IP协议转换器
 #define ESID_Set_Unbounded				 (g_China ? (g_Big5 ? "未綁定" : "未绑定") : "Unbounded")
@@ -567,6 +592,11 @@ extern "C" {
 #define ESID_Jd_KongTiao_Leisure         (g_China ? (g_Big5 ? "休閒" : "休闲") : "Casual")
 #define ESID_Jd_KongTiao_Sleep           (g_China ? (g_Big5 ? "睡眠" : "睡眠") : "Sleep")
 #define ESID_Jd_KongTiao_Close           (g_China ? (g_Big5 ? "關閉" : "关闭") : "OFF")
+#define ESID_Jd_Light_Control            (g_China ? (g_Big5 ? "燈光控制" : "灯光控制") : "Light control")
+#define ESID_Jd_Kongtiao_Control         (g_China ? (g_Big5 ? "空調控制" : "空调控制") : "A/C control")
+#define ESID_Jd_Chuanlian_Control        (g_China ? (g_Big5 ? "窗簾控制" : "窗帘控制") : "Curtain control")
+#define ESID_Jd_Dianyuan_Control         (g_China ? (g_Big5 ? "電源控制" : "电源控制") : "Socket control")
+#define ESID_Jd_Meiqi_Control            (g_China ? (g_Big5 ? "煤氣控制" : "煤气控制") : "Gas control")
 
 //主界面文字
 #define ESID_Main_Missed_Call			 (g_China ? (g_Big5 ? "未接來電" : "未接来电") : "MissedCall")
@@ -675,13 +705,14 @@ typedef enum
 	SID_Set_Rtsp_Port_Null,
 	SID_Set_Rtsp_Channel_Null,
 	SID_Set_Ring_Tips_Fail,
+
+	//设置提示框
 	SID_Msg_Connect_Outtime,
 	SID_Msg_Save_OK,
 	SID_Msg_Save_Err,
 	SID_Msg_Param_Save,
 	SID_Msg_Operat_OK,
 	SID_Msg_Operat_Err,
-	SID_Net_Door_Card_Delet_All,
 	SID_Msg_Format,
 	SID_Msg_Recover_OK,
 	SID_Msg_Return_FactorySet,
@@ -689,6 +720,28 @@ typedef enum
 	SID_Msg_IP_Unline,
 	SID_Msg_Obtain_Jd_False,
 	SID_Msg_JD_Mode_Unused,
+	SID_Msg_JD_Yuyue_UnDevice,
+
+	// 预约文字
+	SID_Jd_Yuyue,
+	SID_Jd_Yuyue_Del,
+	SID_Jd_Yuyue_EveryDay,
+	SID_Jd_Yuyue_EveryWeek,
+	SID_Jd_Yuyue_EveryMonth,
+	SID_Jd_Yuyue_Day,
+	SID_Jd_Yuyue_Week_Sun,
+	SID_Jd_Yuyue_Week_Mon,
+	SID_Jd_Yuyue_Week_Tue,
+	SID_Jd_Yuyue_Week_Wed,
+	SID_Jd_Yuyue_Week_Thu,
+	SID_Jd_Yuyue_Week_Fri,
+	SID_Jd_Yuyue_Week_Sat, 
+	SID_Jd_Yuyue_Action_Open,
+	SID_Jd_Yuyue_Action_Close,
+	SID_Jd_Yuyue_Dev_None,
+	SID_Jd_Dev_Set_Attr,
+	SID_Jd_Dev_Set_Light,
+	SID_Jd_Dev_Set_Temp,
 
 	// IP协议转换器
 	SID_Set_Unbounded,
@@ -701,7 +754,6 @@ typedef enum
 	SID_Set_Bind_OK,
 	SID_Set_Bind_Fail,	
 
-
 	// 网络门前机文字
 	SID_Net_Door, 
 	SID_Net_Door_First,
@@ -709,7 +761,7 @@ typedef enum
 	SID_Net_Door_NetParam,
 	SID_Net_Door_Get_MAC,
 	SID_Net_Door_Save_Reboot_Door,
-
+	SID_Net_Door_Card_Delet_All,
 
 	// 报警文字
 	SID_Bj_Report_Type_Chufa,
@@ -767,7 +819,6 @@ typedef enum
 	SID_Bj_Mode_Unused,
 	SID_Bj_Set_Err, 
 
-
 	// 对讲文字
 	SID_MainMonitor_Door,
 	SID_MainMonitor_Stair,
@@ -805,6 +856,7 @@ typedef enum
 	SID_Inter_busy,
 	SID_Inter_ConnFailed,
 	SID_Inter_SearchFailed,
+	SID_Dev_Busy,
 
 	// 家电文字
 	SID_Jd_Set,
@@ -1125,6 +1177,11 @@ typedef enum
 	SID_Jd_KongTiao_Leisure,
 	SID_Jd_KongTiao_Sleep,
 	SID_Jd_KongTiao_Close,
+	SID_Jd_Light_Control,
+	SID_Jd_Kongtiao_Control,
+	SID_Jd_Chuanlian_Control,
+	SID_Jd_Dianyuan_Control,
+	SID_Jd_Meiqi_Control,
 
 	//主界面文字
 	SID_Main_Missed_Call,

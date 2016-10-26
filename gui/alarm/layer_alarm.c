@@ -302,7 +302,6 @@ static void clone_one_list(uint8 num)
 		ituWidgetSetName(AlarmRecordList2Text, tmp);
 
 		ituWidgetAdd(AlarmRecordListCoverFlow, AlarmRecordListBackground);	
-		//ituSceneUpdate(AlarmRecordListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
 		ituCoverFlowUpdate((ITUWidget*)AlarmRecordListCoverFlow, ITU_EVENT_LAYOUT, 0, 0, 0);
 	}
 }
@@ -601,6 +600,8 @@ static void update_area_state(uint8 clone_flag)
 	is24hour = af_data.is_24_hour;
 	no24clear = alarm_get_24clear_param();
 	no24touch = alarm_get_no24touch_param();
+
+	debug_log("is24hour %d, no24clear = %d, no24touch = %d\n", is24hour, no24clear, no24touch);
 
 	memset(g_sprite_shanshuo_flag, 0, sizeof(g_sprite_shanshuo_flag));
 	g_timer_show_shanshuo_flag = 0;
@@ -1177,6 +1178,7 @@ bool AlarmRightButtonOnMouseUp(ITUWidget* widget, char* param)
 		if (1 == alarming)
 		{
 			ShowAlarmFailHitMsgWin(9);
+			ituRadioBoxSetChecked(AlarmRightSecurityRadioBox, true);
 		}
 		else
 		{
@@ -1188,6 +1190,7 @@ bool AlarmRightButtonOnMouseUp(ITUWidget* widget, char* param)
 		if (1 == alarming)
 		{
 			ShowAlarmFailHitMsgWin(9);
+			ituRadioBoxSetChecked(AlarmRightSecurityRadioBox, true);
 		}
 		else
 		{

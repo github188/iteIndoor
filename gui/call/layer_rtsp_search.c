@@ -457,9 +457,10 @@ bool RTSPSearchLayerOnTimer(ITUWidget* widget, char* param)
 			}
 		}
 		#endif
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 /*************************************************

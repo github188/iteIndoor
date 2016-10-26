@@ -350,6 +350,10 @@ bool SetRtspOnEnter(ITUWidget* widget, char* param)
 		ituWidgetSetVisible(SetRtspFactoryMsgBackground, false);
 		ituWidgetSetVisible(SetRtspBackground, true);
 		ituWidgetSetVisible(SetRtspCoverFlow, true);
+		if (!ituWidgetIsEnabled(SetRtspBackground))
+		{
+			ituWidgetEnable(SetRtspBackground);
+		}
 	}
 	else if (strcmp(param, "SetNumKeyBordLayer") == 0)
 	{
@@ -415,6 +419,11 @@ static void ShowSetCameraParam()
 
 	// 固定
 	sprintf(g_homedev.DeviceName, "%s", text_tmp);
+
+	if ((strcmp(g_homedev.FactoryName, "HIKVISION") != 0) && (strcmp(g_homedev.FactoryName, "SelfIPC") != 0))
+	{
+		strcpy(g_homedev.FactoryName, "HIKVISION");
+	}
 #endif
 
 	for (i = 0; i < 9; i++)

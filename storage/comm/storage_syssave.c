@@ -107,11 +107,7 @@ SYSCONFIG gRecoSysConfig =
 	""},							// user_server家政密码	
 	// 留影留言参数
 	{LYLY_TYPE_VIDEO, 			// Mode 留言模式
-	#ifdef _USE_FOR_SHOW_
-	0,							// Enable 留言使能
-	#else
 	1,							// Enable 留言使能
-	#endif
 	{0, 0, 0},					// Link留言的联动
 	0},							// default_tip留言的默认提示音 0 默认 1 自动录制
 	// 免打扰
@@ -247,11 +243,7 @@ const SYSCONFIG  gInitSysConfig =
 	""},							// user_server家政密码	
 	// 留影留言参数
 	{LYLY_TYPE_VIDEO, 			// Mode 留言模式
-	#ifdef _USE_FOR_SHOW_
-	0,							// Enable 留言使能
-	#else
 	1,							// Enable 留言使能
-	#endif
 	{0, 0, 0},					// Link留言的联动
 	0},							// default_tip留言的默认提示音 0 默认 1 自动录制
 	// 免打扰

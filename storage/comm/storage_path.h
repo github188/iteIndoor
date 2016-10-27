@@ -96,9 +96,12 @@
 /**************************************************************************/
 /*									信息								  */	
 /**************************************************************************/
-#define MSG_DIR_PATH			CFG_TEMP_DRIVE":/INFO"								// 信息文件夹		
-#define MSG_MANAGE_PATH			CFG_TEMP_DRIVE":/INFO/MANAGE.BIN"						// 信息管理文件
-#define MSG_VOICE_PATH			CFG_TEMP_DRIVE":/INFO/VOICE"							// 信息声音文件
+//#define MSG_DIR_PATH			CFG_TEMP_DRIVE":/INFO"								// 信息文件夹		
+//#define MSG_MANAGE_PATH			CFG_TEMP_DRIVE":/INFO/MANAGE.BIN"						// 信息管理文件
+//#define MSG_VOICE_PATH			CFG_TEMP_DRIVE":/INFO/VOICE"							// 信息声音文件
+#define MSG_DIR_PATH			"D:/INFO"								// 信息文件夹		
+#define MSG_MANAGE_PATH			"D:/INFO/MANAGE.BIN"						// 信息管理文件
+#define MSG_VOICE_PATH			"D:/INFO/VOICE"							// 信息声音文件
 
 // 信息提示音
 #define MSG_HIT1_PATH			CFG_PRIVATE_DRIVE":/res/rings/Hit/MSG1.WAV"				// 信息提示音1

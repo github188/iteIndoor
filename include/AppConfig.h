@@ -116,7 +116,7 @@
 #define V7M_ML_VER				4					// 米粒V7M版本
 #define V7M_TF_VER				5					// 天富V7M版本
 
-#define VER_TYPE				V7M_ML_VER
+#define VER_TYPE				E81_AH_VER
 
 
 

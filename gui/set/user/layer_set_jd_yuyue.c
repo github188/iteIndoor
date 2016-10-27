@@ -308,7 +308,7 @@ bool SetJdYuYueListDataButtonOnMouseUp(ITUWidget* widget, char* param)
 	if (0 == JdYuyueList->nCount)
 	{
 		debug_log("JdYuyueList->nCount = 0 !!!\n");
-		return;
+		return false;
 	}
 
 	for (i = 0; i < JdYuyueList->nCount; i++)
